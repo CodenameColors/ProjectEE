@@ -1,0 +1,15 @@
+C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\itemCreation\bin\Debug\itemCreation.exe.config
+C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\itemCreation\bin\Debug\itemCreation.exe
+C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\itemCreation\bin\Debug\itemCreation.pdb
+C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\itemCreation\obj\Debug\itemCreation.csprojAssemblyReference.cache
+C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\itemCreation\obj\Debug\MainWindow.g.cs
+C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\itemCreation\obj\Debug\App.g.cs
+C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\itemCreation\obj\Debug\itemCreation_MarkupCompile.cache
+C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\itemCreation\obj\Debug\itemCreation_MarkupCompile.lref
+C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\itemCreation\obj\Debug\MainWindow.baml
+C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\itemCreation\obj\Debug\itemCreation.g.resources
+C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\itemCreation\obj\Debug\itemCreation.Properties.Resources.resources
+C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\itemCreation\obj\Debug\itemCreation.csproj.GenerateResource.cache
+C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\itemCreation\obj\Debug\itemCreation.csproj.CoreCompileInputs.cache
+C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\itemCreation\obj\Debug\itemCreation.exe
+C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\itemCreation\obj\Debug\itemCreation.pdb
