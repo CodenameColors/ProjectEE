@@ -29,12 +29,12 @@
     <ControlTemplate x:Key="LevelEditorTileMap_Template">
       <TabControl Background="#FF2B2B2B">
         <TabItem Header="Tile Map" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
-          <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,4,5,7" IsEnabled="False">
+          <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,4,5,7" IsEnabled="True">
             <Canvas Margin="0,0,0,0" x:Name="TileMap_Canvas" IsHitTestVisible="True" MouseWheel="LevelEditor_Canvas_MouseWheel" Width="512" Height="512" MouseLeftButtonDown="TileMap_Canvas_MouseLeftButtonDown" MouseMove="TileMap_Canvas_MouseMove" HorizontalAlignment="Left" VerticalAlignment="Top" >
               <Canvas.Background>
                 <VisualBrush x:Name="LevelEditorTileMapCanvas_VB" TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute" Stretch="Uniform" >
                   <VisualBrush.Visual>
-                    <Rectangle Width="10" Height="10" Fill="Black" Stroke="White" StrokeThickness=".1" MouseDown="Rectangle_MouseDown" />
+                    <Rectangle Width="10" Height="10" Fill="Black" Stroke="White" StrokeThickness=".1"/>
                   </VisualBrush.Visual>
                 </VisualBrush>
               </Canvas.Background>
@@ -68,11 +68,12 @@
         <!--MINIMAP-->
         <!--<Label Content="Full Map:" VerticalAlignment="Top" HorizontalAlignment="Stretch" Grid.Row="0" Foreground="Black"/>-->
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,4,5,5">
-          <Canvas x:Name="LevelEditor_Canvas" IsHitTestVisible="True" Grid.Column="2"  Grid.Row="0" MouseWheel="LevelEditor_Canvas_MouseWheel" MouseDown="LevelEditor_Canvas_MouseDown" Width="Auto" Height="Auto" >
+          <Canvas x:Name="LevelEditor_Canvas" IsHitTestVisible="True" Grid.Column="2"  Grid.Row="0" MouseWheel="LevelEditor_Canvas_MouseWheel" 
+                  Width="Auto" Height="Auto" >
             <Canvas.Background>
               <VisualBrush x:Name="FullLeditorGrid_VB" TileMode="Tile" Viewport="0,0,10,10" ViewportUnits="Absolute" Stretch="Uniform" >
                 <VisualBrush.Visual>
-                  <Rectangle Width="10" Height="10" Fill="Black" Stroke="White" StrokeThickness=".1" MouseDown="Rectangle_MouseDown" />
+                  <Rectangle Width="10" Height="10" Fill="Black" Stroke="White" StrokeThickness=".1" />
                 </VisualBrush.Visual>
               </VisualBrush>
             </Canvas.Background>
@@ -237,7 +238,7 @@
             <MenuItem Header="Cut" Foreground="Black"/>
             <MenuItem Header="Paste" Foreground="Black"/>
             <Separator />
-            <MenuItem Header="Project Settings" Foreground="Black" Click="MenuItem_Click"/>
+            <MenuItem Header="Project Settings" Foreground="Black" Click="ProjectSettingsMenuItem_Click"/>
           </MenuItem>
         </Menu>
         <Menu DockPanel.Dock="Top" Grid.Column="3" Background="Transparent" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0">
@@ -283,7 +284,7 @@
       <!--The editor objects window-->
       <Label x:Name="label3" Content="Editor Objects" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top"/>
       <Label Content="Desc" Foreground="White" HorizontalAlignment="Right" Margin="0,0,20,351" />
-      <CheckBox HorizontalAlignment="Right" Margin="0,8,4,0" x:Name="Desc_CB" Click="Desc_CB_Click" Checked="Desc_CB_Checked" VerticalAlignment="Top" Background="#FF484848" Foreground="White" />
+      <CheckBox HorizontalAlignment="Right" Margin="0,8,4,0" x:Name="Desc_CB" Click="Desc_CB_Click" VerticalAlignment="Top" Background="#FF484848" Foreground="White" />
       <Label Content="Import" Foreground="White" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,18,20,0"/>
 
       <Button Width="15" Height="15" Margin="0,25,4,0" VerticalAlignment="Top" HorizontalAlignment="Right" Background="#FF484848" Foreground="White" VerticalContentAlignment="Center" Click="ImportToEditor">
@@ -321,9 +322,9 @@
         <Button Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Top" Height="22" Background="#FF383838" Foreground="White" Content="Play" Width="52" />
       </Grid>
 
-      <GridSplitter x:Name="gridSplitter" Grid.Column="1" HorizontalAlignment="Left"  VerticalAlignment="Stretch" Width="3"  Background="#FF868686" DragDelta="gridSplitter_DragDelta" />
+      <GridSplitter x:Name="gridSplitter" Grid.Column="1" HorizontalAlignment="Left"  VerticalAlignment="Stretch" Width="3"  Background="#FF868686" />
       <GridSplitter x:Name="gridSplitter1" Grid.Column="2" HorizontalAlignment="Left"  VerticalAlignment="Stretch" Width="3"  Background="#FF868686"/>
-      <TabControl x:Name="EditorWindows_TB" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White" Margin="10,30,5,6" BorderBrush="#FF3C3C3C" SelectionChanged="EditorWindows_TB_SelectionChanged">
+      <TabControl x:Name="EditorWindows_TC" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White" Margin="10,30,5,6" BorderBrush="#FF3C3C3C" SelectionChanged="EditorWindows_TC_SelectionChanged">
         <!--LEVEL EDITOR STARTS HERE-->
         <TabItem Header="Level Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
           <Grid Background="#FF3C3C3C">
@@ -349,13 +350,13 @@
 
             <!--<GridSplitter Background="White" HorizontalAlignment="Stretch" Height="3" Margin="0,0,0,0" Grid.Row="1" VerticalAlignment="Top" />-->
             <Canvas Grid.Row="0" x:Name="LevelEditor_BackCanvas" IsHitTestVisible="True" Grid.Column="0" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" 
-										MouseWheel="LevelEditor_Canvas_MouseWheel" MouseDown="LevelEditor_Canvas_MouseDown" MouseRightButtonDown="LevelEditor_BackCanvas_MouseRightButtonDown" 
-										MouseMove="LevelEditor_BackCanvas_MouseMove" MouseUp="LevelEditor_BackCanvas_MouseUp" SizeChanged="LevelEditor_BackCanvas_SizeChanged"
-										ClipToBounds="True" IsEnabled="False">
+										MouseWheel="LevelEditor_Canvas_MouseWheel" 
+										MouseMove="LevelEditor_BackCanvas_MouseMove" SizeChanged="LevelEditor_BackCanvas_SizeChanged"
+										ClipToBounds="True">
               <Canvas.Background>
                 <VisualBrush x:Name="Canvas_grid" TileMode="Tile" Stretch="Fill" Viewport="0,0,40,40" ViewportUnits="Absolute" >
                   <VisualBrush.Visual>
-                    <Rectangle Width="10" Height="10" Fill="Black" Stroke="Gray" StrokeThickness=".1" MouseDown="Rectangle_MouseDown" />
+                    <Rectangle Width="10" Height="10" Fill="Black" Stroke="Gray" StrokeThickness=".1" />
                   </VisualBrush.Visual>
                 </VisualBrush>
               </Canvas.Background>
@@ -403,7 +404,8 @@
         <ColumnDefinition Width="2.5*" MinWidth="250"/>
       </Grid.ColumnDefinitions>
       <Label x:Name="label" Content="Project Explorer" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="25" FontSize="12" Foreground="White" Margin="1,0,0,0"/>
-      <TreeView x:Name="treeView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#FF2B2B2B" Foreground="White" Margin="0,25,0,0" BorderBrush="Transparent" SelectedItemChanged="treeView_SelectedItemChanged"/>
+      <TreeView x:Name="ProjectContentExplorer" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                Background="#FF2B2B2B" Foreground="White" Margin="0,25,0,0" BorderBrush="Transparent" SelectedItemChanged="ProjectContentExplorer_SelectedItemChanged"/>
       <GridSplitter x:Name="Pro_Cont_GS" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="3" Background="#FF868686"/>
 
       <Label x:Name="label1" Content="Content Explorer" Grid.Column="1" HorizontalAlignment="Left" Margin="41,0,0,0" VerticalAlignment="Top" Foreground="White"/>
