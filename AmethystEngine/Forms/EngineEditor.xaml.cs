@@ -205,6 +205,178 @@ namespace AmethystEngine.Forms
       w.Show();
     }
 
+    #region This handles all the windows GUI features. Resize, fullscreen. etc
+
+    #region Resizing
+    private System.Windows.Interop.HwndSource _hwndSource;
+
+    protected override void OnInitialized(EventArgs e)
+    {
+      SourceInitialized += OnSourceInitialized;
+      base.OnInitialized(e);
+    }
+
+    private void OnSourceInitialized(object sender, EventArgs e)
+    {
+      _hwndSource = (System.Windows.Interop.HwndSource)PresentationSource.FromVisual(this);
+    }
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    private static extern IntPtr SendMessage(IntPtr hWnd, UInt32 msg, IntPtr wParam, IntPtr lParam);
+
+    protected void ResizeRectangle_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+      Rectangle rectangle = sender as Rectangle;
+      switch (rectangle.Name)
+      {
+        case "top":
+          Cursor = Cursors.SizeNS;
+          ResizeWindow(ResizeDirection.Top);
+          break;
+        case "bottom":
+          Cursor = Cursors.SizeNS;
+          ResizeWindow(ResizeDirection.Bottom);
+          break;
+        case "left":
+          Cursor = Cursors.SizeWE;
+          ResizeWindow(ResizeDirection.Left);
+          break;
+        case "right":
+          Cursor = Cursors.SizeWE;
+          ResizeWindow(ResizeDirection.Right);
+          break;
+        case "topLeft":
+          Cursor = Cursors.SizeNWSE;
+          ResizeWindow(ResizeDirection.TopLeft);
+          break;
+        case "topRight":
+          Cursor = Cursors.SizeNESW;
+          ResizeWindow(ResizeDirection.TopRight);
+          break;
+        case "bottomLeft":
+          Cursor = Cursors.SizeNESW;
+          ResizeWindow(ResizeDirection.BottomLeft);
+          break;
+        case "bottomRight":
+          Cursor = Cursors.SizeNWSE;
+          ResizeWindow(ResizeDirection.BottomRight);
+          break;
+        default:
+          break;
+      }
+    }
+
+    private void ResizeWindow(ResizeDirection direction)
+    {
+      SendMessage(_hwndSource.Handle, 0x112, (IntPtr)(61440 + direction), IntPtr.Zero);
+    }
+
+    private enum ResizeDirection
+    {
+      Left = 1,
+      Right = 2,
+      Top = 3,
+      TopLeft = 4,
+      TopRight = 5,
+      Bottom = 6,
+      BottomLeft = 7,
+      BottomRight = 8,
+    }
+
+    protected void OnPreviewMouseMove(object sender, MouseEventArgs e)
+    {
+      if (Mouse.LeftButton != MouseButtonState.Pressed)
+        Cursor = Cursors.Arrow;
+    }
+
+    public override void OnApplyTemplate()
+    {
+      /* omitted */
+
+      Grid resizeGrid = this.FindName("resizeGrid") as Grid;
+      if (resizeGrid != null)
+      {
+        foreach (UIElement element in resizeGrid.Children)
+        {
+          Rectangle resizeRectangle = element as Rectangle;
+          if (resizeRectangle != null)
+          {
+            resizeRectangle.PreviewMouseDown += ResizeRectangle_PreviewMouseDown;
+            resizeRectangle.MouseMove += ResizeRectangle_MouseMove;
+          }
+        }
+      }
+
+      base.OnApplyTemplate();
+    }
+
+    protected void ResizeRectangle_MouseMove(Object sender, MouseEventArgs e)
+    {
+      Rectangle rectangle = sender as Rectangle;
+      switch (rectangle.Name)
+      {
+        case "top":
+          Cursor = Cursors.SizeNS;
+          break;
+        case "bottom":
+          Cursor = Cursors.SizeNS;
+          break;
+        case "left":
+          Cursor = Cursors.SizeWE;
+          break;
+        case "right":
+          Cursor = Cursors.SizeWE;
+          break;
+        case "topLeft":
+          Cursor = Cursors.SizeNWSE;
+          break;
+        case "topRight":
+          Cursor = Cursors.SizeNESW;
+          break;
+        case "bottomLeft":
+          Cursor = Cursors.SizeNESW;
+          break;
+        case "bottomRight":
+          Cursor = Cursors.SizeNWSE;
+          break;
+        default:
+          break;
+      }
+    }
+    #endregion
+
+
+
+    private void LBind_close(object sender, RoutedEventArgs e)
+    {
+      System.Windows.Application.Current.Shutdown();
+    }
+    private void LBind_FullScreen(object sender, RoutedEventArgs e)
+    {
+      if (WindowState != WindowState.Maximized)
+      {
+        WindowState = WindowState.Maximized;
+        WindowStyle = WindowStyle.None;
+      }
+      else
+      {
+        WindowState = WindowState.Normal;
+        WindowStyle = WindowStyle.None;
+      }
+    }
+
+    private void LBind_Minimize(object sender, RoutedEventArgs e)
+    {
+      WindowState = WindowState.Minimized;
+      WindowStyle = WindowStyle.None;
+
+    }
+
+    private void LBind_DragMove(object sender, MouseButtonEventArgs e)
+    {
+      this.DragMove();
+    }
+    #endregion
 
     #region "Dynamic Template Binding"
     private void Desc_CB_Click(object sender, RoutedEventArgs e)
@@ -651,8 +823,7 @@ namespace AmethystEngine.Forms
     #region "Scene Viewer"
 
     #endregion
-
-
+    
     #region GetImageFromCanvas
     private BitmapImage GetJpgImage(BitmapSource source)
     {
@@ -700,179 +871,6 @@ namespace AmethystEngine.Forms
       ((DispatcherFrame)f).Continue = false;
       return null;
     }
-
-    #region This handles all the windows GUI features. Resize, fullscreen. etc
-
-    #region Resizing
-    private System.Windows.Interop.HwndSource _hwndSource;
-
-    protected override void OnInitialized(EventArgs e)
-    {
-      SourceInitialized += OnSourceInitialized;
-      base.OnInitialized(e);
-    }
-
-    private void OnSourceInitialized(object sender, EventArgs e)
-    {
-      _hwndSource = (System.Windows.Interop.HwndSource)PresentationSource.FromVisual(this);
-    }
-
-    [DllImport("user32.dll", CharSet = CharSet.Auto)]
-    private static extern IntPtr SendMessage(IntPtr hWnd, UInt32 msg, IntPtr wParam, IntPtr lParam);
-
-    protected void ResizeRectangle_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-    {
-      Rectangle rectangle = sender as Rectangle;
-      switch (rectangle.Name)
-      {
-        case "top":
-          Cursor = Cursors.SizeNS;
-          ResizeWindow(ResizeDirection.Top);
-          break;
-        case "bottom":
-          Cursor = Cursors.SizeNS;
-          ResizeWindow(ResizeDirection.Bottom);
-          break;
-        case "left":
-          Cursor = Cursors.SizeWE;
-          ResizeWindow(ResizeDirection.Left);
-          break;
-        case "right":
-          Cursor = Cursors.SizeWE;
-          ResizeWindow(ResizeDirection.Right);
-          break;
-        case "topLeft":
-          Cursor = Cursors.SizeNWSE;
-          ResizeWindow(ResizeDirection.TopLeft);
-          break;
-        case "topRight":
-          Cursor = Cursors.SizeNESW;
-          ResizeWindow(ResizeDirection.TopRight);
-          break;
-        case "bottomLeft":
-          Cursor = Cursors.SizeNESW;
-          ResizeWindow(ResizeDirection.BottomLeft);
-          break;
-        case "bottomRight":
-          Cursor = Cursors.SizeNWSE;
-          ResizeWindow(ResizeDirection.BottomRight);
-          break;
-        default:
-          break;
-      }
-    }
-
-    private void ResizeWindow(ResizeDirection direction)
-    {
-      SendMessage(_hwndSource.Handle, 0x112, (IntPtr)(61440 + direction), IntPtr.Zero);
-    }
-
-    private enum ResizeDirection
-    {
-      Left = 1,
-      Right = 2,
-      Top = 3,
-      TopLeft = 4,
-      TopRight = 5,
-      Bottom = 6,
-      BottomLeft = 7,
-      BottomRight = 8,
-    }
-
-    protected void OnPreviewMouseMove(object sender, MouseEventArgs e)
-    {
-      if (Mouse.LeftButton != MouseButtonState.Pressed)
-        Cursor = Cursors.Arrow;
-    }
-
-    public override void OnApplyTemplate()
-    {
-      /* omitted */
-
-      Grid resizeGrid = this.FindName("resizeGrid") as Grid;
-      if (resizeGrid != null)
-      {
-        foreach (UIElement element in resizeGrid.Children)
-        {
-          Rectangle resizeRectangle = element as Rectangle;
-          if (resizeRectangle != null)
-          {
-            resizeRectangle.PreviewMouseDown += ResizeRectangle_PreviewMouseDown;
-            resizeRectangle.MouseMove += ResizeRectangle_MouseMove;
-          }
-        }
-      }
-
-      base.OnApplyTemplate();
-    }
-
-    protected void ResizeRectangle_MouseMove(Object sender, MouseEventArgs e)
-    {
-      Rectangle rectangle = sender as Rectangle;
-      switch (rectangle.Name)
-      {
-        case "top":
-          Cursor = Cursors.SizeNS;
-          break;
-        case "bottom":
-          Cursor = Cursors.SizeNS;
-          break;
-        case "left":
-          Cursor = Cursors.SizeWE;
-          break;
-        case "right":
-          Cursor = Cursors.SizeWE;
-          break;
-        case "topLeft":
-          Cursor = Cursors.SizeNWSE;
-          break;
-        case "topRight":
-          Cursor = Cursors.SizeNESW;
-          break;
-        case "bottomLeft":
-          Cursor = Cursors.SizeNESW;
-          break;
-        case "bottomRight":
-          Cursor = Cursors.SizeNWSE;
-          break;
-        default:
-          break;
-      }
-    }
-    #endregion
-
-
-
-    private void LBind_close(object sender, RoutedEventArgs e)
-    {
-      System.Windows.Application.Current.Shutdown();
-    }
-    private void LBind_FullScreen(object sender, RoutedEventArgs e)
-    {
-      if (WindowState != WindowState.Maximized)
-      {
-        WindowState = WindowState.Maximized;
-        WindowStyle = WindowStyle.None;
-      }
-      else
-      {
-        WindowState = WindowState.Normal;
-        WindowStyle = WindowStyle.None;
-      }
-    }
-
-    private void LBind_Minimize(object sender, RoutedEventArgs e)
-    {
-      WindowState = WindowState.Minimized;
-      WindowStyle = WindowStyle.None;
-
-    }
-
-    private void LBind_DragMove(object sender, MouseButtonEventArgs e)
-    {
-      this.DragMove();
-    }
-    #endregion
 
     private void ProjectSettingsMenuItem_Click(object sender, RoutedEventArgs e)
     {
