@@ -136,115 +136,110 @@ namespace AmethystEngine.Forms
       LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\"));
     }
 
+    /// <summary>
+    /// Load the item source
+    /// </summary>
     private void LoadInitalVars()
     {
-
       PreviewMouseMove += OnPreviewMouseMove;
-      //EditorObj_list.Add(new EditorObject(new BitmapImage(new Uri("/WPF_MORE_TESTING;component/images/Ame_icon_small.png", UriKind.RelativeOrAbsolute)), "Left"));
-
-
-      //EditorObject E = new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png", "Leftt");
-      ////E.Thumbnail.Source = new BitmapImage(new Uri("/WPF_MORE_TESTING;component/images/Ame_icon_small.png", UriKind.Relative));
-
-      //EditorObj_list.Add(E);//Thumbnail = new Image() { Source = new BitmapImage(new Uri("images/Ame_icon_small.png", UriKind.Relative)) } });
-      //E = new EditorObject("/AmethystEngine;component/images/__pluse_and_minun___by_celsius_ice_rose.jpg", "pluse&minun");
-      //EditorObj_list.Add(E);//Thumbnail = new Image() { Source = new BitmapImage(new Uri("images/Ame_icon_small.png", UriKind.Relative)) } });
-      //E = new EditorObject("/AmethystEngine;component/images/500px-Mcol_money_bag.svg.png", "Money");
-      //EditorObj_list.Add(E);//Thumbnail = new Image() { Source = new BitmapImage(new Uri("images/Ame_icon_small.png", UriKind.Relative)) } });
-      //E = new EditorObject("/AmethystEngine;component/images/a50afebd-a3e7-42bb-9c0b-33d394d33334.gif", "sonic");
-      //EditorObj_list.Add(E);//Thumbnail = new Image() { Source = new BitmapImage(new Uri("images/Ame_icon_small.png", UriKind.Relative)) } });
-
-      //E = new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png", "Slide 1");
-      //Titles.Add(E);
-
-      //Titles = new List<EditorObject>()
-      //{
-      //	new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png","Slide 1"),
-      //	new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png","Slide 2"),
-      //	new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png","Slide 3"),
-      //	new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png","Slide 4"),
-      //	new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png","Slide 5"),
-      //	new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png","Slide 6"),
-      //	new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png","Slide 7"),
-      //	new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png","Slide 8"),
-      //	new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png","Slide 9"),
-      //	new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png","Slide 10"),
-      //	new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png","Slide 11"),
-      //	new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png","Slide 12"),
-      //};
-
       EditorObjects_LB.ItemsSource = EditorObj_list;
       SearchResultList.ItemsSource = Titles;
-
-      //IMGTEST();
     }
 
-    #region "Dynamic Template Binding"
+    /// <summary>
+    /// Opens up a file explorer and allows a user to choose a file location.
+    /// </summary>
+    /// <param name="prompt">What the File Explorer Window will display</param>
+    /// <param name="Open">Either a OpenFIleExplorer or a SaveFileExplorer</param>
+    /// <returns>File path as a String</returns>
+    public static String getFilePath(String prompt, bool Open = false)
+    {
+      if (!Open)
+      {
+        Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+        dlg.Title = prompt;
+        dlg.FileName = "IGNORE THIS"; //default file name
+        Nullable<bool> result = dlg.ShowDialog();
+        // Process save file dialog box results
+        string filename = "";
+        if (result == true)
+        {
+          // Save document
+          filename = dlg.FileName;
+          filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+        }
+        Console.WriteLine(filename);
+        return filename;
+      }
+      else
+      {
+        // Prepare a dummy string, thos would appear in the dialog
+        string dummyFileName = "";
 
+        SaveFileDialog sf = new SaveFileDialog();
+        // Feed the dummy name to the save dialog
+        sf.Title = "OpenFileRoot";
+        sf.FileName = "IGNORE THIS"; //default file name
+        sf.FileName = dummyFileName;
+        Nullable<bool> result = sf.ShowDialog();
+        if (result == true)
+        {
+          // Now here's our save folder
+          string savePath = System.IO.Path.GetDirectoryName(sf.FileName);
+          Console.WriteLine(savePath);
+          return savePath;
+          // Do whatever
+        }
+        return "";
+      }
+    }
+
+    /// <summary>
+    /// opens the form to create a new project.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void CreateNewProject(object sender, RoutedEventArgs e)
+    {
+      Window w = new NewProject_Form(this);
+      w.Show();
+    }
+
+
+    #region "Dynamic Template Binding"
+    private void Desc_CB_Click(object sender, RoutedEventArgs e)
+    {
+      if ((bool)Desc_CB.IsChecked)
+        EditorObjects_LB.ItemTemplate = (DataTemplate)this.Resources["BigEdit1"];
+      else
+      {
+        if (this.Resources.Contains("EObj_Small"))
+          EditorObjects_LB.ItemTemplate = (DataTemplate)this.Resources["BigEdit"];
+      }
+    }
+
+    private void EditorWindows_TC_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+      if (EditorWindows_TC.SelectedIndex == 0)
+      {
+        ContentLibrary_Control.Template = (ControlTemplate)this.Resources["LevelEditorTileMap_Template"];
+      }
+      else
+      {
+        ContentLibrary_Control.Template = (ControlTemplate)this.Resources["ContentLibaray_LB_Template"];
+        ((ListBox)(ContentLibrary_Control.Template.FindName("EditorObjects_LB", ContentLibrary_Control))).ItemTemplate =
+          (DataTemplate)this.Resources["BigEdit"];
+        ((ListBox)(ContentLibrary_Control.Template.FindName("EditorObjects_LB", ContentLibrary_Control))).ItemsSource = Titles;
+        //((ListBox)(ContentLibrary_Control.Template.FindName("EditorObjects_LB"))).ItemsSource = Titles;
+
+      }
+    }
     #endregion
 
     #region "File/Folder Viewer"
     #region "Folder viewer Tree"
-
-    #endregion
-
-    #region "File Traverse Item View"
-
-    #endregion
-    #endregion
-
-    #region "Level Editor"
-    #region "Tile Map"
-
-    #endregion
-
-    #region "Main Editor Canvas"
-    #region "Panning"
-
-    #endregion
-    #region "Zooming"
-
-    #endregion
-    #endregion
-
-    #region "Full Level Canvas"
-    #region "Property Hot Reloading"
-
-    #endregion
-    #endregion
-
-    #region "Tools"
-
-    #endregion
-    #endregion
-
-    #region "Content Library"
-
-    #endregion
-
-    #region "Scene Viewer"
-
-    #endregion
-
-    private void ImportButton_E(object sender, RoutedEventArgs e)
-    {
-      Console.WriteLine("pressed IMPORT");
-
-
-    }
-
-
-    private void LoadFileTree(String ProjPath = "")
-    {
-      String Path = (ProjPath == "" ? getFilePath("Get Root Node", true) : ProjPath);
-      if (Path != "")
-      {
-        ListDirectory(treeView, Path);
-      }
-    }
-
     //TODO: Multi lined label
-    private void treeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+    private void ProjectContentExplorer_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
       String TempPic = "/AmethystEngine;component/images/Ame_icon_small.png";
       CurTreeView = (TreeView)sender; Titles.Clear();
@@ -295,59 +290,319 @@ namespace AmethystEngine.Forms
       return directoryNode;
 
     }
-
-    public static String getFilePath(String prompt, bool Open = false)
+    /// <summary>
+    /// Load the ContentTree View with a file Tree.
+    /// </summary>
+    /// <param name="ProjPath"></param>
+    private void LoadFileTree(String ProjPath = "")
     {
-      if (!Open)
+      String Path = (ProjPath == "" ? getFilePath("Get Root Node", true) : ProjPath);
+      if (Path != "")
       {
-        Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-        dlg.Title = prompt;
-        dlg.FileName = "IGNORE THIS"; //default file name
-        Nullable<bool> result = dlg.ShowDialog();
-        // Process save file dialog box results
-        string filename = "";
-        if (result == true)
-        {
-          // Save document
-          filename = dlg.FileName;
-          filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
-        }
-        Console.WriteLine(filename);
-        return filename;
-      }
-      else
-      {
-        // Prepare a dummy string, thos would appear in the dialog
-        string dummyFileName = "";
-
-        SaveFileDialog sf = new SaveFileDialog();
-        // Feed the dummy name to the save dialog
-        sf.Title = "OpenFileRoot";
-        sf.FileName = "IGNORE THIS"; //default file name
-        sf.FileName = dummyFileName;
-        Nullable<bool> result = sf.ShowDialog();
-        if (result == true)
-        {
-          // Now here's our save folder
-          string savePath = System.IO.Path.GetDirectoryName(sf.FileName);
-          Console.WriteLine(savePath);
-          return savePath;
-          // Do whatever
-        }
-        return "";
+        ListDirectory(ProjectContentExplorer, Path);
       }
     }
+    #endregion
 
-
-
-
-    // TODO: set up the TRUE file structure and implement it here.
-    private void CreateNewProject(object sender, RoutedEventArgs e)
+    #region "File Traverse Item View"
+    private void DirectoryBack_BTN_Click(object sender, RoutedEventArgs e)
     {
-      Window w = new NewProject_Form(this);
-      w.Show();
+      if (((TreeViewItem)ProjectContentExplorer.SelectedItem).Parent != null)
+        try
+        {
+          ((TreeViewItem)((TreeViewItem)ProjectContentExplorer.SelectedItem).Parent).IsSelected = true;
+        }
+        catch (InvalidCastException) { return; }
+    }
+    private void SearchResultList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+      ((ListBox)sender).ItemsSource = Titles;
+
+      int i = (((ListBox)sender).SelectedIndex);
+      if (i < 0)
+        return;
+
+      switch (((EditorObject)Titles[i]).EditObjType)
+      {
+        case (EObjectType.None):
+          return;
+        case (EObjectType.File):
+          return;
+        case (EObjectType.Folder):
+          ((TreeViewItem)(((TreeViewItem)(ProjectContentExplorer.SelectedItem)).Items[((ListBox)sender).SelectedIndex])).IsSelected = true;
+          return;
+      }
+    }
+    #endregion
+    #endregion
+
+    #region "Level Editor"
+
+    #region "Tile Map"
+    //Creates a tile brush to paint the editor. Uses selected tile from tile map.
+    private void TileMap_Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+      RenderTargetBitmap rtb = new RenderTargetBitmap((int)TileMap_Canvas_temp.ActualWidth,
+       (int)TileMap_Canvas_temp.ActualHeight, 96d, 96d, System.Windows.Media.PixelFormats.Default);
+      rtb.Render(TileMap_Canvas_temp);
+
+      Point pp = Mouse.GetPosition(TileMap_Canvas_temp);
+      Console.WriteLine(pp.ToString());
+      pp.X -= Math.Floor(pp.X) % 32;  //TODO: Add the offset so we can fill the grid AFTER PAnNNG
+      pp.Y -= Math.Floor(pp.Y) % 32;
+      int x = (int)pp.X;
+      int y = (int)pp.Y;
+      Console.WriteLine(String.Format("x: {0},  y: {1}", x, y));
+      Console.WriteLine("");
+      var crop = new CroppedBitmap(rtb, new Int32Rect(x, y, 32, 32));
+      // using BitmapImage version to prove its created successfully
+      Image image2 = new Image(); image2.Source = crop; //cropped
+      imgtilebrush = new ImageBrush(image2.Source);
+      SelectedTile_Canvas.Children.Add(new Rectangle() { Width = 32, Height = 32, Fill = imgtilebrush, RenderTransform = new ScaleTransform(.5, .5) });
     }
 
+    private void TileMap_Canvas_MouseMove(object sender, MouseEventArgs e)
+    {
+      Canvas TileMap_Canvas_temp = (Canvas)(ContentLibrary_Control.Template.FindName("TileMap_Canvas", ContentLibrary_Control));
+      Point p = Mouse.GetPosition(TileMap_Canvas_temp);
+      String point = String.Format("({0}, {1})", (int)p.X, (int)p.Y);
+      LevelEditorCords_TB.Text = point;
+    }
+    #endregion
+
+    #region "Main Editor Canvas"
+    /// <summary>
+    /// handles left mouse button down events.
+    /// Painting the tile canvas is handled here.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+      if (imgtilebrush == null)
+      {
+        Console.WriteLine("no brush selected/tile");
+        return;
+      }
+      Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush };
+      Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
+      Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y);
+      LevelEditor_Canvas.Children.Add(r);
+
+      FullMapEditorFill(p);
+    }
+
+    private Point GetGridSnapCords(Point p)
+    {
+      int Xoff = (int)(Math.Abs(Canvas_grid.Viewport.X)) % EditorGridWidth; Xoff = EditorGridWidth - Xoff; //offset
+      int YOff = (int)(Math.Abs(Canvas_grid.Viewport.Y)) % EditorGridHeight; YOff = EditorGridHeight - YOff;
+
+      p.X /= ZoomLevel; p.Y /= ZoomLevel;
+      p.X -= Math.Floor(p.X - Xoff) % EditorGridWidth;  //TODO: Add the offset so we can fill the grid AFTER PAnNNG
+      p.Y -= Math.Floor(p.Y - YOff) % EditorGridHeight;
+      return p;
+    }
+
+    private void FullMapEditorFill(Point p)
+    {
+      //flll the data.
+      int fullY = (int)FullMapLEditor_Canvas.ActualHeight; fullY -= fullY % (NumOfCellsY);
+      int fullX = (int)FullMapLEditor_Canvas.ActualWidth; fullX -= fullX % (NumOfCellsX);
+      fullX = fullX / (NumOfCellsX);
+      fullY = fullY / (NumOfCellsY);
+      TileMapData[((int)p.X + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth,
+        ((int)p.Y + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight] = 1;
+
+      Rectangle r = new Rectangle() { Width = 4, Height = 4, Fill = imgtilebrush };
+
+      int setX = (4 * ((int)p.X / EditorGridWidth)) + ((int)GridOffset.X);
+      int setY = (4 * ((int)p.Y / EditorGridHeight)) + ((int)GridOffset.Y);
+
+      Canvas.SetLeft(r, setX); Canvas.SetTop(r, setY);
+      FullMapLEditor_Canvas.Children.Add(r);
+      FullMapCanvasHightlight_rect = r;
+    }
+
+    /// <summary>
+    /// This method takes care of mouse movement events on the main level editor canvas.
+    /// Panning is handled in here.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void LevelEditor_BackCanvas_MouseMove(object sender, MouseEventArgs e)
+    {
+      //we need to display the cords.
+      Point p = Mouse.GetPosition(LevelEditor_BackCanvas);
+      String point = String.Format("({0}, {1})", (int)p.X, (int)p.Y);
+      LevelEditorCords_TB.Text = point;
+
+      //which way is mouse moving?
+      MPos -= (Vector)e.GetPosition(LevelEditor_Canvas);
+      if (MPos.X == 0 && MPos.Y > 0) //north
+        MouseMovement = CardinalDirection.N;
+      if (MPos.X > 0 && MPos.Y > 0) //North East
+        MouseMovement = CardinalDirection.NE;
+      if (MPos.X > 0 && MPos.Y == 0) //East
+        MouseMovement = CardinalDirection.E;
+      if (MPos.X > 0 && MPos.Y < 0) //South East
+        MouseMovement = CardinalDirection.SE;
+      if (MPos.X == 0 && MPos.Y < 0) //South
+        MouseMovement = CardinalDirection.S;
+      if (MPos.X < 0 && MPos.Y < 0) //South West
+        MouseMovement = CardinalDirection.SW;
+      if (MPos.X < 0 && MPos.Y == 0) //West
+        MouseMovement = CardinalDirection.W;
+      if (MPos.X < 0 && MPos.Y > 0) //North West
+        MouseMovement = CardinalDirection.NW;
+      //is the middle mouse button down?
+      if (e.MiddleButton == MouseButtonState.Pressed)
+        LavelEditorPan();
+      MPos = e.GetPosition(LevelEditor_Canvas); //set this for the iteration
+    }
+
+    //this method is here to update the size of rectangle on the fullmap on the right.
+    /// <summary>
+    /// This method handles the changing of canvas size.
+    /// Changes the Selection Rect size to match the ratio of the main editor canvas.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void LevelEditor_BackCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+      if (FullMapLEditor_Canvas.Children.Count == 0) return;
+
+      int MainCurCellsX = ((int)Math.Ceiling((LevelEditor_BackCanvas.ActualWidth / Canvas_grid.Viewport.Width)));
+      int MainCurCellsY = ((int)Math.Ceiling(LevelEditor_BackCanvas.ActualHeight / Canvas_grid.Viewport.Height));
+
+      Rectangle r = new Rectangle() { Width = MainCurCellsX * 4, Height = MainCurCellsY * 4, Stroke = Brushes.White, StrokeThickness = 1, Name = "SelectionRect" };
+      TileMapData = new int[(NumOfCellsX), (NumOfCellsY)];
+      Canvas.SetLeft(r, 0); Canvas.SetTop(r, 0);
+
+      FullMapLEditor_Canvas.Children.RemoveAt(0);
+      FullMapLEditor_Canvas.Children.Insert(0, r);
+
+    }
+
+    #region "Panning"
+    /// <summary>
+    /// Performs the panning effect on the main level editor canvas.
+    /// </summary>
+    private void LavelEditorPan()
+    {
+      //this is here so when we pan the tiles work with the relative cords we are moving to. Its allows the tiles to maintain position data.
+      foreach (UIElement child in LevelEditor_Canvas.Children) 
+      {
+        double x = Canvas.GetLeft(child);
+        double y = Canvas.GetTop(child);
+        Canvas.SetLeft(child, x + MPos.X);
+        Canvas.SetTop(child, y + MPos.Y);
+      }
+      //moves the Grid, and canvas to perform a panning effect/.
+      Canvas_grid.Viewport = new Rect(Canvas_grid.Viewport.X + MPos.X, Canvas_grid.Viewport.Y + MPos.Y,
+        Canvas_grid.Viewport.Width, Canvas_grid.Viewport.Height);
+      FullMapLEditor_VB.Viewport = new Rect()
+      {
+        X = FullMapLEditor_VB.Viewport.X + MPos.X / 10,
+        Y = FullMapLEditor_VB.Viewport.Y + MPos.Y / 10,
+        Width = FullMapLEditor_VB.Viewport.Width,
+        Height = FullMapLEditor_VB.Viewport.Height
+      }; //desices how quick we will pan.
+      //Moves ONLY the selection rectangle in the full map viewer.
+      foreach (UIElement child in FullMapLEditor_Canvas.Children)
+      {
+        if (((Rectangle)child).Name == "SelectionRect")
+        {
+          double x = Canvas.GetLeft(child);
+          double y = Canvas.GetTop(child);
+          Canvas.SetLeft(child, x - MPos.X / 10); //TODO: give this an if statment so the grid cannot go off the screen.
+          Canvas.SetTop(child, y - MPos.Y / 10);  //SCALE use the ratio to pan and link both accurately
+        }
+      }
+      GridOffset.X -= MPos.X / 10; //keeps in sync
+      GridOffset.Y -= MPos.Y / 10;
+    }
+      
+    #endregion
+    #region "Zooming"
+    /// <summary>
+    /// handles mouse scroll events
+    /// Zooming is handled here.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void LevelEditor_Canvas_MouseWheel(object sender, MouseWheelEventArgs e)
+    {
+      Console.WriteLine("scroollll");
+
+      if (e.Delta > 0) //zoom in!
+      {
+        ZoomLevel += .2;
+        Canvas_grid.Transform = new ScaleTransform(ZoomLevel, ZoomLevel);
+        LevelEditor_Canvas.RenderTransform = new ScaleTransform(ZoomLevel, ZoomLevel);
+        Console.WriteLine(String.Format("W:{0},  H{1}", EditorGridWidth, EditorGridHeight));
+        //TODO: resize selection rectangle
+      }
+      else  //zoom out!
+      {
+        ZoomLevel -= .2;
+        Canvas_grid.Transform = new ScaleTransform(ZoomLevel, ZoomLevel);
+        LevelEditor_Canvas.RenderTransform = new ScaleTransform(ZoomLevel, ZoomLevel);
+        Console.WriteLine(String.Format("W:{0},  H{1}", EditorGridWidth, EditorGridHeight));
+        //TODO: resize selection rectangle
+      }
+    }
+    #endregion
+    #endregion
+
+    #region "Full Level Canvas"
+    private void scaleFullMapEditor()
+    {
+      FullMapLEditor_Canvas.Width = NumOfCellsX * 2;
+      FullMapLEditor_Canvas.Height = NumOfCellsY * 2;
+
+      Console.WriteLine("tewst");
+      int fullY = (int)FullMapLEditor_Canvas.Width; fullY -= fullY % (NumOfCellsY);
+      int fullX = (int)FullMapLEditor_Canvas.Height; fullX -= fullX % (NumOfCellsX);
+      int UniformCellHeight = (fullX / NumOfCellsX < fullY / NumOfCellsY ? fullX / NumOfCellsX : fullY / NumOfCellsY);
+      UniformCellHeight = 4;
+
+      FullMapLEditor_VB.Viewport = new Rect(0, 0, UniformCellHeight, UniformCellHeight);
+
+      //find out the num of cells in the MAIN grid editor
+      int MainCurCellsX = ((int)(LevelEditor_BackCanvas.ActualWidth / Canvas_grid.Viewport.Width));
+      int MainCurCellsY = ((int)(LevelEditor_BackCanvas.ActualHeight / Canvas_grid.Viewport.Height));
+
+      Rectangle r = new Rectangle() { Width = MainCurCellsX * 4, Height = MainCurCellsY * 4, Stroke = Brushes.White, StrokeThickness = 1, Name = "SelectionRect" };
+      TileMapData = new int[(NumOfCellsX), (NumOfCellsY)];
+      Canvas.SetLeft(r, 0); Canvas.SetTop(r, 0);
+      FullMapLEditor_Canvas.Children.Add(r);
+    }
+    
+    //quick move of the level editor canvas. when you click the screen renders that section.
+    private void EditorCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+
+      //LevelEditor_Canvas.se
+    }
+    #region "Property Hot Reloading"
+
+    #endregion
+    #endregion
+
+    #region "Tools"
+
+    #endregion
+    #endregion
+
+    #region "Content Library"
+    /// <summary>
+    /// When the import button is pressed in the content explorer section of the editor.
+    /// Functionality depends on the current open editor.
+    /// IF(LEVEL) {Only allow PNG}
+    /// ELSE {//TODO: WIP}
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     private void ImportToEditor(object sender, RoutedEventArgs e)
     {
       Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
@@ -357,21 +612,16 @@ namespace AmethystEngine.Forms
 
       // Show save file dialog box
       Nullable<bool> result = dlg.ShowDialog();
-
-      // Process save file dialog box results
+      // Process save file dialog box results kicks out if the user doesn't select an item.
       string filename = "";
       if (result == true)
-      {
-        // Save document
         filename = dlg.FileName;
-      }
       else
-      {
         return;
-      }
+
       Console.WriteLine(filename);
 
-      if (EditorWindows_TB.SelectedIndex == 0)
+      if (EditorWindows_TC.SelectedIndex == 0)
       {
         Canvas TileMap = (Canvas)ContentLibrary_Control.Template.FindName("TileMap_Canvas", ContentLibrary_Control);
         System.Windows.Media.Imaging.BitmapImage bmp = new System.Windows.Media.Imaging.BitmapImage();
@@ -396,6 +646,47 @@ namespace AmethystEngine.Forms
         EditorObjects_LB.ItemsSource = EditorObj_list;
       }
     }
+    #endregion
+
+    #region "Scene Viewer"
+
+    #endregion
+
+
+    #region GetImageFromCanvas
+    private BitmapImage GetJpgImage(BitmapSource source)
+    {
+      return GetImage(source, new JpegBitmapEncoder());
+    }
+
+    private BitmapImage GetPngImage(BitmapSource source)
+    {
+      return GetImage(source, new PngBitmapEncoder());
+    }
+
+    private BitmapImage GetImage(BitmapSource source, BitmapEncoder encoder)
+    {
+      var bmpImage = new BitmapImage();
+
+      using (var srcMS = new MemoryStream())
+      {
+        encoder.Frames.Add(BitmapFrame.Create(source));
+        encoder.Save(srcMS);
+
+        srcMS.Position = 0;
+        using (var destMS = new MemoryStream(srcMS.ToArray()))
+        {
+          bmpImage.BeginInit();
+          bmpImage.StreamSource = destMS;
+          bmpImage.CacheOption = BitmapCacheOption.OnLoad;
+          bmpImage.EndInit();
+          bmpImage.Freeze();
+        }
+      }
+      return bmpImage;
+    }
+    #endregion
+
 
     public void DoEvents()
     {
@@ -407,17 +698,8 @@ namespace AmethystEngine.Forms
     public object ExitFrame(object f)
     {
       ((DispatcherFrame)f).Continue = false;
-
       return null;
     }
-
-    private void IMGTEST()
-    {
-      //Assembly myAssembly = Assembly.GetExecutingAssembly();
-      //Stream myStream = myAssembly.GetManifestResourceStream(myAssembly.GetName().Name + "/images/smol megumin.jpg");
-      //System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(myStream);
-    }
-
 
     #region This handles all the windows GUI features. Resize, fullscreen. etc
 
@@ -592,68 +874,12 @@ namespace AmethystEngine.Forms
     }
     #endregion
 
-    private void Desc_CB_Checked(object sender, RoutedEventArgs e)
-    {
-
-    }
-
-
-    private void Desc_CB_Click(object sender, RoutedEventArgs e)
-    {
-      if ((bool)Desc_CB.IsChecked)
-        EditorObjects_LB.ItemTemplate = (DataTemplate)this.Resources["BigEdit1"];
-      else
-      {
-        if (this.Resources.Contains("EObj_Small"))
-          EditorObjects_LB.ItemTemplate = (DataTemplate)this.Resources["BigEdit"];
-      }
-    }
-
-    private void MenuItem_Click(object sender, RoutedEventArgs e)
+    private void ProjectSettingsMenuItem_Click(object sender, RoutedEventArgs e)
     {
       Window w = new ProjectSettings();
       w.Show();
     }
-
-    private void gridSplitter_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
-    {
-      Console.WriteLine(e.VerticalChange);
-      //EditorObjects_LB.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Stretch;
-    }
-
-    private void SearchResultList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-      ((ListBox)sender).ItemsSource = Titles;
-      Console.WriteLine("clicked on the thing");
-
-      int i = (((ListBox)sender).SelectedIndex);
-      if (i < 0)
-        return;
-
-      switch (((EditorObject)Titles[i]).EditObjType)
-      {
-        case (EObjectType.None):
-          return;
-        case (EObjectType.File):
-
-          return;
-        case (EObjectType.Folder):
-          ((TreeViewItem)(((TreeViewItem)(treeView.SelectedItem)).Items[((ListBox)sender).SelectedIndex])).IsSelected = true;
-          return;
-
-      }
-
-    }
-
-    private void DirectoryBack_BTN_Click(object sender, RoutedEventArgs e)
-    {
-      if (((TreeViewItem)treeView.SelectedItem).Parent != null)
-        try
-        {
-          ((TreeViewItem)((TreeViewItem)treeView.SelectedItem).Parent).IsSelected = true;
-        }
-        catch (InvalidCastException) { return; }
-    }
+    
     public void ProcessOutputDataHandler(object sendingProcess, DataReceivedEventArgs outLine)
     {
       // (outLine.Data) <- this field contains outputData text
@@ -670,342 +896,6 @@ namespace AmethystEngine.Forms
 
       }
     }
-
-    private void Canvas_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-      Console.WriteLine("new Height:  " + e.NewSize.Height);
-      Console.WriteLine("new Width:  " + e.NewSize.Width);
-      //LevelEditor_Canvas.vuew
-    }
-
-    private void LevelEditor_Canvas_MouseDown(object sender, MouseButtonEventArgs e)
-    {
-      //Console.WriteLine("rect clicked");
-      //if (e.MiddleButton == MouseButtonState.Pressed)
-      //{
-      //	Console.WriteLine("Middle Click");
-      //	Canvas_grid.Viewport = new Rect() { X = Canvas_grid.Viewport.X - 40, Y = Canvas_grid.Viewport.Y - 40, Width = EditorGridWidth, Height = EditorGridHeight };
-      //	foreach (UIElement child in LevelEditor_Canvas.Children)
-      //	{
-      //		double x = Canvas.GetLeft(child);
-      //		double y = Canvas.GetTop(child);
-      //		Canvas.SetLeft(child, x - 40);
-      //		Canvas.SetTop(child, y - 40);
-      //	}
-
-
-      //	FullMapLEditor_VB.Viewport = new Rect()
-      //	{
-      //		X = FullMapLEditor_VB.Viewport.X + 4,
-      //		Y = FullMapLEditor_VB.Viewport.Y + 4,
-      //		Width = FullMapLEditor_VB.Viewport.Width,
-      //		Height = FullMapLEditor_VB.Viewport.Height
-      //	};
-      //	foreach (UIElement child in FullMapLEditor_Canvas.Children)
-      //	{
-      //		if (((Rectangle)child).Name == "SelectionRect")
-      //		{
-      //			double x = Canvas.GetLeft(child);
-      //			double y = Canvas.GetTop(child);
-      //			Canvas.SetLeft(child, x + 4);
-      //			Canvas.SetTop(child, y + 4);
-      //			GridOffset.X += 1;
-      //			GridOffset.Y += 1;
-      //		}
-      //	}
-      //}
-    }
-
-    //this will allow the user to choose from a menu. most likely what type of sprite/background is this tile/sprite.
-    private void LevelEditor_BackCanvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-    {
-
-    }
-
-    //this method is here to update the size of rectangle on the fullmap on the right.
-    private void LevelEditor_BackCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-      if (FullMapLEditor_Canvas.Children.Count == 0) return;
-
-      int MainCurCellsX = ((int)Math.Ceiling((LevelEditor_BackCanvas.ActualWidth / Canvas_grid.Viewport.Width)));
-      int MainCurCellsY = ((int)Math.Ceiling(LevelEditor_BackCanvas.ActualHeight / Canvas_grid.Viewport.Height));
-
-      Rectangle r = new Rectangle() { Width = MainCurCellsX * 4, Height = MainCurCellsY * 4, Stroke = Brushes.White, StrokeThickness = 1, Name = "SelectionRect" };
-      TileMapData = new int[(NumOfCellsX), (NumOfCellsY)];
-      Canvas.SetLeft(r, 0); Canvas.SetTop(r, 0);
-
-      FullMapLEditor_Canvas.Children.RemoveAt(0);
-      FullMapLEditor_Canvas.Children.Insert(0, r);
-
-    }
-
-    //quick move of the level editor canvas. when you click the screen renders that section.
-    private void EditorCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-
-      //LevelEditor_Canvas.se
-    }
-    // ?
-    private void Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
-    {
-
-    }
-
-    private void Button_Click(object sender, RoutedEventArgs e)
-    {
-      //	Console.WriteLine("tewst");
-      //	int fullY = (int)FullMapLEditor_Canvas.ActualHeight; fullY -= fullY % int.Parse(NumOfCellsY);
-      //	int fullX = (int)FullMapLEditor_Canvas.ActualWidth; fullX -= fullX % int.Parse(NumOfCellsX);
-      //	//LevelEditorFull_Canvas.Width = fullX;
-      //	//LevelEditorFull_Canvas.Height = fullY;
-      //	//LevelEditorFull_Canvas.ActualHeight
-      //	//Canvas_grid.TileMode = TileMode.None;
-      //	FullMapLEditor_VB.Viewport = new Rect(0, 0, fullX / (NumOfCellsX), fullY / (NumOfCellsY));
-      //	Rectangle r = new Rectangle() { Width = 100, Height = 100, Stroke = Brushes.Black, StrokeThickness = 1 };
-      //	TileMapData = new int[(NumOfCellsX), (NumOfCellsY)];
-      //	Canvas.SetLeft(r, 0); Canvas.SetTop(r, 0);
-      //	FullMapLEditor_Canvas.Children.Add(r);
-    }
-
-    private void scaleFullMapEditor()
-    {
-      FullMapLEditor_Canvas.Width = NumOfCellsX * 2;
-      FullMapLEditor_Canvas.Height = NumOfCellsY * 2;
-
-      Console.WriteLine("tewst");
-      int fullY = (int)FullMapLEditor_Canvas.Width; fullY -= fullY % (NumOfCellsY);
-      int fullX = (int)FullMapLEditor_Canvas.Height; fullX -= fullX % (NumOfCellsX);
-      //LevelEditorFull_Canvas.Width = fullX;
-      //LevelEditorFull_Canvas.Height = fullY;
-      //LevelEditorFull_Canvas.ActualHeight
-      //Canvas_grid.TileMode = TileMode.None;
-
-      int UniformCellHeight = (fullX / NumOfCellsX < fullY / NumOfCellsY ? fullX / NumOfCellsX : fullY / NumOfCellsY);
-      UniformCellHeight = 4;
-
-      FullMapLEditor_VB.Viewport = new Rect(0, 0, UniformCellHeight, UniformCellHeight);
-
-      //find out the num of cells in the MAIN grid editor
-      int MainCurCellsX = ((int)(LevelEditor_BackCanvas.ActualWidth / Canvas_grid.Viewport.Width));
-      int MainCurCellsY = ((int)(LevelEditor_BackCanvas.ActualHeight / Canvas_grid.Viewport.Height));
-
-      Rectangle r = new Rectangle() { Width = MainCurCellsX * 4, Height = MainCurCellsY * 4, Stroke = Brushes.White, StrokeThickness = 1, Name = "SelectionRect" };
-      TileMapData = new int[(NumOfCellsX), (NumOfCellsY)];
-      Canvas.SetLeft(r, 0); Canvas.SetTop(r, 0);
-      FullMapLEditor_Canvas.Children.Add(r);
-    }
-
-
-    private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-      if (imgtilebrush == null)
-      {
-        Console.WriteLine("no brush selected/tile");
-        return;
-      }
-
-      //what is the current canvas offset?
-      Console.WriteLine(Canvas_grid.Viewport);
-      int Xoff = (int)(Math.Abs(Canvas_grid.Viewport.X)) % EditorGridWidth; Xoff = EditorGridWidth - Xoff;
-      int YOff = (int)(Math.Abs(Canvas_grid.Viewport.Y)) % EditorGridHeight; YOff = EditorGridHeight - YOff;
-
-      Canvas c = (Canvas)sender;
-      Point p = Mouse.GetPosition(LevelEditor_BackCanvas);
-      p.X /= ZoomLevel; p.Y /= ZoomLevel;
-      p.X -= Math.Floor(p.X - Xoff) % EditorGridWidth;  //TODO: Add the offset so we can fill the grid AFTER PAnNNG
-      p.Y -= Math.Floor(p.Y - YOff) % EditorGridHeight;
-      Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush };
-      Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y);
-      LevelEditor_Canvas.Children.Add(r);
-
-      //flll the data.
-      int fullY = (int)FullMapLEditor_Canvas.ActualHeight; fullY -= fullY % (NumOfCellsY);
-      int fullX = (int)FullMapLEditor_Canvas.ActualWidth; fullX -= fullX % (NumOfCellsX);
-      fullX = fullX / (NumOfCellsX);
-      fullY = fullY / (NumOfCellsY);
-
-      TileMapData[((int)p.X + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth,
-        ((int)p.Y + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight] = 1; //TODO: add offset for correct data
-      r = new Rectangle() { Width = 4, Height = 4, Fill = imgtilebrush };
-
-      int setX = (4 * ((int)p.X / EditorGridWidth)) + ((int)GridOffset.X);
-      int setY = (4 * ((int)p.Y / EditorGridHeight)) + ((int)GridOffset.Y);
-
-      Canvas.SetLeft(r, setX); Canvas.SetTop(r, setY);
-      FullMapLEditor_Canvas.Children.Add(r);
-      FullMapCanvasHightlight_rect = r;
-    }
-
-    //this method is here to allow pan movement on the main level editor window.
-    private void LevelEditor_BackCanvas_MouseMove(object sender, MouseEventArgs e)
-    {
-      //we need to display the cords.
-      Point p = Mouse.GetPosition(LevelEditor_BackCanvas);
-      String point = String.Format("({0}, {1})", (int)p.X, (int)p.Y);
-      LevelEditorCords_TB.Text = point;
-
-      //which way is mouse moving?
-      MPos -= (Vector)e.GetPosition(LevelEditor_Canvas);
-      if (MPos.X == 0 && MPos.Y > 0) //north
-        MouseMovement = CardinalDirection.N;
-      if (MPos.X > 0 && MPos.Y > 0) //North East
-        MouseMovement = CardinalDirection.NE;
-      if (MPos.X > 0 && MPos.Y == 0) //East
-        MouseMovement = CardinalDirection.E;
-      if (MPos.X > 0 && MPos.Y < 0) //South East
-        MouseMovement = CardinalDirection.SE;
-      if (MPos.X == 0 && MPos.Y < 0) //South
-        MouseMovement = CardinalDirection.S;
-      if (MPos.X < 0 && MPos.Y < 0) //South West
-        MouseMovement = CardinalDirection.SW;
-      if (MPos.X < 0 && MPos.Y == 0) //West
-        MouseMovement = CardinalDirection.W;
-      if (MPos.X < 0 && MPos.Y > 0) //North West
-        MouseMovement = CardinalDirection.NW;
-      //is the middle mouse button down?
-      if (e.MiddleButton == MouseButtonState.Pressed)
-      {
-        Console.WriteLine("Middle Click");
-
-        foreach (UIElement child in LevelEditor_Canvas.Children)
-        {
-          double x = Canvas.GetLeft(child);
-          double y = Canvas.GetTop(child);
-          Canvas.SetLeft(child, x + MPos.X);
-          Canvas.SetTop(child, y + MPos.Y);
-        }
-        Canvas_grid.Viewport = new Rect(Canvas_grid.Viewport.X + MPos.X, Canvas_grid.Viewport.Y + MPos.Y,
-          Canvas_grid.Viewport.Width, Canvas_grid.Viewport.Height);
-        FullMapLEditor_VB.Viewport = new Rect()
-        {
-          X = FullMapLEditor_VB.Viewport.X + MPos.X / 10,
-          Y = FullMapLEditor_VB.Viewport.Y + MPos.Y / 10,
-          Width = FullMapLEditor_VB.Viewport.Width,
-          Height = FullMapLEditor_VB.Viewport.Height
-        };
-        foreach (UIElement child in FullMapLEditor_Canvas.Children)
-        {
-          if (((Rectangle)child).Name == "SelectionRect")
-          {
-            double x = Canvas.GetLeft(child);
-            double y = Canvas.GetTop(child);
-            Canvas.SetLeft(child, x - MPos.X / 10); //TODO: give this an if statment so the grid cannot go off the screen.
-            Canvas.SetTop(child, y - MPos.Y / 10);  //SCALE use the ratio to pan and link both accurately
-          }
-        }
-        GridOffset.X -= MPos.X / 10;
-        GridOffset.Y -= MPos.Y / 10;
-      }
-      MPos = e.GetPosition(LevelEditor_Canvas); //set this for the iteration
-    }
-
-    private void LevelEditor_Canvas_MouseWheel(object sender, MouseWheelEventArgs e)
-    {
-      Console.WriteLine("scroollll");
-
-      if (e.Delta > 0) //zoom in!
-      {
-        ZoomLevel += .2;
-        Canvas_grid.Transform = new ScaleTransform(ZoomLevel, ZoomLevel);
-        LevelEditor_Canvas.RenderTransform = new ScaleTransform(ZoomLevel, ZoomLevel);
-        Console.WriteLine(String.Format("W:{0},  H{1}", EditorGridWidth, EditorGridHeight));
-        //TODO: resize selection rectangle
-      }
-      else  //zoom out!
-      {
-        ZoomLevel -= .2;
-        Canvas_grid.Transform = new ScaleTransform(ZoomLevel, ZoomLevel);
-        LevelEditor_Canvas.RenderTransform = new ScaleTransform(ZoomLevel, ZoomLevel);
-        Console.WriteLine(String.Format("W:{0},  H{1}", EditorGridWidth, EditorGridHeight));
-        //TODO: resize selection rectangle
-      }
-    }
-
-    //this needs to snap to the grid once we at finished panning
-    private void LevelEditor_BackCanvas_MouseUp(object sender, MouseButtonEventArgs e)
-    {
-
-    }
-
-    private void EditorWindows_TB_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-      if (EditorWindows_TB.SelectedIndex == 0)
-      {
-        ContentLibrary_Control.Template = (ControlTemplate)this.Resources["LevelEditorTileMap_Template"];
-      }
-      else
-      {
-        ContentLibrary_Control.Template = (ControlTemplate)this.Resources["ContentLibaray_LB_Template"];
-        ((ListBox)(ContentLibrary_Control.Template.FindName("EditorObjects_LB", ContentLibrary_Control))).ItemTemplate =
-          (DataTemplate)this.Resources["BigEdit"];
-        ((ListBox)(ContentLibrary_Control.Template.FindName("EditorObjects_LB", ContentLibrary_Control))).ItemsSource = Titles;
-        //((ListBox)(ContentLibrary_Control.Template.FindName("EditorObjects_LB"))).ItemsSource = Titles;
-
-      }
-    }
-
-
-    private BitmapImage GetJpgImage(BitmapSource source)
-    {
-      return GetImage(source, new JpegBitmapEncoder());
-    }
-
-    private BitmapImage GetPngImage(BitmapSource source)
-    {
-      return GetImage(source, new PngBitmapEncoder());
-    }
-
-    private BitmapImage GetImage(BitmapSource source, BitmapEncoder encoder)
-    {
-      var bmpImage = new BitmapImage();
-
-      using (var srcMS = new MemoryStream())
-      {
-        encoder.Frames.Add(BitmapFrame.Create(source));
-        encoder.Save(srcMS);
-
-        srcMS.Position = 0;
-        using (var destMS = new MemoryStream(srcMS.ToArray()))
-        {
-          bmpImage.BeginInit();
-          bmpImage.StreamSource = destMS;
-          bmpImage.CacheOption = BitmapCacheOption.OnLoad;
-          bmpImage.EndInit();
-          bmpImage.Freeze();
-        }
-      }
-
-      return bmpImage;
-    }
-
-    //Creates a tile brush to paint the editor. Uses selected tile from tile map.
-    private void TileMap_Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-      RenderTargetBitmap rtb = new RenderTargetBitmap((int)TileMap_Canvas_temp.ActualWidth,
-       (int)TileMap_Canvas_temp.ActualHeight, 96d, 96d, System.Windows.Media.PixelFormats.Default);
-      rtb.Render(TileMap_Canvas_temp);
-
-      Point pp = Mouse.GetPosition(TileMap_Canvas_temp);
-      Console.WriteLine(pp.ToString());
-      pp.X -= Math.Floor(pp.X) % 32;  //TODO: Add the offset so we can fill the grid AFTER PAnNNG
-      pp.Y -= Math.Floor(pp.Y) % 32;
-      int x = (int)pp.X;
-      int y = (int)pp.Y;
-      Console.WriteLine(String.Format("x: {0},  y: {1}", x, y));
-      Console.WriteLine("");
-      var crop = new CroppedBitmap(rtb, new Int32Rect(x, y, 32, 32));
-      // using BitmapImage version to prove its created successfully
-      Image image2 = new Image(); image2.Source = crop; //cropped
-      imgtilebrush = new ImageBrush(image2.Source);
-      SelectedTile_Canvas.Children.Add(new Rectangle() { Width = 32, Height = 32, Fill = imgtilebrush, RenderTransform = new ScaleTransform(.5, .5) });
-    }
-
-    private void TileMap_Canvas_MouseMove(object sender, MouseEventArgs e)
-    {
-      Canvas TileMap_Canvas_temp = (Canvas)(ContentLibrary_Control.Template.FindName("TileMap_Canvas", ContentLibrary_Control));
-      Point p = Mouse.GetPosition(TileMap_Canvas_temp);
-      String point = String.Format("({0}, {1})", (int)p.X, (int)p.Y);
-      LevelEditorCords_TB.Text = point;
-    }
+    
   }
 }
