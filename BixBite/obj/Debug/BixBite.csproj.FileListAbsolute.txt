@@ -1,9 +1,0 @@
-C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\BixBite\bin\Debug\BixBite.dll
-C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\BixBite\bin\Debug\BixBite.pdb
-C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\BixBite\bin\Debug\MonoGame.Framework.dll
-C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\BixBite\bin\Debug\MonoGame.Framework.dll.config
-C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\BixBite\obj\Debug\BixBite.csprojAssemblyReference.cache
-C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\BixBite\obj\Debug\BixBite.csproj.CoreCompileInputs.cache
-C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\BixBite\obj\Debug\BixBite.csproj.CopyComplete
-C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\BixBite\obj\Debug\BixBite.dll
-C:\Users\Antonio\Documents\ProjectE_E\ProjectE_E\BixBite\obj\Debug\BixBite.pdb
