@@ -50,6 +50,9 @@
     <Compile Include="Characters\NPC.cs" />
     <Compile Include="Characters\PartyMember.cs" />
     <Compile Include="Characters\Player.cs" />
+    <Compile Include="Effects\ImageEffect.cs" />
+    <Compile Include="Level.cs" />
+    <Compile Include="Property.cs" />
     <Compile Include="SceneObject\Prop.cs" />
     <Compile Include="Rendering\GameImage.cs" />
     <Compile Include="Input\InputController.cs" />
@@ -58,6 +61,7 @@
     <Compile Include="Rendering\Sprite.cs" />
     <Compile Include="Rendering\SpriteLayer.cs" />
     <Compile Include="SceneObject\Spawner.cs" />
+    <Compile Include="SceneObject\Transistion.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

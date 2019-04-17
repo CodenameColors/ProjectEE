@@ -14,6 +14,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using BixBite.Rendering;
+using BixBite;
 
 namespace AmethystEngine.Forms
 {
@@ -68,6 +70,7 @@ namespace AmethystEngine.Forms
     VisualBrush FullMapLEditor_VB = new VisualBrush();
     Rectangle FullMapCanvasHightlight_rect = new Rectangle();
 
+		Level CurentLevel;
     int[,] TileMapData = new int[10, 10];
     public ImageBrush imgtilebrush { get; private set; }
 
@@ -818,14 +821,25 @@ namespace AmethystEngine.Forms
         EditorObjects_LB.ItemsSource = EditorObj_list;
       }
     }
-    #endregion
+		#endregion
 
-    #region "Scene Viewer"
+		#region "Scene Viewer"
+		private void SceneViewAdd_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			//what editor are we currently in?
+			if(EditorWindows_TC.SelectedIndex == 0)	//Level Editor
+			{
+				if (!SceneExplorer_TreeView.HasItems) //there is no current Level we are editing.
+				{
+					//create new level
+					Level 
+				}
+			}
+		}
+		#endregion
 
-    #endregion
-    
-    #region GetImageFromCanvas
-    private BitmapImage GetJpgImage(BitmapSource source)
+		#region GetImageFromCanvas
+		private BitmapImage GetJpgImage(BitmapSource source)
     {
       return GetImage(source, new JpegBitmapEncoder());
     }
@@ -894,6 +908,7 @@ namespace AmethystEngine.Forms
 
       }
     }
-    
-  }
+
+	
+	}
 }

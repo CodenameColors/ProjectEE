@@ -414,8 +414,8 @@
 
       <GridSplitter x:Name="Cont_Scene_GS" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="3" Background="#FF868686"/>
       <Label x:Name="label2" Content="Scene Explorer" Foreground="White" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" />
-      <Button Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="AUTO" Content="Add +" Foreground="White" Background="#FF4F4F4F" Height="26" BorderThickness="0" Margin="0,0,1,0"/>
-      <TreeView x:Name="treeView1" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,25,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch"/>
+			<Button x:Name="SceneViewAdd_BTN" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="AUTO" Content="Add +" Foreground="White" Background="#FF4F4F4F" Height="26" BorderThickness="0" Margin="0,0,1,0" Click="SceneViewAdd_BTN_Click"/>
+      <TreeView x:Name="SceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,25,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch"/>
 
       <ListBox x:Name="SearchResultList" Grid.Column="1" HorizontalAlignment="Stretch" Margin="3,25,0,0" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
                Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" ItemsSource="{Binding Titles}" ItemTemplate="{StaticResource CExplorer}" SelectionChanged="SearchResultList_SelectionChanged" ScrollViewer.VerticalScrollBarVisibility="Hidden">
