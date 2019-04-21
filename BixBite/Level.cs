@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,9 +11,9 @@ namespace BixBite
 	public class Level
 	{
 		//instance variables
-		public String LevelName = "";
-		public List<SpriteLayer> layers = new List<SpriteLayer>();
-		public Property Properties = new Property();
+		public String LevelName { get; set; }
+		public ObservableCollection<SpriteLayer> layers = new ObservableCollection<SpriteLayer>();
+		public List<Tuple<String, String>> Properties = new List<Tuple<string, string>>();
 
 		public Level(String desname)
 		{
