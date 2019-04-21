@@ -33,6 +33,15 @@ namespace AmethystEngine.Forms
     NW,
   }
 
+	public enum SceneObjectType
+	{
+		None,
+		Level,
+		Layer,
+		LayerData
+	}
+
+
   public class LevelEditorProp
   {
     public String PropertyName { get; set; }
@@ -47,32 +56,33 @@ namespace AmethystEngine.Forms
     }
   }
 
-  /// <summary>
-  /// Interaction logic for EngineEditor.xaml
-  /// </summary>
-  public partial class EngineEditor : Window
-  {
+	/// <summary>
+	/// Interaction logic for EngineEditor.xaml
+	/// </summary>
+	public partial class EngineEditor : Window
+	{
 
-    public List<EditorObject> EditorObj_list = new List<EditorObject>();
-    //List<Item> Titles { get; set; }
-    public List<EditorObject> Titles = new List<EditorObject>();
-    TreeViewItem CurTreeViewNode = new TreeViewItem();
-    TreeView CurTreeView = new TreeView();
+		public List<EditorObject> EditorObj_list = new List<EditorObject>();
+		//List<Item> Titles { get; set; }
+		public List<EditorObject> Titles = new List<EditorObject>();
+		TreeViewItem CurTreeViewNode = new TreeViewItem();
+		TreeView CurTreeView = new TreeView();
 
-    /// <summary> This is the List that hold all the property data for a given selected LevelEditor Object </summary>
+		/// <summary> This is the List that hold all the property data for a given selected LevelEditor Object </summary>
 		public List<LevelEditorProp> LEditorTS;
 
-    //these hold the pointers to the controls that i use for my level editor.
-    Canvas MapLEditor_Canvas = new Canvas();
-    Canvas FullMapLEditor_Canvas = new Canvas();
-    ListBox EditorObjects_LB = new ListBox();
-    Canvas TileMap_Canvas_temp = new Canvas();
-    VisualBrush FullMapLEditor_VB = new VisualBrush();
-    Rectangle FullMapCanvasHightlight_rect = new Rectangle();
+		//these hold the pointers to the controls that i use for my level editor.
+		Canvas MapLEditor_Canvas = new Canvas();
+		Canvas FullMapLEditor_Canvas = new Canvas();
+		ListBox EditorObjects_LB = new ListBox();
+		Canvas TileMap_Canvas_temp = new Canvas();
+		VisualBrush FullMapLEditor_VB = new VisualBrush();
+		Rectangle FullMapCanvasHightlight_rect = new Rectangle();
 
-		Level CurentLevel;
-    int[,] TileMapData = new int[10, 10];
-    public ImageBrush imgtilebrush { get; private set; }
+		int[,] TileMapData = new int[10, 10];
+		public ObservableCollection<Level> OpenLevels { get; set;}
+		public ImageBrush imgtilebrush { get; private set; }
+		private Tuple<object, SceneObjectType> CurrentLevelEditorSceneObject;
 
     int EditorGridHeight = 40;
     int EditorGridWidth = 40;
@@ -104,19 +114,20 @@ namespace AmethystEngine.Forms
       EditorObjects_LB = (ListBox)ContentLibrary_Control.Template.FindName("EditorObjects_LB", ContentLibrary_Control);
       TileMap_Canvas_temp = (Canvas)(ContentLibrary_Control.Template.FindName("TileMap_Canvas", ContentLibrary_Control));
 
-      //LevelEditorScreenRatio = Math.Round(LevelEditor_BackCanvas.ActualWidth / LevelEditor_BackCanvas.ActualHeight,1);
+			//LevelEditorScreenRatio = Math.Round(LevelEditor_BackCanvas.ActualWidth / LevelEditor_BackCanvas.ActualHeight,1);
 
-      LEditorTS = new List<LevelEditorProp>()
-      {
-        new LevelEditorProp(){ PropertyName = "Level Name", PropertyData="Default" },
-        new LevelEditorProp(){ PropertyName = "Map Width(cells)", PropertyData="200" },
-        new LevelEditorProp(){ PropertyName = "Map Height(cells)", PropertyData="400" },
-				//new LevelEditorProp("test 2")
+			LEditorTS = new List<LevelEditorProp>()
+			{
+				new LevelEditorProp(){ PropertyName = "Level Name", PropertyData="Default" },
+				new LevelEditorProp(){ PropertyName = "Map Width(cells)", PropertyData="200" },
+				new LevelEditorProp(){ PropertyName = "Map Height(cells)", PropertyData="400" },
+				//new LevelEditorProp("test 2")								
 			};
 
+			OpenLevels = new ObservableCollection<Level>();
 
 
-      ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
+			ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
       LB.ItemsSource = LEditorTS;
 
       LevelEditorScreenRatio = double.Parse(LEditorTS[1].PropertyData) / double.Parse(LEditorTS[2].PropertyData);
@@ -824,18 +835,7 @@ namespace AmethystEngine.Forms
 		#endregion
 
 		#region "Scene Viewer"
-		private void SceneViewAdd_BTN_Click(object sender, RoutedEventArgs e)
-		{
-			//what editor are we currently in?
-			if(EditorWindows_TC.SelectedIndex == 0)	//Level Editor
-			{
-				if (!SceneExplorer_TreeView.HasItems) //there is no current Level we are editing.
-				{
-					//create new level
-					Level 
-				}
-			}
-		}
+
 		#endregion
 
 		#region GetImageFromCanvas
@@ -909,6 +909,75 @@ namespace AmethystEngine.Forms
       }
     }
 
-	
+		private void NewLevel_MenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			LEStarting_TB.Visibility = Visibility.Hidden;
+			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).IsEnabled = true;
+			LevelEditor_Canvas.IsEnabled = true;
+
+			//TreeViewItem LevelRoot = new TreeViewItem() { Header = "NewLevel" };
+
+			//SceneExplorer_TreeView.Items.Add(LevelRoot);
+
+			//LevelRoot.Items.Add(new TreeViewItem() { Header = "Background Layer" });
+
+			//create a new Level object.
+			CreateLevel("testing");
+		}
+
+		private void CreateLevel(String LevelName)
+		{
+			//create new Level
+			Level TempLevel = new Level(LevelName);
+			SpriteLayer TempLevelChild = new SpriteLayer(LayerType.Tile) { LayerName = "Background" };
+			TempLevel.AddLayer(TempLevelChild.LayerName, LayerType.Tile);
+
+			//show the newly created LEVEL
+			TreeViewItem TVI = new TreeViewItem() { Header = LevelName, Tag = "Level"};
+			TreeViewItem TVI1 = new TreeViewItem() { Header = "Backgorund", Tag = "Layer" };
+			TVI.Items.Add(TVI1);
+			SceneExplorer_TreeView.Items.Add(TVI);
+			OpenLevels.Add(TempLevel);
+			
+
+		}
+
+		private void SceneExplorer_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+			Console.WriteLine("Changed Scene Object");
+			if(((TreeViewItem)(e.NewValue)).Tag.ToString() == "Level" )
+				CurrentLevelEditorSceneObject = new Tuple<object, SceneObjectType>(e.NewValue, SceneObjectType.Level);
+			if (((TreeViewItem)(e.NewValue)).Tag.ToString() == "Layer")
+				CurrentLevelEditorSceneObject = new Tuple<object, SceneObjectType>(e.NewValue, SceneObjectType.Layer);
+
+		}
+
+		private void SceneViewAdd_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			//what editor are we currently in?
+			if (EditorWindows_TC.SelectedIndex == 0)  //Level Editor
+			{
+				if (SceneExplorer_TreeView.HasItems) //there is no current Level we are editing.
+				{
+					//are we clicked on a level? Then create a new layer
+					if (CurrentLevelEditorSceneObject.Item2 == SceneObjectType.Level)
+					{
+						ContextMenu cm = this.FindResource("LevelContextMenu_Template") as ContextMenu;
+						cm.PlacementTarget = sender as Button;
+						cm.IsOpen = true;
+					}
+
+					//are we clicked on a Layer? 
+					if(CurrentLevelEditorSceneObject.Item2 == SceneObjectType.Layer)
+					{
+						//What type of layer?
+
+
+					}
+
+					//create new sprite layer object data.
+				}
+			}
+		}
 	}
 }

@@ -20,9 +20,9 @@ namespace BixBite.Rendering
 	public class SpriteLayer
 	{
 		//instance variables
-		public String LayerName;
+		public String LayerName { get; set; }
 		public LayerType layerType = LayerType.None;
-		List<object> LayerObjects = new List<object>(); //contains the objects for this layer. 
+		List <object> LayerObjects = new List<object>(); //contains the objects for this layer. 
 		ImageEffect layereffect = new ImageEffect();
 
 		public SpriteLayer()
