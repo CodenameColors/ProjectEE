@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BixBite.SceneObject
 {
-	class Transistion
+	class Transistion : GameObject
 	{
 	}
 }

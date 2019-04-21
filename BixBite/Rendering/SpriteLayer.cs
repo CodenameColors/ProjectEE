@@ -22,7 +22,7 @@ namespace BixBite.Rendering
 		//instance variables
 		public String LayerName { get; set; }
 		public LayerType layerType = LayerType.None;
-		List <object> LayerObjects = new List<object>(); //contains the objects for this layer. 
+		object LayerObjects = new object(); //contains the objects for this layer. 
 		ImageEffect layereffect = new ImageEffect();
 
 		public SpriteLayer()
@@ -30,15 +30,34 @@ namespace BixBite.Rendering
 		}
 		public SpriteLayer(LayerType desltype)
 		{
-			layerType = desltype;
+			DefineLayerDataType(layerType = desltype); //set the objectdata datatype
 		}
 
+		/// <summary>
+		/// Used to define what hte structure that will hold the Layer data. 
+		/// ALSO used to hot reset the size of the tile grid
+		/// </summary>
+		public void DefineLayerDataType(LayerType desltype, int width = 0, int height = 0)
+		{
+			switch (layerType)
+			{
+				case (LayerType.Tile):
+					LayerObjects = new int[width,height];
+					break;
+				case (LayerType.Sprite):
+					LayerObjects = new List<Sprite>();
+					break;
+				case (LayerType.Gameobject):
+					LayerObjects = new List<GameObject>();
+					break;
+			}
+		}
 
 		/// <summary>
 		/// Add objects to the current sprite layer depending on type.
 		/// </summary>
 		/// <param name="newLayerObject">Desired object to add.</param>
-		public void AddToLayer(object newLayerObject)
+		public void AddToLayer(object newLayerObject, int xcell = 0, int ycell = 0, int tiledata = 0)
 		{
 			switch (layerType)
 			{
@@ -46,13 +65,27 @@ namespace BixBite.Rendering
 					throw new SpriteLayerException(LayerType.None);
 				case (LayerType.Sprite):
 					if (newLayerObject is Sprite)
-						LayerObjects.Add(newLayerObject);
+					{
+						if (LayerObjects is List<Sprite>)
+							((List<Sprite>)LayerObjects).Add((Sprite)newLayerObject);
+						else Console.WriteLine("Invalid defined Layerobject type. Not a List of Sprites");
+					}
 					return;
-				case (LayerType.Tile):					
+				case (LayerType.Tile):
+					if (newLayerObject is Microsoft.Xna.Framework.Point)
+					{
+						if (LayerObjects is int[,])
+							((int[,])LayerObjects)[xcell, ycell] = tiledata;
+						else Console.WriteLine("Invalid defined Layerobject type. Not a List of Tiles");
+					}
 					return;
 				case (LayerType.Gameobject):
-					if (newLayerObject is Prop || newLayerObject is Spawner || newLayerObject is Transistion)
-						LayerObjects.Add(newLayerObject);
+					if (newLayerObject is GameObject)
+					{
+						if (LayerObjects is List<GameObject>)
+							((List<GameObject>)LayerObjects).Add((GameObject)newLayerObject);
+						else Console.WriteLine("Invalid defined Layerobject type. Not a List of GameObjects");
+					}
 					return;
 			}
 		}
