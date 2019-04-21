@@ -53,6 +53,7 @@
     <Compile Include="Effects\ImageEffect.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="Property.cs" />
+    <Compile Include="SceneObject\GameObject.cs" />
     <Compile Include="SceneObject\Prop.cs" />
     <Compile Include="Rendering\GameImage.cs" />
     <Compile Include="Input\InputController.cs" />
