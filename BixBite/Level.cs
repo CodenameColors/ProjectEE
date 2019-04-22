@@ -12,16 +12,17 @@ namespace BixBite
 	{
 		//instance variables
 		public String LevelName { get; set; }
-		public ObservableCollection<SpriteLayer> layers = new ObservableCollection<SpriteLayer>();
+		public ObservableCollection<SpriteLayer> Layers { get; set; }
 		public Dictionary<String, object> Properties = new Dictionary<string, object>();
 
 		public Level(String desname)
 		{
 			LevelName = desname;
+			Layers = new ObservableCollection<SpriteLayer>();
 		}
 		public void AddLayer(String LayerName, LayerType deslayertype)
 		{
-			layers.Add(new SpriteLayer(deslayertype) { LayerName = LayerName });
+			Layers.Add(new SpriteLayer(deslayertype) { LayerName = LayerName });
 		}
 
 		public void ImportLevel()

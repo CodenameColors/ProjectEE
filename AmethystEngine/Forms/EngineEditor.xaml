@@ -452,21 +452,25 @@
 			<Button x:Name="SceneViewAdd_BTN" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="AUTO" Content="Add +" 
 							Foreground="White" Background="#FF4F4F4F" Height="26" BorderThickness="0" Margin="0,0,1,0" Click="SceneViewAdd_BTN_Click"/>
 
-			<TreeView x:Name="SceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,25,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" ItemsSource="{Binding OpenLevels}" SelectedItemChanged="SceneExplorer_TreeView_SelectedItemChanged">
+			<TreeView x:Name="SceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,25,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
+								 SelectedItemChanged="SceneExplorer_TreeView_SelectedItemChanged">
 				<TreeView.Resources>
-					<HierarchicalDataTemplate DataType="{x:Type Bix:Level}">
-						<TextBlock Text="{Binding LevelName}"/>
+					<HierarchicalDataTemplate DataType="{x:Type Bix:Level}" ItemsSource="{Binding Layers}">
+						<StackPanel Orientation="Horizontal">
+							<Image Margin="0,0,5,0" />
+							<TextBlock Text=" [" Foreground="Blue" />
+							<TextBlock Text="{Binding LevelName}" Foreground="Blue" />
+							<TextBlock Text="]" Foreground="Blue" />
+						</StackPanel>
 					</HierarchicalDataTemplate>
-					<!--<HierarchicalDataTemplate DataType="{x:Type Bix:Level}">
-						<TextBlock Text="{Binding Path=LevelName}" />
-
-						<HierarchicalDataTemplate.ItemTemplate>
-							<DataTemplate DataType="{x:Type BixRen:SpriteLayer}" >
-								<TextBlock Text="testing1" />
-							</DataTemplate>
-						</HierarchicalDataTemplate.ItemTemplate>
-					</HierarchicalDataTemplate>-->
-
+					<DataTemplate DataType="{x:Type BixRen:SpriteLayer}">
+						<StackPanel Orientation="Horizontal">
+							<Image Margin="0,0,5,0" />
+							<TextBlock Text=" (" Foreground="Green" />
+							<TextBlock Text="{Binding LayerName}" Foreground="Green" />
+							<TextBlock Text=" years)" Foreground="Green" />
+						</StackPanel>
+					</DataTemplate>
 				</TreeView.Resources>
 			</TreeView>
 
