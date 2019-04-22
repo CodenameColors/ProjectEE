@@ -572,7 +572,8 @@ namespace AmethystEngine.Forms
       }
       Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush };
       Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
-      Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y);
+			int iii = 0;
+      Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, iii);
       LevelEditor_Canvas.Children.Add(r);
 
       FullMapEditorFill(p);
@@ -951,7 +952,7 @@ namespace AmethystEngine.Forms
 				CurrentLevelEditorSceneObject = new Tuple<object, SceneObjectType>(e.NewValue, SceneObjectType.Layer);
 
 		}
-
+		
 		private void SceneViewAdd_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			//what editor are we currently in?
@@ -960,7 +961,7 @@ namespace AmethystEngine.Forms
 				if (SceneExplorer_TreeView.HasItems) //there is no current Level we are editing.
 				{
 					//are we clicked on a level? Then create a new layer
-					if (CurrentLevelEditorSceneObject.Item2 == SceneObjectType.Level)
+					if (CurrentLevelEditorSceneObject.Item1 is Level)
 					{
 						ContextMenu cm = this.FindResource("LevelContextMenu_Template") as ContextMenu;
 						cm.PlacementTarget = sender as Button;
@@ -968,7 +969,7 @@ namespace AmethystEngine.Forms
 					}
 
 					//are we clicked on a Layer? 
-					if(CurrentLevelEditorSceneObject.Item2 == SceneObjectType.Layer)
+					if(CurrentLevelEditorSceneObject.Item1 is SpriteLayer)
 					{
 						//What type of layer?
 

@@ -42,14 +42,14 @@
 
 		<ControlTemplate x:Key="LevelEditorTileMap_Template">
 			<TabControl Background="#FF2B2B2B">
-				<TabItem Header="Tile Map" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
-					<ScrollViewer x:Name="LevelEditorTIleMap_SV" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,4,5,7" IsEnabled="True">
+				<TabItem Header="Tile Map" Background="Black" Foreground="Black" BorderBrush="#FF4D4D4D">
+					<ScrollViewer x:Name="LevelEditorTIleMap_SV" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,4,5,7" IsEnabled="True" Background="Black">
 						<Canvas x:Name="TileMap_Canvas" IsHitTestVisible="True" MouseWheel="LevelEditor_Canvas_MouseWheel" Width="512" Height="512" MouseLeftButtonDown="TileMap_Canvas_MouseLeftButtonDown" 
 										MouseMove="TileMap_Canvas_MouseMove" HorizontalAlignment="Left" VerticalAlignment="Top" >
 							<Canvas.Background>
 								<VisualBrush x:Name="LevelEditorTileMapCanvas_VB" TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute" Stretch="Uniform" >
 									<VisualBrush.Visual>
-										<Rectangle Width="10" Height="10" Fill="Black" Stroke="White" StrokeThickness=".1"/>
+										<Rectangle Width="10" Height="10" Fill="Transparent" Stroke="White" StrokeThickness=".1" Visibility="Hidden"/>
 									</VisualBrush.Visual>
 								</VisualBrush>
 							</Canvas.Background>
@@ -306,7 +306,7 @@
 				<TextBlock Text="+" Margin="0,0,1,2" VerticalAlignment="Center"/>
 			</Button>
 			<ContentControl x:Name="ContentLibrary_Control" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
-               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" Margin="0,45,0,0" Template="{DynamicResource LevelEditorTileMap_Template}">
+               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" Margin="0,46,0,-1" Template="{DynamicResource LevelEditorTileMap_Template}">
 			</ContentControl>
 
 			<!--The properties window-->
@@ -362,22 +362,22 @@
 				<TabItem Header="Level Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 					<Grid Background="#FF3C3C3C">
 						<Grid.RowDefinitions>
-							<RowDefinition Height="*"/>
-							<RowDefinition Height="32"/>
+							<RowDefinition/>
+							<RowDefinition Height="25"/>
 						</Grid.RowDefinitions>
 
 						<!--level editor status bar-->
-						<Grid Grid.Row="1" Height="32" VerticalAlignment="Top">
+						<Grid Grid.Row="1" Height="32" VerticalAlignment="Top" Margin="0,0,0,-7">
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="Auto"/>
 								<ColumnDefinition/>
 								<ColumnDefinition/>
 								<ColumnDefinition/>
 							</Grid.ColumnDefinitions>
-							<TextBox x:Name="LevelEditorCords_TB" MinWidth="50" Width="Auto" Margin="1,1,146,0" FontSize="10" Grid.ColumnSpan="2" Background="#FF4F4F4F" BorderBrush="#00ABADB3"/>
+							<TextBox x:Name="LevelEditorCords_TB" MinWidth="50" Width="Auto" Margin="1,3,146,7" FontSize="10" Grid.ColumnSpan="2" Background="#FF4F4F4F" BorderBrush="#00ABADB3"/>
 
 							<Canvas x:Name="SelectedTile_Canvas" Width="32" Grid.Column="3" HorizontalAlignment="Right" Margin="0,0,3,0" RenderTransformOrigin="-0.281,0.531"/>
-							<Label Content="Selected Tile:" Grid.Column="3" Margin="0,0,40,0" Background="Transparent" Foreground="White" BorderThickness="0" HorizontalAlignment="Right" FontSize="18"/>
+							<Label Content="Selected Tile:" Grid.Column="3" Margin="0,-3,40,3" Background="Transparent" Foreground="White" BorderThickness="0" HorizontalAlignment="Right" FontSize="18"/>
 						</Grid>
 
 

@@ -14,7 +14,7 @@ namespace BixBite.Rendering
 		None,
 		Tile,			//used for background/tile art
 		Sprite,		//used for sprites, NOT tile
-		Gameobject		//used for location to indicate script triggers.
+		Gameobject		//used for location to indicate script triggers. 
 	};
 
 	public class SpriteLayer
@@ -22,12 +22,15 @@ namespace BixBite.Rendering
 		//instance variables
 		public String LayerName { get; set; }
 		public LayerType layerType = LayerType.None;
-		object LayerObjects = new object(); //contains the objects for this layer. 
-		ImageEffect layereffect = new ImageEffect();
 
+		private Dictionary<String, object> Properties = new Dictionary<string, object>();
+		object LayerObjects = new object(); //contains the objects for this layer. 
+		ImageEffect layereffect = new ImageEffect(); //and image effect that will effect THE WHOLE layer. So windDistort for example.
+		
 		public SpriteLayer()
 		{
 		}
+
 		public SpriteLayer(LayerType desltype)
 		{
 			DefineLayerDataType(layerType = desltype); //set the objectdata datatype
@@ -88,6 +91,52 @@ namespace BixBite.Rendering
 					}
 					return;
 			}
+		}
+
+		/// <summary>
+		/// Get the data of a desired property. MUST EXIST ALREADY. 
+		/// </summary>
+		/// <param name="PropertyName"></param>
+		/// <returns>Property Data if exists \n Returns null if it doens't exist</returns>
+		public object GetProperty(String PropertyName)
+		{
+			if (Properties.ContainsKey(PropertyName))
+			{
+				return Properties[PropertyName];
+			}
+			return null;
+		}
+
+		/// <summary>
+		/// Adds a new property IF it doesn't exist already
+		/// </summary>
+		/// <param name="PropertyName">The Property name that you would like to add</param>
+		/// <param name="newpData"> new property data.</param>
+		public void AddProperty(String PropertyName, object PropertyData)
+		{
+			if (Properties.ContainsKey(PropertyName))
+			{
+				return;
+			}
+			else
+			{
+				Properties.Add(PropertyName, PropertyData);
+			}
+		}
+
+		/// <summary>
+		/// Set a property to a new value
+		/// </summary>
+		/// <param name="PropertyName">The Property name that you would like to change</param>
+		/// <param name="newpData"> new property data. MUST MATCH TYPE</param>
+		public void ChangeProperty(String PropertyName, object newpData)
+		{
+			if (Properties.ContainsKey(PropertyName))
+			{
+				if (Properties[PropertyName].GetType() == newpData.GetType())
+					Properties[PropertyName] = newpData;
+			}
+			return;
 		}
 
 		/// <summary>
