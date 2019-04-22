@@ -572,8 +572,29 @@ namespace AmethystEngine.Forms
       }
       Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush };
       Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
+
 			int iii = 0;
-      Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, iii);
+
+			//are we clicked on a spritelayer? AND a tile layer?
+			if (SceneExplorer_TreeView.SelectedValue is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Tile)
+			{
+				//what layer are we on?
+				foreach(Level lev in OpenLevels)
+				{
+					if (lev.Layers.IndexOf( ((SpriteLayer)SceneExplorer_TreeView.SelectedItem) ) > 0)
+					{
+						iii = lev.Layers.IndexOf(((SpriteLayer)SceneExplorer_TreeView.SelectedItem));
+						Console.WriteLine(iii);
+					}
+				}
+				//Level TempLevel = ((Level)((TreeViewItem)SceneExplorer_TreeView.SelectedItem).Parent);
+				//((SpriteLayer)SceneExplorer_TreeView.SelectedValue).get
+			}
+			else
+				return;
+
+
+      Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, 0);
       LevelEditor_Canvas.Children.Add(r);
 
       FullMapEditorFill(p);
@@ -947,9 +968,9 @@ namespace AmethystEngine.Forms
 		private void SceneExplorer_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			Console.WriteLine("Changed Scene Object");
-			if(((TreeViewItem)(e.NewValue)).Tag.ToString() == "Level" )
+			if(e.NewValue is Level)
 				CurrentLevelEditorSceneObject = new Tuple<object, SceneObjectType>(e.NewValue, SceneObjectType.Level);
-			if (((TreeViewItem)(e.NewValue)).Tag.ToString() == "Layer")
+			if (e.NewValue is SpriteLayer)
 				CurrentLevelEditorSceneObject = new Tuple<object, SceneObjectType>(e.NewValue, SceneObjectType.Layer);
 
 		}
@@ -962,7 +983,7 @@ namespace AmethystEngine.Forms
 				if (SceneExplorer_TreeView.HasItems) //there is no current Level we are editing.
 				{
 					//are we clicked on a level? Then create a new layer
-					if (CurrentLevelEditorSceneObject.Item1 is Level)
+					if (SceneExplorer_TreeView.SelectedValue is Level)
 					{
 						ContextMenu cm = this.FindResource("LevelContextMenu_Template") as ContextMenu;
 						cm.PlacementTarget = sender as Button;
@@ -981,5 +1002,20 @@ namespace AmethystEngine.Forms
 				}
 			}
 		}
+
+		private void AddTileLayer_Click(object sender, RoutedEventArgs e)
+		{
+			((Level)SceneExplorer_TreeView.SelectedValue).Layers.Add(new SpriteLayer(LayerType.Tile) { LayerName = "new tile" });
+		}
+		private void SpriteLayer_Click(object sender, RoutedEventArgs e)
+		{
+			((Level)SceneExplorer_TreeView.SelectedValue).Layers.Add(new SpriteLayer(LayerType.Sprite) { LayerName = "new sprite" });
+		}
+		private void GameObjectLayer_Click(object sender, RoutedEventArgs e)
+		{
+			((Level)SceneExplorer_TreeView.SelectedValue).Layers.Add(new SpriteLayer(LayerType.Gameobject) { LayerName = "new G.O." });
+		}
+
+
 	}
 }

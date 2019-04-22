@@ -29,9 +29,9 @@
 		</Style>
 
 		<ContextMenu x:Key="LevelContextMenu_Template">
-			<MenuItem Header="Add Tile Layer" />
-			<MenuItem Header="Add Sprite Layer" />
-			<MenuItem Header="Add Gameobject Layer" />
+			<MenuItem Header="Add Tile Layer" Click="AddTileLayer_Click" />
+			<MenuItem Header="Add Sprite Layer" Click="SpriteLayer_Click" />
+			<MenuItem Header="Add Gameobject Layer" Click="GameObjectLayer_Click" />
 		</ContextMenu>
 
 		<ContextMenu x:Key="LevelSpriteLayerContextMenu_Template">
@@ -458,17 +458,13 @@
 					<HierarchicalDataTemplate DataType="{x:Type Bix:Level}" ItemsSource="{Binding Layers}">
 						<StackPanel Orientation="Horizontal">
 							<Image Margin="0,0,5,0" />
-							<TextBlock Text=" [" Foreground="Blue" />
-							<TextBlock Text="{Binding LevelName}" Foreground="Blue" />
-							<TextBlock Text="]" Foreground="Blue" />
+							<TextBlock Text="{Binding LevelName}" Foreground="White" />
 						</StackPanel>
 					</HierarchicalDataTemplate>
 					<DataTemplate DataType="{x:Type BixRen:SpriteLayer}">
 						<StackPanel Orientation="Horizontal">
 							<Image Margin="0,0,5,0" />
-							<TextBlock Text=" (" Foreground="Green" />
-							<TextBlock Text="{Binding LayerName}" Foreground="Green" />
-							<TextBlock Text=" years)" Foreground="Green" />
+							<TextBlock Text="{Binding LayerName}" Foreground="White" />
 						</StackPanel>
 					</DataTemplate>
 				</TreeView.Resources>
