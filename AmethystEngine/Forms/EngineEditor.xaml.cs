@@ -924,6 +924,7 @@ namespace AmethystEngine.Forms
 
 			//create a new Level object.
 			CreateLevel("testing");
+			SceneExplorer_TreeView.ItemsSource = OpenLevels;
 		}
 
 		private void CreateLevel(String LevelName)
@@ -931,13 +932,13 @@ namespace AmethystEngine.Forms
 			//create new Level
 			Level TempLevel = new Level(LevelName);
 			SpriteLayer TempLevelChild = new SpriteLayer(LayerType.Tile) { LayerName = "Background" };
-			TempLevel.AddLayer(TempLevelChild.LayerName, LayerType.Tile);
+			TempLevel.Layers.Add(TempLevelChild);
 
-			//show the newly created LEVEL
-			TreeViewItem TVI = new TreeViewItem() { Header = LevelName, Tag = "Level"};
-			TreeViewItem TVI1 = new TreeViewItem() { Header = "Backgorund", Tag = "Layer" };
-			TVI.Items.Add(TVI1);
-			SceneExplorer_TreeView.Items.Add(TVI);
+			////show the newly created LEVEL
+			//TreeViewItem TVI = new TreeViewItem() { Header = LevelName, Tag = "Level"};
+			//TreeViewItem TVI1 = new TreeViewItem() { Header = "Backgorund", Tag = "Layer" };
+			//TVI.Items.Add(TVI1);
+			//SceneExplorer_TreeView.Items.Add(TVI);
 			OpenLevels.Add(TempLevel);
 			
 
