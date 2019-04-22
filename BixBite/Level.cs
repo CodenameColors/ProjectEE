@@ -13,7 +13,7 @@ namespace BixBite
 		//instance variables
 		public String LevelName { get; set; }
 		public ObservableCollection<SpriteLayer> layers = new ObservableCollection<SpriteLayer>();
-		public List<Tuple<String, String>> Properties = new List<Tuple<string, string>>();
+		public Dictionary<String, object> Properties = new Dictionary<string, object>();
 
 		public Level(String desname)
 		{
