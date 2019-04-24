@@ -528,6 +528,7 @@ namespace AmethystEngine.Forms
     //Creates a tile brush to paint the editor. Uses selected tile from tile map.
     private void TileMap_Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
+      SelectedTile_Canvas.Children.Clear(); imgtilebrush = null;
       RenderTargetBitmap rtb = new RenderTargetBitmap((int)TileMap_Canvas_temp.ActualWidth,
        (int)TileMap_Canvas_temp.ActualHeight, 96d, 96d, System.Windows.Media.PixelFormats.Default);
       rtb.Render(TileMap_Canvas_temp);
@@ -570,6 +571,7 @@ namespace AmethystEngine.Forms
         Console.WriteLine("no brush selected/tile");
         return;
       }
+
       Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush };
       Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
 
@@ -594,7 +596,7 @@ namespace AmethystEngine.Forms
 				return;
 
 
-      Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, 0);
+      Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, iii);
       LevelEditor_Canvas.Children.Add(r);
 
       FullMapEditorFill(p);
