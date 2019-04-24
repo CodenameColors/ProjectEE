@@ -42,22 +42,23 @@
 
 		<ControlTemplate x:Key="LevelEditorTileMap_Template">
 			<TabControl Background="#FF2B2B2B">
-				<TabItem Header="Tile Map" Background="Black" Foreground="Black" BorderBrush="#FF4D4D4D">
-					<ScrollViewer x:Name="LevelEditorTIleMap_SV" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,4,5,7" IsEnabled="True" Background="Black">
-						<Canvas x:Name="TileMap_Canvas" IsHitTestVisible="True" MouseWheel="LevelEditor_Canvas_MouseWheel" Width="512" Height="512" MouseLeftButtonDown="TileMap_Canvas_MouseLeftButtonDown" 
+        <TabItem Header="Tile Map" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
+          <ScrollViewer x:Name="LevelEditorTIleMap_SV" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,4,5,7" IsEnabled="True" Background="Black">
+            <Canvas x:Name="TileMap_Canvas" IsHitTestVisible="True" MouseWheel="LevelEditor_Canvas_MouseWheel" Width="512" Height="512" MouseLeftButtonDown="TileMap_Canvas_MouseLeftButtonDown" 
 										MouseMove="TileMap_Canvas_MouseMove" HorizontalAlignment="Left" VerticalAlignment="Top" >
-							<Canvas.Background>
-								<VisualBrush x:Name="LevelEditorTileMapCanvas_VB" TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute" Stretch="Uniform" >
-									<VisualBrush.Visual>
-										<Rectangle Width="10" Height="10" Fill="Transparent" Stroke="White" StrokeThickness=".1" Visibility="Hidden"/>
-									</VisualBrush.Visual>
-								</VisualBrush>
-							</Canvas.Background>
-						</Canvas>
-					</ScrollViewer>
-
-				</TabItem>
-				<TabItem Header="Custom Sets [WIP]" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
+              <Canvas.Background>
+                <VisualBrush x:Name="LevelEditorTileMapCanvas_VB" TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute" Stretch="Uniform" >
+                  <VisualBrush.Visual>
+                    <Rectangle Width="10" Height="10" Fill="Transparent" Stroke="White" StrokeThickness=".1" Visibility="Hidden"/>
+                  </VisualBrush.Visual>
+                </VisualBrush>
+              </Canvas.Background>
+            </Canvas>
+          </ScrollViewer>
+        </TabItem>
+        <TabItem Header="Sprite Lib" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
+        </TabItem>
+        <TabItem Header="Custom Sets [WIP]" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 				</TabItem>
 			</TabControl>
 		</ControlTemplate>
@@ -455,7 +456,7 @@
 			<TreeView x:Name="SceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,25,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
 								 SelectedItemChanged="SceneExplorer_TreeView_SelectedItemChanged">
 				<TreeView.Resources>
-					<HierarchicalDataTemplate DataType="{x:Type Bix:Level}" ItemsSource="{Binding Layers}">
+					<HierarchicalDataTemplate DataType="{x:Type Bix:Level}" ItemsSource="{Binding L}">
 						<StackPanel Orientation="Horizontal">
 							<Image Margin="0,0,5,0" />
 							<TextBlock Text="{Binding LevelName}" Foreground="White" />
