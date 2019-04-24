@@ -581,7 +581,7 @@ namespace AmethystEngine.Forms
 				//what layer are we on?
 				foreach(Level lev in OpenLevels)
 				{
-					if (lev.Layers.IndexOf( ((SpriteLayer)SceneExplorer_TreeView.SelectedItem) ) > 0)
+					if (lev.Layers.IndexOf( ((SpriteLayer)SceneExplorer_TreeView.SelectedValue) ) > 0)
 					{
 						iii = lev.Layers.IndexOf(((SpriteLayer)SceneExplorer_TreeView.SelectedItem));
 						Console.WriteLine(iii);
