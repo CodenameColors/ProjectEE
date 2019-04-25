@@ -456,7 +456,7 @@
 			<TreeView x:Name="SceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,25,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
 								 SelectedItemChanged="SceneExplorer_TreeView_SelectedItemChanged">
 				<TreeView.Resources>
-					<HierarchicalDataTemplate DataType="{x:Type Bix:Level}" ItemsSource="{Binding L}">
+					<HierarchicalDataTemplate DataType="{x:Type Bix:Level}" ItemsSource="{Binding Layers}">
 						<StackPanel Orientation="Horizontal">
 							<Image Margin="0,0,5,0" />
 							<TextBlock Text="{Binding LevelName}" Foreground="White" />
