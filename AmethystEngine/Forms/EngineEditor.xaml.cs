@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using BixBite.Rendering;
 using BixBite;
+using AmethystEngine.Components.Tools;
 
 namespace AmethystEngine.Forms
 {
@@ -41,8 +42,16 @@ namespace AmethystEngine.Forms
 		LayerData
 	}
 
+	public enum EditorTool
+	{
+		None,
+		Select,
+		Eraser,
+		Move,
+		Brush
+	}
 
-  public class LevelEditorProp
+	public class LevelEditorProp
   {
     public String PropertyName { get; set; }
     public String PropertyData { get; set; }
@@ -78,6 +87,9 @@ namespace AmethystEngine.Forms
 		Canvas TileMap_Canvas_temp = new Canvas();
 		VisualBrush FullMapLEditor_VB = new VisualBrush();
 		Rectangle FullMapCanvasHightlight_rect = new Rectangle();
+
+		EditorTool CurrentTool = EditorTool.None;
+		SelectTool selectTool = new SelectTool();
 
 		int[,] TileMapData = new int[10, 10];
 		public ObservableCollection<Level> OpenLevels { get; set;}
@@ -566,41 +578,72 @@ namespace AmethystEngine.Forms
     /// <param name="e"></param>
     private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-      if (imgtilebrush == null)
-      {
-        Console.WriteLine("no brush selected/tile");
-        return;
-      }
-
-      Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush };
-      Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
-
+			Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
+			Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
 			int iii = 0;
+			
+			if (CurrentTool == EditorTool.Brush)
+			{
+				iii = GetTileZIndex(SceneExplorer_TreeView);
+				Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush };
 
+				Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 0, (int)pos.X , (int)pos.Y);
+				if (rr != null) return;//check to see if the current tile exists. if so then don't add.
+
+				Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, iii);
+				LevelEditor_Canvas.Children.Add(r);
+				FullMapEditorFill(p);
+			}
+			else if(CurrentTool == EditorTool.Select)
+			{
+				//find the tile
+				if (SceneExplorer_TreeView.SelectedValue is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Tile)
+				{
+					Rectangle r = new Rectangle() { Tag = "selection", Width = 40, Height = 40, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
+					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), GetTileZIndex(SceneExplorer_TreeView), (int)pos.X, (int)pos.Y);
+					Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, 100);
+
+					//don't add another selection rectangle on an existing selection rectangle
+					Rectangle sr = SelectTool.FindTile(LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 100, (int)pos.X, (int)pos.Y);
+
+					
+					if (sr != null) return;
+					selectTool.SelectedTiles.Add(rr);
+					LevelEditor_Canvas.Children.Add(r);
+				}
+			}
+			else if (CurrentTool == EditorTool.Eraser)
+			{
+
+			}
+			else if (CurrentTool == EditorTool.Move)
+			{
+
+			}
+
+			
+    }
+
+		private int GetTileZIndex(TreeView treeitem)
+		{
+			int index = 0;
 			//are we clicked on a spritelayer? AND a tile layer?
-			if (SceneExplorer_TreeView.SelectedValue is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Tile)
+			if (treeitem.SelectedValue is SpriteLayer && ((SpriteLayer)treeitem.SelectedValue).layerType == LayerType.Tile)
 			{
 				//what layer are we on?
-				foreach(Level lev in OpenLevels)
+				foreach (Level lev in OpenLevels)
 				{
-					if (lev.Layers.IndexOf( ((SpriteLayer)SceneExplorer_TreeView.SelectedValue) ) > 0)
+					foreach (SpriteLayer sl in lev.Layers)
 					{
-						iii = lev.Layers.IndexOf(((SpriteLayer)SceneExplorer_TreeView.SelectedItem));
-						Console.WriteLine(iii);
+						if(sl.LayerName == ((SpriteLayer)treeitem.SelectedItem).LayerName)
+						{
+							return lev.Layers.IndexOf(sl);
+						}
 					}
 				}
-				//Level TempLevel = ((Level)((TreeViewItem)SceneExplorer_TreeView.SelectedItem).Parent);
-				//((SpriteLayer)SceneExplorer_TreeView.SelectedValue).get
 			}
-			else
-				return;
-
-
-      Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, iii);
-      LevelEditor_Canvas.Children.Add(r);
-
-      FullMapEditorFill(p);
-    }
+			return -1;
+		}
 
     private Point GetGridSnapCords(Point p)
     {
@@ -1018,6 +1061,24 @@ namespace AmethystEngine.Forms
 			((Level)SceneExplorer_TreeView.SelectedValue).Layers.Add(new SpriteLayer(LayerType.Gameobject) { LayerName = "new G.O." });
 		}
 
+		private void LevelEditorSelection_Click(object sender, RoutedEventArgs e)
+		{
+			CurrentTool = EditorTool.Select;
+		}
 
+		private void LevelEditorEraser_Click(object sender, RoutedEventArgs e)
+		{
+			CurrentTool = EditorTool.Eraser;
+		}
+
+		private void LevelEditorMove_Click(object sender, RoutedEventArgs e)
+		{
+			CurrentTool = EditorTool.Move;
+		}
+
+		private void LevelEditorBrush_Click(object sender, RoutedEventArgs e)
+		{
+			CurrentTool = EditorTool.Brush;
+		}
 	}
 }

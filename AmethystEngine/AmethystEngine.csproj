@@ -86,6 +86,7 @@
     <Compile Include="Components\EditorObect.cs" />
     <Compile Include="Components\Item.cs" />
     <Compile Include="Components\SplashScreen.cs" />
+    <Compile Include="Components\Tools\SelectTool.cs" />
     <Compile Include="Components\XMLManager.cs" />
     <Compile Include="Forms\EngineEditor.xaml.cs">
       <DependentUpon>EngineEditor.xaml</DependentUpon>

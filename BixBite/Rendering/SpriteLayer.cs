@@ -24,7 +24,7 @@ namespace BixBite.Rendering
 		public LayerType layerType = LayerType.None;
 
 		private Dictionary<String, object> Properties = new Dictionary<string, object>();
-		object LayerObjects = new object(); //contains the objects for this layer. 
+		public object LayerObjects = new object(); //contains the objects for this layer. 
 		ImageEffect layereffect = new ImageEffect(); //and image effect that will effect THE WHOLE layer. So windDistort for example.
 		
 		public SpriteLayer()
