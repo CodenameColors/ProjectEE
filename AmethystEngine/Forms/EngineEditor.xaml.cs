@@ -540,6 +540,7 @@ namespace AmethystEngine.Forms
     //Creates a tile brush to paint the editor. Uses selected tile from tile map.
     private void TileMap_Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
+			//TODO: MAKE THIS WORK WITH VARIABLE SIZES NOT JUST 32x32
       SelectedTile_Canvas.Children.Clear(); imgtilebrush = null;
       RenderTargetBitmap rtb = new RenderTargetBitmap((int)TileMap_Canvas_temp.ActualWidth,
        (int)TileMap_Canvas_temp.ActualHeight, 96d, 96d, System.Windows.Media.PixelFormats.Default);
@@ -557,7 +558,9 @@ namespace AmethystEngine.Forms
       // using BitmapImage version to prove its created successfully
       Image image2 = new Image(); image2.Source = crop; //cropped
       imgtilebrush = new ImageBrush(image2.Source);
-      SelectedTile_Canvas.Children.Add(new Rectangle() { Width = 32, Height = 32, Fill = imgtilebrush, RenderTransform = new ScaleTransform(.5, .5) });
+			int tilenumdata = ((y / 32) * ((int)TileMap_Canvas_temp.ActualWidth / 32)) + (x / 32); 
+      SelectedTile_Canvas.Children.Add(new Rectangle() { Width = 32, Height = 32,
+				Fill = imgtilebrush, Tag = tilenumdata, RenderTransform = new ScaleTransform(.8,.8)});
     }
 
     private void TileMap_Canvas_MouseMove(object sender, MouseEventArgs e)
@@ -578,6 +581,8 @@ namespace AmethystEngine.Forms
     /// <param name="e"></param>
     private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
+			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
+
 			Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
 			Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
 			int iii = 0;
@@ -585,14 +590,13 @@ namespace AmethystEngine.Forms
 			if (CurrentTool == EditorTool.Brush)
 			{
 				iii = GetTileZIndex(SceneExplorer_TreeView);
-				Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush };
-
+				Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid.
 				Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 0, (int)pos.X , (int)pos.Y);
 				if (rr != null) return;//check to see if the current tile exists. if so then don't add.
 
-				Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, iii);
-				LevelEditor_Canvas.Children.Add(r);
-				FullMapEditorFill(p);
+				Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, iii); //place the tile position wise
+				LevelEditor_Canvas.Children.Add(r); //actual place it on the canvas
+				FullMapEditorFill(p, iii); //update the fullmap display to reflect this change
 			}
 			else if(CurrentTool == EditorTool.Select)
 			{
@@ -626,7 +630,6 @@ namespace AmethystEngine.Forms
 
 		private int GetTileZIndex(TreeView treeitem)
 		{
-			int index = 0;
 			//are we clicked on a spritelayer? AND a tile layer?
 			if (treeitem.SelectedValue is SpriteLayer && ((SpriteLayer)treeitem.SelectedValue).layerType == LayerType.Tile)
 			{
@@ -656,17 +659,20 @@ namespace AmethystEngine.Forms
       return p;
     }
 
-    private void FullMapEditorFill(Point p)
+    private void FullMapEditorFill(Point p, int zindex)
     {
       //flll the data.
       int fullY = (int)FullMapLEditor_Canvas.ActualHeight; fullY -= fullY % (NumOfCellsY);
       int fullX = (int)FullMapLEditor_Canvas.ActualWidth; fullX -= fullX % (NumOfCellsX);
       fullX = fullX / (NumOfCellsX);
       fullY = fullY / (NumOfCellsY);
-      TileMapData[((int)p.X + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth,
-        ((int)p.Y + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight] = 1;
 
-      Rectangle r = new Rectangle() { Width = 4, Height = 4, Fill = imgtilebrush };
+			SpriteLayer curlayer = (SpriteLayer)SceneExplorer_TreeView.SelectedValue;
+			curlayer.AddToLayer(new object(), ((int)p.X + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth
+				, ((int)p.Y + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight,
+				int.Parse(((Rectangle)SelectedTile_Canvas.Children[0]).Tag.ToString()));
+
+			Rectangle r = new Rectangle() { Width = 4, Height = 4, Fill = imgtilebrush };
 
       int setX = (4 * ((int)p.X / EditorGridWidth)) + ((int)GridOffset.X);
       int setY = (4 * ((int)p.Y / EditorGridHeight)) + ((int)GridOffset.Y);
@@ -710,7 +716,10 @@ namespace AmethystEngine.Forms
       //is the middle mouse button down?
       if (e.MiddleButton == MouseButtonState.Pressed)
         LavelEditorPan();
-      MPos = e.GetPosition(LevelEditor_Canvas); //set this for the iteration
+			if (e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Brush)
+				Canvas_MouseLeftButtonDown(sender, new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left));
+
+			MPos = e.GetPosition(LevelEditor_Canvas); //set this for the iteration
     }
 
     //this method is here to update the size of rectangle on the fullmap on the right.
@@ -998,6 +1007,7 @@ namespace AmethystEngine.Forms
 			//create new Level
 			Level TempLevel = new Level(LevelName);
 			SpriteLayer TempLevelChild = new SpriteLayer(LayerType.Tile) { LayerName = "Background" };
+			TempLevelChild.DefineLayerDataType(LayerType.Tile, 200, 400);
 			TempLevel.Layers.Add(TempLevelChild);
 
 			////show the newly created LEVEL
@@ -1048,9 +1058,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		//TODO: make it work with background tile grid sizes.
 		private void AddTileLayer_Click(object sender, RoutedEventArgs e)
 		{
 			((Level)SceneExplorer_TreeView.SelectedValue).Layers.Add(new SpriteLayer(LayerType.Tile) { LayerName = "new tile" });
+			((Level)SceneExplorer_TreeView.SelectedValue).Layers.Last().DefineLayerDataType(LayerType.Tile, 200, 400);
 		}
 		private void SpriteLayer_Click(object sender, RoutedEventArgs e)
 		{
@@ -1079,6 +1091,14 @@ namespace AmethystEngine.Forms
 		private void LevelEditorBrush_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentTool = EditorTool.Brush;
+		}
+
+		private void Test_Click(object sender, RoutedEventArgs e)
+		{
+			//moving test
+			Canvas.SetLeft(selectTool.SelectedTiles[0], Canvas.GetLeft(selectTool.SelectedTiles[0]) + selectTool.SelectedTiles[0].ActualWidth); 
+
+			//layer moving test.
 		}
 	}
 }

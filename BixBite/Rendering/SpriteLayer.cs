@@ -37,6 +37,19 @@ namespace BixBite.Rendering
 		}
 
 		/// <summary>
+		/// This method allows the "hot reloading" of the tile grids MAX size
+		/// </summary>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		public int[,] ResizeLayerBounds(int x, int y)
+		{
+			if (layerType != LayerType.Tile) return null; //only is allowed on TILE sprite layers.
+			int[,] temparr = new int[x,y];
+			LayerObjects = temparr;
+			return null;
+		}
+
+		/// <summary>
 		/// Used to define what hte structure that will hold the Layer data. 
 		/// ALSO used to hot reset the size of the tile grid
 		/// </summary>
@@ -62,6 +75,7 @@ namespace BixBite.Rendering
 		/// <param name="newLayerObject">Desired object to add.</param>
 		public void AddToLayer(object newLayerObject, int xcell = 0, int ycell = 0, int tiledata = 0)
 		{
+			Console.WriteLine("tttt");
 			switch (layerType)
 			{
 				case (LayerType.None):
@@ -75,12 +89,12 @@ namespace BixBite.Rendering
 					}
 					return;
 				case (LayerType.Tile):
-					if (newLayerObject is Microsoft.Xna.Framework.Point)
+					if (LayerObjects is Array && ((Array)LayerObjects).Rank == 2)
 					{
-						if (LayerObjects is int[,])
-							((int[,])LayerObjects)[xcell, ycell] = tiledata;
-						else Console.WriteLine("Invalid defined Layerobject type. Not a List of Tiles");
+						((Array)LayerObjects).SetValue(tiledata, xcell, ycell);
 					}
+					//((int[,])LayerObjects)[xcell, ycell] = tiledata;
+					else Console.WriteLine("Invalid defined Layerobject type. Not a List of Tiles");
 					return;
 				case (LayerType.Gameobject):
 					if (newLayerObject is GameObject)
