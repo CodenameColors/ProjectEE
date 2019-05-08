@@ -40,11 +40,11 @@ namespace AmethystEngine.Components.Tools
 		/// <param name="x">the x position of the mouse in relative origin to the canvas</param>
 		/// <param name="y">the y position of the mouse in relative origin to the canvas</param>
 		/// <returns>Returns the rectangle that the mouse has clicked on. NULL if not found.</returns>
-		public static Rectangle FindTile(List<Rectangle> layertiles, int zindex, int x, int y)
+		public static Rectangle FindTile(Canvas backcanvas, List<Rectangle> layertiles, int zindex, int x, int y)
 		{
 			foreach (Rectangle r in layertiles)
 			{
-				if (inTile(r, x, y))
+				if (inTile(backcanvas, r, x, y))
 				{
 					if (Canvas.GetZIndex(r as System.Windows.UIElement) == zindex)
 						return r;
@@ -73,12 +73,12 @@ namespace AmethystEngine.Components.Tools
 		/// Takes in a tile, and a mouse position. Determines if the mouse is within the tiles bounds.
 		/// </summary>
 		/// <returns>true if the mouse location is within a given range</returns>
-		public static bool inTile(Rectangle tile, int x, int y)
+		public static bool inTile(Canvas backcanvas, Rectangle tile, int x, int y)
 		{
 			int left = (int)Canvas.GetLeft(tile);
-			int right = left + (int)tile.ActualWidth;
+			int right = left + (int)(tile.ActualWidth * backcanvas.RenderTransform.Value.M11);
 			int top = (int)Canvas.GetTop(tile);
-			int bottom = top + (int)tile.ActualHeight;
+			int bottom = top + (int)(tile.ActualHeight * backcanvas.RenderTransform.Value.M11);
 			if (x >= left && x <= right)
 			{
 				if (y >= top && y <= bottom )
