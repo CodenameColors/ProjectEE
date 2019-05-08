@@ -591,8 +591,9 @@ namespace AmethystEngine.Forms
 			{
 				iii = GetTileZIndex(SceneExplorer_TreeView);
 				Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid.
-				Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 0, (int)pos.X , (int)pos.Y);
-				if (rr != null) return;//check to see if the current tile exists. if so then don't add.
+				Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 0, (int)pos.X , (int)pos.Y);
+        if (rr != null)
+        { Console.WriteLine(String.Format("Cell ({0},{1}) already is filled",(int)pos.X, (int)pos.Y)); return; }//check to see if the current tile exists. if so then don't add.
 
 				Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, iii); //place the tile position wise
 				LevelEditor_Canvas.Children.Add(r); //actual place it on the canvas
@@ -604,11 +605,11 @@ namespace AmethystEngine.Forms
 				if (SceneExplorer_TreeView.SelectedValue is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Tile)
 				{
 					Rectangle r = new Rectangle() { Tag = "selection", Width = 40, Height = 40, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
-					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), GetTileZIndex(SceneExplorer_TreeView), (int)pos.X, (int)pos.Y);
+					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), GetTileZIndex(SceneExplorer_TreeView), (int)pos.X, (int)pos.Y);
 					Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, 100);
 
 					//don't add another selection rectangle on an existing selection rectangle
-					Rectangle sr = SelectTool.FindTile(LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 100, (int)pos.X, (int)pos.Y);
+					Rectangle sr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 100, (int)pos.X, (int)pos.Y);
 
 					
 					if (sr != null) return;
