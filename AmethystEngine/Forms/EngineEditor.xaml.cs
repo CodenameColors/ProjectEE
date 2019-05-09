@@ -48,7 +48,8 @@ namespace AmethystEngine.Forms
 		Select,
 		Eraser,
 		Move,
-		Brush
+		Brush,
+    Fill
 	}
 
 	public class LevelEditorProp
@@ -95,6 +96,7 @@ namespace AmethystEngine.Forms
 		public ObservableCollection<Level> OpenLevels { get; set;}
 		public ImageBrush imgtilebrush { get; private set; }
 		private Tuple<object, SceneObjectType> CurrentLevelEditorSceneObject;
+    Point[] SelectionRectPoints = new Point[2];
 
     int EditorGridHeight = 40;
     int EditorGridWidth = 40;
@@ -610,12 +612,12 @@ namespace AmethystEngine.Forms
 
 					//don't add another selection rectangle on an existing selection rectangle
 					Rectangle sr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 100, (int)pos.X, (int)pos.Y);
+          SelectionRectPoints[1] = new Point(e.GetPosition(LevelEditor_Canvas).X, e.GetPosition(LevelEditor_Canvas).Y); //store the start point of the select rect
 
-					
-					if (sr != null) return;
+          if (sr != null) return;
 					selectTool.SelectedTiles.Add(rr);
 					LevelEditor_Canvas.Children.Add(r);
-				}
+        }
 			}
 			else if (CurrentTool == EditorTool.Eraser)
 			{
@@ -625,11 +627,14 @@ namespace AmethystEngine.Forms
 			{
 
 			}
-
-			
     }
 
-		private int GetTileZIndex(TreeView treeitem)
+    private void LevelEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+      SelectionRectPoints[1] = new Point(e.GetPosition(LevelEditor_Canvas).X, e.GetPosition(LevelEditor_Canvas).Y);
+    }
+    
+    private int GetTileZIndex(TreeView treeitem)
 		{
 			//are we clicked on a spritelayer? AND a tile layer?
 			if (treeitem.SelectedValue is SpriteLayer && ((SpriteLayer)treeitem.SelectedValue).layerType == LayerType.Tile)
@@ -1094,12 +1099,48 @@ namespace AmethystEngine.Forms
 			CurrentTool = EditorTool.Brush;
 		}
 
-		private void Test_Click(object sender, RoutedEventArgs e)
+    private void Fill_Click(object sender, RoutedEventArgs e)
+    {
+      CurrentTool = EditorTool.Fill;
+
+      int columns = (int)(GetGridSnapCords(SelectionRectPoints[1]).X - GetGridSnapCords(SelectionRectPoints[0]).X);
+      int rows = (int)(GetGridSnapCords(SelectionRectPoints[1]).Y - GetGridSnapCords(SelectionRectPoints[0]).Y);
+
+      columns /= (int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11);
+      rows /= (int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11);
+
+      Point begginning = GetGridSnapCords(SelectionRectPoints[0]);
+
+      for (int i = 0; i <= columns; i++)
+      {
+        for (int j = 0; j <= rows; j++)
+        {
+          Point p = new Point(begginning.X + (((int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11)) * i), begginning.Y + (((int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11)) * j));
+          SpriteLayer curlayer = (SpriteLayer)SceneExplorer_TreeView.SelectedValue;
+          curlayer.AddToLayer(new object(), ((int)p.X + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth
+          , ((int)p.Y + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight,
+          int.Parse(((Rectangle)SelectedTile_Canvas.Children[0]).Tag.ToString()));
+
+          Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush };
+
+          int setX = (4 * ((int)p.X / EditorGridWidth)) + ((int)GridOffset.X);
+          int setY = (4 * ((int)p.Y / EditorGridHeight)) + ((int)GridOffset.Y);
+
+          Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, 0); //place the tile position wise
+          LevelEditor_Canvas.Children.Add(r); //actual place it on the canvas
+          FullMapEditorFill(p, 0); //update the fullmap display to reflect this change
+        }
+      }
+    }
+
+    private void Test_Click(object sender, RoutedEventArgs e)
 		{
 			//moving test
 			Canvas.SetLeft(selectTool.SelectedTiles[0], Canvas.GetLeft(selectTool.SelectedTiles[0]) + selectTool.SelectedTiles[0].ActualWidth); 
 
 			//layer moving test.
 		}
-	}
+
+    
+  }
 }
