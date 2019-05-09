@@ -327,6 +327,7 @@
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="Auto"/>
 					<ColumnDefinition/>
 					<ColumnDefinition Width="Auto" MinWidth="44"/>
 					<ColumnDefinition Width="Auto" MinWidth="292"/>
@@ -355,7 +356,11 @@
 					<MenuItem Header="Brush" Click="LevelEditorBrush_Click">
 					</MenuItem>
 				</Menu>
-				<Menu DockPanel.Dock="Top" Grid.Column="5" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
+        <Menu DockPanel.Dock="Top" Grid.Column="5" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
+          <MenuItem Header="Fill" Click="Fill_Click">
+          </MenuItem>
+        </Menu>
+        <Menu DockPanel.Dock="Top" Grid.Column="6" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
 					<MenuItem Header="Test" Click="Test_Click">
 					</MenuItem>
 				</Menu>
@@ -396,7 +401,7 @@
 						<Canvas Grid.Row="0" x:Name="LevelEditor_BackCanvas" IsHitTestVisible="True" Grid.Column="0" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" 
 										MouseWheel="LevelEditor_Canvas_MouseWheel" 
 										MouseMove="LevelEditor_BackCanvas_MouseMove" SizeChanged="LevelEditor_BackCanvas_SizeChanged"
-										ClipToBounds="True">
+										ClipToBounds="True" MouseLeftButtonUp="LevelEditor_BackCanvas_MouseLeftButtonUp">
 							<Canvas.Background>
 								<VisualBrush x:Name="Canvas_grid" TileMode="Tile" Stretch="Fill" Viewport="0,0,40,40" ViewportUnits="Absolute" >
 									<VisualBrush.Visual>
