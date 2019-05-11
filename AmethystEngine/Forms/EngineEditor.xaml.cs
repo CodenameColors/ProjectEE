@@ -586,13 +586,15 @@ namespace AmethystEngine.Forms
 			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
 
 			Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
-			Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
+			//Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_Canvas));
+			Point p = RelativeGridSnap(Mouse.GetPosition(LevelEditor_BackCanvas));
+			Console.WriteLine(String.Format("Snapped grid cords: {0}", p.ToString()));
 			int iii = 0;
 			
 			if (CurrentTool == EditorTool.Brush)
 			{
-				iii = GetTileZIndex(SceneExplorer_TreeView);
-				Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid.
+				iii = GetTileZIndex(SceneExplorer_TreeView); //what layer are we on?
+				Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid. always 40 becasue thats the base. 
 				Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 0, (int)pos.X , (int)pos.Y);
         if (rr != null)
         { Console.WriteLine(String.Format("Cell ({0},{1}) already is filled",(int)pos.X, (int)pos.Y)); return; }//check to see if the current tile exists. if so then don't add.
@@ -612,12 +614,13 @@ namespace AmethystEngine.Forms
 
 					//don't add another selection rectangle on an existing selection rectangle
 					Rectangle sr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 100, (int)pos.X, (int)pos.Y);
-          SelectionRectPoints[1] = new Point(e.GetPosition(LevelEditor_Canvas).X, e.GetPosition(LevelEditor_Canvas).Y); //store the start point of the select rect
 
           if (sr != null) return;
 					selectTool.SelectedTiles.Add(rr);
 					LevelEditor_Canvas.Children.Add(r);
-        }
+
+					SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+				}
 			}
 			else if (CurrentTool == EditorTool.Eraser)
 			{
@@ -631,8 +634,27 @@ namespace AmethystEngine.Forms
 
     private void LevelEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-      SelectionRectPoints[1] = new Point(e.GetPosition(LevelEditor_Canvas).X, e.GetPosition(LevelEditor_Canvas).Y);
-    }
+			if (CurrentTool == EditorTool.Brush)
+			{
+
+			}
+			else if (CurrentTool == EditorTool.Select)
+			{
+				SelectionRectPoints[1] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y);
+			}
+			else if (CurrentTool == EditorTool.Eraser)
+			{
+
+			}
+			else if (CurrentTool == EditorTool.Fill)
+			{
+
+			}
+			else if (CurrentTool == EditorTool.Move)
+			{
+
+			}
+		}
     
     private int GetTileZIndex(TreeView treeitem)
 		{
@@ -652,6 +674,38 @@ namespace AmethystEngine.Forms
 				}
 			}
 			return -1;
+		}
+
+		private Point RelativeGridSnap(Point p)
+		{
+
+			//find the Relative grid size in pixels
+			int relgridsize = (((int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11)));
+			//find the offset amount.
+			int Xoff = (int)(Math.Abs(Canvas_grid.Viewport.X));
+			int YOff = (int)(Math.Abs(Canvas_grid.Viewport.Y));
+
+			//what is the left over amount?
+			Xoff %= relgridsize;
+			YOff %= relgridsize;
+
+			//relative snap offset
+			Xoff = relgridsize - Xoff;
+			YOff = relgridsize - YOff;
+
+			//add the offset to the current mouse position.
+			p = new Point(Xoff + p.X, YOff + p.Y);
+
+			//divide the sumation by the relative grid size
+			Point relpoint = new Point((int)(p.X / relgridsize)-1, (int)(p.Y / relgridsize)-1);
+
+			//this gives us the cell number. Use this and multiply by the base value.
+			Point snappedpoint = new Point(relpoint.X * 40 , relpoint.Y * 40);
+
+			//return the ABS grid cords.
+
+
+			return snappedpoint;
 		}
 
     private Point GetGridSnapCords(Point p)
@@ -818,7 +872,9 @@ namespace AmethystEngine.Forms
         Console.WriteLine(String.Format("W:{0},  H{1}", EditorGridWidth, EditorGridHeight));
         //TODO: resize selection rectangle
       }
-    }
+			ZoomFactor_TB.Text = String.Format("({0})%  ({1}x{1})" , 100 * ZoomLevel, EditorGridWidth * ZoomLevel);
+
+		}
     #endregion
     #endregion
 
@@ -1103,33 +1159,33 @@ namespace AmethystEngine.Forms
     {
       CurrentTool = EditorTool.Fill;
 
-      int columns = (int)(GetGridSnapCords(SelectionRectPoints[1]).X - GetGridSnapCords(SelectionRectPoints[0]).X);
-      int rows = (int)(GetGridSnapCords(SelectionRectPoints[1]).Y - GetGridSnapCords(SelectionRectPoints[0]).Y);
+      int columns = (int)(RelativeGridSnap(SelectionRectPoints[1]).X - RelativeGridSnap(SelectionRectPoints[0]).X);
+      int rows = (int)(RelativeGridSnap(SelectionRectPoints[1]).Y - RelativeGridSnap(SelectionRectPoints[0]).Y);
 
-      columns /= (int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11);
-      rows /= (int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11);
+			columns /= (int)(40);
+			rows /= (int)(40);
 
-      Point begginning = GetGridSnapCords(SelectionRectPoints[0]);
-
+			Point begginning = GetGridSnapCords(SelectionRectPoints[0]);
       for (int i = 0; i <= columns; i++)
       {
         for (int j = 0; j <= rows; j++)
         {
-          Point p = new Point(begginning.X + (((int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11)) * i), begginning.Y + (((int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11)) * j));
-          SpriteLayer curlayer = (SpriteLayer)SceneExplorer_TreeView.SelectedValue;
-          curlayer.AddToLayer(new object(), ((int)p.X + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth
-          , ((int)p.Y + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight,
-          int.Parse(((Rectangle)SelectedTile_Canvas.Children[0]).Tag.ToString()));
+					Point p = new Point(begginning.X + (int)(40  * i), begginning.Y + (int)(40 * j ));
+					int iii = GetTileZIndex(SceneExplorer_TreeView);
+					Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid.
+					SpriteLayer curlayer = (SpriteLayer)SceneExplorer_TreeView.SelectedValue;
+					curlayer.AddToLayer(new object(), ((int)p.X + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth
+						, ((int)p.Y + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight,
+						int.Parse(((Rectangle)SelectedTile_Canvas.Children[0]).Tag.ToString()));
 
-          Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush };
+					//Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 0, (int)pos.X, (int)pos.Y);
+					//if (rr != null)
+					//{ Console.WriteLine(String.Format("Cell ({0},{1}) already is filled", (int)pos.X, (int)pos.Y)); return; }//check to see if the current tile exists. if so then don't add.
 
-          int setX = (4 * ((int)p.X / EditorGridWidth)) + ((int)GridOffset.X);
-          int setY = (4 * ((int)p.Y / EditorGridHeight)) + ((int)GridOffset.Y);
-
-          Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, 0); //place the tile position wise
-          LevelEditor_Canvas.Children.Add(r); //actual place it on the canvas
-          FullMapEditorFill(p, 0); //update the fullmap display to reflect this change
-        }
+					Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, iii); //place the tile position wise
+					LevelEditor_Canvas.Children.Add(r); //actual place it on the canvas
+					FullMapEditorFill(p, iii); //update the fullmap display to reflect this change
+				}
       }
     }
 
