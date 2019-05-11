@@ -25,7 +25,7 @@ namespace AmethystEngine.Forms
   public partial class MainWindow : Window
   {
     //List<projdata> recentprojs = new List<projdata>();
-    public List<EditorObject> recentprojs = new List<EditorObject>();
+  public List<EditorObject> recentprojs = new List<EditorObject>();
     List<String> TFiles = new List<string>();
     public MainWindow()
     {

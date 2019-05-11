@@ -42,23 +42,23 @@
 
 		<ControlTemplate x:Key="LevelEditorTileMap_Template">
 			<TabControl Background="#FF2B2B2B">
-        <TabItem Header="Tile Map" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
-          <ScrollViewer x:Name="LevelEditorTIleMap_SV" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,4,5,7" IsEnabled="True" Background="Black">
-            <Canvas x:Name="TileMap_Canvas" IsHitTestVisible="True" MouseWheel="LevelEditor_Canvas_MouseWheel" Width="512" Height="512" MouseLeftButtonDown="TileMap_Canvas_MouseLeftButtonDown" 
+				<TabItem Header="Tile Map" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
+					<ScrollViewer x:Name="LevelEditorTIleMap_SV" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,4,5,7" IsEnabled="True" Background="Black">
+						<Canvas x:Name="TileMap_Canvas" IsHitTestVisible="True" MouseWheel="LevelEditor_Canvas_MouseWheel" Width="512" Height="512" MouseLeftButtonDown="TileMap_Canvas_MouseLeftButtonDown" 
 										MouseMove="TileMap_Canvas_MouseMove" HorizontalAlignment="Left" VerticalAlignment="Top" >
-              <Canvas.Background>
-                <VisualBrush x:Name="LevelEditorTileMapCanvas_VB" TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute" Stretch="Uniform" >
-                  <VisualBrush.Visual>
-                    <Rectangle Width="10" Height="10" Fill="Transparent" Stroke="White" StrokeThickness=".1" Visibility="Hidden"/>
-                  </VisualBrush.Visual>
-                </VisualBrush>
-              </Canvas.Background>
-            </Canvas>
-          </ScrollViewer>
-        </TabItem>
-        <TabItem Header="Sprite Lib" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
-        </TabItem>
-        <TabItem Header="Custom Sets [WIP]" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
+							<Canvas.Background>
+								<VisualBrush x:Name="LevelEditorTileMapCanvas_VB" TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute" Stretch="Uniform" >
+									<VisualBrush.Visual>
+										<Rectangle Width="10" Height="10" Fill="Transparent" Stroke="White" StrokeThickness=".1" Visibility="Hidden"/>
+									</VisualBrush.Visual>
+								</VisualBrush>
+							</Canvas.Background>
+						</Canvas>
+					</ScrollViewer>
+				</TabItem>
+				<TabItem Header="Sprite Lib" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
+				</TabItem>
+				<TabItem Header="Custom Sets [WIP]" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 				</TabItem>
 			</TabControl>
 		</ControlTemplate>
@@ -327,7 +327,7 @@
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="Auto"/>
-          <ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition/>
 					<ColumnDefinition Width="Auto" MinWidth="44"/>
 					<ColumnDefinition Width="Auto" MinWidth="292"/>
@@ -356,15 +356,15 @@
 					<MenuItem Header="Brush" Click="LevelEditorBrush_Click">
 					</MenuItem>
 				</Menu>
-        <Menu DockPanel.Dock="Top" Grid.Column="5" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
-          <MenuItem Header="Fill" Click="Fill_Click">
-          </MenuItem>
-        </Menu>
-        <Menu DockPanel.Dock="Top" Grid.Column="6" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
+				<Menu DockPanel.Dock="Top" Grid.Column="5" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
+					<MenuItem Header="Fill" Click="Fill_Click">
+					</MenuItem>
+				</Menu>
+				<Menu DockPanel.Dock="Top" Grid.Column="6" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
 					<MenuItem Header="Test" Click="Test_Click">
 					</MenuItem>
 				</Menu>
-				
+
 				<!--<Button HorizontalAlignment="Right" VerticalAlignment="Center"  Width="60" Height="22" Background="#FF383838" Foreground="White" Content="Level" Grid.Column="0"/>
         <Button HorizontalAlignment="Right" VerticalAlignment="Center"  Width="60" Height="22" Background="#FF383838" Foreground="White" Content="Selection" Grid.Column="1"/>
         <Button HorizontalAlignment="Right" VerticalAlignment="Center"  Width="60" Height="22" Background="#FF383838" Foreground="White" Content="Eraser" Grid.Column="2"/>
@@ -386,14 +386,17 @@
 						<Grid Grid.Row="1" Height="32" VerticalAlignment="Top" Margin="0,0,0,-7">
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="Auto"/>
-								<ColumnDefinition/>
-								<ColumnDefinition/>
+								<ColumnDefinition Width="Auto"/>
+								<ColumnDefinition Width="Auto" MinWidth="103"/>
 								<ColumnDefinition/>
 							</Grid.ColumnDefinitions>
-							<TextBox x:Name="LevelEditorCords_TB" MinWidth="50" Width="Auto" Margin="1,3,146,7" FontSize="10" Grid.ColumnSpan="2" Background="#FF4F4F4F" BorderBrush="#00ABADB3"/>
+							<TextBox x:Name="LevelEditorCords_TB" MinWidth="50" Width="68" Margin="1,3,0,7" FontSize="10" Grid.Column="0" Background="#FF4F4F4F" BorderBrush="#00ABADB3" HorizontalAlignment="Left"/>
+
+							<TextBox x:Name="ZoomFactor_TB" Grid.Column="2" MinWidth="50" Width="92" Margin="5,6,0,10" FontSize="10" Background="#FF4F4F4F" BorderBrush="#00ABADB3" HorizontalAlignment="Left" Text="100% " VerticalAlignment="Center" Height="16"/>
+
 
 							<Canvas x:Name="SelectedTile_Canvas" Width="32" Grid.Column="3" HorizontalAlignment="Right" Margin="0,0,3,0" RenderTransformOrigin="-0.281,0.531"/>
-							<Label Content="Selected Tile:" Grid.Column="3" Margin="0,-3,40,3" Background="Transparent" Foreground="White" BorderThickness="0" HorizontalAlignment="Right" FontSize="18"/>
+							<Label Content="Selected Tile:" Grid.Column="3" Margin="0,-3,40,3" Background="Transparent" Foreground="White" BorderThickness="0" HorizontalAlignment="Right" FontSize="18" Width="114"/>
 						</Grid>
 
 

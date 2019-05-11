@@ -75,9 +75,9 @@ namespace AmethystEngine.Components.Tools
 		/// <returns>true if the mouse location is within a given range</returns>
 		public static bool inTile(Canvas backcanvas, Rectangle tile, int x, int y)
 		{
-			int left = (int)Canvas.GetLeft(tile);
+			int left = (int)(Canvas.GetLeft(tile) * backcanvas.RenderTransform.Value.M11);
 			int right = left + (int)(tile.ActualWidth * backcanvas.RenderTransform.Value.M11);
-			int top = (int)Canvas.GetTop(tile);
+			int top = (int)(Canvas.GetTop(tile) * backcanvas.RenderTransform.Value.M11);
 			int bottom = top + (int)(tile.ActualHeight * backcanvas.RenderTransform.Value.M11);
 			if (x >= left && x <= right)
 			{
