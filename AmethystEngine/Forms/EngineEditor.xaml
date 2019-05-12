@@ -328,6 +328,8 @@
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition/>
 					<ColumnDefinition Width="Auto" MinWidth="44"/>
 					<ColumnDefinition Width="Auto" MinWidth="292"/>
@@ -361,10 +363,18 @@
 					</MenuItem>
 				</Menu>
 				<Menu DockPanel.Dock="Top" Grid.Column="6" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
+					<MenuItem Header="Up Layer" Click="UpLaverLevelEditor_BTN_Click">
+					</MenuItem>
+				</Menu>
+				<Menu DockPanel.Dock="Top" Grid.Column="7" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
+					<MenuItem Header="Down Laver" Click="DownLaverLevelEditor_BTN_Click">
+					</MenuItem>
+				</Menu>
+				<Menu DockPanel.Dock="Top" Grid.Column="8" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
 					<MenuItem Header="Test" Click="Test_Click">
 					</MenuItem>
 				</Menu>
-
+				
 				<!--<Button HorizontalAlignment="Right" VerticalAlignment="Center"  Width="60" Height="22" Background="#FF383838" Foreground="White" Content="Level" Grid.Column="0"/>
         <Button HorizontalAlignment="Right" VerticalAlignment="Center"  Width="60" Height="22" Background="#FF383838" Foreground="White" Content="Selection" Grid.Column="1"/>
         <Button HorizontalAlignment="Right" VerticalAlignment="Center"  Width="60" Height="22" Background="#FF383838" Foreground="White" Content="Eraser" Grid.Column="2"/>
