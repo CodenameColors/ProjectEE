@@ -108,6 +108,29 @@ namespace BixBite.Rendering
 		}
 
 		/// <summary>
+		/// Add objects to the current sprite layer depending on type.
+		/// </summary>
+		/// <param name="newLayerObject">Desired object to add.</param>
+		public void DeleteFromLayer(int xcell = 0, int ycell = 0)
+		{
+			switch (layerType)
+			{
+				case (LayerType.None):
+					throw new SpriteLayerException(LayerType.None);
+				case (LayerType.Sprite):
+					//WIP
+					return;
+				case (LayerType.Tile):
+					((int[,])LayerObjects)[xcell, ycell] = 0;
+					return;
+				case (LayerType.Gameobject):
+					//WIP
+					return;
+			}
+		}
+
+
+		/// <summary>
 		/// Get the data of a desired property. MUST EXIST ALREADY. 
 		/// </summary>
 		/// <param name="PropertyName"></param>
