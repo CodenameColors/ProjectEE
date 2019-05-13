@@ -92,11 +92,11 @@ namespace AmethystEngine.Forms
 		EditorTool CurrentTool = EditorTool.None;
 		SelectTool selectTool = new SelectTool();
 
-		int[,] TileMapData = new int[10, 10];
 		public ObservableCollection<Level> OpenLevels { get; set;}
 		public ImageBrush imgtilebrush { get; private set; }
 		private Tuple<object, SceneObjectType> CurrentLevelEditorSceneObject;
     Point[] SelectionRectPoints = new Point[2];
+
 
     int EditorGridHeight = 40;
     int EditorGridWidth = 40;
@@ -587,7 +587,7 @@ namespace AmethystEngine.Forms
 
 			Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
 			//Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_Canvas));
-			Point p = RelativeGridSnap(pos);
+			Point p = GetGridSnapCords(pos);
 			Console.WriteLine(String.Format("Snapped grid cords: {0}", p.ToString()));
 			int iii = 0;
 			
@@ -646,8 +646,8 @@ namespace AmethystEngine.Forms
 			}
 			else if (CurrentTool == EditorTool.Move)
 			{
-
-			}
+        SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+      }
     }
 
     private void LevelEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -694,42 +694,36 @@ namespace AmethystEngine.Forms
 			return -1;
 		}
 
-		private Point RelativeGridSnap(Point p)
-		{
+    private Point RelativeGridSnap(Point p)
+    {
 
-			//find the Relative grid size in pixels
-			int relgridsize = (((int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11)));
-			//find the offset amount.
-			int Xoff = (int)(Math.Abs(Canvas_grid.Viewport.X));
-			int YOff = (int)(Math.Abs(Canvas_grid.Viewport.Y));
+      //find the Relative grid size in pixels
+      int relgridsize = (((int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11)));
+      //find the offset amount.
+      int Xoff = (int)(Math.Abs(Canvas_grid.Viewport.X));
+      int YOff = (int)(Math.Abs(Canvas_grid.Viewport.Y));
 
-			//what is the left over amount?
-			Xoff %= relgridsize;
-			YOff %= relgridsize;
+      //what is the left over amount?
+      Xoff %= relgridsize;
+      YOff %= relgridsize;
 
-			//relative snap offset
-			Xoff = relgridsize - Xoff;
-			YOff = relgridsize - YOff;
+      //relative snap offset
+      Xoff = relgridsize - Xoff;
+      YOff = relgridsize - YOff;
 
-			//add the offset to the current mouse position.
-			p = new Point(Xoff + p.X, YOff + p.Y);
+      //add the offset to the current mouse position.
+      p = new Point(Xoff + p.X, YOff + p.Y);
 
-			//divide the sumation by the relative grid size
-			Point relpoint = new Point((int)(p.X / relgridsize)-1, (int)(p.Y / relgridsize)-1);
+      //divide the sumation by the relative grid size
+      Point relpoint = new Point((int)(p.X / relgridsize) - 1, (int)(p.Y / relgridsize) - 1);
 
-			//this gives us the cell number. Use this and multiply by the base value.
-			Point snappedpoint = new Point(relpoint.X * 40 , relpoint.Y * 40);
+      //this gives us the cell number. Use this and multiply by the base value.
+      Point snappedpoint = new Point(relpoint.X * 40, relpoint.Y * 40);
 
-			//find offset
-			Xoff = (int)(Math.Abs(Canvas_grid.Viewport.X));
-			YOff = (int)(Math.Abs(Canvas_grid.Viewport.Y));
-
-			//what is the left over amount?
-			Xoff %= relgridsize;
-			YOff %= relgridsize;
-
-			return snappedpoint = new Point(snappedpoint.X + Xoff, snappedpoint.Y + YOff); //return with the ABS gird positions.
-		}
+      //return the ABS grid cords.
+     
+      return snappedpoint;
+    }
 
     private Point GetGridSnapCords(Point p)
     {
@@ -800,10 +794,31 @@ namespace AmethystEngine.Forms
       //is the middle mouse button down?
       if (e.MiddleButton == MouseButtonState.Pressed)
         LavelEditorPan();
-			if (e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Brush)
-				Canvas_MouseLeftButtonDown(sender, new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left));
+      if (e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Brush)
+        Canvas_MouseLeftButtonDown(sender, new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left));
+      else if (e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Move)
+      {
+        CardinalDirection cd = GetDCirectionalMove(p, 0);                //TODO: CHANGE THE Z INDEX TO VARIABLE
+        switch (cd)
+        {
+          //TODO: ADD the logic to change the data positions.
+          case (CardinalDirection.N):
+            Canvas.SetTop(selectTool.SelectedTiles[0], Canvas.GetTop(selectTool.SelectedTiles[0]) - selectTool.SelectedTiles[0].ActualWidth);
+            break;
+          case (CardinalDirection.S):
+            Canvas.SetTop(selectTool.SelectedTiles[0], Canvas.GetTop(selectTool.SelectedTiles[0]) + selectTool.SelectedTiles[0].ActualWidth);
+            break;
+          case (CardinalDirection.W):
+            Canvas.SetLeft(selectTool.SelectedTiles[0], Canvas.GetLeft(selectTool.SelectedTiles[0]) - selectTool.SelectedTiles[0].ActualWidth);
+            break;
+          case (CardinalDirection.E):
+            Canvas.SetLeft(selectTool.SelectedTiles[0], Canvas.GetLeft(selectTool.SelectedTiles[0]) + selectTool.SelectedTiles[0].ActualWidth);
+            break;
+        }
+      }
 
-			MPos = e.GetPosition(LevelEditor_Canvas); //set this for the iteration
+
+      MPos = e.GetPosition(LevelEditor_Canvas); //set this for the iteration
     }
 
     //this method is here to update the size of rectangle on the fullmap on the right.
@@ -821,7 +836,6 @@ namespace AmethystEngine.Forms
       int MainCurCellsY = ((int)Math.Ceiling(LevelEditor_BackCanvas.ActualHeight / Canvas_grid.Viewport.Height));
 
       Rectangle r = new Rectangle() { Width = MainCurCellsX * 4, Height = MainCurCellsY * 4, Stroke = Brushes.White, StrokeThickness = 1, Name = "SelectionRect" };
-      TileMapData = new int[(NumOfCellsX), (NumOfCellsY)];
       Canvas.SetLeft(r, 0); Canvas.SetTop(r, 0);
 
       FullMapLEditor_Canvas.Children.RemoveAt(0);
@@ -921,7 +935,6 @@ namespace AmethystEngine.Forms
       int MainCurCellsY = ((int)(LevelEditor_BackCanvas.ActualHeight / Canvas_grid.Viewport.Height));
 
       Rectangle r = new Rectangle() { Width = MainCurCellsX * 4, Height = MainCurCellsY * 4, Stroke = Brushes.White, StrokeThickness = 1, Name = "SelectionRect" };
-      TileMapData = new int[(NumOfCellsX), (NumOfCellsY)];
       Canvas.SetLeft(r, 0); Canvas.SetTop(r, 0);
       FullMapLEditor_Canvas.Children.Add(r);
     }
@@ -1281,6 +1294,48 @@ namespace AmethystEngine.Forms
 			ue.Clear();
 			selectTool.SelectedTiles.Clear();
 		}
+
+    /// <summary>
+    /// this method is here to determine whether the user has moved to the next cell.
+    /// </summary>
+    /// <returns>The direction in which they have moved.</returns>
+    private CardinalDirection GetDCirectionalMove(Point p, int zIndex)
+    {
+      int relgridsize = (((int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11)));
+      //use the current rectange that the user is in to get the (x,y) cords
+      //compare these values to the current MOUSE POS
+      Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 0, (int)p.X, (int)p.Y);
+      Point snappedpoints = RelativeGridSnap(SelectionRectPoints[0]);
+      if (rr != null)
+          return CardinalDirection.None;
+      else
+      {
+        if (p.X < snappedpoints.X && (p.Y > snappedpoints.Y && p.Y < snappedpoints.Y + relgridsize))
+        {  //west
+          Console.WriteLine("moved west");
+          return CardinalDirection.W;
+        }
+        else if (p.X > snappedpoints.X + relgridsize && (p.Y > snappedpoints.Y && p.Y < snappedpoints.Y + relgridsize))
+        {  //east
+          Console.WriteLine("moved East");
+          return CardinalDirection.E;
+        }
+        else if (p.Y > snappedpoints.Y + relgridsize && (p.X > snappedpoints.X && p.X < snappedpoints.X + relgridsize))
+        {  //east
+          Console.WriteLine("moved South");
+          return CardinalDirection.S;
+        }
+        else if (p.Y < snappedpoints.Y && (p.X > snappedpoints.X && p.X < snappedpoints.X + relgridsize))
+        {  //east
+          Console.WriteLine("moved North");
+          return CardinalDirection.N;
+        }
+      }
+      //if now which direction did you move?
+      return CardinalDirection.None;
+    }
+    
+
 		#endregion
 
 
