@@ -712,13 +712,13 @@ namespace AmethystEngine.Forms
       YOff = relgridsize - YOff;
 
       //add the offset to the current mouse position.
-      p = new Point(Xoff + p.X, YOff + p.Y);
+      p = new Point(p.X, p.Y);
 
       //divide the sumation by the relative grid size
-      Point relpoint = new Point((int)(p.X / relgridsize) - 1, (int)(p.Y / relgridsize) - 1);
+      Point relpoint = new Point((int)(p.X / relgridsize), (int)(p.Y / relgridsize));
 
       //this gives us the cell number. Use this and multiply by the base value.
-      Point snappedpoint = new Point(relpoint.X * 40, relpoint.Y * 40);
+      Point snappedpoint = new Point(relpoint.X * 40 + (Xoff / LevelEditor_Canvas.RenderTransform.Value.M11), relpoint.Y * 40 + (YOff/ LevelEditor_Canvas.RenderTransform.Value.M11));
 
       //return the ABS grid cords.
      
@@ -770,7 +770,7 @@ namespace AmethystEngine.Forms
     {
       //we need to display the cords.
       Point p = Mouse.GetPosition(LevelEditor_BackCanvas);
-      String point = String.Format("({0}, {1})", (int)p.X, (int)p.Y);
+      String point = String.Format("({0}, {1}) OFF:({2}, {3})", (int)p.X, (int)p.Y, (int)Canvas_grid.Viewport.X, (int)Canvas_grid.Viewport.Y);
       LevelEditorCords_TB.Text = point;
 
       //which way is mouse moving?
