@@ -587,7 +587,7 @@ namespace AmethystEngine.Forms
 
 			Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
 			//Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_Canvas));
-			Point p = RelativeGridSnap(Mouse.GetPosition(LevelEditor_BackCanvas));
+			Point p = RelativeGridSnap(pos);
 			Console.WriteLine(String.Format("Snapped grid cords: {0}", p.ToString()));
 			int iii = 0;
 			
@@ -719,8 +719,16 @@ namespace AmethystEngine.Forms
 
 			//this gives us the cell number. Use this and multiply by the base value.
 			Point snappedpoint = new Point(relpoint.X * 40 , relpoint.Y * 40);
-			
-			return snappedpoint; //return with the ABS gird positions.
+
+			//find offset
+			Xoff = (int)(Math.Abs(Canvas_grid.Viewport.X));
+			YOff = (int)(Math.Abs(Canvas_grid.Viewport.Y));
+
+			//what is the left over amount?
+			Xoff %= relgridsize;
+			YOff %= relgridsize;
+
+			return snappedpoint = new Point(snappedpoint.X + Xoff, snappedpoint.Y + YOff); //return with the ABS gird positions.
 		}
 
     private Point GetGridSnapCords(Point p)
