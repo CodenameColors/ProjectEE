@@ -714,6 +714,9 @@ namespace AmethystEngine.Forms
 			Xoff = (int)(Xoff * LevelEditor_Canvas.RenderTransform.Value.M11);
 			YOff = (int)(YOff * LevelEditor_Canvas.RenderTransform.Value.M11);
 
+      if (Xoff == 40) Xoff = 0;
+      if (YOff == 40) YOff = 0;
+
 			//add the offset to the current mouse position.
 			p = new Point(p.X, p.Y);
 
@@ -805,19 +808,26 @@ namespace AmethystEngine.Forms
           //TODO: ADD the logic to change the data positions.
           case (CardinalDirection.N):
             Canvas.SetTop(selectTool.SelectedTiles[0], Canvas.GetTop(selectTool.SelectedTiles[0]) - selectTool.SelectedTiles[0].ActualWidth);
+            SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
             break;
           case (CardinalDirection.S):
             Canvas.SetTop(selectTool.SelectedTiles[0], Canvas.GetTop(selectTool.SelectedTiles[0]) + selectTool.SelectedTiles[0].ActualWidth);
+            SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
             break;
           case (CardinalDirection.W):
             Canvas.SetLeft(selectTool.SelectedTiles[0], Canvas.GetLeft(selectTool.SelectedTiles[0]) - selectTool.SelectedTiles[0].ActualWidth);
+            SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
             break;
           case (CardinalDirection.E):
             Canvas.SetLeft(selectTool.SelectedTiles[0], Canvas.GetLeft(selectTool.SelectedTiles[0]) + selectTool.SelectedTiles[0].ActualWidth);
+            SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
             break;
         }
       }
-
+      else if(e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Select)
+      {
+        Console.WriteLine("Select Move");
+      }
 
       MPos = e.GetPosition(LevelEditor_Canvas); //set this for the iteration
     }
