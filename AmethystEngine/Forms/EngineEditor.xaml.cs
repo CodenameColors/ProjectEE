@@ -698,31 +698,32 @@ namespace AmethystEngine.Forms
     {
 
       //find the Relative grid size in pixels
-      int relgridsize = (((int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11)));
+      int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11,1));
       //find the offset amount.
       int Xoff = (int)(Math.Abs(Canvas_grid.Viewport.X));
       int YOff = (int)(Math.Abs(Canvas_grid.Viewport.Y));
 
       //what is the left over amount?
-      Xoff %= relgridsize;
-      YOff %= relgridsize;
+      Xoff %= 40;
+      YOff %= 40;
 
       //relative snap offset
-      Xoff = relgridsize - Xoff;
-      YOff = relgridsize - YOff;
+      Xoff = 40 - Xoff;
+      YOff = 40 - YOff;
 
-      //add the offset to the current mouse position.
-      p = new Point(p.X, p.Y);
+			Xoff = (int)(Xoff * LevelEditor_Canvas.RenderTransform.Value.M11);
+			YOff = (int)(YOff * LevelEditor_Canvas.RenderTransform.Value.M11);
+
+			//add the offset to the current mouse position.
+			p = new Point(p.X, p.Y);
 
       //divide the sumation by the relative grid size
       Point relpoint = new Point((int)(p.X / relgridsize), (int)(p.Y / relgridsize));
+			relpoint.X *= (relgridsize);
+			relpoint.Y *= (relgridsize);
 
-      //this gives us the cell number. Use this and multiply by the base value.
-      Point snappedpoint = new Point(relpoint.X * 40 + (Xoff / LevelEditor_Canvas.RenderTransform.Value.M11), relpoint.Y * 40 + (YOff/ LevelEditor_Canvas.RenderTransform.Value.M11));
-
-      //return the ABS grid cords.
-     
-      return snappedpoint;
+			//this gives us the cell number. Use this and multiply by the base value.
+			return new Point(relpoint.X + Xoff, relpoint.Y + YOff);
     }
 
     private Point GetGridSnapCords(Point p)
@@ -962,15 +963,17 @@ namespace AmethystEngine.Forms
 			CurrentTool = EditorTool.Brush;
 		}
 
+
+		//TODO: This only works for base 40...
 		private void Fill_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentTool = EditorTool.Fill;
-
+			int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
 			int columns = (int)(RelativeGridSnap(SelectionRectPoints[1]).X - RelativeGridSnap(SelectionRectPoints[0]).X);
 			int rows = (int)(RelativeGridSnap(SelectionRectPoints[1]).Y - RelativeGridSnap(SelectionRectPoints[0]).Y);
 
-			columns /= (int)(40);
-			rows /= (int)(40);
+			columns /= relgridsize;
+			rows /= relgridsize;
 
 			Point begginning = GetGridSnapCords(SelectionRectPoints[0]);
 			for (int i = 0; i <= columns; i++)
