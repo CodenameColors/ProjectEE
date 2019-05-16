@@ -826,8 +826,40 @@ namespace AmethystEngine.Forms
       }
       else if(e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Select)
       {
-        Console.WriteLine("Select Move");
-      }
+        
+				//this is the select area move section.
+
+				//first we need to find out have we moved to a different cell?
+				//if (GetDCirectionalMove(p, 0) != CardinalDirection.None)
+				//{
+					Console.WriteLine("Select Move");
+					Point SnappedLeft = RelativeGridSnap(SelectionRectPoints[0]);
+
+					//find the Relative grid size in pixels
+					int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
+					
+					Point Snapped = RelativeGridSnap(p); //If we have then find the bottom right cords of that cell.
+					//use the bottom cords to draw the selection rect on layer 100.
+					Snapped.X += p.X; Snapped.Y += p.Y;
+
+				int wid = (int)p.X - (int)SelectionRectPoints[0].X;
+				int heigh = (int)p.Y - (int)SelectionRectPoints[0].Y;
+
+				//the drawing, and data manuplation will have to occur on LEFTMOUSEBUTTONUP
+				Rectangle r = new Rectangle() { Tag = "selection", Width = wid, Height = heigh, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
+					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), GetTileZIndex(SceneExplorer_TreeView), (int)p.X, (int)p.Y);
+					Canvas.SetLeft(r, (int)SelectionRectPoints[0].X); Canvas.SetTop(r, (int)SelectionRectPoints[0].Y); Canvas.SetZIndex(r, 100);
+
+					//don't add another selection rectangle on an existing selection rectangle
+					Rectangle sr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 100, (int)p.X, (int)p.Y);
+
+					//if (sr != null) return;
+					selectTool.SelectedTiles.Add(rr);
+					LevelEditor_Canvas.Children.Add(r);
+				//}
+
+
+			}
 
       MPos = e.GetPosition(LevelEditor_Canvas); //set this for the iteration
     }
