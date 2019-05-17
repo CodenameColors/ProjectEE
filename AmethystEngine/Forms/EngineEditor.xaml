@@ -412,9 +412,8 @@
 
             <!--<GridSplitter Background="White" HorizontalAlignment="Stretch" Height="3" Margin="0,0,0,0" Grid.Row="1" VerticalAlignment="Top" />-->
             <Canvas Grid.Row="0" x:Name="LevelEditor_BackCanvas" IsHitTestVisible="True" Grid.Column="0" MouseLeftButtonDown="Canvas_MouseLeftButtonDown" 
-										MouseWheel="LevelEditor_Canvas_MouseWheel" 
-										MouseMove="LevelEditor_BackCanvas_MouseMove" SizeChanged="LevelEditor_BackCanvas_SizeChanged"
-										ClipToBounds="True" MouseLeftButtonUp="LevelEditor_BackCanvas_MouseLeftButtonUp">
+										MouseWheel="LevelEditor_Canvas_MouseWheel" SizeChanged="LevelEditor_BackCanvas_SizeChanged"
+										ClipToBounds="True" MouseLeftButtonUp="LevelEditor_BackCanvas_MouseLeftButtonUp" MouseMove="LevelEditor_BackCanvas_MouseMove">
               <Canvas.Background>
                 <VisualBrush x:Name="Canvas_grid" TileMode="Tile" Stretch="Uniform" Viewport="0,0,40,40" ViewportUnits="Absolute" >
                   <VisualBrush.Visual>

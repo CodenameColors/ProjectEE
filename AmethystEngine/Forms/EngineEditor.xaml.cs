@@ -659,6 +659,7 @@ namespace AmethystEngine.Forms
 			else if (CurrentTool == EditorTool.Select)
 			{
 				SelectionRectPoints[1] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y);
+				Console.WriteLine("Select MUP");
 			}
 			else if (CurrentTool == EditorTool.Eraser)
 			{
@@ -694,39 +695,43 @@ namespace AmethystEngine.Forms
 			return -1;
 		}
 
-    private Point RelativeGridSnap(Point p)
-    {
+		private Point RelativeGridSnap(Point p, bool abs = true)
+		{
 
-      //find the Relative grid size in pixels
-      int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11,1));
-      //find the offset amount.
-      int Xoff = (int)(Math.Abs(Canvas_grid.Viewport.X));
-      int YOff = (int)(Math.Abs(Canvas_grid.Viewport.Y));
+			//find the Relative grid size in pixels
+			int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
+			//find the offset amount.
+			int Xoff = (int)(Math.Abs(Canvas_grid.Viewport.X));
+			int YOff = (int)(Math.Abs(Canvas_grid.Viewport.Y));
 
-      //what is the left over amount?
-      Xoff %= 40;
-      YOff %= 40;
+			//what is the left over amount?
+			Xoff %= 40;
+			YOff %= 40;
 
-      //relative snap offset
-      Xoff = 40 - Xoff;
-      YOff = 40 - YOff;
+			//relative snap offset
+			Xoff = 40 - Xoff;
+			YOff = 40 - YOff;
 
 			Xoff = (int)(Xoff * LevelEditor_Canvas.RenderTransform.Value.M11);
 			YOff = (int)(YOff * LevelEditor_Canvas.RenderTransform.Value.M11);
 
-      if (Xoff == 40) Xoff = 0;
-      if (YOff == 40) YOff = 0;
+			if (Xoff == 40) Xoff = 0;
+			if (YOff == 40) YOff = 0;
 
-			//add the offset to the current mouse position.
-			p = new Point(p.X, p.Y);
-
-      //divide the sumation by the relative grid size
-      Point relpoint = new Point((int)(p.X / relgridsize), (int)(p.Y / relgridsize));
+			//divide the sumation by the relative grid size
+			Point relpoint = new Point((int)((p.X - Xoff)/ relgridsize), (int)((p.Y - YOff )/ relgridsize));
 			relpoint.X *= (relgridsize);
 			relpoint.Y *= (relgridsize);
 
-			//this gives us the cell number. Use this and multiply by the base value.
-			return new Point(relpoint.X + Xoff, relpoint.Y + YOff);
+			if (abs) { //return the abs size. Base 40x40 grid.
+				return new Point(relpoint.X + Xoff, relpoint.Y + YOff);//this gives us the cell number. Use this and multiply by the base value.
+			}
+			else //rel grid size
+			{
+				return new Point();
+			}
+			
+
     }
 
     private Point GetGridSnapCords(Point p)
@@ -772,31 +777,16 @@ namespace AmethystEngine.Forms
     /// <param name="e"></param>
     private void LevelEditor_BackCanvas_MouseMove(object sender, MouseEventArgs e)
     {
-      //we need to display the cords.
-      Point p = Mouse.GetPosition(LevelEditor_BackCanvas);
+			//we need to display the cords.
+			Point p = Mouse.GetPosition(LevelEditor_BackCanvas);
       String point = String.Format("({0}, {1}) OFF:({2}, {3})", (int)p.X, (int)p.Y, (int)Canvas_grid.Viewport.X, (int)Canvas_grid.Viewport.Y);
       LevelEditorCords_TB.Text = point;
 
-      //which way is mouse moving?
-      MPos -= (Vector)e.GetPosition(LevelEditor_Canvas);
-      if (MPos.X == 0 && MPos.Y > 0) //north
-        MouseMovement = CardinalDirection.N;
-      if (MPos.X > 0 && MPos.Y > 0) //North East
-        MouseMovement = CardinalDirection.NE;
-      if (MPos.X > 0 && MPos.Y == 0) //East
-        MouseMovement = CardinalDirection.E;
-      if (MPos.X > 0 && MPos.Y < 0) //South East
-        MouseMovement = CardinalDirection.SE;
-      if (MPos.X == 0 && MPos.Y < 0) //South
-        MouseMovement = CardinalDirection.S;
-      if (MPos.X < 0 && MPos.Y < 0) //South West
-        MouseMovement = CardinalDirection.SW;
-      if (MPos.X < 0 && MPos.Y == 0) //West
-        MouseMovement = CardinalDirection.W;
-      if (MPos.X < 0 && MPos.Y > 0) //North West
-        MouseMovement = CardinalDirection.NW;
-      //is the middle mouse button down?
-      if (e.MiddleButton == MouseButtonState.Pressed)
+			//which way is mouse moving?
+			MPos -= (Vector)e.GetPosition(LevelEditor_Canvas);
+
+			//is the middle mouse button down?
+			if (e.MiddleButton == MouseButtonState.Pressed)
         LavelEditorPan();
       if (e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Brush)
         Canvas_MouseLeftButtonDown(sender, new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left));
@@ -835,24 +825,27 @@ namespace AmethystEngine.Forms
 					Console.WriteLine("Select Move");
 					Point SnappedLeft = RelativeGridSnap(SelectionRectPoints[0]);
 
+					Point pp = GetGridSnapCords(SelectionRectPoints[0]);
+
 					//find the Relative grid size in pixels
 					int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
 					
 					Point Snapped = RelativeGridSnap(p); //If we have then find the bottom right cords of that cell.
 					//use the bottom cords to draw the selection rect on layer 100.
-					Snapped.X += p.X; Snapped.Y += p.Y;
+					//Snapped.X += p.X; Snapped.Y += p.Y;
 
-				int wid = (int)p.X - (int)SelectionRectPoints[0].X;
-				int heigh = (int)p.Y - (int)SelectionRectPoints[0].Y;
+					int wid = (int)GetGridSnapCords(p).X - (int)pp.X + 40;
+					int heigh = (int)GetGridSnapCords(p).Y - (int)pp.Y + 40;
 
 				//the drawing, and data manuplation will have to occur on LEFTMOUSEBUTTONUP
-				Rectangle r = new Rectangle() { Tag = "selection", Width = wid, Height = heigh, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
+					Rectangle r = new Rectangle() { Tag = "selection", Width = wid, Height = heigh, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
+					r.MouseLeftButtonUp += LevelEditor_BackCanvas_MouseLeftButtonUp;
 					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), GetTileZIndex(SceneExplorer_TreeView), (int)p.X, (int)p.Y);
-					Canvas.SetLeft(r, (int)SelectionRectPoints[0].X); Canvas.SetTop(r, (int)SelectionRectPoints[0].Y); Canvas.SetZIndex(r, 100);
+					Canvas.SetLeft(r, (int)pp.X); Canvas.SetTop(r, (int)pp.Y); Canvas.SetZIndex(r, 100);
 
 					//don't add another selection rectangle on an existing selection rectangle
 					Rectangle sr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 100, (int)p.X, (int)p.Y);
-
+					Deselect();
 					//if (sr != null) return;
 					selectTool.SelectedTiles.Add(rr);
 					LevelEditor_Canvas.Children.Add(r);
@@ -1025,6 +1018,7 @@ namespace AmethystEngine.Forms
 					Point p = new Point(begginning.X + (int)(40 * i), begginning.Y + (int)(40 * j));
 					int iii = GetTileZIndex(SceneExplorer_TreeView);
 					Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid.
+					r.MouseLeftButtonUp += LevelEditor_BackCanvas_MouseLeftButtonUp;
 					SpriteLayer curlayer = (SpriteLayer)SceneExplorer_TreeView.SelectedValue;
 					curlayer.AddToLayer(new object(), ((int)p.X + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth
 						, ((int)p.Y + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight,
