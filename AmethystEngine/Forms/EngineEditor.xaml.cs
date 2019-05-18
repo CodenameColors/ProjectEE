@@ -589,19 +589,21 @@ namespace AmethystEngine.Forms
 			//Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_Canvas));
 			Point p = GetGridSnapCords(pos);
 			Console.WriteLine(String.Format("Snapped grid cords: {0}", p.ToString()));
-			int iii = 0;
+			//we need to get the current Sprite layer that is currently clicked.
+			Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
+			int curLayer = Curlevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
 			
 			if (CurrentTool == EditorTool.Brush)
 			{
-				iii = GetTileZIndex(SceneExplorer_TreeView); //what layer are we on?
 				Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid. always 40 becasue thats the base. 
-				Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 0, (int)pos.X , (int)pos.Y);
+
+				Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X , (int)pos.Y);
         if (rr != null)
         { Console.WriteLine(String.Format("Cell ({0},{1}) already is filled",(int)pos.X, (int)pos.Y)); return; }//check to see if the current tile exists. if so then don't add.
 
-				Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, iii); //place the tile position wise
+				Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, curLayer); //place the tile position wise
 				LevelEditor_Canvas.Children.Add(r); //actual place it on the canvas
-				FullMapEditorFill(p, iii); //update the fullmap display to reflect this change
+				FullMapEditorFill(p, curLayer); //update the fullmap display to reflect this change
 			}
 			else if(CurrentTool == EditorTool.Select)
 			{
@@ -609,7 +611,7 @@ namespace AmethystEngine.Forms
 				if (SceneExplorer_TreeView.SelectedValue is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Tile)
 				{
 					Rectangle r = new Rectangle() { Tag = "selection", Width = 40, Height = 40, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
-					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), GetTileZIndex(SceneExplorer_TreeView), (int)pos.X, (int)pos.Y);
+					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
 					Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, 100);
 
 					//don't add another selection rectangle on an existing selection rectangle
@@ -625,7 +627,7 @@ namespace AmethystEngine.Forms
 			else if (CurrentTool == EditorTool.Eraser)
 			{
 				//find the tile on the layer that is selected.
-				Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), GetTileZIndex(SceneExplorer_TreeView), (int)pos.X, (int)pos.Y);
+				Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
 				if (rr == null) return; //if you click on a empty rect return
 																//find the rect in the current layers displayed tiles
 				int i = LevelEditor_Canvas.Children.IndexOf(rr);
@@ -777,10 +779,17 @@ namespace AmethystEngine.Forms
     /// <param name="e"></param>
     private void LevelEditor_BackCanvas_MouseMove(object sender, MouseEventArgs e)
     {
+			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
+
 			//we need to display the cords.
 			Point p = Mouse.GetPosition(LevelEditor_BackCanvas);
       String point = String.Format("({0}, {1}) OFF:({2}, {3})", (int)p.X, (int)p.Y, (int)Canvas_grid.Viewport.X, (int)Canvas_grid.Viewport.Y);
       LevelEditorCords_TB.Text = point;
+
+			//we need to get the current Sprite layer that is currently clicked.
+			Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
+			int curLayer = Curlevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+
 
 			//which way is mouse moving?
 			MPos -= (Vector)e.GetPosition(LevelEditor_Canvas);
@@ -816,37 +825,21 @@ namespace AmethystEngine.Forms
       }
       else if(e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Select)
       {
-        
-				//this is the select area move section.
 
-				//first we need to find out have we moved to a different cell?
-				//if (GetDCirectionalMove(p, 0) != CardinalDirection.None)
-				//{
-					Console.WriteLine("Select Move");
-					Point SnappedLeft = RelativeGridSnap(SelectionRectPoints[0]);
 
 					Point pp = GetGridSnapCords(SelectionRectPoints[0]);
-
-					//find the Relative grid size in pixels
-					int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
 					
 					Point Snapped = RelativeGridSnap(p); //If we have then find the bottom right cords of that cell.
-					//use the bottom cords to draw the selection rect on layer 100.
-					//Snapped.X += p.X; Snapped.Y += p.Y;
-
 					int wid = (int)GetGridSnapCords(p).X - (int)pp.X + 40;
 					int heigh = (int)GetGridSnapCords(p).Y - (int)pp.Y + 40;
 
-				//the drawing, and data manuplation will have to occur on LEFTMOUSEBUTTONUP
+					//the drawing, and data manuplation will have to occur on LEFTMOUSEBUTTONUP
 					Rectangle r = new Rectangle() { Tag = "selection", Width = wid, Height = heigh, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
 					r.MouseLeftButtonUp += LevelEditor_BackCanvas_MouseLeftButtonUp;
-					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), GetTileZIndex(SceneExplorer_TreeView), (int)p.X, (int)p.Y);
+					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)p.X, (int)p.Y);
 					Canvas.SetLeft(r, (int)pp.X); Canvas.SetTop(r, (int)pp.Y); Canvas.SetZIndex(r, 100);
-
-					//don't add another selection rectangle on an existing selection rectangle
-					Rectangle sr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 100, (int)p.X, (int)p.Y);
 					Deselect();
-					//if (sr != null) return;
+					
 					selectTool.SelectedTiles.Add(rr);
 					LevelEditor_Canvas.Children.Add(r);
 				//}
@@ -1167,15 +1160,21 @@ namespace AmethystEngine.Forms
 			LEStarting_TB.Visibility = Visibility.Hidden;
 			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).IsEnabled = true;
 			LevelEditor_Canvas.IsEnabled = true;
+			String DesName = "level"; int val = 0;
 
-			//TreeViewItem LevelRoot = new TreeViewItem() { Header = "NewLevel" };
+			//create a new Level object. Make sure it doesn't have multiple of the same level names
+			for (int i = 0; i < SceneExplorer_TreeView.Items.Count; i++)
+			{
+				if (((Level)SceneExplorer_TreeView.Items[i]).LevelName == DesName)
+				{
+					val++;
+					DesName += val;
+					i = 0; //reset. This will make sure to check ALL layers even  already processed ones.
+				}
+			}
 
-			//SceneExplorer_TreeView.Items.Add(LevelRoot);
 
-			//LevelRoot.Items.Add(new TreeViewItem() { Header = "Background Layer" });
-
-			//create a new Level object.
-			CreateLevel("testing");
+			CreateLevel(DesName);
 			SceneExplorer_TreeView.ItemsSource = OpenLevels;
 		}
 
@@ -1183,18 +1182,10 @@ namespace AmethystEngine.Forms
 		{
 			//create new Level
 			Level TempLevel = new Level(LevelName);
-			SpriteLayer TempLevelChild = new SpriteLayer(LayerType.Tile) { LayerName = "Background" };
+			SpriteLayer TempLevelChild = new SpriteLayer(LayerType.Tile, TempLevel) { LayerName = "Background" };
 			TempLevelChild.DefineLayerDataType(LayerType.Tile, 200, 400);
 			TempLevel.Layers.Add(TempLevelChild);
-
-			////show the newly created LEVEL
-			//TreeViewItem TVI = new TreeViewItem() { Header = LevelName, Tag = "Level"};
-			//TreeViewItem TVI1 = new TreeViewItem() { Header = "Backgorund", Tag = "Layer" };
-			//TVI.Items.Add(TVI1);
-			//SceneExplorer_TreeView.Items.Add(TVI);
 			OpenLevels.Add(TempLevel);
-			
-
 		}
 
 		private void SceneExplorer_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -1238,16 +1229,16 @@ namespace AmethystEngine.Forms
 		//TODO: make it work with background tile grid sizes.
 		private void AddTileLayer_Click(object sender, RoutedEventArgs e)
 		{
-			((Level)SceneExplorer_TreeView.SelectedValue).Layers.Add(new SpriteLayer(LayerType.Tile) { LayerName = "new tile" });
+			((Level)SceneExplorer_TreeView.SelectedValue).AddLayer("new tile", LayerType.Tile); 
 			((Level)SceneExplorer_TreeView.SelectedValue).Layers.Last().DefineLayerDataType(LayerType.Tile, 200, 400);
 		}
 		private void SpriteLayer_Click(object sender, RoutedEventArgs e)
 		{
-			((Level)SceneExplorer_TreeView.SelectedValue).Layers.Add(new SpriteLayer(LayerType.Sprite) { LayerName = "new sprite" });
+			((Level)SceneExplorer_TreeView.SelectedValue).AddLayer("new sprite", LayerType.Sprite); 
 		}
 		private void GameObjectLayer_Click(object sender, RoutedEventArgs e)
 		{
-			((Level)SceneExplorer_TreeView.SelectedValue).Layers.Add(new SpriteLayer(LayerType.Gameobject) { LayerName = "new G.O." });
+			((Level)SceneExplorer_TreeView.SelectedValue).AddLayer("new GOL", LayerType.Gameobject);
 		}
 
 		
