@@ -1053,7 +1053,7 @@ namespace AmethystEngine.Forms
 			{
 				for (int j = 0; j <= rows; j++)
 				{
-					Point p = new Point(begginning.X + (int)(40 * i), begginning.Y + (int)(40 * j));
+					Point p = new Point(begginning.X + (int)(40 * i) +1, begginning.Y + (int)(40 * j) +1);
 					int iii = GetTileZIndex(SceneExplorer_TreeView);
 					Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid.
 					r.MouseLeftButtonUp += LevelEditor_BackCanvas_MouseLeftButtonUp;
