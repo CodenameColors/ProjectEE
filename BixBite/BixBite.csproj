@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BixBiteTypes.cs" />
     <Compile Include="Characters\Character.cs" />
     <Compile Include="Characters\Enemy.cs" />
     <Compile Include="Characters\NPC.cs" />
