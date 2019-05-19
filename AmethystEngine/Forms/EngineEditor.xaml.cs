@@ -21,19 +21,6 @@ using AmethystEngine.Components.Tools;
 namespace AmethystEngine.Forms
 {
 
-  public enum CardinalDirection
-  {
-    None,
-    N,
-    NE,
-    E,
-    SE,
-    S,
-    SW,
-    W,
-    NW,
-  }
-
 	public enum SceneObjectType
 	{
 		None,
@@ -96,9 +83,10 @@ namespace AmethystEngine.Forms
 		public ImageBrush imgtilebrush { get; private set; }
 		private Tuple<object, SceneObjectType> CurrentLevelEditorSceneObject;
     Point[] SelectionRectPoints = new Point[2];
+		Point[] shiftpoints = new Point[3]; //0 = mouse down , 1 = mouse up , 2 on shifting "tick"
 
 
-    int EditorGridHeight = 40;
+		int EditorGridHeight = 40;
     int EditorGridWidth = 40;
     int NumOfCellsX = 10;
     int NumOfCellsY = 10;
@@ -106,7 +94,7 @@ namespace AmethystEngine.Forms
     Point MPos = new Point();
     List<String> CMDOutput = new List<string>();
     public double ZoomLevel = 1;
-    CardinalDirection MouseMovement = CardinalDirection.None;
+    BixBite.BixBiteTypes.CardinalDirection MouseMovement = BixBite.BixBiteTypes.CardinalDirection.None;
 
 
     double LevelEditorScreenRatio = 0.0f;
@@ -648,7 +636,9 @@ namespace AmethystEngine.Forms
 			}
 			else if (CurrentTool == EditorTool.Move)
 			{
-        SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+        //SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+				shiftpoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+				shiftpoints[2] = shiftpoints[0];
 			}
     }
 
@@ -688,7 +678,8 @@ namespace AmethystEngine.Forms
 							curLayer, (int)begginning.X + (relgridsize * i) +1, (int)begginning.Y + (relgridsize * j)+1);
 						if (!selectTool.SelectedTiles.Contains(rr))
 						{
-							selectTool.SelectedTiles.Add(rr);
+							if(rr != null)
+								selectTool.SelectedTiles.Add(rr);
 						}
 					}
 				}
@@ -703,7 +694,32 @@ namespace AmethystEngine.Forms
 			}
 			else if (CurrentTool == EditorTool.Move)
 			{
+				Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
+				int curLayer = Curlevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+				int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
 
+				
+				Point begginning = RelativeGridSnap(SelectionRectPoints[0]);
+				begginning.X = (int)begginning.X; begginning.Y = (int)begginning.Y;
+				shiftpoints[1] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y);
+
+				int columns = (int)(RelativeGridSnap(SelectionRectPoints[1]).X - RelativeGridSnap(SelectionRectPoints[0]).X);
+				int rows = (int)(RelativeGridSnap(SelectionRectPoints[1]).Y - RelativeGridSnap(SelectionRectPoints[0]).Y);
+				//how much to move/shift the data.
+				int shiftcolumns = (int)(RelativeGridSnap(shiftpoints[1]).X - RelativeGridSnap(shiftpoints[0]).X);
+				int shiftrows = (int)(RelativeGridSnap(shiftpoints[1]).Y - RelativeGridSnap(shiftpoints[0]).Y);
+				int absrow = 0; int abscol = 0; Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
+				columns /= relgridsize; shiftcolumns /= relgridsize;
+				rows /= relgridsize; shiftrows /= relgridsize;
+				for (int i = 0; i <= columns; i++)
+				{
+					for(int j = 0; j <= rows; j++)
+					{
+						absrow = ((int)begginning.Y + (relgridsize * j) + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight;
+						abscol = ((int)begginning.X + (relgridsize * i) + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth;
+						Curlevel.Movedata(absrow, abscol, shiftrows, shiftcolumns, curLayer, LayerType.Tile);
+					}
+				}
 			}
 		}
     
@@ -831,46 +847,44 @@ namespace AmethystEngine.Forms
         Canvas_MouseLeftButtonDown(sender, new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left));
       else if (e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Move)
       {
-        CardinalDirection cd = GetDCirectionalMove(p, 0);                //TODO: CHANGE THE Z INDEX TO VARIABLE
+				BixBite.BixBiteTypes.CardinalDirection cd = GetDCirectionalMove(p, 0);                //TODO: CHANGE THE Z INDEX TO VARIABLE
         switch (cd)
         {
           //TODO: ADD the logic to change the data positions.
-          case (CardinalDirection.N):
+          case (BixBite.BixBiteTypes.CardinalDirection.N):
 						for(int i = 0; i < selectTool.SelectedTiles.Count; i++)
 						{
 							Canvas.SetTop(selectTool.SelectedTiles[i], Canvas.GetTop(selectTool.SelectedTiles[i]) - selectTool.SelectedTiles[i].ActualWidth);
 						}
-						SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+						shiftpoints[2] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
 						break;
-          case (CardinalDirection.S):
+          case (BixBite.BixBiteTypes.CardinalDirection.S):
 						for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
 						{
 							Canvas.SetTop(selectTool.SelectedTiles[i], Canvas.GetTop(selectTool.SelectedTiles[i]) + selectTool.SelectedTiles[i].ActualWidth);
 						}
-            SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+						shiftpoints[2] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
             break;
-          case (CardinalDirection.W):
+          case (BixBite.BixBiteTypes.CardinalDirection.W):
 						for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
 						{
 							Canvas.SetLeft(selectTool.SelectedTiles[i], Canvas.GetLeft(selectTool.SelectedTiles[i]) - selectTool.SelectedTiles[i].ActualWidth);
 						}
-						
-            SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+
+						shiftpoints[2] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
             break;
-          case (CardinalDirection.E):
+          case (BixBite.BixBiteTypes.CardinalDirection.E):
 						for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
 						{
 							Canvas.SetLeft(selectTool.SelectedTiles[i], Canvas.GetLeft(selectTool.SelectedTiles[i]) + selectTool.SelectedTiles[i].ActualWidth);
 						}
-						
-            SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+
+						shiftpoints[2] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
             break;
         }
       }
       else if(e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Select)
       {
-
-
 					Point pp = GetGridSnapCords(SelectionRectPoints[0]);
 					
 					Point Snapped = RelativeGridSnap(p); //If we have then find the bottom right cords of that cell.
@@ -1053,7 +1067,7 @@ namespace AmethystEngine.Forms
 			{
 				for (int j = 0; j <= rows; j++)
 				{
-					Point p = new Point(begginning.X + (int)(40 * i) +1, begginning.Y + (int)(40 * j) +1);
+					Point p = new Point(begginning.X + (int)(40 * i), begginning.Y + (int)(40 * j));
 					int iii = GetTileZIndex(SceneExplorer_TreeView);
 					Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid.
 					r.MouseLeftButtonUp += LevelEditor_BackCanvas_MouseLeftButtonUp;
@@ -1330,11 +1344,80 @@ namespace AmethystEngine.Forms
 
 		private void DownLaverLevelEditor_BTN_Click(object sender, RoutedEventArgs e)
 		{
+			//we need to make sure that we have selected a sprite layer in the tree view.
+			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
+			if (selectTool.SelectedTiles.Count == 0) return;//Do we have a selected area?
+																											//is there a layer above the current to transfer the data to?
+																											//we need to get the current Sprite layer that is currently clicked.
+			Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
+			int curLayer = Curlevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+			if (curLayer -1 < 0) return;
 
+			//from here all the prereqs are fulfilled so we can apply the up layer VISUALLY 
+			for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
+			{
+				Canvas.SetZIndex(selectTool.SelectedTiles[i], Canvas.GetZIndex(selectTool.SelectedTiles[i]) - 1);
+			}
+			
+			//Change the data for the level objects 
+			int absrow = 0; int abscol = 0; Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
+			int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
+			int columns = (int)(RelativeGridSnap(SelectionRectPoints[1]).X - RelativeGridSnap(SelectionRectPoints[0]).X);
+			int rows = (int)(RelativeGridSnap(SelectionRectPoints[1]).Y - RelativeGridSnap(SelectionRectPoints[0]).Y);
+
+			columns /= relgridsize;
+			rows /= relgridsize;
+
+			Point begginning = RelativeGridSnap(SelectionRectPoints[0]);
+			begginning.X = (int)begginning.X; begginning.Y = (int)begginning.Y;
+			for (int i = 0; i <= columns; i++)
+			{
+				for (int j = 0; j <= rows; j++)
+				{
+					absrow = ((int)begginning.Y + (relgridsize * j) + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight;
+					abscol = ((int)begginning.X + (relgridsize * i)+ (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth;
+					Curlevel.ChangeLayer(absrow, abscol, curLayer, curLayer - 1, LayerType.Tile);
+				}
+			}
 		}
 
 		private void UpLaverLevelEditor_BTN_Click(object sender, RoutedEventArgs e)
 		{
+			//we need to make sure that we have selected a sprite layer in the tree view.
+			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
+			if (selectTool.SelectedTiles.Count == 0) return;//Do we have a selected area?
+			//is there a layer above the current to transfer the data to?
+			//we need to get the current Sprite layer that is currently clicked.
+			Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
+			int curLayer = Curlevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+			if (Curlevel.Layers.Count - 1 == curLayer) return;
+
+			//from here all the prereqs are fulfilled so we can apply the up layer VISUALLY 
+			for(int i = 0; i < selectTool.SelectedTiles.Count; i++)
+			{
+				Canvas.SetZIndex(selectTool.SelectedTiles[i], Canvas.GetZIndex(selectTool.SelectedTiles[i])+ 1);
+			}
+
+			//Change the data for the level objects 
+			int absrow = 0; int abscol = 0; Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
+			int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
+			int columns = (int)(RelativeGridSnap(SelectionRectPoints[1]).X - RelativeGridSnap(SelectionRectPoints[0]).X);
+			int rows = (int)(RelativeGridSnap(SelectionRectPoints[1]).Y - RelativeGridSnap(SelectionRectPoints[0]).Y);
+
+			columns /= relgridsize;
+			rows /= relgridsize;
+
+			Point begginning = RelativeGridSnap(SelectionRectPoints[0]);
+			begginning.X = (int)begginning.X; begginning.Y = (int)begginning.Y;
+			for (int i = 0; i <= columns; i++)
+			{
+				for (int j = 0; j <= rows; j++)
+				{
+					absrow = ((int)begginning.Y + (relgridsize * j) + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight;
+					abscol = ((int)begginning.X + (relgridsize * i) + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth;
+					Curlevel.ChangeLayer(absrow, abscol, curLayer, curLayer + 1, LayerType.Tile);
+				}
+			}
 
 		}
 
@@ -1375,40 +1458,40 @@ namespace AmethystEngine.Forms
     /// this method is here to determine whether the user has moved to the next cell.
     /// </summary>
     /// <returns>The direction in which they have moved.</returns>
-    private CardinalDirection GetDCirectionalMove(Point p, int zIndex)
+    private BixBite.BixBiteTypes.CardinalDirection GetDCirectionalMove(Point p, int zIndex)
     {
       int relgridsize = (((int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11)));
       //use the current rectange that the user is in to get the (x,y) cords
       //compare these values to the current MOUSE POS
       Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 0, (int)p.X, (int)p.Y);
-      Point snappedpoints = RelativeGridSnap(SelectionRectPoints[0]);
+      Point snappedpoints = RelativeGridSnap(shiftpoints[2]);
       if (rr != null)
-          return CardinalDirection.None;
+          return BixBite.BixBiteTypes.CardinalDirection.None;
       else
       {
         if (p.X < snappedpoints.X && (p.Y > snappedpoints.Y && p.Y < snappedpoints.Y + relgridsize))
         {  //west
           Console.WriteLine("moved west");
-          return CardinalDirection.W;
+          return BixBite.BixBiteTypes.CardinalDirection.W;
         }
         else if (p.X > snappedpoints.X + relgridsize && (p.Y > snappedpoints.Y && p.Y < snappedpoints.Y + relgridsize))
         {  //east
           Console.WriteLine("moved East");
-          return CardinalDirection.E;
+          return BixBite.BixBiteTypes.CardinalDirection.E;
         }
         else if (p.Y > snappedpoints.Y + relgridsize && (p.X > snappedpoints.X && p.X < snappedpoints.X + relgridsize))
         {  //east
           Console.WriteLine("moved South");
-          return CardinalDirection.S;
+          return BixBite.BixBiteTypes.CardinalDirection.S;
         }
         else if (p.Y < snappedpoints.Y && (p.X > snappedpoints.X && p.X < snappedpoints.X + relgridsize))
         {  //east
           Console.WriteLine("moved North");
-          return CardinalDirection.N;
+          return BixBite.BixBiteTypes.CardinalDirection.N;
         }
       }
       //if now which direction did you move?
-      return CardinalDirection.None;
+      return BixBite.BixBiteTypes.CardinalDirection.None;
     }
     
 
