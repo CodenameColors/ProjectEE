@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BixBite.SceneObject
+namespace BixBite.Effects
 {
-	class Spawner : GameObject
+	class ImageEffect
 	{
 	}
 }
