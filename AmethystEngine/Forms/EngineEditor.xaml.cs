@@ -649,7 +649,7 @@ namespace AmethystEngine.Forms
 			else if (CurrentTool == EditorTool.Move)
 			{
         SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
-      }
+			}
     }
 
     private void LevelEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -660,8 +660,38 @@ namespace AmethystEngine.Forms
 			}
 			else if (CurrentTool == EditorTool.Select)
 			{
+
+				Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
+				//we need to get the current Sprite layer that is currently clicked.
+				Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
+				int curLayer = Curlevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+
 				SelectionRectPoints[1] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y);
 				Console.WriteLine("Select MUP");
+
+				//At this point the entire selection area should be drawn.
+				int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
+				int columns = (int)(RelativeGridSnap(SelectionRectPoints[1]).X - RelativeGridSnap(SelectionRectPoints[0]).X);
+				int rows = (int)(RelativeGridSnap(SelectionRectPoints[1]).Y - RelativeGridSnap(SelectionRectPoints[0]).Y);
+
+				columns /= relgridsize;
+				rows /= relgridsize;
+
+				Point begginning = RelativeGridSnap(SelectionRectPoints[0]);
+				begginning.X = (int)begginning.X; begginning.Y = (int)begginning.Y;
+				for (int i = 0; i <= columns; i++)
+				{
+					for (int j = 0; j <= rows; j++)
+					{
+						//find the rectangle
+						Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 
+							curLayer, (int)begginning.X + (relgridsize * i) +1, (int)begginning.Y + (relgridsize * j)+1);
+						if (!selectTool.SelectedTiles.Contains(rr))
+						{
+							selectTool.SelectedTiles.Add(rr);
+						}
+					}
+				}
 			}
 			else if (CurrentTool == EditorTool.Eraser)
 			{
@@ -806,19 +836,33 @@ namespace AmethystEngine.Forms
         {
           //TODO: ADD the logic to change the data positions.
           case (CardinalDirection.N):
-            Canvas.SetTop(selectTool.SelectedTiles[0], Canvas.GetTop(selectTool.SelectedTiles[0]) - selectTool.SelectedTiles[0].ActualWidth);
-            SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
-            break;
+						for(int i = 0; i < selectTool.SelectedTiles.Count; i++)
+						{
+							Canvas.SetTop(selectTool.SelectedTiles[i], Canvas.GetTop(selectTool.SelectedTiles[i]) - selectTool.SelectedTiles[i].ActualWidth);
+						}
+						SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+						break;
           case (CardinalDirection.S):
-            Canvas.SetTop(selectTool.SelectedTiles[0], Canvas.GetTop(selectTool.SelectedTiles[0]) + selectTool.SelectedTiles[0].ActualWidth);
+						for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
+						{
+							Canvas.SetTop(selectTool.SelectedTiles[i], Canvas.GetTop(selectTool.SelectedTiles[i]) + selectTool.SelectedTiles[i].ActualWidth);
+						}
             SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
             break;
           case (CardinalDirection.W):
-            Canvas.SetLeft(selectTool.SelectedTiles[0], Canvas.GetLeft(selectTool.SelectedTiles[0]) - selectTool.SelectedTiles[0].ActualWidth);
+						for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
+						{
+							Canvas.SetLeft(selectTool.SelectedTiles[i], Canvas.GetLeft(selectTool.SelectedTiles[i]) - selectTool.SelectedTiles[i].ActualWidth);
+						}
+						
             SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
             break;
           case (CardinalDirection.E):
-            Canvas.SetLeft(selectTool.SelectedTiles[0], Canvas.GetLeft(selectTool.SelectedTiles[0]) + selectTool.SelectedTiles[0].ActualWidth);
+						for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
+						{
+							Canvas.SetLeft(selectTool.SelectedTiles[i], Canvas.GetLeft(selectTool.SelectedTiles[i]) + selectTool.SelectedTiles[i].ActualWidth);
+						}
+						
             SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
             break;
         }
@@ -836,11 +880,12 @@ namespace AmethystEngine.Forms
 					//the drawing, and data manuplation will have to occur on LEFTMOUSEBUTTONUP
 					Rectangle r = new Rectangle() { Tag = "selection", Width = wid, Height = heigh, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
 					r.MouseLeftButtonUp += LevelEditor_BackCanvas_MouseLeftButtonUp;
-					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)p.X, (int)p.Y);
+					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, layertiles: LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 
+																						 zindex: curLayer, x: (int)p.X, y: (int)p.Y);
 					Canvas.SetLeft(r, (int)pp.X); Canvas.SetTop(r, (int)pp.Y); Canvas.SetZIndex(r, 100);
 					Deselect();
 					
-					selectTool.SelectedTiles.Add(rr);
+					//selectTool.SelectedTiles.Add(rr);
 					LevelEditor_Canvas.Children.Add(r);
 				//}
 
@@ -1022,6 +1067,7 @@ namespace AmethystEngine.Forms
 					FullMapEditorFill(p, iii); //update the fullmap display to reflect this change
 				}
 			}
+			Deselect();
 		}
 		#endregion
 		#endregion
