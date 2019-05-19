@@ -24,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -35,6 +36,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BixBite">
+      <HintPath>..\BixBite\bin\Debug\BixBite.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -83,6 +87,7 @@
     <Compile Include="Components\EditorObect.cs" />
     <Compile Include="Components\Item.cs" />
     <Compile Include="Components\SplashScreen.cs" />
+    <Compile Include="Components\Tools\SelectTool.cs" />
     <Compile Include="Components\XMLManager.cs" />
     <Compile Include="Forms\EngineEditor.xaml.cs">
       <DependentUpon>EngineEditor.xaml</DependentUpon>

@@ -18,9 +18,9 @@ namespace ProjectE_E
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-			graphics.PreferredBackBufferHeight = 520;
-			graphics.PreferredBackBufferWidth = 800;
-		}
+			      graphics.PreferredBackBufferHeight = 520;
+			      graphics.PreferredBackBufferWidth = 800;
+		    }
 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
