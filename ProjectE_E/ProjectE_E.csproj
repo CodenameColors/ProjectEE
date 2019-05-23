@@ -44,7 +44,10 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Components\Camera.cs" />
     <Compile Include="Components\Map.cs" />
+    <Compile Include="Components\Player.cs" />
+    <Compile Include="Components\TileHelper.cs" />
     <Compile Include="Components\Tiles.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Program.cs" />

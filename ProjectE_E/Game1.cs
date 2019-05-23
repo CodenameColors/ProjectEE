@@ -9,48 +9,51 @@ namespace ProjectE_E
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game
-    {
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
-				Sprite TestSprite = new Sprite();
+	public class Game1 : Game
+	{
+		GraphicsDeviceManager graphics;
+		SpriteBatch spriteBatch;
+		Sprite TestSprite = new Sprite();
 
-				Map map;
+		Map map;
+		Player Player;
+		Camera camera;
 
-        public Game1()
-        {
-            graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
-			      graphics.PreferredBackBufferHeight = 520;
-			      graphics.PreferredBackBufferWidth = 800;
-		    }
+		public Game1()
+		{
+				graphics = new GraphicsDeviceManager(this);
+				Content.RootDirectory = "Content";
+				graphics.PreferredBackBufferHeight = 520;
+				graphics.PreferredBackBufferWidth = 800;
+		}
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
+		/// <summary>
+		/// Allows the game to perform any initialization it needs to before starting to run.
+		/// This is where it can query for any required services and load any non-graphic
+		/// related content.  Calling base.Initialize will enumerate through any components
+		/// and initialize them as well.
+		/// </summary>
 		protected override void Initialize()
 		{
 
 			//create map
 			map = new Map();
-
-      base.Initialize();
+			Player = new Player();
+			base.Initialize();
 		}
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
-    protected override void LoadContent()
-    {
-      // Create a new SpriteBatch, which can be used to draw textures.
-      spriteBatch = new SpriteBatch(GraphicsDevice);
+    /// <summary>
+    /// LoadContent will be called once per game and is the place to load
+    /// all of your content.
+    /// </summary>
+		protected override void LoadContent()
+		{
+			// Create a new SpriteBatch, which can be used to draw textures.
+			spriteBatch = new SpriteBatch(GraphicsDevice);
 			Texture2D t = this.Content.Load<Texture2D>("smolmegumin");
 			TestSprite.setTexture(t); //set the image.
 
+			camera = new Camera(GraphicsDevice.Viewport);
 
 			//load the assets.
 			//this.Content.Load<Texture2D>("Images/Tile1");
@@ -67,16 +70,24 @@ namespace ProjectE_E
 					//{ 2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,},
 
 				//my dumb test map LUL
-				{ 2,2,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,2,2,},
-				{ 2,0,2,2,2,2,2,2,0,0,0,0,0,2,2,2,2,2,0,2,},
-				{ 2,0,0,0,0,0,2,2,0,0,0,0,0,2,2,2,2,2,0,2,},
-				{ 2,0,0,0,0,0,2,0,0,0,0,0,0,2,2,2,2,2,0,2,},
+				{ 0,0,0,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,2,2,},
+				{ 0,0,0,2,2,2,2,2,0,0,0,0,0,2,2,2,2,2,0,2,},
+				{ 0,0,0,0,0,0,2,2,0,0,0,0,0,2,2,2,2,2,0,2,},
+				{ 1,0,0,0,0,0,2,0,0,0,0,0,0,2,2,2,2,2,0,2,},
+				{ 2,1,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,2,},
 				{ 2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,2,},
-				{ 2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
-				{ 2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
-				{ 2,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,2,2,2,},
+				{ 2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,2,},
+				{ 2,2,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,0,0,0,},
+				{ 2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,},
+				{ 2,2,1,0,0,0,0,0,1,1,0,0,0,0,0,2,0,0,0,0,},
+				{ 2,2,2,1,0,0,0,1,2,2,0,0,0,0,0,0,0,0,0,0,},
+				{ 2,2,2,2,1,1,1,2,2,0,1,1,1,1,1,1,1,1,1,1,},
+				{ 2,2,2,2,2,2,2,2,2,0,2,2,2,2,2,2,2,2,2,2,},
 
 			}, 64);
+
+			Player.Load(this.Content);
+			
 
 			// TODO: use this.Content to load your game content here
 		}
@@ -86,39 +97,45 @@ namespace ProjectE_E
 		/// game-specific content.
 		/// </summary>
 		protected override void UnloadContent()
-        {
-            // TODO: Unload any non ContentManager content here
-						//TestSprite.unload
-        }
+		{
+				// TODO: Unload any non ContentManager content here
+				//TestSprite.unload
+		}
 
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Update(GameTime gameTime)
-        {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
+		/// <summary>
+		/// Allows the game to run logic such as updating the world,
+		/// checking for collisions, gathering input, and playing audio.
+		/// </summary>
+		/// <param name="gameTime">Provides a snapshot of timing values.</param>
+		protected override void Update(GameTime gameTime)
+		{
+			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+				Exit();
 
-            // TODO: Add your update logic here
+			Player.Update(gameTime);
+			foreach (CollisionTiles tile in map.CollisionTiles)
+			{
+				Player.Collision(tile.Rectangle, map.Width, map.Height);
+				camera.Update(Player.Position, map.Width, map.Height);
+			}
+			
+			base.Update(gameTime);
+		}
 
-            base.Update(gameTime);
-        }
-
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Draw(GameTime gameTime)
-        {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-						spriteBatch.Begin();
-						//spriteBatch.Draw(TestSprite.getTexture(), new Vector2(0, 0));
-						map.Draw(spriteBatch);
-						// TODO: Add your drawing code here
-						spriteBatch.End();
-            base.Draw(gameTime);
-        }
-    }
+      /// <summary>
+      /// This is called when the game should draw itself.
+      /// </summary>
+      /// <param name="gameTime">Provides a snapshot of timing values.</param>
+		protected override void Draw(GameTime gameTime)
+		{
+			GraphicsDevice.Clear(Color.CornflowerBlue);
+			spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform);
+			//spriteBatch.Draw(TestSprite.getTexture(), new Vector2(0, 0));
+			map.Draw(spriteBatch);
+			Player.Draw(spriteBatch);
+			// TODO: Add your drawing code here
+			spriteBatch.End();
+			base.Draw(gameTime);
+		}
+  }
 }
