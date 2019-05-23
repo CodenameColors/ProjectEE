@@ -40,8 +40,8 @@ namespace ProjectE_E.Components
 					if (number > 0)
 						collisionTiles.Add(new CollisionTiles(number, new Microsoft.Xna.Framework.Rectangle(x * size, y * size, size, size)));
 
-					width = (x + 1) * 1;
-					height = (y + 1) * 1;
+					width = (x + 1) * size;
+					height = (y + 1) * size;
 				}
 			}
 		}
