@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using BixBite.Rendering;
+using BixBite.Characters;
 using ProjectE_E.Components;
 
 namespace ProjectE_E
@@ -9,7 +10,7 @@ namespace ProjectE_E
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-	public class Game1 : Game
+	public class Emeralds_Elements : Game
 	{
 		GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
@@ -19,7 +20,7 @@ namespace ProjectE_E
 		Player Player;
 		Camera camera;
 
-		public Game1()
+		public Emeralds_Elements()
 		{
 				graphics = new GraphicsDeviceManager(this);
 				Content.RootDirectory = "Content";
@@ -80,7 +81,7 @@ namespace ProjectE_E
 				{ 2,2,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,0,0,0,},
 				{ 2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,},
 				{ 2,2,1,0,0,0,0,0,1,1,0,0,0,0,0,2,0,0,0,0,},
-				{ 2,2,2,1,0,0,0,1,2,2,0,0,0,0,0,0,0,0,0,0,},
+				{ 2,2,2,1,0,0,0,1,2,2,2,2,0,0,0,0,0,0,0,0,},
 				{ 2,2,2,2,1,1,1,2,2,0,1,1,1,1,1,1,1,1,1,1,},
 				{ 2,2,2,2,2,2,2,2,2,0,2,2,2,2,2,2,2,2,2,2,},
 
