@@ -65,6 +65,7 @@
     <Compile Include="Rendering\SpriteLayer.cs" />
     <Compile Include="SceneObject\Spawner.cs" />
     <Compile Include="SceneObject\Transistion.cs" />
+    <Compile Include="TileCollisionChecker.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

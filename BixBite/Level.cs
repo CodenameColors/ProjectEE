@@ -15,6 +15,8 @@ namespace BixBite
 		public ObservableCollection<SpriteLayer> Layers { get; set; }
 		public Dictionary<String, object> Properties = new Dictionary<string, object>();
 
+		public Level() { }
+
 		public Level(String desname)
 		{
 			LevelName = desname;
@@ -131,6 +133,5 @@ namespace BixBite
 		{
 
 		}
-
 	}
 }

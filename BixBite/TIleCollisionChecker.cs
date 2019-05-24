@@ -5,12 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectE_E.Components
+namespace BixBite
 {
-	/// <summary>
-	/// This class is here to help with the collision checking of the tiles on the map.
-	/// </summary>
-	static class TileHelper
+	public static class TileCollisionChecker
 	{
 		public static bool TouchTopOf(this Rectangle r1, Rectangle r2)
 		{
@@ -24,6 +21,7 @@ namespace ProjectE_E.Components
 		{
 			return (r1.Top <= r2.Bottom + (r2.Height / 5) &&
 				r1.Top >= r2.Bottom - 1 &&
+				r1.Right >= r2.Left + r2.Width / 5 &&
 				r1.Right >= r2.Left + r2.Width / 5 &&
 				r1.Left <= r2.Right - (r2.Width / 5));
 
@@ -44,6 +42,5 @@ namespace ProjectE_E.Components
 				r1.Top <= r2.Bottom - (r2.Width / 4) &&
 				r1.Bottom >= r2.Top + (r2.Width / 4));
 		}
-
 	}
 }
