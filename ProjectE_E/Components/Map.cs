@@ -9,6 +9,7 @@ namespace ProjectE_E.Components
 {
 	class Map
 	{
+		String Name;
 		private List<CollisionTiles> collisionTiles = new List<CollisionTiles>();
 
 		public List<CollisionTiles> CollisionTiles
