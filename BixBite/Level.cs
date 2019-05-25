@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
+using System.Windows;
+using System.Xml;
 using BixBite.Rendering;
 
 namespace BixBite
@@ -126,12 +126,150 @@ namespace BixBite
 
 		public void ImportLevel()
 		{
-
+			
 		}
 
-		public void ExportLevel()
+		async public void ExportLevel(String FilePath, List<String> TileSets)
 		{
+			XmlWriterSettings settings = new XmlWriterSettings
+			{
+				Indent = true,
+				IndentChars = "  ",
+				NewLineChars = "\r\n",
+				NewLineHandling = NewLineHandling.Replace
+				
+			};
+			settings.Async = true;
+			//settings.NewLineHandling = NewLineHandling.Entitize;
 
+			using (XmlWriter writer = XmlWriter.Create(FilePath, settings))
+			{
+				//Level attritbutes instance
+				await writer.WriteStartElementAsync(null, "Level", null);
+				await writer.WriteAttributeStringAsync(null, "Name", null, "Level 1");
+				await writer.WriteAttributeStringAsync(null, "Width", null, "800");
+				await writer.WriteAttributeStringAsync(null, "Height", null, "600");
+
+				//TileSets
+				foreach(String imgloc in TileSets)
+				{
+					Thread.Sleep(100);
+					System.Drawing.Image img = System.Drawing.Image.FromFile(imgloc);
+					int len = imgloc.LastIndexOf('.') - imgloc.LastIndexOfAny(new char[] { '/', '\\' });
+					String name = imgloc.Substring(imgloc.LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
+					await writer.WriteStartElementAsync(null, "TileSet", null);
+					await writer.WriteAttributeStringAsync(null, "Name", null, name);
+					await writer.WriteAttributeStringAsync(null, "Location", null, imgloc);
+					await writer.WriteAttributeStringAsync(null, "Width", null, img.Width.ToString());
+					await writer.WriteAttributeStringAsync(null, "Height", null, img.Height.ToString());
+					await writer.WriteEndElementAsync();//end of tile set
+				}
+
+				await writer.WriteStartElementAsync(null, "Layers", null);
+				
+				foreach(SpriteLayer layer in Layers)
+				{
+					if (Layers.Count == 0) break;
+					else if(layer.layerType == LayerType.Tile)
+					{
+						await writer.WriteStartElementAsync(null, "TileLayer", null);
+						await writer.WriteAttributeStringAsync(null, "Name", null, layer.LayerName);
+
+						//level data tile wise
+						int[,] tiledata = ((int[,])layer.LayerObjects);
+						for(int i = 0; i < tiledata.GetLength(0); i++)
+						{
+							String rowdata = "";
+							for(int j = 0; j < tiledata.GetLength(1); j++)
+							{
+								rowdata += String.Format("{0},", tiledata[i, j]);
+							}
+							await writer.WriteStartElementAsync(null, "Row", null);
+							await writer.WriteStringAsync(rowdata.Substring(0, rowdata.Length-1));
+							await writer.WriteEndElementAsync(); //end of row
+						}
+
+						await writer.WriteEndElementAsync(); //end of tile layer
+					}
+					else if (layer.layerType == LayerType.Sprite)
+					{
+						await writer.WriteStartElementAsync(null, "SpriteLayer", null);
+						await writer.WriteEndElementAsync();
+					}
+					else if (layer.layerType == LayerType.Gameobject)
+					{
+						await writer.WriteStartElementAsync(null, "GameObjectLayer", null);
+						await writer.WriteEndElementAsync();
+					}
+				}
+
+
+				await writer.WriteEndElementAsync(); //end of layers
+
+
+				//await writer.WriteStartElementAsync(null, "TileLayer", null);
+				//await writer.WriteAttributeStringAsync(null, "Name", null, "TileName");
+				//await writer.WriteStartElementAsync(null, "Row", null);
+				//await writer.WriteStringAsync("0,0,0,0,0,0");
+				//await writer.WriteEndElementAsync();
+				//await writer.WriteStartElementAsync(null, "Row", null);
+				//await writer.WriteStringAsync("0,0,0,0,0,0");
+				//await writer.WriteEndElementAsync();
+				//await writer.WriteStartElementAsync(null, "Row", null);
+				//await writer.WriteStringAsync("0,0,0,0,0,0");
+				//await writer.WriteEndElementAsync();
+				//await writer.WriteStartElementAsync(null, "Row", null);
+				//await writer.WriteStringAsync("0,0,0,0,0,0");
+				//await writer.WriteEndElementAsync();
+				//await writer.WriteEndElementAsync();
+
+				//await writer.WriteStartElementAsync(null, "SpriteLayer", null);
+				//await writer.WriteAttributeStringAsync(null, "Name", null, "TileName");
+
+				//await writer.WriteStartElementAsync(null, "Sprite", null);
+				//await writer.WriteAttributeStringAsync(null, "Name", null, "TileName");
+				//await writer.WriteAttributeStringAsync(null, "Location", null, "PathName");
+				//await writer.WriteAttributeStringAsync(null, "Width", null, "800");
+				//await writer.WriteAttributeStringAsync(null, "Height", null, "600");
+				//await writer.WriteAttributeStringAsync(null, "x", null, "126");
+				//await writer.WriteAttributeStringAsync(null, "y", null, "456");
+				//await writer.WriteEndElementAsync();
+
+				//await writer.WriteEndElementAsync();
+
+				//await writer.WriteStartElementAsync(null, "GameObjectLayer", null);
+				//await writer.WriteAttributeStringAsync(null, "Name", null, "TileName");
+				//await writer.WriteStartElementAsync(null, "Row", null);
+				//await writer.WriteStringAsync("0,0,0,0,0,0");
+				//await writer.WriteEndElementAsync();
+				//await writer.WriteStartElementAsync(null, "Row", null);
+				//await writer.WriteStringAsync("0,0,0,0,0,0");
+				//await writer.WriteEndElementAsync();
+				//await writer.WriteStartElementAsync(null, "Row", null);
+				//await writer.WriteStringAsync("0,0,0,0,0,0");
+				//await writer.WriteEndElementAsync();
+				//await writer.WriteStartElementAsync(null, "Row", null);
+				//await writer.WriteStringAsync("0,0,0,0,0,0");
+				//await writer.WriteEndElementAsync();
+
+				//Gameobject scripts
+				await writer.WriteStartElementAsync(null, "GameObjectScripts", null);
+				await writer.WriteAttributeStringAsync(null, "Group", null, "NUM");
+				await writer.WriteAttributeStringAsync(null, "Event", null, "EventName");
+
+				await writer.WriteStartElementAsync(null, "Data", null);
+				await writer.WriteAttributeStringAsync(null, "TYpe", null, "EventType");
+				await writer.WriteStartElementAsync(null, "EventData", null);
+				await writer.WriteAttributeStringAsync(null, "Activiation", null, "[Button]");
+				await writer.WriteStringAsync("Objects to load here");
+				await writer.WriteEndElementAsync();
+				await writer.WriteEndElementAsync();
+
+				await writer.WriteEndElementAsync();
+				await writer.WriteEndElementAsync();
+
+				await writer.FlushAsync();
+			}
 		}
 	}
 }

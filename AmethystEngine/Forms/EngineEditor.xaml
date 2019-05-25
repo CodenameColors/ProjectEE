@@ -42,21 +42,30 @@
 
     <ControlTemplate x:Key="LevelEditorTileMap_Template">
       <TabControl Background="#FF2B2B2B">
-        <TabItem Header="Tile Map" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
-          <ScrollViewer x:Name="LevelEditorTIleMap_SV" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,4,5,7" IsEnabled="True" Background="Black">
-            <Canvas x:Name="TileMap_Canvas" IsHitTestVisible="True" MouseWheel="LevelEditor_Canvas_MouseWheel" Width="512" Height="512" MouseLeftButtonDown="TileMap_Canvas_MouseLeftButtonDown" 
+
+				<TabItem Header="Tile Map" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="*"/>
+						</Grid.RowDefinitions>
+						<Label Grid.Row="0" Content="TileSet:" VerticalContentAlignment="Center" Foreground="White"/>
+						<ComboBox Grid.Row="0" x:Name="TileSetSelector_CB" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="50,5,5,5" SelectionChanged="TileSetSelector_CB_SelectionChanged" />
+						<ScrollViewer Grid.Row="1" x:Name="LevelEditorTIleMap_SV" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,5,5,7" IsEnabled="True" Background="Black">
+							<Canvas x:Name="TileMap_Canvas" IsHitTestVisible="True" MouseWheel="LevelEditor_Canvas_MouseWheel" Width="512" Height="512" MouseLeftButtonDown="TileMap_Canvas_MouseLeftButtonDown" 
 										MouseMove="TileMap_Canvas_MouseMove" HorizontalAlignment="Left" VerticalAlignment="Top" >
-              <Canvas.Background>
-                <VisualBrush x:Name="LevelEditorTileMapCanvas_VB" TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute" Stretch="Uniform" >
-                  <VisualBrush.Visual>
-                    <Rectangle Width="10" Height="10" Fill="Transparent" Stroke="White" StrokeThickness=".1" Visibility="Hidden"/>
-                  </VisualBrush.Visual>
-                </VisualBrush>
-              </Canvas.Background>
-            </Canvas>
-          </ScrollViewer>
-        </TabItem>
-        <TabItem Header="Sprite Lib" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
+								<Canvas.Background>
+									<VisualBrush x:Name="LevelEditorTileMapCanvas_VB" Stretch="None" TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute" >
+										<VisualBrush.Visual>
+											<Rectangle  Width="32" Height="32" Fill="Transparent" Stroke="White" StrokeThickness=".2" Visibility="Visible" />
+										</VisualBrush.Visual>
+									</VisualBrush>
+								</Canvas.Background>
+							</Canvas>
+						</ScrollViewer>
+					</Grid>
+				</TabItem>
+				<TabItem Header="Sprite Lib" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
         </TabItem>
         <TabItem Header="Custom Sets [WIP]" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
         </TabItem>

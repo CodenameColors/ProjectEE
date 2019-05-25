@@ -72,9 +72,13 @@ namespace AmethystEngine.Forms
 		Canvas MapLEditor_Canvas = new Canvas();
 		Canvas FullMapLEditor_Canvas = new Canvas();
 		ListBox EditorObjects_LB = new ListBox();
-		Canvas TileMap_Canvas_temp = new Canvas();
 		VisualBrush FullMapLEditor_VB = new VisualBrush();
 		Rectangle FullMapCanvasHightlight_rect = new Rectangle();
+
+		VisualBrush TileMap_VB = new VisualBrush();
+		Canvas TileMap_Canvas_temp = new Canvas();
+		ComboBox TileSets_CB = new ComboBox();
+		Rectangle TileMapTiles_Rect = new Rectangle();
 
 		EditorTool CurrentTool = EditorTool.None;
 		SelectTool selectTool = new SelectTool();
@@ -84,7 +88,7 @@ namespace AmethystEngine.Forms
 		private Tuple<object, SceneObjectType> CurrentLevelEditorSceneObject;
     Point[] SelectionRectPoints = new Point[2];
 		Point[] shiftpoints = new Point[3]; //0 = mouse down , 1 = mouse up , 2 on shifting "tick"
-
+		private List<Image> TileSets = new List<Image>();
 
 		int EditorGridHeight = 40;
     int EditorGridWidth = 40;
@@ -113,16 +117,19 @@ namespace AmethystEngine.Forms
       //Find and set level editor controls!
       FullMapLEditor_Canvas = (Canvas)FullMapGrid_Control.Template.FindName("LevelEditor_Canvas", FullMapGrid_Control);
       FullMapLEditor_VB = (VisualBrush)FullMapGrid_Control.Template.FindName("FullLeditorGrid_VB", FullMapGrid_Control);
-      EditorObjects_LB = (ListBox)ContentLibrary_Control.Template.FindName("EditorObjects_LB", ContentLibrary_Control);
+			
+			EditorObjects_LB = (ListBox)ContentLibrary_Control.Template.FindName("EditorObjects_LB", ContentLibrary_Control);
       TileMap_Canvas_temp = (Canvas)(ContentLibrary_Control.Template.FindName("TileMap_Canvas", ContentLibrary_Control));
+			TileSets_CB = (ComboBox)(ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control));
+			TileMapTiles_Rect = (Rectangle)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB_Rect", ContentLibrary_Control);
+			TileMap_VB = (VisualBrush)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB", ContentLibrary_Control);
 
 			//LevelEditorScreenRatio = Math.Round(LevelEditor_BackCanvas.ActualWidth / LevelEditor_BackCanvas.ActualHeight,1);
-
 			LEditorTS = new List<LevelEditorProp>()
 			{
 				new LevelEditorProp(){ PropertyName = "Level Name", PropertyData="Default" },
-				new LevelEditorProp(){ PropertyName = "Map Width(cells)", PropertyData="200" },
-				new LevelEditorProp(){ PropertyName = "Map Height(cells)", PropertyData="400" },
+				new LevelEditorProp(){ PropertyName = "Map Width(cells)", PropertyData="30" },
+				new LevelEditorProp(){ PropertyName = "Map Height(cells)", PropertyData="50" },
 				//new LevelEditorProp("test 2")								
 			};
 
@@ -392,19 +399,25 @@ namespace AmethystEngine.Forms
     {
       this.DragMove();
     }
-    #endregion
+		#endregion
 
-    #region "Dynamic Template Binding"
-    private void Desc_CB_Click(object sender, RoutedEventArgs e)
-    {
-      if ((bool)Desc_CB.IsChecked)
-        EditorObjects_LB.ItemTemplate = (DataTemplate)this.Resources["BigEdit1"];
-      else
-      {
-        if (this.Resources.Contains("EObj_Small"))
-          EditorObjects_LB.ItemTemplate = (DataTemplate)this.Resources["BigEdit"];
-      }
-    }
+		#region "Dynamic Template Binding"
+		private void Desc_CB_Click(object sender, RoutedEventArgs e)
+		{
+			if (EditorWindows_TC.SelectedIndex == 0) //we are in the level editor.
+			{
+			}
+			else // other editors WIP
+			{
+				if ((bool)Desc_CB.IsChecked)
+					EditorObjects_LB.ItemTemplate = (DataTemplate)this.Resources["BigEdit1"];
+				else
+				{
+					if (this.Resources.Contains("EObj_Small"))
+						EditorObjects_LB.ItemTemplate = (DataTemplate)this.Resources["BigEdit"];
+				}
+			}
+		}
 
     private void EditorWindows_TC_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -414,10 +427,10 @@ namespace AmethystEngine.Forms
       }
       else
       {
-        ContentLibrary_Control.Template = (ControlTemplate)this.Resources["ContentLibaray_LB_Template"];
-        ((ListBox)(ContentLibrary_Control.Template.FindName("EditorObjects_LB", ContentLibrary_Control))).ItemTemplate =
-          (DataTemplate)this.Resources["BigEdit"];
-        ((ListBox)(ContentLibrary_Control.Template.FindName("EditorObjects_LB", ContentLibrary_Control))).ItemsSource = Titles;
+        //ContentLibrary_Control.Template = (ControlTemplate)this.Resources["ContentLibaray_LB_Template"];
+        //((ListBox)(ContentLibrary_Control.Template.FindName("EditorObjects_LB", ContentLibrary_Control))).ItemTemplate =
+        //  (DataTemplate)this.Resources["BigEdit"];
+        //((ListBox)(ContentLibrary_Control.Template.FindName("EditorObjects_LB", ContentLibrary_Control))).ItemsSource = Titles;
         //((ListBox)(ContentLibrary_Control.Template.FindName("EditorObjects_LB"))).ItemsSource = Titles;
 
       }
@@ -495,6 +508,8 @@ namespace AmethystEngine.Forms
     #region "File Traverse Item View"
     private void DirectoryBack_BTN_Click(object sender, RoutedEventArgs e)
     {
+			if (((TreeViewItem)ProjectContentExplorer.SelectedItem) == null) return;	//you need to click on something...
+
       if (((TreeViewItem)ProjectContentExplorer.SelectedItem).Parent != null)
         try
         {
@@ -583,6 +598,7 @@ namespace AmethystEngine.Forms
 			
 			if (CurrentTool == EditorTool.Brush)
 			{
+				if(SelectedTile_Canvas.Children.Count == 0) return;
 				Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid. always 40 becasue thats the base. 
 
 				Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X , (int)pos.Y);
@@ -840,6 +856,7 @@ namespace AmethystEngine.Forms
 			//which way is mouse moving?
 			MPos -= (Vector)e.GetPosition(LevelEditor_Canvas);
 
+
 			//is the middle mouse button down?
 			if (e.MiddleButton == MouseButtonState.Pressed)
         LavelEditorPan();
@@ -931,16 +948,31 @@ namespace AmethystEngine.Forms
 
     }
 
-    #region "Panning"
-    /// <summary>
-    /// Performs the panning effect on the main level editor canvas.
-    /// </summary>
-    private void LavelEditorPan()
-    {
-      //this is here so when we pan the tiles work with the relative cords we are moving to. Its allows the tiles to maintain position data.
-      foreach (UIElement child in LevelEditor_Canvas.Children) 
+		#region "Panning"
+		/// <summary>
+		/// Performs the panning effect on the main level editor canvas.
+		/// </summary>
+		private void LavelEditorPan()
+		{
+			bool exit = true;
+			if (Canvas_grid.Viewport.X >= 0)
+			{
+				Canvas_grid.Viewport = new Rect(-1, Canvas_grid.Viewport.Y, Canvas_grid.Viewport.Width, Canvas_grid.Viewport.Height);
+				exit = exit & false;
+			}
+			if (Canvas_grid.Viewport.Y >= 0)
+			{
+				Canvas_grid.Viewport = new Rect(Canvas_grid.Viewport.X, -1, Canvas_grid.Viewport.Width, Canvas_grid.Viewport.Height);
+				exit = exit & false;
+			}
+			
+
+
+			//this is here so when we pan the tiles work with the relative cords we are moving to. Its allows the tiles to maintain position data.
+			foreach (UIElement child in LevelEditor_Canvas.Children) 
       {
-        double x = Canvas.GetLeft(child);
+				if (!exit) return;
+				double x = Canvas.GetLeft(child);
         double y = Canvas.GetTop(child);
         Canvas.SetLeft(child, x + MPos.X);
         Canvas.SetTop(child, y + MPos.Y);
@@ -955,16 +987,26 @@ namespace AmethystEngine.Forms
         Width = FullMapLEditor_VB.Viewport.Width,
         Height = FullMapLEditor_VB.Viewport.Height
       }; //desices how quick we will pan.
+
       //Moves ONLY the selection rectangle in the full map viewer.
       foreach (UIElement child in FullMapLEditor_Canvas.Children)
       {
+				Console.WriteLine("Moved in bounds");
         if (((Rectangle)child).Name == "SelectionRect")
         {
-          double x = Canvas.GetLeft(child);
+					if (!exit) return;
+					double x = Canvas.GetLeft(child);
           double y = Canvas.GetTop(child);
+
           Canvas.SetLeft(child, x - MPos.X / 10); //TODO: give this an if statment so the grid cannot go off the screen.
           Canvas.SetTop(child, y - MPos.Y / 10);  //SCALE use the ratio to pan and link both accurately
-        }
+
+					//x = Canvas.GetLeft(child);
+					//y = Canvas.GetTop(child);
+					//if (x < 0) { Canvas.SetLeft(child, 0);  return; }
+					//if (y < 0) { Canvas.SetTop(child, 0); return; }
+
+				}
       }
       GridOffset.X -= MPos.X / 10; //keeps in sync
       GridOffset.Y -= MPos.Y / 10;
@@ -981,6 +1023,7 @@ namespace AmethystEngine.Forms
     private void LevelEditor_Canvas_MouseWheel(object sender, MouseWheelEventArgs e)
     {
       Console.WriteLine("scroollll");
+			if (ZoomLevel == .2) return; //do not allow this be 0 which in turn / by 0;
 
       if (e.Delta > 0) //zoom in!
       {
@@ -1113,22 +1156,29 @@ namespace AmethystEngine.Forms
 
       Console.WriteLine(filename);
 
-      if (EditorWindows_TC.SelectedIndex == 0)
-      {
-        Canvas TileMap = (Canvas)ContentLibrary_Control.Template.FindName("TileMap_Canvas", ContentLibrary_Control);
-        System.Windows.Media.Imaging.BitmapImage bmp = new System.Windows.Media.Imaging.BitmapImage();
-        Image image = new Image();
-        var pic = new System.Windows.Media.Imaging.BitmapImage();
-        pic.BeginInit();
-        pic.UriSource = new Uri(filename); // url is from the xml
-        pic.EndInit();
-        image.Source = pic;
-        image.Width = 512;
-        image.Height = 512;
+			if (EditorWindows_TC.SelectedIndex == 0)
+			{
+				Image image = new Image();
+				var pic = new System.Windows.Media.Imaging.BitmapImage();
+				pic.BeginInit();
+				pic.UriSource = new Uri(filename); // url is from the xml
+				pic.EndInit();
 
-        TileMap.Children.Add(image);
+				System.Drawing.Image img = System.Drawing.Image.FromFile(filename);
+				image.Source = pic;
+				image.Width = img.Width;
+				image.Height = img.Height;
+				//Interaction interaction
 
-      }
+
+				image.Tag = String.Format("{0},{1}", 0, 1);
+
+				int len = pic.UriSource.ToString().LastIndexOf('.') - pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' });
+
+				TileSets_CB.Items.Add(pic.UriSource.ToString().Substring(pic.UriSource.ToString().LastIndexOfAny(new char[] { '/','\\'}) + 1 , len-1));
+				TileSets.Add(image);
+				TileSets_CB.SelectedIndex = 0;
+			}
       else
       {
         EditorObject E = new EditorObject(filename, filename.Substring(filename.LastIndexOf((filename.Contains("\\") ? "\\" : "/")) + 1, filename.LastIndexOf(".") - filename.LastIndexOf((filename.Contains("\\") ? "\\" : "/")) - 1), false);
@@ -1138,6 +1188,24 @@ namespace AmethystEngine.Forms
         EditorObjects_LB.ItemsSource = EditorObj_list;
       }
     }
+
+		/// <summary>
+		/// Displays the Correct Tileset depending on the selected item
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void TileSetSelector_CB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if(TileSets_CB.SelectedIndex >= 0)
+			{
+
+				Canvas TileMap = (Canvas)ContentLibrary_Control.Template.FindName("TileMap_Canvas", ContentLibrary_Control);
+				TileMap.Children.Clear();
+				TileMap.Children.Add(TileSets[TileSets_CB.SelectedIndex]);
+				
+			}
+		}
+
 		#endregion
 
 		#region "Scene Viewer"
@@ -1243,9 +1311,16 @@ namespace AmethystEngine.Forms
 			//create new Level
 			Level TempLevel = new Level(LevelName);
 			SpriteLayer TempLevelChild = new SpriteLayer(LayerType.Tile, TempLevel) { LayerName = "Background" };
-			TempLevelChild.DefineLayerDataType(LayerType.Tile, 200, 400);
+			TempLevelChild.DefineLayerDataType(LayerType.Tile, 30, 50);
+			TempLevel.Layers.Add(TempLevelChild);
+			TempLevelChild = new SpriteLayer(LayerType.Gameobject, TempLevel) { LayerName = "Collision" };
+			TempLevelChild.DefineLayerDataType(LayerType.Gameobject, 30, 50);
+			TempLevel.Layers.Add(TempLevelChild);
+			TempLevelChild = new SpriteLayer(LayerType.Sprite, TempLevel) { LayerName = "Sprite" };
+			TempLevelChild.DefineLayerDataType(LayerType.Sprite, 30, 50);
 			TempLevel.Layers.Add(TempLevelChild);
 			OpenLevels.Add(TempLevel);
+
 		}
 
 		private void SceneExplorer_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -1290,7 +1365,7 @@ namespace AmethystEngine.Forms
 		private void AddTileLayer_Click(object sender, RoutedEventArgs e)
 		{
 			((Level)SceneExplorer_TreeView.SelectedValue).AddLayer("new tile", LayerType.Tile); 
-			((Level)SceneExplorer_TreeView.SelectedValue).Layers.Last().DefineLayerDataType(LayerType.Tile, 200, 400);
+			((Level)SceneExplorer_TreeView.SelectedValue).Layers.Last().DefineLayerDataType(LayerType.Tile, 30, 50);
 		}
 		private void SpriteLayer_Click(object sender, RoutedEventArgs e)
 		{
@@ -1306,9 +1381,18 @@ namespace AmethystEngine.Forms
     private void Test_Click(object sender, RoutedEventArgs e)
 		{
 			//moving test
-			Canvas.SetLeft(selectTool.SelectedTiles[0], Canvas.GetLeft(selectTool.SelectedTiles[0]) + selectTool.SelectedTiles[0].ActualWidth); 
+			//Canvas.SetLeft(selectTool.SelectedTiles[0], Canvas.GetLeft(selectTool.SelectedTiles[0]) + selectTool.SelectedTiles[0].ActualWidth);
 
 			//layer moving test.
+			List<String> TileSetImages = new List<string>();
+			foreach (Image i in TileSets)
+			{
+				string localPath = new Uri(i.Source.ToString()).LocalPath;
+				TileSetImages.Add(localPath); //URI isn't supported so turn it local!
+			}
+			Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
+			Curlevel.ExportLevel("C: \\Users\\Antonio\\Documents\\text.xml", TileSetImages);
+
 		}
 
 
@@ -1493,7 +1577,8 @@ namespace AmethystEngine.Forms
       //if now which direction did you move?
       return BixBite.BixBiteTypes.CardinalDirection.None;
     }
-    
+
+
 
 		#endregion
 
