@@ -36,7 +36,6 @@ namespace ProjectE_E
 		/// </summary>
 		protected override void Initialize()
 		{
-
 			//create map
 			map = new Map();
 			Player = new Player();
