@@ -14,7 +14,7 @@ namespace BixBite.Rendering
 		None,
 		Tile,			//used for background/tile art
 		Sprite,		//used for sprites, NOT tile
-		Gameobject		//used for location to indicate script triggers. 
+		GameEvent		//used for location to indicate script triggers. 
 	};
 
 	public class SpriteLayer
@@ -65,7 +65,7 @@ namespace BixBite.Rendering
 				case (LayerType.Sprite):
 					LayerObjects = new List<Sprite>();
 					break;
-				case (LayerType.Gameobject):
+				case (LayerType.GameEvent):
 					LayerObjects = new List<GameObject>();
 					break;
 			}
@@ -98,7 +98,7 @@ namespace BixBite.Rendering
 					//((int[,])LayerObjects)[xcell, ycell] = tiledata;
 					else Console.WriteLine("Invalid defined Layerobject type. Not a List of Tiles");
 					return;
-				case (LayerType.Gameobject):
+				case (LayerType.GameEvent):
 					if (newLayerObject is GameObject)
 					{
 						if (LayerObjects is List<GameObject>)
