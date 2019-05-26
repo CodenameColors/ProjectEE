@@ -859,7 +859,21 @@ namespace AmethystEngine.Forms
 
 			//is the middle mouse button down?
 			if (e.MiddleButton == MouseButtonState.Pressed)
-        LavelEditorPan();
+			{
+				bool exit = true;
+				if (Canvas_grid.Viewport.X >= 0)
+				{
+					Canvas_grid.Viewport = new Rect(-1, Canvas_grid.Viewport.Y, Canvas_grid.Viewport.Width, Canvas_grid.Viewport.Height);
+					exit = exit & false;
+				}
+				if (Canvas_grid.Viewport.Y >= 0)
+				{
+					Canvas_grid.Viewport = new Rect(Canvas_grid.Viewport.X, -1, Canvas_grid.Viewport.Width, Canvas_grid.Viewport.Height);
+					exit = exit & false;
+				}
+				if (exit)
+					LavelEditorPan();
+			}
       if (e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Brush)
         Canvas_MouseLeftButtonDown(sender, new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left));
       else if (e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Move)
@@ -965,13 +979,13 @@ namespace AmethystEngine.Forms
 				Canvas_grid.Viewport = new Rect(Canvas_grid.Viewport.X, -1, Canvas_grid.Viewport.Width, Canvas_grid.Viewport.Height);
 				exit = exit & false;
 			}
-			
+			if (!exit) return;
 
 
 			//this is here so when we pan the tiles work with the relative cords we are moving to. Its allows the tiles to maintain position data.
 			foreach (UIElement child in LevelEditor_Canvas.Children) 
       {
-				if (!exit) return;
+				
 				double x = Canvas.GetLeft(child);
         double y = Canvas.GetTop(child);
         Canvas.SetLeft(child, x + MPos.X);
@@ -994,17 +1008,16 @@ namespace AmethystEngine.Forms
 				Console.WriteLine("Moved in bounds");
         if (((Rectangle)child).Name == "SelectionRect")
         {
-					if (!exit) return;
 					double x = Canvas.GetLeft(child);
           double y = Canvas.GetTop(child);
 
           Canvas.SetLeft(child, x - MPos.X / 10); //TODO: give this an if statment so the grid cannot go off the screen.
           Canvas.SetTop(child, y - MPos.Y / 10);  //SCALE use the ratio to pan and link both accurately
 
-					//x = Canvas.GetLeft(child);
-					//y = Canvas.GetTop(child);
-					//if (x < 0) { Canvas.SetLeft(child, 0);  return; }
-					//if (y < 0) { Canvas.SetTop(child, 0); return; }
+					x = Canvas.GetLeft(child);
+					y = Canvas.GetTop(child);
+					if (x < 0) { Canvas.SetLeft(child, 0); return; }
+					if (y < 0) { Canvas.SetTop(child, 0); return; }
 
 				}
       }
@@ -1313,8 +1326,8 @@ namespace AmethystEngine.Forms
 			SpriteLayer TempLevelChild = new SpriteLayer(LayerType.Tile, TempLevel) { LayerName = "Background" };
 			TempLevelChild.DefineLayerDataType(LayerType.Tile, 30, 50);
 			TempLevel.Layers.Add(TempLevelChild);
-			TempLevelChild = new SpriteLayer(LayerType.Gameobject, TempLevel) { LayerName = "Collision" };
-			TempLevelChild.DefineLayerDataType(LayerType.Gameobject, 30, 50);
+			TempLevelChild = new SpriteLayer(LayerType.GameEvent, TempLevel) { LayerName = "Collision" };
+			TempLevelChild.DefineLayerDataType(LayerType.GameEvent, 30, 50);
 			TempLevel.Layers.Add(TempLevelChild);
 			TempLevelChild = new SpriteLayer(LayerType.Sprite, TempLevel) { LayerName = "Sprite" };
 			TempLevelChild.DefineLayerDataType(LayerType.Sprite, 30, 50);
@@ -1373,7 +1386,7 @@ namespace AmethystEngine.Forms
 		}
 		private void GameObjectLayer_Click(object sender, RoutedEventArgs e)
 		{
-			((Level)SceneExplorer_TreeView.SelectedValue).AddLayer("new GOL", LayerType.Gameobject);
+			((Level)SceneExplorer_TreeView.SelectedValue).AddLayer("new GOL", LayerType.GameEvent);
 		}
 
 		

@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using BixBite.Rendering;
 using BixBite.Characters;
 using ProjectE_E.Components;
+using System.Collections.Generic;
 
 namespace ProjectE_E
 {
@@ -15,7 +16,7 @@ namespace ProjectE_E
 		GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
 		Sprite TestSprite = new Sprite();
-
+		
 		Map map;
 		Player Player;
 		Camera camera;
@@ -24,8 +25,8 @@ namespace ProjectE_E
 		{
 				graphics = new GraphicsDeviceManager(this);
 				Content.RootDirectory = "Content";
-				graphics.PreferredBackBufferHeight = 520;
-				graphics.PreferredBackBufferWidth = 800;
+				//graphics.PreferredBackBufferHeight = 520;
+				//graphics.PreferredBackBufferWidth = 800;
 		}
 
 		/// <summary>
