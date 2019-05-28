@@ -13,12 +13,14 @@ namespace BixBite
 		//instance variables
 		public String LevelName { get; set; }
 		public ObservableCollection<SpriteLayer> Layers { get; set; }
+		public int xCells {get; set;}
+		public int yCells { get; set; }
 		public Dictionary<String, object> Properties = new Dictionary<string, object>();
 
 		/// <summary>
 		/// This  variable stores all the anyonmous methods for event triggers.
 		/// </summary>
-		Dictionary<string, System.Reflection.MethodInfo> EventsLUT = new Dictionary<string, System.Reflection.MethodInfo>();
+		private Dictionary<string, System.Reflection.MethodInfo> EventsLUT = new Dictionary<string, System.Reflection.MethodInfo>();
 
 
 		public Level() { }
@@ -135,7 +137,7 @@ namespace BixBite
 			
 		}
 
-		async public void ExportLevel(String FilePath, List<String> TileSets)
+		async public void ExportLevel(String FilePath, List<String> TileSets, List<Tuple<int, int>> CellDimen = null)
 		{
 			XmlWriterSettings settings = new XmlWriterSettings
 			{
@@ -166,8 +168,10 @@ namespace BixBite
 					await writer.WriteStartElementAsync(null, "TileSet", null);
 					await writer.WriteAttributeStringAsync(null, "Name", null, name);
 					await writer.WriteAttributeStringAsync(null, "Location", null, imgloc);
-					await writer.WriteAttributeStringAsync(null, "Width", null, img.Width.ToString());
-					await writer.WriteAttributeStringAsync(null, "Height", null, img.Height.ToString());
+					await writer.WriteAttributeStringAsync(null, "MapWidth", null, img.Width.ToString());
+					await writer.WriteAttributeStringAsync(null, "MapHeight", null, img.Height.ToString());
+					await writer.WriteAttributeStringAsync(null, "TileWidth", null, "32");
+					await writer.WriteAttributeStringAsync(null, "TileHeight", null, "32");
 					await writer.WriteEndElementAsync();//end of tile set
 				}
 

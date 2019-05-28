@@ -66,7 +66,7 @@ namespace BixBite.Rendering
 					LayerObjects = new List<Sprite>();
 					break;
 				case (LayerType.GameEvent):
-					LayerObjects = new List<GameObject>();
+					LayerObjects = new List<GameEvent>();
 					break;
 			}
 		}
@@ -99,10 +99,10 @@ namespace BixBite.Rendering
 					else Console.WriteLine("Invalid defined Layerobject type. Not a List of Tiles");
 					return;
 				case (LayerType.GameEvent):
-					if (newLayerObject is GameObject)
+					if (newLayerObject is GameEvent)
 					{
-						if (LayerObjects is List<GameObject>)
-							((List<GameObject>)LayerObjects).Add((GameObject)newLayerObject);
+						if (LayerObjects is List<GameEvent>)
+							((List<GameEvent>)LayerObjects).Add((GameEvent)newLayerObject);
 						else Console.WriteLine("Invalid defined Layerobject type. Not a List of GameObjects");
 					}
 					return;

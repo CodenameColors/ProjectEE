@@ -1,4 +1,7 @@
 ﻿using AmethystEngine.Components;
+using AmethystEngine.Components.Tools;
+using BixBite;
+using BixBite.Rendering;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -14,9 +17,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using BixBite.Rendering;
-using BixBite;
-using AmethystEngine.Components.Tools;
 
 namespace AmethystEngine.Forms
 {
@@ -76,9 +76,12 @@ namespace AmethystEngine.Forms
 		Rectangle FullMapCanvasHightlight_rect = new Rectangle();
 
 		VisualBrush TileMap_VB = new VisualBrush();
-		Canvas TileMap_Canvas_temp = new Canvas();
+		Canvas TileMap_Canvas = new Canvas();
 		ComboBox TileSets_CB = new ComboBox();
 		Rectangle TileMapTiles_Rect = new Rectangle();
+		Rectangle FullMapSelection_Rect = new Rectangle();
+
+
 
 		EditorTool CurrentTool = EditorTool.None;
 		SelectTool selectTool = new SelectTool();
@@ -119,7 +122,7 @@ namespace AmethystEngine.Forms
       FullMapLEditor_VB = (VisualBrush)FullMapGrid_Control.Template.FindName("FullLeditorGrid_VB", FullMapGrid_Control);
 			
 			EditorObjects_LB = (ListBox)ContentLibrary_Control.Template.FindName("EditorObjects_LB", ContentLibrary_Control);
-      TileMap_Canvas_temp = (Canvas)(ContentLibrary_Control.Template.FindName("TileMap_Canvas", ContentLibrary_Control));
+      TileMap_Canvas = (Canvas)(ContentLibrary_Control.Template.FindName("TileMap_Canvas", ContentLibrary_Control));
 			TileSets_CB = (ComboBox)(ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control));
 			TileMapTiles_Rect = (Rectangle)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB_Rect", ContentLibrary_Control);
 			TileMap_VB = (VisualBrush)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB", ContentLibrary_Control);
@@ -144,7 +147,7 @@ namespace AmethystEngine.Forms
       NumOfCellsX = int.Parse(LEditorTS[1].PropertyData);
       NumOfCellsY = int.Parse(LEditorTS[2].PropertyData);
 
-      scaleFullMapEditor();
+      //scaleFullMapEditor();
       //FullMapGrid_Control.Template.FindName("")
     }
 
@@ -406,6 +409,18 @@ namespace AmethystEngine.Forms
 		{
 			if (EditorWindows_TC.SelectedIndex == 0) //we are in the level editor.
 			{
+				TabControl LELibary_TC = (TabControl)ContentLibrary_Control.Template.FindName("LevelEditorLibary_TabControl", ContentLibrary_Control);
+				if (LELibary_TC.SelectedIndex == 1) //sprite libary
+				{
+					ListBox SpriteLibary_LB = (ListBox)ContentLibrary_Control.Template.FindName("SpriteLibary_LB", ContentLibrary_Control);
+					if ((bool)Desc_CB.IsChecked)
+						SpriteLibary_LB.ItemTemplate = (DataTemplate)this.Resources["BigEdit1"];
+					else
+					{
+						if (this.Resources.Contains("EObj_Small"))
+							SpriteLibary_LB.ItemTemplate = (DataTemplate)this.Resources["BigEdit"];
+					}
+				}
 			}
 			else // other editors WIP
 			{
@@ -545,26 +560,42 @@ namespace AmethystEngine.Forms
     //Creates a tile brush to paint the editor. Uses selected tile from tile map.
     private void TileMap_Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
+			int xtile, ytile, TileSetOffest = 0;
 			//TODO: MAKE THIS WORK WITH VARIABLE SIZES NOT JUST 32x32
-      SelectedTile_Canvas.Children.Clear(); imgtilebrush = null;
-      RenderTargetBitmap rtb = new RenderTargetBitmap((int)TileMap_Canvas_temp.ActualWidth,
-       (int)TileMap_Canvas_temp.ActualHeight, 96d, 96d, System.Windows.Media.PixelFormats.Default);
-      rtb.Render(TileMap_Canvas_temp);
+			Image Timg = TileSets[TileSets_CB.SelectedIndex];
+			List<String> TagProps = Timg.Tag.ToString().Split(new char[] { ','}).ToList();
+			xtile = Int32.Parse(TagProps[0]); ytile = Int32.Parse(TagProps[1]);
 
-      Point pp = Mouse.GetPosition(TileMap_Canvas_temp);
+			//there can be multiple tile sets per level file. 
+			for(int i = 0; i < TileSets_CB.SelectedIndex; i++)
+			{
+				Image img = TileSets[i];
+				List<String> TempTagProps = Timg.Tag.ToString().Split(new char[] { ',' }).ToList();
+				TileSetOffest += (int)((img.Width/ Int32.Parse(TempTagProps[0])) * (img.Height / Int32.Parse(TempTagProps[1])));
+			}
+
+      SelectedTile_Canvas.Children.Clear(); imgtilebrush = null;
+      RenderTargetBitmap rtb = new RenderTargetBitmap((int)TileMap_Canvas.ActualWidth,
+       (int)TileMap_Canvas.ActualHeight, 96d, 96d, System.Windows.Media.PixelFormats.Default);
+      rtb.Render(TileMap_Canvas);
+
+      Point pp = Mouse.GetPosition(TileMap_Canvas);
       Console.WriteLine(pp.ToString());
-      pp.X -= Math.Floor(pp.X) % 32;  //TODO: Add the offset so we can fill the grid AFTER PAnNNG
+      pp.X -= Math.Floor(pp.X) % xtile;  //TODO: Add the offset so we can fill the grid AFTER PAnNNG
       pp.Y -= Math.Floor(pp.Y) % 32;
       int x = (int)pp.X;
       int y = (int)pp.Y;
       Console.WriteLine(String.Format("x: {0},  y: {1}", x, y));
       Console.WriteLine("");
-      var crop = new CroppedBitmap(rtb, new Int32Rect(x, y, 32, 32));
+      var crop = new CroppedBitmap(rtb, new Int32Rect(x, y, xtile, ytile));
       // using BitmapImage version to prove its created successfully
       Image image2 = new Image(); image2.Source = crop; //cropped
       imgtilebrush = new ImageBrush(image2.Source);
-			int tilenumdata = ((y / 32) * ((int)TileMap_Canvas_temp.ActualWidth / 32)) + (x / 32); 
-      SelectedTile_Canvas.Children.Add(new Rectangle() { Width = 32, Height = 32,
+			//calculate the int value in canvas "array"
+			int tilenumdata = ((y / ytile) * ((int)TileMap_Canvas.ActualWidth / xtile)) + (x / xtile);
+			tilenumdata += TileSetOffest;
+
+			SelectedTile_Canvas.Children.Add(new Rectangle() { Width = xtile, Height = ytile,
 				Fill = imgtilebrush, Tag = tilenumdata, RenderTransform = new ScaleTransform(.8,.8)});
     }
 
@@ -823,7 +854,7 @@ namespace AmethystEngine.Forms
 				((int)p.X + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth,	 // current column
 				int.Parse(((Rectangle)SelectedTile_Canvas.Children[0]).Tag.ToString())); //the value of data 
 
-			Rectangle r = new Rectangle() { Width = 4, Height = 4, Fill = imgtilebrush };
+			Rectangle r = new Rectangle() { Width = 10, Height = 10, Fill = imgtilebrush };
 
       int setX = (4 * ((int)p.X / EditorGridWidth)) + ((int)GridOffset.X);
       int setY = (4 * ((int)p.Y / EditorGridHeight)) + ((int)GridOffset.Y);
@@ -954,11 +985,14 @@ namespace AmethystEngine.Forms
       int MainCurCellsX = ((int)Math.Ceiling((LevelEditor_BackCanvas.ActualWidth / Canvas_grid.Viewport.Width)));
       int MainCurCellsY = ((int)Math.Ceiling(LevelEditor_BackCanvas.ActualHeight / Canvas_grid.Viewport.Height));
 
-      Rectangle r = new Rectangle() { Width = MainCurCellsX * 4, Height = MainCurCellsY * 4, Stroke = Brushes.White, StrokeThickness = 1, Name = "SelectionRect" };
-      Canvas.SetLeft(r, 0); Canvas.SetTop(r, 0);
 
-      FullMapLEditor_Canvas.Children.RemoveAt(0);
-      FullMapLEditor_Canvas.Children.Insert(0, r);
+			FullMapLEditor_Canvas.Children.RemoveAt(0);
+
+			FullMapSelection_Rect = new Rectangle() { Width = MainCurCellsX * 10, Height = MainCurCellsY * 10, Stroke = Brushes.White, StrokeThickness = 1, Name = "SelectionRect" };
+      Canvas.SetLeft(FullMapSelection_Rect, 0); Canvas.SetTop(FullMapSelection_Rect, 0);
+			Canvas.SetZIndex(FullMapSelection_Rect, 100);
+      
+      FullMapLEditor_Canvas.Children.Add(FullMapSelection_Rect);
 
     }
 
@@ -991,19 +1025,12 @@ namespace AmethystEngine.Forms
         Canvas.SetLeft(child, x + MPos.X);
         Canvas.SetTop(child, y + MPos.Y);
       }
-      //moves the Grid, and canvas to perform a panning effect/.
-      Canvas_grid.Viewport = new Rect(Canvas_grid.Viewport.X + MPos.X, Canvas_grid.Viewport.Y + MPos.Y,
-        Canvas_grid.Viewport.Width, Canvas_grid.Viewport.Height);
-      FullMapLEditor_VB.Viewport = new Rect()
-      {
-        X = FullMapLEditor_VB.Viewport.X + MPos.X / 10,
-        Y = FullMapLEditor_VB.Viewport.Y + MPos.Y / 10,
-        Width = FullMapLEditor_VB.Viewport.Width,
-        Height = FullMapLEditor_VB.Viewport.Height
-      }; //desices how quick we will pan.
+			//moves the Grid, and canvas to perform a panning effect/.
+			Canvas_grid.Viewport = new Rect(Canvas_grid.Viewport.X + MPos.X, Canvas_grid.Viewport.Y + MPos.Y,
+				Canvas_grid.Viewport.Width, Canvas_grid.Viewport.Height);
 
-      //Moves ONLY the selection rectangle in the full map viewer.
-      foreach (UIElement child in FullMapLEditor_Canvas.Children)
+			//Moves ONLY the selection rectangle in the full map viewer.
+			foreach (UIElement child in FullMapLEditor_Canvas.Children)
       {
 				Console.WriteLine("Moved in bounds");
         if (((Rectangle)child).Name == "SelectionRect")
@@ -1013,11 +1040,6 @@ namespace AmethystEngine.Forms
 
           Canvas.SetLeft(child, x - MPos.X / 10); //TODO: give this an if statment so the grid cannot go off the screen.
           Canvas.SetTop(child, y - MPos.Y / 10);  //SCALE use the ratio to pan and link both accurately
-
-					x = Canvas.GetLeft(child);
-					y = Canvas.GetTop(child);
-					if (x < 0) { Canvas.SetLeft(child, 0); return; }
-					if (y < 0) { Canvas.SetTop(child, 0); return; }
 
 				}
       }
@@ -1055,7 +1077,7 @@ namespace AmethystEngine.Forms
         //TODO: resize selection rectangle
       }
 			ZoomFactor_TB.Text = String.Format("({0})%  ({1}x{1})" , 100 * ZoomLevel, EditorGridWidth * ZoomLevel);
-
+			scaleFullMapEditor();
 		}
     #endregion
     #endregion
@@ -1063,24 +1085,28 @@ namespace AmethystEngine.Forms
     #region "Full Level Canvas"
     private void scaleFullMapEditor()
     {
-      FullMapLEditor_Canvas.Width = NumOfCellsX * 2;
-      FullMapLEditor_Canvas.Height = NumOfCellsY * 2;
+			Level TempLevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
+			if (TempLevel == null) return; //TODO: Remove after i make force select work on tree view.
+			FullMapLEditor_Canvas.Width = TempLevel.xCells * 10;
+      FullMapLEditor_Canvas.Height = TempLevel.yCells * 10;
 
       Console.WriteLine("tewst");
       int fullY = (int)FullMapLEditor_Canvas.Width; fullY -= fullY % (NumOfCellsY);
       int fullX = (int)FullMapLEditor_Canvas.Height; fullX -= fullX % (NumOfCellsX);
-      int UniformCellHeight = (fullX / NumOfCellsX < fullY / NumOfCellsY ? fullX / NumOfCellsX : fullY / NumOfCellsY);
-      UniformCellHeight = 4;
 
-      FullMapLEditor_VB.Viewport = new Rect(0, 0, UniformCellHeight, UniformCellHeight);
+      FullMapLEditor_VB.Viewport = new Rect(0, 0, 10, 10);
 
-      //find out the num of cells in the MAIN grid editor
-      int MainCurCellsX = ((int)(LevelEditor_BackCanvas.ActualWidth / Canvas_grid.Viewport.Width));
-      int MainCurCellsY = ((int)(LevelEditor_BackCanvas.ActualHeight / Canvas_grid.Viewport.Height));
 
-      Rectangle r = new Rectangle() { Width = MainCurCellsX * 4, Height = MainCurCellsY * 4, Stroke = Brushes.White, StrokeThickness = 1, Name = "SelectionRect" };
-      Canvas.SetLeft(r, 0); Canvas.SetTop(r, 0);
-      FullMapLEditor_Canvas.Children.Add(r);
+      int MainCurCellsX = (int)Math.Ceiling(LevelEditor_BackCanvas.RenderSize.Width / (40 * ZoomLevel));
+      int MainCurCellsY = (int)Math.Ceiling(LevelEditor_BackCanvas.RenderSize.Height / (40 * ZoomLevel));
+
+			FullMapLEditor_Canvas.Children.Remove(FullMapSelection_Rect);
+			FullMapSelection_Rect = new Rectangle() { Width = MainCurCellsX * 10, Height = MainCurCellsY * 10, Stroke = Brushes.White, StrokeThickness = 1, Name = "SelectionRect"};
+      Canvas.SetLeft(FullMapSelection_Rect, 0);
+			Canvas.SetTop(FullMapSelection_Rect, 0);
+			Canvas.SetZIndex(FullMapSelection_Rect, 100);  //100 is the selection layer.
+			
+      FullMapLEditor_Canvas.Children.Add(FullMapSelection_Rect);
     }
     
     //quick move of the level editor canvas. when you click the screen renders that section.
@@ -1153,54 +1179,129 @@ namespace AmethystEngine.Forms
 		/// <param name="e"></param>
 		private void ImportToEditor(object sender, RoutedEventArgs e)
     {
-      Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-      dlg.FileName = "Document"; //default file name
-                                 //dlg.DefaultExt = ".xml"; //default file extension
-                                 //dlg.Filter = "XML documents (.xml)|*.xml"; //filter files by extension
-
-      // Show save file dialog box
-      Nullable<bool> result = dlg.ShowDialog();
-      // Process save file dialog box results kicks out if the user doesn't select an item.
-      string filename = "";
-      if (result == true)
-        filename = dlg.FileName;
-      else
-        return;
-
-      Console.WriteLine(filename);
+			string filename = "";
 
 			if (EditorWindows_TC.SelectedIndex == 0)
 			{
-				Image image = new Image();
-				var pic = new System.Windows.Media.Imaging.BitmapImage();
-				pic.BeginInit();
-				pic.UriSource = new Uri(filename); // url is from the xml
-				pic.EndInit();
+				//get the LevelEditor content Libary tab control
+				TabControl LELibary_TC = (TabControl)ContentLibrary_Control.Template.FindName("LevelEditorLibary_TabControl", ContentLibrary_Control);
+				if (LELibary_TC.SelectedIndex == 0)
+				{
 
-				System.Drawing.Image img = System.Drawing.Image.FromFile(filename);
-				image.Source = pic;
-				image.Width = img.Width;
-				image.Height = img.Height;
-				//Interaction interaction
+					Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+					dlg.FileName = "picture"; //default file 
+					dlg.DefaultExt = ".png"; //default file extension
+					dlg.Filter = "PNG (.PNG)|*.png"; //filter files by extension
 
+					// Show save file dialog box
+					Nullable<bool> result = dlg.ShowDialog();
+					// Process save file dialog box results kicks out if the user doesn't select an item.
+					filename = "";
+					if (result == true)
+						filename = dlg.FileName;
+					else
+						return;
 
-				image.Tag = String.Format("{0},{1}", 0, 1);
+					Console.WriteLine(filename);
 
-				int len = pic.UriSource.ToString().LastIndexOf('.') - pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' });
+					//show the properties grid for input.
+					Grid Prob_Grid = (Grid)ContentLibrary_Control.Template.FindName("TileSetProperties_Grid", ContentLibrary_Control);
+					Prob_Grid.Visibility = Visibility.Visible;
+					((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).Visibility = Visibility.Hidden;
+					((ComboBox)ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control)).Visibility = Visibility.Hidden;
+					((Label)ContentLibrary_Control.Template.FindName("TileSet_LBL", ContentLibrary_Control)).Visibility = Visibility.Hidden;
 
-				TileSets_CB.Items.Add(pic.UriSource.ToString().Substring(pic.UriSource.ToString().LastIndexOfAny(new char[] { '/','\\'}) + 1 , len-1));
-				TileSets.Add(image);
-				TileSets_CB.SelectedIndex = 0;
+					TextBox Name_TB = (TextBox)ContentLibrary_Control.Template.FindName("TileMapName_TB", ContentLibrary_Control);
+					Name_TB.Text = filename;
+				}
+				else if(LELibary_TC.SelectedIndex == 1) //we are in the sprite tab
+				{
+					Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+					dlg.FileName = "picture"; //default file 
+					dlg.DefaultExt = ".png"; //default file extension
+					dlg.Filter = "PNG (.PNG)|*.png"; //filter files by extension
+
+					// Show save file dialog box
+					Nullable<bool> result = dlg.ShowDialog();
+					// Process save file dialog box results kicks out if the user doesn't select an item.
+					filename = "";
+					if (result == true)
+						filename = dlg.FileName;
+					else
+						return;
+
+					ListBox SpriteLibary_LB = (ListBox)ContentLibrary_Control.Template.FindName("SpriteLibary_LB", ContentLibrary_Control);
+
+					EditorObject E = new EditorObject(filename, filename.Substring(filename.LastIndexOf((filename.Contains("\\") ? "\\" : "/")) + 1, filename.LastIndexOf(".") - filename.LastIndexOf((filename.Contains("\\") ? "\\" : "/")) - 1), false);
+					EditorObj_list.Add(E);
+					SpriteLibary_LB.ItemsSource = null;
+					SpriteLibary_LB.ItemsSource = EditorObj_list;
+
+				}
 			}
       else
       {
-        EditorObject E = new EditorObject(filename, filename.Substring(filename.LastIndexOf((filename.Contains("\\") ? "\\" : "/")) + 1, filename.LastIndexOf(".") - filename.LastIndexOf((filename.Contains("\\") ? "\\" : "/")) - 1), false);
-        EditorObj_list.Add(E);//Thumbnail = new Image() { Source = new BitmapImage(new Uri("images/Ame_icon_small.png", UriKind.Relative)) } });
-        EditorObjects_LB.ItemsSource = null;
-        //EditorObjects_LB.UpdateLayout();
-        EditorObjects_LB.ItemsSource = EditorObj_list;
+				//get the sprite listbox
+				TabControl SpriteLibary_LB = (TabControl)ContentLibrary_Control.Template.FindName("SpriteLibary_LB", ContentLibrary_Control);
+				
+				EditorObject E = new EditorObject(filename, filename.Substring(filename.LastIndexOf((filename.Contains("\\") ? "\\" : "/")) + 1, filename.LastIndexOf(".") - filename.LastIndexOf((filename.Contains("\\") ? "\\" : "/")) - 1), false);
+        EditorObj_list.Add(E);
+				EditorObjects_LB.ItemsSource = null;
+				EditorObjects_LB.ItemsSource = EditorObj_list;
       }
     }
+
+		private void CreateTileMap_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			int Width, Height = 0;
+
+			TextBox Width_TB = (TextBox)ContentLibrary_Control.Template.FindName("TileWidth_TB", ContentLibrary_Control);
+			TextBox Height_TB = (TextBox)ContentLibrary_Control.Template.FindName("TileHeight_TB", ContentLibrary_Control);
+			TextBox Name_TB = (TextBox)ContentLibrary_Control.Template.FindName("TileMapName_TB", ContentLibrary_Control);
+			if (Int32.TryParse(Width_TB.Text, out Width))
+			{
+				if (Int32.TryParse(Height_TB.Text, out Height))
+				{
+					if(Width > 0 && Height > 0)
+					{
+						CreateTileMap(Name_TB.Text, Width, Height);
+					}
+				}
+			}
+
+			//set visabilty. 
+			Grid Prob_Grid = (Grid)ContentLibrary_Control.Template.FindName("TileSetProperties_Grid", ContentLibrary_Control);
+			Prob_Grid.Visibility = Visibility.Hidden;
+			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).Visibility = Visibility.Visible;
+			((ComboBox)ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control)).Visibility = Visibility.Visible;
+			((Label)ContentLibrary_Control.Template.FindName("TileSet_LBL", ContentLibrary_Control)).Visibility = Visibility.Visible;
+
+		}
+
+		private void CreateTileMap(String FileName, int x, int y)
+		{
+			if (FileName == "") { MessageBox.Show("Filename is invaild!"); return; }
+			Image image = new Image();
+			var pic = new System.Windows.Media.Imaging.BitmapImage();
+			pic.BeginInit();
+			pic.UriSource = new Uri(FileName); // url is from the xml
+			pic.EndInit();
+
+			System.Drawing.Image img = System.Drawing.Image.FromFile(FileName);
+			image.Source = pic;
+			image.Width = img.Width;
+			image.Height = img.Height;
+			//Interaction interaction
+
+			//give the image a tag of the next int value FOR the NEXT tileset. if there is one.
+			image.Tag = String.Format("{0},{1}", x,y);
+
+			int len = pic.UriSource.ToString().LastIndexOf('.') - pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' });
+
+			TileSets_CB.Items.Add(pic.UriSource.ToString().Substring(pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1));
+			TileSets.Add(image);
+			TileSets_CB.SelectedIndex = 0;
+		}
 
 		/// <summary>
 		/// Displays the Correct Tileset depending on the selected item
@@ -1298,51 +1399,148 @@ namespace AmethystEngine.Forms
 
 		private void NewLevel_MenuItem_Click(object sender, RoutedEventArgs e)
 		{
-			LEStarting_TB.Visibility = Visibility.Hidden;
-			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).IsEnabled = true;
-			LevelEditor_Canvas.IsEnabled = true;
-			String DesName = "level"; int val = 0;
-
-			//create a new Level object. Make sure it doesn't have multiple of the same level names
-			for (int i = 0; i < SceneExplorer_TreeView.Items.Count; i++)
-			{
-				if (((Level)SceneExplorer_TreeView.Items[i]).LevelName == DesName)
-				{
-					val++;
-					DesName += val;
-					i = 0; //reset. This will make sure to check ALL layers even  already processed ones.
-				}
-			}
-
-
-			CreateLevel(DesName);
-			SceneExplorer_TreeView.ItemsSource = OpenLevels;
+			NewLevelData_CC.Visibility = Visibility.Visible;
+			LevelEditor_BackCanvas.Visibility = Visibility.Hidden;
+			LevelEditorStatusBar_Grid.Visibility = Visibility.Hidden;
 		}
 
-		private void CreateLevel(String LevelName)
+		private void CreateLevel(String LevelName, int XCellsVal, int YCellsVal)
 		{
 			//create new Level
 			Level TempLevel = new Level(LevelName);
 			SpriteLayer TempLevelChild = new SpriteLayer(LayerType.Tile, TempLevel) { LayerName = "Background" };
-			TempLevelChild.DefineLayerDataType(LayerType.Tile, 30, 50);
+			TempLevelChild.DefineLayerDataType(LayerType.Tile, XCellsVal, YCellsVal);
 			TempLevel.Layers.Add(TempLevelChild);
 			TempLevelChild = new SpriteLayer(LayerType.GameEvent, TempLevel) { LayerName = "Collision" };
-			TempLevelChild.DefineLayerDataType(LayerType.GameEvent, 30, 50);
+			TempLevelChild.DefineLayerDataType(LayerType.GameEvent, XCellsVal, YCellsVal);
 			TempLevel.Layers.Add(TempLevelChild);
 			TempLevelChild = new SpriteLayer(LayerType.Sprite, TempLevel) { LayerName = "Sprite" };
-			TempLevelChild.DefineLayerDataType(LayerType.Sprite, 30, 50);
+			TempLevelChild.DefineLayerDataType(LayerType.Sprite, XCellsVal, YCellsVal);
 			TempLevel.Layers.Add(TempLevelChild);
-			OpenLevels.Add(TempLevel);
 
+			TempLevel.xCells = XCellsVal;
+			TempLevel.yCells = YCellsVal;
+
+			//change focus:
+			OpenLevels.Add(TempLevel);
+			SceneExplorer_TreeView.ItemsSource = OpenLevels;
+			SceneExplorer_TreeView.Items.Refresh();
+			SceneExplorer_TreeView.UpdateLayout();
+
+			NewLevelData_CC.Visibility = Visibility.Hidden;
+			LevelEditor_BackCanvas.Visibility = Visibility.Visible;
+			LevelEditorStatusBar_Grid.Visibility = Visibility.Visible;
+			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).IsEnabled = true;
+			LevelEditor_Canvas.IsEnabled = true;
+			ContentLibaryImport_BTN.IsEnabled = true;
+
+			LEditorTS = new List<LevelEditorProp>()
+			{
+				new LevelEditorProp(){ PropertyName = "Level Name", PropertyData="Default" },
+				new LevelEditorProp(){ PropertyName = "Map Width(cells)", PropertyData="30" },
+				new LevelEditorProp(){ PropertyName = "Map Height(cells)", PropertyData="50" },
+				//new LevelEditorProp("test 2")								
+			};
+
+
+		}
+
+		public static TreeViewItem FindTviFromObjectRecursive(ItemsControl ic, object o)
+		{
+			//Search for the object model in first level children (recursively)
+			TreeViewItem tvi = ic.ItemContainerGenerator.ContainerFromItem(o) as TreeViewItem;
+			if (tvi != null) return tvi;
+			//Loop through user object models
+			foreach (object i in ic.Items)
+			{
+				//Get the TreeViewItem associated with the iterated object model
+				TreeViewItem tvi2 = ic.ItemContainerGenerator.ContainerFromItem(i) as TreeViewItem;
+				tvi = FindTviFromObjectRecursive(tvi2, o);
+				if (tvi != null) return tvi;
+			}
+			return null;
+		}
+
+		/// <summary>
+		/// Creates a new level. This method is here to grab all the properties.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void CreateLevel_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			String LName = LevelName_TB.Text;
+			bool bLName =
+				System.Text.RegularExpressions.Regex.IsMatch(LName, @"^[A-Za-z][A-Za-z0-9]+");
+
+			if (bLName)
+			{
+				Console.WriteLine("Valid");
+				int xnum, ynum = 0;
+				if (Int32.TryParse(XCellsVal_TB.Text, out xnum))
+				{
+					if (Int32.TryParse(YCellsVal_TB.Text, out ynum))
+					{
+						CreateLevel(LName,xnum, ynum);
+						//SceneExplorer_TreeView.ItemsSource = OpenLevels;
+					}
+				}
+			}
+			else MessageBox.Show("Invalid Level name");
+
+		}
+		
+
+		private void XCellsVal_TB_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			int numval, pixval = 0;
+			if(Int32.TryParse(((TextBox)sender).Text, out numval) && Int32.TryParse(XCellsWidth_TB.Text, out pixval))
+			{
+				LevelWidth_TB.Text = (numval * pixval).ToString();
+			}
+			else LevelWidth_TB.Text = "0";
+		}
+
+		private void YCellsVal_TB_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			int numval, pixval = 0;
+			if (Int32.TryParse(((TextBox)sender).Text, out numval) && Int32.TryParse(XCellsHeight_TB.Text, out pixval))
+			{
+				LevelHeight_TB.Text = (numval * pixval).ToString();
+			}
+			else LevelHeight_TB.Text = "0";
 		}
 
 		private void SceneExplorer_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			Console.WriteLine("Changed Scene Object");
 			if(e.NewValue is Level)
-				CurrentLevelEditorSceneObject = new Tuple<object, SceneObjectType>(e.NewValue, SceneObjectType.Level);
+			{
+				LEditorTS = new List<LevelEditorProp>()
+				{
+					new LevelEditorProp(){ PropertyName = "Level Name", PropertyData=((Level)e.NewValue).LevelName },
+					new LevelEditorProp(){ PropertyName = "Map Width(cells)", PropertyData=((Level)e.NewValue).xCells.ToString() },
+					new LevelEditorProp(){ PropertyName = "Map Height(cells)", PropertyData=((Level)e.NewValue).yCells.ToString() },
+					//new LevelEditorProp("test 2")								
+				};
+				ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
+				LB.ItemsSource = null;
+				LB.ItemsSource = LEditorTS;
+
+			}
+				
 			if (e.NewValue is SpriteLayer)
-				CurrentLevelEditorSceneObject = new Tuple<object, SceneObjectType>(e.NewValue, SceneObjectType.Layer);
+			{
+				LEditorTS = new List<LevelEditorProp>()
+				{
+					new LevelEditorProp(){ PropertyName = "SpriteLayer Name:", PropertyData=((SpriteLayer)e.NewValue).LayerName },
+					new LevelEditorProp(){ PropertyName = "Layer Type:", PropertyData=((SpriteLayer)e.NewValue).layerType.ToString() },
+					//new LevelEditorProp("test 2")								
+				};
+				ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
+				LB.ItemsSource = null;
+				LB.ItemsSource = LEditorTS;
+			}
+			
 
 		}
 		
@@ -1377,8 +1575,9 @@ namespace AmethystEngine.Forms
 		//TODO: make it work with background tile grid sizes.
 		private void AddTileLayer_Click(object sender, RoutedEventArgs e)
 		{
-			((Level)SceneExplorer_TreeView.SelectedValue).AddLayer("new tile", LayerType.Tile); 
-			((Level)SceneExplorer_TreeView.SelectedValue).Layers.Last().DefineLayerDataType(LayerType.Tile, 30, 50);
+			Level TempLevel = ((Level)SceneExplorer_TreeView.SelectedValue);
+			TempLevel.AddLayer("new tile", LayerType.Tile); 
+			TempLevel.Layers.Last().DefineLayerDataType(LayerType.Tile, TempLevel.xCells, TempLevel.yCells);
 		}
 		private void SpriteLayer_Click(object sender, RoutedEventArgs e)
 		{
@@ -1405,6 +1604,7 @@ namespace AmethystEngine.Forms
 			}
 			Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
 			Curlevel.ExportLevel("C: \\Users\\Antonio\\Documents\\text.xml", TileSetImages);
+			Curlevel.Layers[2].AddToLayer(new Sprite() { Name = "Pls Work" }, 0, 0, 0);
 
 		}
 
@@ -1593,8 +1793,17 @@ namespace AmethystEngine.Forms
 
 
 
+
+
+
+
 		#endregion
 
+		private void UnlockMapProperties_CB_Click(object sender, RoutedEventArgs e)
+		{
+			MessageBox.Show("WIP Not ready yet...");
+		}
 
+		
 	}
 }
