@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace BixBite.SceneObject
 {
-	public class GameObject
+	class GameObject
 	{
-
 	}
 }

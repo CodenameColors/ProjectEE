@@ -13,7 +13,7 @@ namespace BixBite.Rendering
 		public Vector2 Screen_pos;
 		public Vector2 Screen_scale;
 		public String PathLocation;
-		public String Name;
+		public String Name { get; set; }
 		public int Width;
 		public int Hieght;
 
