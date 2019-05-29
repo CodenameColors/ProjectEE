@@ -381,7 +381,9 @@
 				<Menu DockPanel.Dock="Top" Grid.Column="0" Background="Transparent" Foreground="White" VerticalAlignment="Top" Margin="0,4,0,3" Height="18">
 					<MenuItem Header="Level" Foreground="White">
 						<MenuItem x:Name="NewLevel_MenuItem" Header="New Level" Foreground="Black" Click="NewLevel_MenuItem_Click"/>
-						<MenuItem Header="Open level" Foreground="Black"/>
+						<MenuItem Header="Open level" Foreground="Black" Click="OpenLevel_MenuItem_ClickAsync"/>
+						<MenuItem Header="Save level" Foreground="Black"/>
+						<MenuItem Header="Save level As" Foreground="Black" Click="SaveLevel_MenuItem_Click" />
 					</MenuItem>
 				</Menu>
 				<Menu DockPanel.Dock="Top" Grid.Column="1" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >

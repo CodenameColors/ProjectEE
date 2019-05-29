@@ -1280,6 +1280,7 @@ namespace AmethystEngine.Forms
 
 		private void CreateTileMap(String FileName, int x, int y)
 		{
+			
 			if (FileName == "") { MessageBox.Show("Filename is invaild!"); return; }
 			Image image = new Image();
 			var pic = new System.Windows.Media.Imaging.BitmapImage();
@@ -1526,6 +1527,13 @@ namespace AmethystEngine.Forms
 				LB.ItemsSource = null;
 				LB.ItemsSource = LEditorTS;
 
+				
+				foreach (Tuple<String, String, int, int> tilesetTuples in ((Level)e.NewValue).TileSet)
+				{
+					TileSets_CB.Items.Clear(); //remove the past data.
+					CreateTileMap(tilesetTuples.Item2, tilesetTuples.Item3, tilesetTuples.Item4); //fill in the new data.
+				}
+
 			}
 				
 			if (e.NewValue is SpriteLayer)
@@ -1560,7 +1568,7 @@ namespace AmethystEngine.Forms
 					}
 
 					//are we clicked on a Layer? 
-					if(CurrentLevelEditorSceneObject.Item1 is SpriteLayer)
+					if(SceneExplorer_TreeView.SelectedValue is SpriteLayer)
 					{
 						//What type of layer?
 
@@ -1804,6 +1812,91 @@ namespace AmethystEngine.Forms
 			MessageBox.Show("WIP Not ready yet...");
 		}
 
-		
+		private void SaveLevel_MenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+			dlg.Title = "New Level File";
+			dlg.FileName = ""; //default file name
+			dlg.Filter = "txt files (*.xml)|*.xml|All files (*.*)|*.*";
+			dlg.FilterIndex = 2;
+			dlg.RestoreDirectory = true;
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+			Console.WriteLine(dlg.FileName);
+
+			List<Tuple<int, int>> celldim = new List<Tuple<int, int>>();
+
+			//layer moving test.
+			List<String> TileSetImages = new List<string>();
+			foreach (Image i in TileSets)
+			{
+				string localPath = new Uri(i.Source.ToString()).LocalPath;
+				TileSetImages.Add(localPath); //URI isn't supported so turn it local!
+				String[] s = i.Tag.ToString().Split(',');
+				celldim.Add(new Tuple<int, int>(Int32.Parse(s[0]), Int32.Parse(s[1])));
+
+			}
+
+			Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
+			Curlevel.ExportLevel(dlg.FileName, TileSetImages, celldim);
+		}
+
+		private async void OpenLevel_MenuItem_ClickAsync(object sender, RoutedEventArgs e)
+		{
+			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+			dlg.Title = "New Level File";
+			dlg.FileName = ""; //default file name
+			dlg.Filter = "txt files (*.xml)|*.xml|All files (*.*)|*.*";
+			dlg.FilterIndex = 2;
+			dlg.RestoreDirectory = true;
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+			Console.WriteLine(dlg.FileName);
+
+			OpenLevels.Add((await Level.ImportLevel(dlg.FileName)));
+			//change focus:
+			SceneExplorer_TreeView.ItemsSource = OpenLevels;
+			SceneExplorer_TreeView.Items.Refresh();
+			SceneExplorer_TreeView.UpdateLayout();
+
+			NewLevelData_CC.Visibility = Visibility.Hidden;
+			LevelEditor_BackCanvas.Visibility = Visibility.Visible;
+			LevelEditorStatusBar_Grid.Visibility = Visibility.Visible;
+			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).IsEnabled = true;
+			LevelEditor_Canvas.IsEnabled = true;
+			ContentLibaryImport_BTN.IsEnabled = true;
+
+			foreach (Tuple<String, String, int, int> tilesetTuples in OpenLevels[OpenLevels.Count-1].TileSet) {
+				TileSets_CB.Items.Clear(); //remove the past data.
+				CreateTileMap(tilesetTuples.Item2, tilesetTuples.Item3, tilesetTuples.Item4);
+			}
+
+
+			//set visabilty. 
+			Grid Prob_Grid = (Grid)ContentLibrary_Control.Template.FindName("TileSetProperties_Grid", ContentLibrary_Control);
+			Prob_Grid.Visibility = Visibility.Hidden;
+			((ScrollViewer) ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).Visibility = Visibility.Visible;
+			((ComboBox) ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control)).Visibility = Visibility.Visible;
+			((Label) ContentLibrary_Control.Template.FindName("TileSet_LBL", ContentLibrary_Control)).Visibility = Visibility.Visible;
+
+		}
 	}
 }

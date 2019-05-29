@@ -12,6 +12,10 @@ namespace BixBite
 	{
 		//instance variables
 		public String LevelName { get; set; }
+		/// <summary>
+		/// Item1: TileSetName Item2: TileSet Image Location Item3: TileWidth Item4:TileHeight
+		/// </summary>
+		public List<Tuple<String, String, int, int>> TileSet = new List<Tuple<string, string, int, int>>();
 		public ObservableCollection<SpriteLayer> Layers { get; set; }
 		public int xCells {get; set;}
 		public int yCells { get; set; }
@@ -23,7 +27,7 @@ namespace BixBite
 		private Dictionary<string, System.Reflection.MethodInfo> EventsLUT = new Dictionary<string, System.Reflection.MethodInfo>();
 
 
-		public Level() { }
+		public Level() { Layers = new ObservableCollection<SpriteLayer>(); }
 
 		public Level(String desname)
 		{
@@ -132,9 +136,121 @@ namespace BixBite
 			}
 		}
 
-		public void ImportLevel()
+		async public static System.Threading.Tasks.Task<Level> ImportLevel(String filename)
 		{
-			
+			Level TempLevel = new Level();
+
+			XmlReaderSettings settings = new XmlReaderSettings();
+			settings.Async = true;
+			//Create the Level object from the file
+			using (XmlReader reader = XmlReader.Create(filename, settings))
+			{
+				while (await reader.ReadAsync())
+				{
+					//The first tag should be a level tag. it includes name, and map width/height
+					if (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Level")
+					{
+						Console.WriteLine("Start Element {0}", reader.Name);
+						Console.WriteLine(reader.AttributeCount);
+						TempLevel.LevelName = reader.GetAttribute("Name");
+						TempLevel.xCells = Int32.Parse(reader.GetAttribute("Width")) / 40;
+						TempLevel.yCells = Int32.Parse(reader.GetAttribute("Height")) / 40;
+						//reader.ReadToNextSibling("TileSet");
+						while (reader.Name.Trim() != "TileSet") //ignore whitespace
+							await reader.ReadAsync();
+
+						//next up is the tilesets for the map.
+						while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "TileSet")
+						{
+							String Name = reader.GetAttribute("Name");
+							String Location = reader.GetAttribute("Location");
+							int Width = Int32.Parse(reader.GetAttribute("TileWidth"));
+							int Height = Int32.Parse(reader.GetAttribute("TileHeight"));
+							TempLevel.TileSet.Add(new Tuple<string, string, int, int>(Name, Location, Width, Height));
+							await reader.ReadAsync(); await reader.ReadAsync();
+						}
+
+						//the next thing is the layers . LOOPS
+						while ((reader.NodeType == XmlNodeType.EndElement && reader.Name.Trim() != "Layers") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Layers")) //loop through all the TileSets
+						{
+							
+							//create a temp array.//Tile int[,]
+							List<List<int>> LevelData = new List<List<int>>();
+							await reader.ReadAsync(); await reader.ReadAsync(); //move to next element
+							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "TileLayer")
+							{
+
+								TempLevel.AddLayer(reader.GetAttribute("Name"), LayerType.Tile);
+								while (reader.Name.Trim() != "Row") //ignore whitespace
+									await reader.ReadAsync();
+								while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Row")
+								{
+									List<int> rowdata = new List<int>();
+									await reader.ReadAsync();
+									String s = (await reader.GetValueAsync());
+									String[] row = s.Split(',');
+									foreach (string ss in row) //parse the ints
+										rowdata.Add(Int32.Parse(ss));
+									await reader.ReadAsync(); await reader.ReadAsync(); await reader.ReadAsync();
+									LevelData.Add(rowdata);
+									
+								}
+								
+							}
+							if (reader.NodeType == XmlNodeType.EndElement && reader.Name.Trim() == "TileLayer")
+							{
+								int[,] str = new int[LevelData.Count, LevelData[0].Count];
+								for (int j = 0; j < LevelData.Count; j++)
+								{
+									for (int i = 0; i < LevelData[j].Count; i++)
+									{
+										str[j, i] = LevelData[j][i];
+									}
+								}
+
+								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects = str;//we have the row data so add to the level data
+							}
+
+							//Sprite
+							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "SpriteLayer")
+							{
+
+							}
+							//gameevent int[,]
+							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameObjectLayer")
+							{
+
+							}
+						}
+					}
+				}
+			}
+//	break;
+						//case XmlNodeType.Text:
+						//	Console.WriteLine("Text Node: {0}",
+						//					 await reader.GetValueAsync());
+						//	break;
+						//case XmlNodeType.EndElement:
+						//	Console.WriteLine("End Element {0}", reader.Name);
+						//	break;
+						//default:
+						//	Console.WriteLine("Other node {0} with value {1}",
+						//									reader.NodeType, reader.Value);
+						//	break;
+			return TempLevel;
+
+			//Create the Level object from the file
+
+			//The first tag should be a level tag. it includes name, and map width/height
+
+			//next up is the tilesets for the map.
+
+			//the next thing is the layers . LOOPS
+			//Tile int[,]
+			//Sprite
+			//gameevent int[,]
+
+			//GameEvents content includes group number and eventname LOOPS
 		}
 
 		async public void ExportLevel(String FilePath, List<String> TileSets, List<Tuple<int, int>> CellDimen = null)
@@ -154,24 +270,26 @@ namespace BixBite
 			{
 				//Level attritbutes instance
 				await writer.WriteStartElementAsync(null, "Level", null);
-				await writer.WriteAttributeStringAsync(null, "Name", null, "Level 1");
-				await writer.WriteAttributeStringAsync(null, "Width", null, "800");
-				await writer.WriteAttributeStringAsync(null, "Height", null, "600");
+				await writer.WriteAttributeStringAsync(null, "Name", null, LevelName);
+				await writer.WriteAttributeStringAsync(null, "Width", null, (xCells * 40).ToString());
+				await writer.WriteAttributeStringAsync(null, "Height", null, (yCells * 40).ToString());
 
 				//TileSets
-				foreach(String imgloc in TileSets)
-				{
+				//foreach(String imgloc in TileSets)
+				//{
+				for(int i = 0; i < TileSets.Count; i++)
+				{ 
 					Thread.Sleep(100);
-					System.Drawing.Image img = System.Drawing.Image.FromFile(imgloc);
-					int len = imgloc.LastIndexOf('.') - imgloc.LastIndexOfAny(new char[] { '/', '\\' });
-					String name = imgloc.Substring(imgloc.LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
+					System.Drawing.Image img = System.Drawing.Image.FromFile(TileSets[i]);
+					int len = TileSets[i].LastIndexOf('.') - TileSets[i].LastIndexOfAny(new char[] { '/', '\\' });
+					String name = TileSets[i].Substring(TileSets[i].LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
 					await writer.WriteStartElementAsync(null, "TileSet", null);
 					await writer.WriteAttributeStringAsync(null, "Name", null, name);
-					await writer.WriteAttributeStringAsync(null, "Location", null, imgloc);
+					await writer.WriteAttributeStringAsync(null, "Location", null, TileSets[i]);
 					await writer.WriteAttributeStringAsync(null, "MapWidth", null, img.Width.ToString());
 					await writer.WriteAttributeStringAsync(null, "MapHeight", null, img.Height.ToString());
-					await writer.WriteAttributeStringAsync(null, "TileWidth", null, "32");
-					await writer.WriteAttributeStringAsync(null, "TileHeight", null, "32");
+					await writer.WriteAttributeStringAsync(null, "TileWidth", null, CellDimen[i].Item1.ToString());
+					await writer.WriteAttributeStringAsync(null, "TileHeight", null, CellDimen[i].Item2.ToString());
 					await writer.WriteEndElementAsync();//end of tile set
 				}
 
@@ -248,12 +366,13 @@ namespace BixBite
 				await writer.WriteEndElementAsync(); //end of layers
 
 				await writer.WriteStartElementAsync(null, "GameEvents", null);
-				await writer.WriteAttributeStringAsync(null, "Group", null, "NUM");
-				await writer.WriteAttributeStringAsync(null, "Event", null, "EventName"); //this is the function/delegate name
-
-				await writer.WriteStartElementAsync(null, "Data", null);
+				
+				await writer.WriteStartElementAsync(null, "Event", null);
 				await writer.WriteAttributeStringAsync(null, "Type", null, "EventType");
+				await writer.WriteAttributeStringAsync(null, "Group", null, "-1");
+				await writer.WriteAttributeStringAsync(null, "Function", null, "EventName"); //this is the function/delegate name
 				await writer.WriteStartElementAsync(null, "EventData", null);
+				await writer.WriteStringAsync("File To Load");
 				//await writer.WriteAttributeStringAsync(null, "Activiation", null, "[Button]");
 				//await writer.WriteStringAsync("Objects to load here");
 				await writer.WriteEndElementAsync();
