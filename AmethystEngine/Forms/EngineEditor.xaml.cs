@@ -1326,18 +1326,22 @@ namespace AmethystEngine.Forms
 			{
 
 				Canvas TileMap = (Canvas)ContentLibrary_Control.Template.FindName("TileMap_Canvas", ContentLibrary_Control);
-				TileMap.Children.Clear();
+				
+				BitmapImage pic = new BitmapImage();
+				pic.BeginInit();
+				pic.UriSource = new Uri(CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item2);
+				pic.EndInit();
 
-				BitmapImage im = new BitmapImage();
-				im.BeginInit();
-				im.UriSource = new Uri(CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item2);
-				im.EndInit();
+				System.Drawing.Image img = System.Drawing.Image.FromFile(CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item2);
 
 				//TODO: MAKE THIS WORK WITH VARIABLE SIZES NOT JUST 32x32
 				Image Timg = new Image();
-				Timg.Source = im;
+				Timg.Width = img.Width;
+				Timg.Height = img.Height;
+				Timg.Source = pic;
 
-				TileMap.Children.Add(Timg);
+				TileMap.Children.Clear();
+				TileMap.Children.Add(TileSets[0]);
 				
 			}
 		}
