@@ -87,6 +87,7 @@ namespace AmethystEngine.Forms
 		SelectTool selectTool = new SelectTool();
 
 		public ObservableCollection<Level> OpenLevels { get; set;}
+		public Level CurrentLevel = new Level();
 		public ImageBrush imgtilebrush { get; private set; }
 		private Tuple<object, SceneObjectType> CurrentLevelEditorSceneObject;
     Point[] SelectionRectPoints = new Point[2];
@@ -561,17 +562,31 @@ namespace AmethystEngine.Forms
     private void TileMap_Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
 			int xtile, ytile, TileSetOffest = 0;
+
+			BitmapImage im = new BitmapImage();
+			im.BeginInit();
+			im.UriSource = new Uri(CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item2);
+			im.EndInit();
+
+
 			//TODO: MAKE THIS WORK WITH VARIABLE SIZES NOT JUST 32x32
-			Image Timg = TileSets[TileSets_CB.SelectedIndex];
-			List<String> TagProps = Timg.Tag.ToString().Split(new char[] { ','}).ToList();
-			xtile = Int32.Parse(TagProps[0]); ytile = Int32.Parse(TagProps[1]);
+			Image Timg = new Image();
+			Timg.Source = im;
+
+			xtile = CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item3; ytile = CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item4;
 
 			//there can be multiple tile sets per level file. 
 			for(int i = 0; i < TileSets_CB.SelectedIndex; i++)
 			{
-				Image img = TileSets[i];
-				List<String> TempTagProps = Timg.Tag.ToString().Split(new char[] { ',' }).ToList();
-				TileSetOffest += (int)((img.Width/ Int32.Parse(TempTagProps[0])) * (img.Height / Int32.Parse(TempTagProps[1])));
+
+				BitmapImage im1 = new BitmapImage();
+				im1.BeginInit();
+				im1.UriSource = new Uri(CurrentLevel.TileSet[i].Item2);
+				im1.EndInit();
+				
+				Image img = new Image();
+				img.Source = im1;
+				TileSetOffest += (int)((img.Width/ CurrentLevel.TileSet[i].Item3) * (img.Height / CurrentLevel.TileSet[i].Item4));
 			}
 
       SelectedTile_Canvas.Children.Clear(); imgtilebrush = null;
@@ -582,7 +597,7 @@ namespace AmethystEngine.Forms
       Point pp = Mouse.GetPosition(TileMap_Canvas);
       Console.WriteLine(pp.ToString());
       pp.X -= Math.Floor(pp.X) % xtile;  //TODO: Add the offset so we can fill the grid AFTER PAnNNG
-      pp.Y -= Math.Floor(pp.Y) % 32;
+      pp.Y -= Math.Floor(pp.Y) % ytile;
       int x = (int)pp.X;
       int y = (int)pp.Y;
       Console.WriteLine(String.Format("x: {0},  y: {1}", x, y));
@@ -624,8 +639,7 @@ namespace AmethystEngine.Forms
 			Point p = GetGridSnapCords(pos);
 			Console.WriteLine(String.Format("Snapped grid cords: {0}", p.ToString()));
 			//we need to get the current Sprite layer that is currently clicked.
-			Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
-			int curLayer = Curlevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+			int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
 			
 			if (CurrentTool == EditorTool.Brush)
 			{
@@ -700,8 +714,7 @@ namespace AmethystEngine.Forms
 
 				Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
 				//we need to get the current Sprite layer that is currently clicked.
-				Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
-				int curLayer = Curlevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+				int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
 
 				SelectionRectPoints[1] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y);
 				Console.WriteLine("Select MUP");
@@ -741,8 +754,7 @@ namespace AmethystEngine.Forms
 			}
 			else if (CurrentTool == EditorTool.Move)
 			{
-				Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
-				int curLayer = Curlevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+				int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
 				int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
 
 				
@@ -764,7 +776,7 @@ namespace AmethystEngine.Forms
 					{
 						absrow = ((int)begginning.Y + (relgridsize * j) + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight;
 						abscol = ((int)begginning.X + (relgridsize * i) + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth;
-						Curlevel.Movedata(absrow, abscol, shiftrows, shiftcolumns, curLayer, LayerType.Tile);
+						CurrentLevel.Movedata(absrow, abscol, shiftrows, shiftcolumns, curLayer, LayerType.Tile);
 					}
 				}
 			}
@@ -880,8 +892,7 @@ namespace AmethystEngine.Forms
       LevelEditorCords_TB.Text = point;
 
 			//we need to get the current Sprite layer that is currently clicked.
-			Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
-			int curLayer = Curlevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+			int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
 
 
 			//which way is mouse moving?
@@ -1294,12 +1305,12 @@ namespace AmethystEngine.Forms
 			image.Height = img.Height;
 			//Interaction interaction
 
-			//give the image a tag of the next int value FOR the NEXT tileset. if there is one.
-			image.Tag = String.Format("{0},{1}", x,y);
-
 			int len = pic.UriSource.ToString().LastIndexOf('.') - pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' });
+			String Name= pic.UriSource.ToString().Substring(pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
 
-			TileSets_CB.Items.Add(pic.UriSource.ToString().Substring(pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1));
+			CurrentLevel.TileSet.Add(new Tuple<string, string, int, int>(Name, FileName, x, y)); //add the tile set to the current level object.
+
+			TileSets_CB.Items.Add(Name);
 			TileSets.Add(image);
 			TileSets_CB.SelectedIndex = 0;
 		}
@@ -1316,7 +1327,17 @@ namespace AmethystEngine.Forms
 
 				Canvas TileMap = (Canvas)ContentLibrary_Control.Template.FindName("TileMap_Canvas", ContentLibrary_Control);
 				TileMap.Children.Clear();
-				TileMap.Children.Add(TileSets[TileSets_CB.SelectedIndex]);
+
+				BitmapImage im = new BitmapImage();
+				im.BeginInit();
+				im.UriSource = new Uri(CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item2);
+				im.EndInit();
+
+				//TODO: MAKE THIS WORK WITH VARIABLE SIZES NOT JUST 32x32
+				Image Timg = new Image();
+				Timg.Source = im;
+
+				TileMap.Children.Add(Timg);
 				
 			}
 		}
@@ -1422,12 +1443,14 @@ namespace AmethystEngine.Forms
 			TempLevel.xCells = XCellsVal;
 			TempLevel.yCells = YCellsVal;
 
+			CurrentLevel = TempLevel;
+
 			//change focus:
 			OpenLevels.Add(TempLevel);
 			SceneExplorer_TreeView.ItemsSource = OpenLevels;
 			SceneExplorer_TreeView.Items.Refresh();
 			SceneExplorer_TreeView.UpdateLayout();
-
+			
 			NewLevelData_CC.Visibility = Visibility.Hidden;
 			LevelEditor_BackCanvas.Visibility = Visibility.Visible;
 			LevelEditorStatusBar_Grid.Visibility = Visibility.Visible;
@@ -1516,6 +1539,10 @@ namespace AmethystEngine.Forms
 			Console.WriteLine("Changed Scene Object");
 			if(e.NewValue is Level)
 			{
+				//set the current level PTR
+				CurrentLevel = (Level)e.NewValue;
+
+
 				LEditorTS = new List<LevelEditorProp>()
 				{
 					new LevelEditorProp(){ PropertyName = "Level Name", PropertyData=((Level)e.NewValue).LevelName },
@@ -1527,11 +1554,11 @@ namespace AmethystEngine.Forms
 				LB.ItemsSource = null;
 				LB.ItemsSource = LEditorTS;
 
-				
+				TileSets_CB.Items.Clear(); //remove the past data.
 				foreach (Tuple<String, String, int, int> tilesetTuples in ((Level)e.NewValue).TileSet)
 				{
-					TileSets_CB.Items.Clear(); //remove the past data.
-					CreateTileMap(tilesetTuples.Item2, tilesetTuples.Item3, tilesetTuples.Item4); //fill in the new data.
+					TileSets_CB.Items.Add(tilesetTuples.Item1);
+					//CreateTileMap(tilesetTuples.Item2, tilesetTuples.Item3, tilesetTuples.Item4); //fill in the new data.
 				}
 
 			}
@@ -1605,14 +1632,12 @@ namespace AmethystEngine.Forms
 
 			//layer moving test.
 			List<String> TileSetImages = new List<string>();
-			foreach (Image i in TileSets)
+			foreach (Tuple<String, String, int, int> tilesetstuple in CurrentLevel.TileSet)
 			{
-				string localPath = new Uri(i.Source.ToString()).LocalPath;
-				TileSetImages.Add(localPath); //URI isn't supported so turn it local!
+				TileSetImages.Add(tilesetstuple.Item2); //URI isn't supported so turn it local!
 			}
-			Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
-			Curlevel.ExportLevel("C: \\Users\\Antonio\\Documents\\text.xml", TileSetImages);
-			Curlevel.Layers[2].AddToLayer(new Sprite() { Name = "Pls Work" }, 0, 0, 0);
+			CurrentLevel.ExportLevel("C: \\Users\\Antonio\\Documents\\text.xml", TileSetImages);
+			CurrentLevel.Layers[2].AddToLayer(new Sprite() { Name = "Pls Work" }, 0, 0, 0);
 
 		}
 
@@ -1654,8 +1679,7 @@ namespace AmethystEngine.Forms
 			if (selectTool.SelectedTiles.Count == 0) return;//Do we have a selected area?
 																											//is there a layer above the current to transfer the data to?
 																											//we need to get the current Sprite layer that is currently clicked.
-			Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
-			int curLayer = Curlevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+			int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
 			if (curLayer -1 < 0) return;
 
 			//from here all the prereqs are fulfilled so we can apply the up layer VISUALLY 
@@ -1681,7 +1705,7 @@ namespace AmethystEngine.Forms
 				{
 					absrow = ((int)begginning.Y + (relgridsize * j) + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight;
 					abscol = ((int)begginning.X + (relgridsize * i)+ (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth;
-					Curlevel.ChangeLayer(absrow, abscol, curLayer, curLayer - 1, LayerType.Tile);
+					CurrentLevel.ChangeLayer(absrow, abscol, curLayer, curLayer - 1, LayerType.Tile);
 				}
 			}
 		}
@@ -1693,9 +1717,8 @@ namespace AmethystEngine.Forms
 			if (selectTool.SelectedTiles.Count == 0) return;//Do we have a selected area?
 			//is there a layer above the current to transfer the data to?
 			//we need to get the current Sprite layer that is currently clicked.
-			Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
-			int curLayer = Curlevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
-			if (Curlevel.Layers.Count - 1 == curLayer) return;
+			int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+			if (CurrentLevel.Layers.Count - 1 == curLayer) return;
 
 			//from here all the prereqs are fulfilled so we can apply the up layer VISUALLY 
 			for(int i = 0; i < selectTool.SelectedTiles.Count; i++)
@@ -1720,7 +1743,7 @@ namespace AmethystEngine.Forms
 				{
 					absrow = ((int)begginning.Y + (relgridsize * j) + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight;
 					abscol = ((int)begginning.X + (relgridsize * i) + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth;
-					Curlevel.ChangeLayer(absrow, abscol, curLayer, curLayer + 1, LayerType.Tile);
+					CurrentLevel.ChangeLayer(absrow, abscol, curLayer, curLayer + 1, LayerType.Tile);
 				}
 			}
 
@@ -1837,17 +1860,14 @@ namespace AmethystEngine.Forms
 
 			//layer moving test.
 			List<String> TileSetImages = new List<string>();
-			foreach (Image i in TileSets)
+			foreach (Tuple<String, String, int, int> tilesetstuple in CurrentLevel.TileSet)
 			{
-				string localPath = new Uri(i.Source.ToString()).LocalPath;
-				TileSetImages.Add(localPath); //URI isn't supported so turn it local!
-				String[] s = i.Tag.ToString().Split(',');
-				celldim.Add(new Tuple<int, int>(Int32.Parse(s[0]), Int32.Parse(s[1])));
+				TileSetImages.Add(tilesetstuple.Item2); //URI isn't supported so turn it local!
+				celldim.Add(new Tuple<int, int>(tilesetstuple.Item3, tilesetstuple.Item4));
 
 			}
 
-			Level Curlevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
-			Curlevel.ExportLevel(dlg.FileName, TileSetImages, celldim);
+			CurrentLevel.ExportLevel(dlg.FileName, TileSetImages, celldim);
 		}
 
 		private async void OpenLevel_MenuItem_ClickAsync(object sender, RoutedEventArgs e)
