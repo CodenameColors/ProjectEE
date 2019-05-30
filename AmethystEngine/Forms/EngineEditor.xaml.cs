@@ -325,13 +325,12 @@ namespace AmethystEngine.Forms
       {
         foreach (UIElement element in resizeGrid.Children)
         {
-          Rectangle resizeRectangle = element as Rectangle;
-          if (resizeRectangle != null)
-          {
-            resizeRectangle.PreviewMouseDown += ResizeRectangle_PreviewMouseDown;
-            resizeRectangle.MouseMove += ResizeRectangle_MouseMove;
-          }
-        }
+					if (element is Rectangle resizeRectangle)
+					{
+						resizeRectangle.PreviewMouseDown += ResizeRectangle_PreviewMouseDown;
+						resizeRectangle.MouseMove += ResizeRectangle_MouseMove;
+					}
+				}
       }
 
       base.OnApplyTemplate();
@@ -562,30 +561,18 @@ namespace AmethystEngine.Forms
     private void TileMap_Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
 			int xtile, ytile, TileSetOffest = 0;
-
-			BitmapImage im = new BitmapImage();
-			im.BeginInit();
-			im.UriSource = new Uri(CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item2);
-			im.EndInit();
-
-
-			//TODO: MAKE THIS WORK WITH VARIABLE SIZES NOT JUST 32x32
-			Image Timg = new Image();
-			Timg.Source = im;
-
 			xtile = CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item3; ytile = CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item4;
 
 			//there can be multiple tile sets per level file. 
 			for(int i = 0; i < TileSets_CB.SelectedIndex; i++)
 			{
-
 				BitmapImage im1 = new BitmapImage();
 				im1.BeginInit();
 				im1.UriSource = new Uri(CurrentLevel.TileSet[i].Item2);
 				im1.EndInit();
-				
-				Image img = new Image();
-				img.Source = im1;
+
+				System.Drawing.Image img = System.Drawing.Image.FromFile(CurrentLevel.TileSet[i].Item2);
+				//img.Source = im1;
 				TileSetOffest += (int)((img.Width/ CurrentLevel.TileSet[i].Item3) * (img.Height / CurrentLevel.TileSet[i].Item4));
 			}
 
@@ -612,7 +599,9 @@ namespace AmethystEngine.Forms
 
 			SelectedTile_Canvas.Children.Add(new Rectangle() { Width = xtile, Height = ytile,
 				Fill = imgtilebrush, Tag = tilenumdata, RenderTransform = new ScaleTransform(.8,.8)});
-    }
+			SelectedTile_Canvas.ToolTip = tilenumdata;
+
+		}
 
     private void TileMap_Canvas_MouseMove(object sender, MouseEventArgs e)
     {
@@ -868,8 +857,8 @@ namespace AmethystEngine.Forms
 
 			Rectangle r = new Rectangle() { Width = 10, Height = 10, Fill = imgtilebrush };
 
-      int setX = (4 * ((int)p.X / EditorGridWidth)) + ((int)GridOffset.X);
-      int setY = (4 * ((int)p.Y / EditorGridHeight)) + ((int)GridOffset.Y);
+      int setX = (10 * ((int)p.X / EditorGridWidth)) + ((int)GridOffset.X);
+      int setY = (10 * ((int)p.Y / EditorGridHeight)) + ((int)GridOffset.Y);
 
       Canvas.SetLeft(r, setX); Canvas.SetTop(r, setY);
       FullMapLEditor_Canvas.Children.Add(r);
@@ -1311,7 +1300,6 @@ namespace AmethystEngine.Forms
 			CurrentLevel.TileSet.Add(new Tuple<string, string, int, int>(Name, FileName, x, y)); //add the tile set to the current level object.
 
 			TileSets_CB.Items.Add(Name);
-			TileSets.Add(image);
 			TileSets_CB.SelectedIndex = 0;
 		}
 
@@ -1341,7 +1329,7 @@ namespace AmethystEngine.Forms
 				Timg.Source = pic;
 
 				TileMap.Children.Clear();
-				TileMap.Children.Add(TileSets[0]);
+				TileMap.Children.Add(Timg);
 				
 			}
 		}
@@ -1563,6 +1551,24 @@ namespace AmethystEngine.Forms
 				{
 					TileSets_CB.Items.Add(tilesetTuples.Item1);
 					//CreateTileMap(tilesetTuples.Item2, tilesetTuples.Item3, tilesetTuples.Item4); //fill in the new data.
+
+					Image image = new Image();
+					var pic = new System.Windows.Media.Imaging.BitmapImage();
+					pic.BeginInit();
+					pic.UriSource = new Uri(tilesetTuples.Item2); // url is from the xml
+					pic.EndInit();
+
+					System.Drawing.Image img = System.Drawing.Image.FromFile(tilesetTuples.Item2);
+					image.Source = pic;
+					image.Width = img.Width;
+					image.Height = img.Height;
+					//Interaction interaction
+
+					int len = pic.UriSource.ToString().LastIndexOf('.') - pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' });
+					String Name = pic.UriSource.ToString().Substring(pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
+
+					TileSets_CB.SelectedIndex = 0;
+
 				}
 
 			}
@@ -1634,15 +1640,95 @@ namespace AmethystEngine.Forms
 			//moving test
 			//Canvas.SetLeft(selectTool.SelectedTiles[0], Canvas.GetLeft(selectTool.SelectedTiles[0]) + selectTool.SelectedTiles[0].ActualWidth);
 
-			//layer moving test.
-			List<String> TileSetImages = new List<string>();
-			foreach (Tuple<String, String, int, int> tilesetstuple in CurrentLevel.TileSet)
-			{
-				TileSetImages.Add(tilesetstuple.Item2); //URI isn't supported so turn it local!
-			}
-			CurrentLevel.ExportLevel("C: \\Users\\Antonio\\Documents\\text.xml", TileSetImages);
-			CurrentLevel.Layers[2].AddToLayer(new Sprite() { Name = "Pls Work" }, 0, 0, 0);
+			////layer moving test.
+			//List<String> TileSetImages = new List<string>();
+			//foreach (Tuple<String, String, int, int> tilesetstuple in CurrentLevel.TileSet)
+			//{
+			//	TileSetImages.Add(tilesetstuple.Item2); //URI isn't supported so turn it local!
+			//}
+			//CurrentLevel.ExportLevel("C: \\Users\\Antonio\\Documents\\text.xml", TileSetImages);
+			//CurrentLevel.Layers[2].AddToLayer(new Sprite() { Name = "Pls Work" }, 0, 0, 0);
 
+			RedrawLevel(CurrentLevel);
+
+		}
+
+		private void RedrawLevel(Level LevelToDraw)
+		{
+			LevelEditor_Canvas.Children.Clear(); // CLEAR EVERYTHING!
+
+			//redraw each layer of the new level!
+			foreach(SpriteLayer layer in CurrentLevel.Layers)
+			{
+				int Zindex = CurrentLevel.Layers.IndexOf(layer);
+				if(layer.layerType == LayerType.Tile)
+				{
+					int[,] tilemap = (int[,])layer.LayerObjects; //tile map.
+					//scan through the 2D array of int data
+					for (int i = 0; i < tilemap.GetLength(0); i++)
+					{
+						for(int j =0; j < tilemap.GetLength(1); j++)
+						{
+							//create/get the tilebrush
+							//int xtile, ytile, TileSetOffest = 0;
+							//xtile = CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item3; ytile = CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item4;
+
+							////there can be multiple tile sets per level file. 
+							//for (int i = 0; i < TileSets_CB.SelectedIndex; i++)
+							//{
+							//	BitmapImage im1 = new BitmapImage();
+							//	im1.BeginInit();
+							//	im1.UriSource = new Uri(CurrentLevel.TileSet[i].Item2);
+							//	im1.EndInit();
+
+							//	Image img = new Image();
+							//	img.Source = im1;
+							//	TileSetOffest += (int)((img.Width / CurrentLevel.TileSet[i].Item3) * (img.Height / CurrentLevel.TileSet[i].Item4));
+							//}
+
+							//SelectedTile_Canvas.Children.Clear(); imgtilebrush = null;
+							//RenderTargetBitmap rtb = new RenderTargetBitmap((int)TileMap_Canvas.ActualWidth,
+							// (int)TileMap_Canvas.ActualHeight, 96d, 96d, System.Windows.Media.PixelFormats.Default);
+							//rtb.Render(TileMap_Canvas);
+
+							//Point pp = Mouse.GetPosition(TileMap_Canvas);
+							//Console.WriteLine(pp.ToString());
+							//pp.X -= Math.Floor(pp.X) % xtile;  //TODO: Add the offset so we can fill the grid AFTER PAnNNG
+							//pp.Y -= Math.Floor(pp.Y) % ytile;
+							//int x = (int)pp.X;
+							//int y = (int)pp.Y;
+							//Console.WriteLine(String.Format("x: {0},  y: {1}", x, y));
+							//Console.WriteLine("");
+							//var crop = new CroppedBitmap(rtb, new Int32Rect(x, y, xtile, ytile));
+							//// using BitmapImage version to prove its created successfully
+							//Image image2 = new Image(); image2.Source = crop; //cropped
+							//imgtilebrush = new ImageBrush(image2.Source);
+							////calculate the int value in canvas "array"
+							//int tilenumdata = ((y / ytile) * ((int)TileMap_Canvas.ActualWidth / xtile)) + (x / xtile);
+							//tilenumdata += TileSetOffest;
+
+							//SelectedTile_Canvas.Children.Add(new Rectangle()
+							//{
+							//	Width = xtile,
+							//	Height = ytile,
+							//	Fill = imgtilebrush,
+							//	Tag = tilenumdata,
+							//	RenderTransform = new ScaleTransform(.8, .8)
+							//});
+
+							//paint the current tile with said brush
+						}
+					}
+				}
+				else if (layer.layerType == LayerType.Sprite)
+				{
+
+				}
+				else if (layer.layerType == LayerType.GameEvent)
+				{
+
+				}
+			}
 		}
 
 
@@ -1825,13 +1911,7 @@ namespace AmethystEngine.Forms
       //if now which direction did you move?
       return BixBite.BixBiteTypes.CardinalDirection.None;
     }
-
-
-
-
-
-
-
+		
 		#endregion
 
 		private void UnlockMapProperties_CB_Click(object sender, RoutedEventArgs e)
@@ -1895,7 +1975,8 @@ namespace AmethystEngine.Forms
 			else return; //invalid name
 			Console.WriteLine(dlg.FileName);
 
-			OpenLevels.Add((await Level.ImportLevel(dlg.FileName)));
+			CurrentLevel = ((await Level.ImportLevel(dlg.FileName)));
+			OpenLevels.Add(CurrentLevel);
 			//change focus:
 			SceneExplorer_TreeView.ItemsSource = OpenLevels;
 			SceneExplorer_TreeView.Items.Refresh();
@@ -1907,12 +1988,31 @@ namespace AmethystEngine.Forms
 			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).IsEnabled = true;
 			LevelEditor_Canvas.IsEnabled = true;
 			ContentLibaryImport_BTN.IsEnabled = true;
+			TileSets_CB.Items.Clear(); //remove the past data.
+			
+			//tilemaps
+			foreach (Tuple<String, String, int, int> tilesetTuples in CurrentLevel.TileSet) {
 
-			foreach (Tuple<String, String, int, int> tilesetTuples in OpenLevels[OpenLevels.Count-1].TileSet) {
-				TileSets_CB.Items.Clear(); //remove the past data.
-				CreateTileMap(tilesetTuples.Item2, tilesetTuples.Item3, tilesetTuples.Item4);
+				Image image = new Image();
+				var pic = new System.Windows.Media.Imaging.BitmapImage();
+				pic.BeginInit();
+				pic.UriSource = new Uri(tilesetTuples.Item2); // url is from the xml
+				pic.EndInit();
+
+				System.Drawing.Image img = System.Drawing.Image.FromFile(tilesetTuples.Item2);
+				image.Source = pic;
+				image.Width = img.Width;
+				image.Height = img.Height;
+
+				int len = pic.UriSource.ToString().LastIndexOf('.') - pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' });
+				String Name = pic.UriSource.ToString().Substring(pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
+
+				TileSets_CB.Items.Add(Name);
+				
+				//CreateTileMap(tilesetTuples.Item2, tilesetTuples.Item3, tilesetTuples.Item4);
 			}
-
+			TileSets_CB.SelectedIndex = 0;
+			
 
 			//set visabilty. 
 			Grid Prob_Grid = (Grid)ContentLibrary_Control.Template.FindName("TileSetProperties_Grid", ContentLibrary_Control);
