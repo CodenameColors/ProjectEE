@@ -20,7 +20,7 @@ namespace BixBite
 		public int xCells {get; set;}
 		public int yCells { get; set; }
 		public Dictionary<String, object> Properties = new Dictionary<string, object>();
-
+		public bool bSaved = false; 
 		/// <summary>
 		/// This  variable stores all the anyonmous methods for event triggers.
 		/// </summary>
