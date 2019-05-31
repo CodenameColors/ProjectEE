@@ -694,6 +694,7 @@ namespace AmethystEngine.Forms
 
     private void LevelEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
+			if(((SpriteLayer)SceneExplorer_TreeView.SelectedValue) == null) return;
 			if (CurrentTool == EditorTool.Brush)
 			{
 
@@ -703,6 +704,7 @@ namespace AmethystEngine.Forms
 
 				Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
 				//we need to get the current Sprite layer that is currently clicked.
+				if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue == null)) return;
 				int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
 
 				SelectionRectPoints[1] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y);
@@ -1085,7 +1087,7 @@ namespace AmethystEngine.Forms
     #region "Full Level Canvas"
     private void scaleFullMapEditor()
     {
-			Level TempLevel = ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).ParentLevel;
+			Level TempLevel = CurrentLevel;
 			if (TempLevel == null) return; //TODO: Remove after i make force select work on tree view.
 			FullMapLEditor_Canvas.Width = TempLevel.xCells * 10;
       FullMapLEditor_Canvas.Height = TempLevel.yCells * 10;
@@ -1670,12 +1672,11 @@ namespace AmethystEngine.Forms
 					{
 						//find out the next tile data number using the tuple
 						//this is wrong. It needs to be (imgwidth / tilewidth) * (imgHeight / tileHieght)
-						TileMapThresholds.Add((TileMapThresholds.Count == 0 ? tilesetstuple.Item3 * tilesetstuple.Item4
-																	: (int)TileMapThresholds.Last() + (tilesetstuple.Item3 * tilesetstuple.Item4)));
+						System.Drawing.Image imgTemp = System.Drawing.Image.FromFile(tilesetstuple.Item2);
+						TileMapThresholds.Add((TileMapThresholds.Count == 0 ? (imgTemp.Width / tilesetstuple.Item3) * (imgTemp.Height / tilesetstuple.Item4)
+																	: (int)TileMapThresholds.Last() + (imgTemp.Width / tilesetstuple.Item3) * (imgTemp.Height / tilesetstuple.Item4)));
 					}
-					System.Drawing.Image img = System.Drawing.Image.FromFile(CurrentLevel.TileSet[0].Item2);
-					RenderTargetBitmap rtb = new RenderTargetBitmap(img.Width,
-							img.Height, 96d, 96d, System.Windows.Media.PixelFormats.Default);
+					TileMapThresholds.Insert(0, 0);
 					//scan through the 2D array of int data
 					for (int i = 0; i < tilemap.GetLength(0); i++) //rows
 					{
@@ -1683,40 +1684,43 @@ namespace AmethystEngine.Forms
 						{
 							//retrieve the tileset value, position to crop.
 							int CurTileData = (int)((int[,])layer.LayerObjects).GetValue(i, j);
-							int TilesetInc = 0;
-							String Tilesetpath = CurrentLevel.TileSet[0].Item2;
+							if (CurTileData == -1) continue; //this indicates no tile data, so ignore.
+							int TilesetInc = 1;
+							String Tilesetpath = CurrentLevel.TileSet[0].Item2; //init the first set
 
 							//using the tile data determine the tileset that is being used. offset wise 
 							while (CurTileData > TileMapThresholds[TilesetInc]) //if cur is greater than move to the next tileset.
 							{
-								Tilesetpath = CurrentLevel.TileSet[TilesetInc++].Item2; 
+								Tilesetpath = CurrentLevel.TileSet[TilesetInc].Item2;
+								TilesetInc++;
 							}
-							
-							int rowtilemappos = (int)CurTileData / (img.Width / CurrentLevel.TileSet[TilesetInc].Item3);
-							int coltilemappos = (int)CurTileData % (img.Width / CurrentLevel.TileSet[TilesetInc].Item4);
 
 							//create/get the tilebrush of the current tile.
 							imgtilebrush = null;
 							
-							
-
 							var pic = new System.Windows.Media.Imaging.BitmapImage();
 							pic.BeginInit();
 							pic.UriSource = new Uri(Tilesetpath); // url is from the xml
 							pic.EndInit();
 
-							// The Visual to use as the source of the RenderTargetBitmap.
-							DrawingVisual drawingVisual = new DrawingVisual();
-							DrawingContext drawingContext = drawingVisual.RenderOpen();
-							drawingContext.DrawImage(pic, new Rect(0, 0, img.Width, img.Height));
-							drawingContext.Close();
+							int rowtilemappos;
+							int coltilemappos;
+							if (TilesetInc-1 == 0)
+							{
+								rowtilemappos = (int)CurTileData / (pic.PixelWidth / CurrentLevel.TileSet[TilesetInc - 1].Item3);
+								coltilemappos = (int)CurTileData % (pic.PixelHeight / CurrentLevel.TileSet[TilesetInc - 1].Item4);
+							}
+							else
+							{
+								rowtilemappos = (TileMapThresholds[TilesetInc - 1] - CurTileData) / (pic.PixelWidth / CurrentLevel.TileSet[TilesetInc - 1].Item3);
+								coltilemappos = (TileMapThresholds[TilesetInc - 1] - CurTileData) % (pic.PixelHeight / CurrentLevel.TileSet[TilesetInc - 1].Item4);
+							}
 
-							rtb.Render(drawingVisual);
 							//crop based on the current 
-							var crop = new CroppedBitmap(rtb, new Int32Rect(coltilemappos * CurrentLevel.TileSet[TilesetInc].Item3,
-																															 rowtilemappos * CurrentLevel.TileSet[TilesetInc].Item4,
-																															 CurrentLevel.TileSet[TilesetInc].Item3,
-																															 CurrentLevel.TileSet[TilesetInc].Item4));
+							CroppedBitmap crop = new CroppedBitmap(pic, new Int32Rect(coltilemappos * CurrentLevel.TileSet[TilesetInc-1].Item3,
+																															 rowtilemappos * CurrentLevel.TileSet[TilesetInc-1].Item4,
+																															 CurrentLevel.TileSet[TilesetInc-1].Item3,
+																															 CurrentLevel.TileSet[TilesetInc-1].Item4));
 							Image TileBrushImage = new Image
 							{
 								Source = crop //cropped
@@ -1731,24 +1735,33 @@ namespace AmethystEngine.Forms
 								Fill = new ImageBrush(TileBrushImage.Source)
 							};
 
-							Canvas.SetLeft(ToPaint, i*40);
-							Canvas.SetTop(ToPaint, j*40);
+							Canvas.SetLeft(ToPaint, j*40);
+							Canvas.SetTop(ToPaint, i*40);
 							Canvas.SetZIndex(ToPaint, Zindex);
 
 							LevelEditor_Canvas.Children.Add(ToPaint);
 
+							Rectangle r = new Rectangle() { Width = 10, Height = 10, Fill = imgtilebrush };
+							
+							Canvas.SetLeft(r, j * 10); Canvas.SetTop(r, i * 10); Canvas.SetZIndex(r, Zindex);
+
+							//clear memory
+							ToPaint = null;
+							crop.Source = null;
+							pic = null;
 							//paint the current tile with said brush
 						}
 					}
 				}
 				else if (layer.layerType == LayerType.Sprite)
 				{
-
+					Console.WriteLine("spriteLayer");
 				}
 				else if (layer.layerType == LayerType.GameEvent)
 				{
-
+					Console.WriteLine("Gameevent");
 				}
+				Zindex++;
 			}
 		}
 
@@ -2045,3 +2058,15 @@ namespace AmethystEngine.Forms
 		}
 	}
 }
+
+//NOTES TO MY SELF
+
+/*
+ * System.drawing.Image casuses memory leaks
+ * RenderTargetBitmap also causes memory leaks
+ * 
+ * REASON? They are not IDisposable
+ * 
+ * 
+ * 
+ */

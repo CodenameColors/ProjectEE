@@ -214,12 +214,14 @@ namespace BixBite
 							//Sprite
 							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "SpriteLayer")
 							{
-
+								Console.WriteLine("SpriteLayer");
+								await reader.ReadAsync();
 							}
 							//gameevent int[,]
 							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameEvents")
 							{
-
+								Console.WriteLine("GameEventLayer");
+								await reader.ReadAsync();
 							}
 						}
 					}
@@ -342,7 +344,7 @@ namespace BixBite
 					}
 					else if (layer.layerType == LayerType.GameEvent)
 					{
-						await writer.WriteStartElementAsync(null, "GameObjectLayer", null);
+						await writer.WriteStartElementAsync(null, "GameEvents", null);
 						if (!(layer.LayerObjects is int[,])) goto Skiplayer;
 						int[,] tiledata = ((int[,])layer.LayerObjects);
 						for (int i = 0; i < tiledata.GetLength(0); i++)
