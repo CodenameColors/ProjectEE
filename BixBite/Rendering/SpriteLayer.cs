@@ -61,6 +61,13 @@ namespace BixBite.Rendering
 			{
 				case (LayerType.Tile):
 					LayerObjects = new int[width,height];
+					for(int i = 0; i < width; i++)
+					{
+						for(int j = 0; j < height; j++)
+						{
+							((int[,])LayerObjects)[i, j] = -1;
+						}
+					}
 					break;
 				case (LayerType.Sprite):
 					LayerObjects = new List<Sprite>();
