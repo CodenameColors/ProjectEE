@@ -217,7 +217,7 @@ namespace BixBite
 
 							}
 							//gameevent int[,]
-							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameObjectLayer")
+							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameEvents")
 							{
 
 							}
