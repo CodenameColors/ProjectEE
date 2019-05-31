@@ -1664,57 +1664,78 @@ namespace AmethystEngine.Forms
 				if(layer.layerType == LayerType.Tile)
 				{
 					int[,] tilemap = (int[,])layer.LayerObjects; //tile map.
-					//scan through the 2D array of int data
-					for (int i = 0; i < tilemap.GetLength(0); i++)
+					List<int> TileMapThresholds = new List<int>();
+					//find out the thresholds per tile map.
+					foreach (Tuple<String, String, int, int> tilesetstuple in CurrentLevel.TileSet)
 					{
-						for(int j =0; j < tilemap.GetLength(1); j++)
+						//find out the next tile data number using the tuple
+						//this is wrong. It needs to be (imgwidth / tilewidth) * (imgHeight / tileHieght)
+						TileMapThresholds.Add((TileMapThresholds.Count == 0 ? tilesetstuple.Item3 * tilesetstuple.Item4
+																	: (int)TileMapThresholds.Last() + (tilesetstuple.Item3 * tilesetstuple.Item4)));
+					}
+					System.Drawing.Image img = System.Drawing.Image.FromFile(CurrentLevel.TileSet[0].Item2);
+					RenderTargetBitmap rtb = new RenderTargetBitmap(img.Width,
+							img.Height, 96d, 96d, System.Windows.Media.PixelFormats.Default);
+					//scan through the 2D array of int data
+					for (int i = 0; i < tilemap.GetLength(0); i++) //rows
+					{
+						for(int j =0; j < tilemap.GetLength(1); j++) //columns
 						{
-							//create/get the tilebrush
-							//int xtile, ytile, TileSetOffest = 0;
-							//xtile = CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item3; ytile = CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item4;
+							//retrieve the tileset value, position to crop.
+							int CurTileData = (int)((int[,])layer.LayerObjects).GetValue(i, j);
+							int TilesetInc = 0;
+							String Tilesetpath = CurrentLevel.TileSet[0].Item2;
 
-							////there can be multiple tile sets per level file. 
-							//for (int i = 0; i < TileSets_CB.SelectedIndex; i++)
-							//{
-							//	BitmapImage im1 = new BitmapImage();
-							//	im1.BeginInit();
-							//	im1.UriSource = new Uri(CurrentLevel.TileSet[i].Item2);
-							//	im1.EndInit();
+							//using the tile data determine the tileset that is being used. offset wise 
+							while (CurTileData > TileMapThresholds[TilesetInc]) //if cur is greater than move to the next tileset.
+							{
+								Tilesetpath = CurrentLevel.TileSet[TilesetInc++].Item2; 
+							}
+							
+							int rowtilemappos = (int)CurTileData / (img.Width / CurrentLevel.TileSet[TilesetInc].Item3);
+							int coltilemappos = (int)CurTileData % (img.Width / CurrentLevel.TileSet[TilesetInc].Item4);
 
-							//	Image img = new Image();
-							//	img.Source = im1;
-							//	TileSetOffest += (int)((img.Width / CurrentLevel.TileSet[i].Item3) * (img.Height / CurrentLevel.TileSet[i].Item4));
-							//}
+							//create/get the tilebrush of the current tile.
+							imgtilebrush = null;
+							
+							
 
-							//SelectedTile_Canvas.Children.Clear(); imgtilebrush = null;
-							//RenderTargetBitmap rtb = new RenderTargetBitmap((int)TileMap_Canvas.ActualWidth,
-							// (int)TileMap_Canvas.ActualHeight, 96d, 96d, System.Windows.Media.PixelFormats.Default);
-							//rtb.Render(TileMap_Canvas);
+							var pic = new System.Windows.Media.Imaging.BitmapImage();
+							pic.BeginInit();
+							pic.UriSource = new Uri(Tilesetpath); // url is from the xml
+							pic.EndInit();
 
-							//Point pp = Mouse.GetPosition(TileMap_Canvas);
-							//Console.WriteLine(pp.ToString());
-							//pp.X -= Math.Floor(pp.X) % xtile;  //TODO: Add the offset so we can fill the grid AFTER PAnNNG
-							//pp.Y -= Math.Floor(pp.Y) % ytile;
-							//int x = (int)pp.X;
-							//int y = (int)pp.Y;
-							//Console.WriteLine(String.Format("x: {0},  y: {1}", x, y));
-							//Console.WriteLine("");
-							//var crop = new CroppedBitmap(rtb, new Int32Rect(x, y, xtile, ytile));
-							//// using BitmapImage version to prove its created successfully
-							//Image image2 = new Image(); image2.Source = crop; //cropped
-							//imgtilebrush = new ImageBrush(image2.Source);
-							////calculate the int value in canvas "array"
-							//int tilenumdata = ((y / ytile) * ((int)TileMap_Canvas.ActualWidth / xtile)) + (x / xtile);
-							//tilenumdata += TileSetOffest;
+							// The Visual to use as the source of the RenderTargetBitmap.
+							DrawingVisual drawingVisual = new DrawingVisual();
+							DrawingContext drawingContext = drawingVisual.RenderOpen();
+							drawingContext.DrawImage(pic, new Rect(0, 0, img.Width, img.Height));
+							drawingContext.Close();
 
-							//SelectedTile_Canvas.Children.Add(new Rectangle()
-							//{
-							//	Width = xtile,
-							//	Height = ytile,
-							//	Fill = imgtilebrush,
-							//	Tag = tilenumdata,
-							//	RenderTransform = new ScaleTransform(.8, .8)
-							//});
+							rtb.Render(drawingVisual);
+							//crop based on the current 
+							var crop = new CroppedBitmap(rtb, new Int32Rect(coltilemappos * CurrentLevel.TileSet[TilesetInc].Item3,
+																															 rowtilemappos * CurrentLevel.TileSet[TilesetInc].Item4,
+																															 CurrentLevel.TileSet[TilesetInc].Item3,
+																															 CurrentLevel.TileSet[TilesetInc].Item4));
+							Image TileBrushImage = new Image
+							{
+								Source = crop //cropped
+							};
+
+							imgtilebrush = new ImageBrush(TileBrushImage.Source);
+
+							Rectangle ToPaint = new Rectangle()
+							{
+								Width = 40,
+								Height = 40,
+								Fill = new ImageBrush(TileBrushImage.Source)
+							};
+
+							Canvas.SetLeft(ToPaint, i*40);
+							Canvas.SetTop(ToPaint, j*40);
+							Canvas.SetZIndex(ToPaint, Zindex);
+
+							LevelEditor_Canvas.Children.Add(ToPaint);
 
 							//paint the current tile with said brush
 						}
