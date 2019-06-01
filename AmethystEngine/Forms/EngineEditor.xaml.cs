@@ -1156,8 +1156,8 @@ namespace AmethystEngine.Forms
 					Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid.
 					r.MouseLeftButtonUp += LevelEditor_BackCanvas_MouseLeftButtonUp;
 					SpriteLayer curlayer = (SpriteLayer)SceneExplorer_TreeView.SelectedValue;
-					curlayer.AddToLayer(new object(), ((int)p.X + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth
-						, ((int)p.Y + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight,
+					curlayer.AddToLayer(new object(), ((int)p.Y + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight,
+						((int)p.X + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth,
 						int.Parse(((Rectangle)SelectedTile_Canvas.Children[0]).Tag.ToString()));
 
 					Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, iii); //place the tile position wise
@@ -1744,13 +1744,21 @@ namespace AmethystEngine.Forms
 							Rectangle r = new Rectangle() { Width = 10, Height = 10, Fill = imgtilebrush };
 							
 							Canvas.SetLeft(r, j * 10); Canvas.SetTop(r, i * 10); Canvas.SetZIndex(r, Zindex);
-
+							FullMapLEditor_Canvas.Children.Add(r);
 							//clear memory
 							ToPaint = null;
 							crop.Source = null;
 							pic = null;
+							crop = null;
+							TileBrushImage = null;
+							ToPaint = null;
 							//paint the current tile with said brush
 						}
+						if (i % 50 ==0)
+						{
+							//GC.Collect();
+						}
+						Console.WriteLine(i);
 					}
 				}
 				else if (layer.layerType == LayerType.Sprite)
@@ -2008,7 +2016,6 @@ namespace AmethystEngine.Forms
 			}
 			else return; //invalid name
 			Console.WriteLine(dlg.FileName);
-
 			CurrentLevel = ((await Level.ImportLevel(dlg.FileName)));
 			OpenLevels.Add(CurrentLevel);
 			//change focus:
@@ -2046,7 +2053,8 @@ namespace AmethystEngine.Forms
 				//CreateTileMap(tilesetTuples.Item2, tilesetTuples.Item3, tilesetTuples.Item4);
 			}
 			TileSets_CB.SelectedIndex = 0;
-			
+			//draw the level
+			RedrawLevel(CurrentLevel);
 
 			//set visabilty. 
 			Grid Prob_Grid = (Grid)ContentLibrary_Control.Template.FindName("TileSetProperties_Grid", ContentLibrary_Control);

@@ -124,7 +124,7 @@ namespace BixBite.Rendering
 		{
 			if (layerType == LayerType.Tile)
 			{
-					((int[,])LayerObjects)[xcell, ycell] = 0;
+					((int[,])LayerObjects)[xcell, ycell] = -1;
 			}
 		}
 

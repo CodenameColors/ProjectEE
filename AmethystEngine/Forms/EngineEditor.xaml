@@ -7,7 +7,7 @@
 				xmlns:Bix="clr-namespace:BixBite;assembly=BixBite"
 				xmlns:BixRen="clr-namespace:BixBite.Rendering;assembly=BixBite"
         mc:Ignorable="d" Background="#FF0E0D0D"
-        Title="AmethystEngine" Height="600" Width="1000" Foreground="{x:Null}" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
+        Title="AmethystEngine" Height="1000" Width="1600" Foreground="{x:Null}" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
 	<Window.Resources>
 
 
