@@ -1,10 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using BixBite;
 using BixBite.Rendering;
 using BixBite.Characters;
 using ProjectE_E.Components;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace ProjectE_E
 {
@@ -16,7 +18,7 @@ namespace ProjectE_E
 		GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
 		Sprite TestSprite = new Sprite();
-		
+		Texture2D t2;
 		Map map;
 		Player Player;
 		Camera camera;
@@ -25,8 +27,8 @@ namespace ProjectE_E
 		{
 				graphics = new GraphicsDeviceManager(this);
 				Content.RootDirectory = "Content";
-				//graphics.PreferredBackBufferHeight = 520;
-				//graphics.PreferredBackBufferWidth = 800;
+			graphics.PreferredBackBufferHeight = 1000;
+			graphics.PreferredBackBufferWidth = 1000;
 		}
 
 		/// <summary>
@@ -43,6 +45,12 @@ namespace ProjectE_E
 			base.Initialize();
 		}
 
+
+		protected async void Load_async()
+		{
+			map.level = await map.GetLevelFromFile("C:\\Users\\Antonio\\Documents\\LEvelTesting2_fillless.lvl");
+		}
+
     /// <summary>
     /// LoadContent will be called once per game and is the place to load
     /// all of your content.
@@ -52,40 +60,53 @@ namespace ProjectE_E
 			// Create a new SpriteBatch, which can be used to draw textures.
 			spriteBatch = new SpriteBatch(GraphicsDevice);
 			Texture2D t = this.Content.Load<Texture2D>("smolmegumin");
+			//t2 = this.Content.Load<Texture2D>("Images/PathAndObjects");
+			//Texture2D t = this.Content.Load<Texture2D>("smolmegumin");
+
+
 			TestSprite.setTexture(t); //set the image.
+			Tile.Content = this.Content;
 
 			camera = new Camera(GraphicsDevice.Viewport);
 
 			//load the assets.
 			//this.Content.Load<Texture2D>("Images/Tile1");
-			//this.Content.Load<Texture2D>("Images/Tile2");
+			
 
-			Tiles.Content = this.Content;
-			map.Generate(new int[,]
-			{
-					//{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
-					//{ 2,1,1,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,},
-					//{ 2,2,27,1,0,0,1,1,1,2,2,2,1,0,0,0,0,0,0,0,},
-					//{ 2,0,0,0,0,1,2,2,2,2,2,2,2,1,0,0,0,0,0,0,},
-					//{ 2,0,0,1,1,2,2,2,2,2,2,2,2,2,1,1,1,0,0,0,},
-					//{ 2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,},
+			//Tile.Content = this.Content;
 
-				//my dumb test map LUL
-				{ 0,0,0,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,2,2,},
-				{ 0,0,0,2,2,2,2,2,0,0,0,0,0,2,2,2,2,2,0,2,},
-				{ 0,0,0,0,0,0,2,2,0,0,0,0,0,2,2,2,2,2,0,2,},
-				{ 1,0,0,0,0,0,2,0,0,0,0,0,0,2,2,2,2,2,0,2,},
-				{ 2,1,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,2,},
-				{ 2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,2,},
-				{ 2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,2,},
-				{ 2,2,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,0,0,0,},
-				{ 2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,},
-				{ 2,2,1,0,0,0,0,0,1,1,0,0,0,0,0,2,0,0,0,0,},
-				{ 2,2,2,1,0,0,0,1,2,2,2,2,0,0,0,0,0,0,0,0,},
-				{ 2,2,2,2,1,1,1,2,2,0,1,1,1,1,1,1,1,1,1,1,},
-				{ 2,2,2,2,2,2,2,2,2,0,2,2,2,2,2,2,2,2,2,2,},
+			Load_async();
 
-			}, 64);
+			Thread.Sleep(System.TimeSpan.FromMilliseconds(50));
+
+			map.LoadTileMaps(this.GraphicsDevice, map.level);
+			map.GenerateLevel(map.level, this.GraphicsDevice, spriteBatch);
+
+			//map.Generate(new int[,]
+			//{
+			//		//{ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+			//		//{ 2,1,1,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,},
+			//		//{ 2,2,27,1,0,0,1,1,1,2,2,2,1,0,0,0,0,0,0,0,},
+			//		//{ 2,0,0,0,0,1,2,2,2,2,2,2,2,1,0,0,0,0,0,0,},
+			//		//{ 2,0,0,1,1,2,2,2,2,2,2,2,2,2,1,1,1,0,0,0,},
+			//		//{ 2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,},
+
+			//	//my dumb test map LUL
+			//	{ 0,0,0,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,2,2,},
+			//	{ 0,0,0,2,2,2,2,2,0,0,0,0,0,2,2,2,2,2,0,2,},
+			//	{ 0,0,0,0,0,0,2,2,0,0,0,0,0,2,2,2,2,2,0,2,},
+			//	{ 1,0,0,0,0,0,2,0,0,0,0,0,0,2,2,2,2,2,0,2,},
+			//	{ 2,1,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,2,},
+			//	{ 2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,2,},
+			//	{ 2,2,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,0,2,},
+			//	{ 2,2,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,0,0,0,},
+			//	{ 2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,},
+			//	{ 2,2,1,0,0,0,0,0,1,1,0,0,0,0,0,2,0,0,0,0,},
+			//	{ 2,2,2,1,0,0,0,1,2,2,2,2,0,0,0,0,0,0,0,0,},
+			//	{ 2,2,2,2,1,1,1,2,2,0,1,1,1,1,1,1,1,1,1,1,},
+			//	{ 2,2,2,2,2,2,2,2,2,0,2,2,2,2,2,2,2,2,2,2,},
+
+			//}, 64);
 
 			Player.Load(this.Content);
 			
@@ -114,11 +135,13 @@ namespace ProjectE_E
 				Exit();
 
 			Player.Update(gameTime);
-			foreach (CollisionTiles tile in map.CollisionTiles)
-			{
-				Player.Collision(tile.Rectangle, map.Width, map.Height);
-				camera.Update(Player.Position, map.Width, map.Height);
-			}
+
+			//this is collision detection
+			//foreach (CollisionTiles tile in map.CollisionTiles)
+			//{
+			//	Player.Collision(tile.Rectangle, map.Width, map.Height);
+			camera.Update(Player.Position, map.Width, map.Height);
+			//}
 			
 			base.Update(gameTime);
 		}
@@ -129,12 +152,13 @@ namespace ProjectE_E
       /// <param name="gameTime">Provides a snapshot of timing values.</param>
 		protected override void Draw(GameTime gameTime)
 		{
-			GraphicsDevice.Clear(Color.CornflowerBlue);
-			spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform);
-			//spriteBatch.Draw(TestSprite.getTexture(), new Vector2(0, 0));
+			GraphicsDevice.Clear(Color.Black);
+
+			//SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform
+			spriteBatch.Begin();
+			//spriteBatch.Draw(t2, new Vector2(0, 0));
 			map.Draw(spriteBatch);
 			Player.Draw(spriteBatch);
-			// TODO: Add your drawing code here
 			spriteBatch.End();
 			base.Draw(gameTime);
 		}

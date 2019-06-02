@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace BixBite
 {
+	//adding a this to the parameters of the method will EXTEND that class and AUTO add this function to it methods.
 	public static class TileCollisionChecker
 	{
 		public static bool TouchTopOf(this Rectangle r1, Rectangle r2)
