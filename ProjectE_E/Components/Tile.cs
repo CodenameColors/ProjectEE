@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ProjectE_E.Components
 {
-	class Tiles
+	class Tile
 	{
 		protected Texture2D texture;
 
@@ -21,6 +21,7 @@ namespace ProjectE_E.Components
 			get { return rectangle;}
 			protected set { rectangle = value; }
 		}
+
 		private static ContentManager content;
 		public static ContentManager Content
 		{
@@ -28,18 +29,29 @@ namespace ProjectE_E.Components
 			set { content = value; }
 		}
 
+		public Tile(Texture2D text, Rectangle r)
+		{
+			this.texture = text;
+			this.rectangle = r;
+		}
+		
 		public void Draw(SpriteBatch spriteBatch)
 		{
 			spriteBatch.Draw(texture, rectangle, Color.White);
 		}
 	}
 
-	class CollisionTiles : Tiles
+	class CollisionTiles : Tile
 	{
-		public CollisionTiles(int i, Rectangle newRectangle)
+		//public CollisionTiles(int i, Rectangle newRectangle)
+		//{
+		//	base()
+		//	texture = Content.Load<Texture2D>("Images/Tile" + i);
+		//	this.Rectangle = newRectangle;
+		//}
+		public CollisionTiles(Texture2D text, Rectangle r) : base(text, r)
 		{
-			texture = Content.Load<Texture2D>("Images/Tile" + i);
-			this.Rectangle = newRectangle;
+
 		}
 	}
 

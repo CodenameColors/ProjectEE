@@ -46,7 +46,7 @@
   <ItemGroup>
     <Compile Include="Components\Camera.cs" />
     <Compile Include="Components\Map.cs" />
-    <Compile Include="Components\Tiles.cs" />
+    <Compile Include="Components\Tile.cs" />
     <Compile Include="Emeralds_Elements.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
