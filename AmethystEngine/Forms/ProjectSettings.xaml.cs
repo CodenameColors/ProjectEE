@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -10,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using BixBite;
 
 namespace AmethystEngine.Forms
 {
@@ -18,10 +20,24 @@ namespace AmethystEngine.Forms
   /// </summary>
   public partial class ProjectSettings : Window
   {
-    public ProjectSettings()
+		String ProjectName, Thumbnail, GameLocation, ConfigLocation = String.Empty;
+		List<Level> levels = new List<Level>();
+
+    public ProjectSettings(String ProjectFilepath)
     {
       InitializeComponent();
-    }
+
+		}
+
+		private void LoadInitalVars(String FilePath)
+		{
+			byte[] byteArray = Encoding.UTF8.GetBytes(FilePath);
+			using (TextReader reader = new StreamReader(new MemoryStream(byteArray)))
+			{
+
+
+			}
+		}
 
     private void ProjSettings_DragMove(object sender, MouseButtonEventArgs e)
     {
