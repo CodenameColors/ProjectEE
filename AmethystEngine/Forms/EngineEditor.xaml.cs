@@ -457,8 +457,11 @@ namespace AmethystEngine.Forms
     //TODO: Multi lined label
     private void ProjectContentExplorer_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
+
+
       String TempPic = "/AmethystEngine;component/images/Ame_icon_small.png";
       CurTreeView = (TreeView)sender; Titles.Clear();
+			if (CurTreeView.Items.Count == 0) return; 
       ((TreeViewItem)(CurTreeView.SelectedItem)).IsExpanded = true;
       AmethystEngine.Components.EObjectType EType = EObjectType.File;
       foreach (TreeViewItem tvi in ((TreeViewItem)(CurTreeView.SelectedItem)).Items)
@@ -473,14 +476,23 @@ namespace AmethystEngine.Forms
           EType = EObjectType.Folder;
           desname = tvi.Header.ToString();
         }
-        if (new[] { ".tif", ".jpg", ".png" }.Any(c => desimg.ToLower().Contains(c)))
+        if (new[] { ".tif", ".jpg", ".png" }.Any(c => desname.ToLower().Contains(c)))
         {
+					EditorObject ed = new EditorObject(desimg, desname, brel, EObjectType.File);
+					Titles.Add(ed);
+				}
+        else if(!tvi.Header.ToString().Contains(".")){
+					//desimg = TempPic; brel = true;
+					EditorObject ed = new EditorObject(desimg, desname, brel, EType);
+					Titles.Add(ed);
+				}
+				else
+				{
+					desimg = TempPic; brel = true;
+					EditorObject ed = new EditorObject(desimg, desname, brel, EObjectType.File);
+					Titles.Add(ed);
+				}
 
-        }
-        else { desimg = TempPic; brel = true; }
-
-        EditorObject ed = new EditorObject(desimg, desname, brel, EType);
-        Titles.Add(ed);
       }
       SearchResultList.ItemsSource = null;
       SearchResultList.ItemsSource = Titles;
@@ -641,6 +653,10 @@ namespace AmethystEngine.Forms
 
 				Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, curLayer); //place the tile position wise
 				LevelEditor_Canvas.Children.Add(r); //actual place it on the canvas
+
+				//add offset to point P to turn rel to Abs pos.
+				p.X += Math.Ceiling(Math.Abs(Canvas_grid.Viewport.X));
+				p.Y += Math.Ceiling(Math.Abs(Canvas_grid.Viewport.Y));
 				FullMapEditorFill(p, curLayer); //update the fullmap display to reflect this change
 			}
 			else if(CurrentTool == EditorTool.Select)
@@ -694,7 +710,8 @@ namespace AmethystEngine.Forms
 
     private void LevelEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-			if(((SpriteLayer)SceneExplorer_TreeView.SelectedValue) == null) return;
+			if((SceneExplorer_TreeView.SelectedValue) == null) return;
+			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
 			if (CurrentTool == EditorTool.Brush)
 			{
 
@@ -845,12 +862,6 @@ namespace AmethystEngine.Forms
 
     private void FullMapEditorFill(Point p, int zindex)
     {
-      //flll the data.
-      int fullY = (int)FullMapLEditor_Canvas.ActualHeight; fullY -= fullY % (NumOfCellsY);
-      int fullX = (int)FullMapLEditor_Canvas.ActualWidth; fullX -= fullX % (NumOfCellsX);
-      fullX = fullX / (NumOfCellsX);
-      fullY = fullY / (NumOfCellsY);
-
 			SpriteLayer curlayer = (SpriteLayer)SceneExplorer_TreeView.SelectedValue;
 			curlayer.AddToLayer(new object(),
 				((int)p.Y + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight, //current row
@@ -893,19 +904,7 @@ namespace AmethystEngine.Forms
 			//is the middle mouse button down?
 			if (e.MiddleButton == MouseButtonState.Pressed)
 			{
-				bool exit = true;
-				if (Canvas_grid.Viewport.X >= 0)
-				{
-					Canvas_grid.Viewport = new Rect(-1, Canvas_grid.Viewport.Y, Canvas_grid.Viewport.Width, Canvas_grid.Viewport.Height);
-					exit = exit & false;
-				}
-				if (Canvas_grid.Viewport.Y >= 0)
-				{
-					Canvas_grid.Viewport = new Rect(Canvas_grid.Viewport.X, -1, Canvas_grid.Viewport.Width, Canvas_grid.Viewport.Height);
-					exit = exit & false;
-				}
-				if (exit)
-					LavelEditorPan();
+				LevelEditorPan();
 			}
       if (e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Brush)
         Canvas_MouseLeftButtonDown(sender, new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left));
@@ -1002,22 +1001,8 @@ namespace AmethystEngine.Forms
 		/// <summary>
 		/// Performs the panning effect on the main level editor canvas.
 		/// </summary>
-		private void LavelEditorPan()
+		private void LevelEditorPan()
 		{
-			bool exit = true;
-			if (Canvas_grid.Viewport.X >= 0)
-			{
-				Canvas_grid.Viewport = new Rect(-1, Canvas_grid.Viewport.Y, Canvas_grid.Viewport.Width, Canvas_grid.Viewport.Height);
-				exit = exit & false;
-			}
-			if (Canvas_grid.Viewport.Y >= 0)
-			{
-				Canvas_grid.Viewport = new Rect(Canvas_grid.Viewport.X, -1, Canvas_grid.Viewport.Width, Canvas_grid.Viewport.Height);
-				exit = exit & false;
-			}
-			if (!exit) return;
-
-
 			//this is here so when we pan the tiles work with the relative cords we are moving to. Its allows the tiles to maintain position data.
 			foreach (UIElement child in LevelEditor_Canvas.Children) 
       {
@@ -1035,7 +1020,7 @@ namespace AmethystEngine.Forms
 			foreach (UIElement child in FullMapLEditor_Canvas.Children)
       {
 				Console.WriteLine("Moved in bounds");
-        if (((Rectangle)child).Name == "SelectionRect")
+        if (((Rectangle)child) == FullMapSelection_Rect)
         {
 					double x = Canvas.GetLeft(child);
           double y = Canvas.GetTop(child);
@@ -1092,20 +1077,19 @@ namespace AmethystEngine.Forms
 			FullMapLEditor_Canvas.Width = TempLevel.xCells * 10;
       FullMapLEditor_Canvas.Height = TempLevel.yCells * 10;
 
-      Console.WriteLine("tewst");
-      int fullY = (int)FullMapLEditor_Canvas.Width; fullY -= fullY % (NumOfCellsY);
-      int fullX = (int)FullMapLEditor_Canvas.Height; fullX -= fullX % (NumOfCellsX);
-
       FullMapLEditor_VB.Viewport = new Rect(0, 0, 10, 10);
-
-
+			
       int MainCurCellsX = (int)Math.Ceiling(LevelEditor_BackCanvas.RenderSize.Width / (40 * ZoomLevel));
       int MainCurCellsY = (int)Math.Ceiling(LevelEditor_BackCanvas.RenderSize.Height / (40 * ZoomLevel));
 
+			double pastx, pasty = 0;
+			pastx = Canvas.GetLeft(FullMapSelection_Rect);
+			pasty = Canvas.GetTop(FullMapSelection_Rect);
+
 			FullMapLEditor_Canvas.Children.Remove(FullMapSelection_Rect);
 			FullMapSelection_Rect = new Rectangle() { Width = MainCurCellsX * 10, Height = MainCurCellsY * 10, Stroke = Brushes.White, StrokeThickness = 1, Name = "SelectionRect"};
-      Canvas.SetLeft(FullMapSelection_Rect, 0);
-			Canvas.SetTop(FullMapSelection_Rect, 0);
+      Canvas.SetLeft(FullMapSelection_Rect, pastx);
+			Canvas.SetTop(FullMapSelection_Rect, pasty);
 			Canvas.SetZIndex(FullMapSelection_Rect, 100);  //100 is the selection layer.
 			
       FullMapLEditor_Canvas.Children.Add(FullMapSelection_Rect);
@@ -1392,7 +1376,7 @@ namespace AmethystEngine.Forms
 
     private void ProjectSettingsMenuItem_Click(object sender, RoutedEventArgs e)
     {
-      Window w = new ProjectSettings();
+      Window w = new ProjectSettings(ProjectFilePath);
       w.Show();
     }
     
@@ -1712,8 +1696,8 @@ namespace AmethystEngine.Forms
 							}
 							else
 							{
-								rowtilemappos = (TileMapThresholds[TilesetInc - 1] - CurTileData) / (pic.PixelWidth / CurrentLevel.TileSet[TilesetInc - 1].Item3);
-								coltilemappos = (TileMapThresholds[TilesetInc - 1] - CurTileData) % (pic.PixelHeight / CurrentLevel.TileSet[TilesetInc - 1].Item4);
+								rowtilemappos = (CurTileData - TileMapThresholds[TilesetInc - 1] ) / (pic.PixelWidth / CurrentLevel.TileSet[TilesetInc - 1].Item3);
+								coltilemappos = (CurTileData - TileMapThresholds[TilesetInc - 1]) % (pic.PixelHeight / CurrentLevel.TileSet[TilesetInc - 1].Item4);
 							}
 
 							//crop based on the current 
@@ -1966,7 +1950,7 @@ namespace AmethystEngine.Forms
 			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
 			dlg.Title = "New Level File";
 			dlg.FileName = ""; //default file name
-			dlg.Filter = "txt files (*.xml)|*.xml|All files (*.*)|*.*";
+			dlg.Filter = "txt files (*.lvl)|*.lvl|All files (*.*)|*.*";
 			dlg.FilterIndex = 2;
 			dlg.RestoreDirectory = true;
 
@@ -1993,7 +1977,7 @@ namespace AmethystEngine.Forms
 
 			}
 
-			CurrentLevel.ExportLevel(dlg.FileName, TileSetImages, celldim);
+			CurrentLevel.ExportLevel(dlg.FileName + ".lvl", TileSetImages, celldim);
 		}
 
 		private async void OpenLevel_MenuItem_ClickAsync(object sender, RoutedEventArgs e)
@@ -2063,6 +2047,60 @@ namespace AmethystEngine.Forms
 			((ComboBox) ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control)).Visibility = Visibility.Visible;
 			((Label) ContentLibrary_Control.Template.FindName("TileSet_LBL", ContentLibrary_Control)).Visibility = Visibility.Visible;
 
+		}
+
+		/// <summary>
+		/// imports files to the current games content folder.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ContentExplorerImport_BTN_Click(object sender, RoutedEventArgs e)
+		{
+
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+			dlg.FileName = "assets"; //default file 
+			dlg.Title = "Import New Assest";
+			dlg.DefaultExt = "All files (*.*)|*.*"; //default file extension
+			dlg.Filter = "Level files (*.lvl)|*.lvl| png file (*.PNG)|*.PNG | All files (*.*)|*.*";
+
+			// Show save file dialog box
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results kicks out if the user doesn't select an item.
+			String importfilename, destfilename = "";
+			if (result == true)
+			{
+				importfilename = dlg.FileName;
+				
+			}
+			else
+				return;
+
+			String importendlocation, importstartlocation = "";
+			importendlocation = ProjectFilePath.Replace(".gem", "_Game\\Content\\");
+			importstartlocation = dlg.FileName;
+
+			//filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			int len = importstartlocation.Length - importstartlocation.LastIndexOfAny(new char[] { '/', '\\' });
+			destfilename = importendlocation + importstartlocation.Substring(
+				importstartlocation.LastIndexOfAny(new char[] { '\\', '/' }) + 1, len-1);
+
+			//copy the file
+			File.Copy(importfilename, destfilename, true);
+			//LoadInitalVars();
+			LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\")); //reload the project to show the new file.
+
+			Titles.Add(new EditorObject(destfilename, importstartlocation.Substring(
+				importstartlocation.LastIndexOfAny(new char[] { '\\', '/' }) + 1, len - 1), true ,EObjectType.File));
+
+			SearchResultList.ItemsSource = null;
+			SearchResultList.ItemsSource = Titles;
+
+		}
+
+		private void SearchResultList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			//double clicked
+			Console.WriteLine("doubleclicked");
 		}
 	}
 }

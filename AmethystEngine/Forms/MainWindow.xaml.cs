@@ -169,7 +169,9 @@ namespace AmethystEngine.Forms
           sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game\\" + "bin\\DesktopGL\\AnyCPU\\Debug\\Game1.exe");
           sb.AppendLine("-ConfigLocation:");
           sb.AppendLine("[FILLINLATER]");
-          byte[] data = new UTF8Encoding(true).GetBytes(sb.ToString());
+					sb.AppendLine("-Levels:");
+					sb.AppendLine("[FILLINLATER]");
+					byte[] data = new UTF8Encoding(true).GetBytes(sb.ToString());
           f.Write(data, 0, data.Length);
         }
       }
