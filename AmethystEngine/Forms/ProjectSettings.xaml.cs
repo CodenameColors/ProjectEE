@@ -26,17 +26,42 @@ namespace AmethystEngine.Forms
     public ProjectSettings(String ProjectFilepath)
     {
       InitializeComponent();
-
+			LoadInitalVars(ProjectFilepath);
 		}
 
 		private void LoadInitalVars(String FilePath)
 		{
 			byte[] byteArray = Encoding.UTF8.GetBytes(FilePath);
-			using (TextReader reader = new StreamReader(new MemoryStream(byteArray)))
+
+			using (StreamReader file = new StreamReader(FilePath))
 			{
+				int counter = 0;
+				string ln;
 
-
+				while ((ln = file.ReadLine()) != null)
+				{
+					if(ln == "-ProjectName:")
+					{
+						ln = file.ReadLine();
+						ProjectName_TB.Text = ln;
+					}
+					else if (ln == "-GameLocation:")
+					{
+						ln = file.ReadLine();
+						GameLocation_TB.Text = ln;
+					}
+					else if (ln == "-ConfigLocation:")
+					{
+						ln = file.ReadLine();
+						ConfigLoction_TB.Text = ln;
+					}
+					Console.WriteLine(ln);
+					counter++;
+				}
+				file.Close();
+				Console.WriteLine($"File has {counter} lines.");
 			}
+			
 		}
 
     private void ProjSettings_DragMove(object sender, MouseButtonEventArgs e)

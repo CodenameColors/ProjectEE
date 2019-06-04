@@ -163,14 +163,14 @@ namespace AmethystEngine.Forms
           sb.AppendLine(pname);
           sb.AppendLine("-thumbnail:");
           sb.AppendLine("[FILLINLATER]");
-          sb.AppendLine("-EditorLocation:");
-          sb.AppendLine("[FILLINLATER]");
           sb.AppendLine("-GameLocation:");
           sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game\\" + "bin\\DesktopGL\\AnyCPU\\Debug\\Game1.exe");
           sb.AppendLine("-ConfigLocation:");
-          sb.AppendLine("[FILLINLATER]");
+          sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Config");
 					sb.AppendLine("-Levels:");
-					sb.AppendLine("[FILLINLATER]");
+					sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Levels");
+					sb.AppendLine("-Dialogue:");
+					sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Dialogue");
 					byte[] data = new UTF8Encoding(true).GetBytes(sb.ToString());
           f.Write(data, 0, data.Length);
         }
@@ -178,7 +178,12 @@ namespace AmethystEngine.Forms
 
       CreateGameFiles(path + "\\" + pname + "\\" + pname + "_Game" + "\\");
 
-      String pathString = System.Environment.CurrentDirectory + "\\rpj.txt";
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Images");
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Levels");
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Config");
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Dialogue");
+
+			String pathString = System.Environment.CurrentDirectory + "\\rpj.txt";
 
       if (!System.IO.File.Exists(pathString))
       {
@@ -189,8 +194,9 @@ namespace AmethystEngine.Forms
         System.IO.File.AppendAllText(pathString, String.Format("{0}{1}{2}", path + "\\" + pname + "\\", pname, ".gem\n"));
       }
       this.Hide();
-      EngineEditor ff = new EngineEditor(String.Format("{0}", path + "\\" + pname + "\\" + pname + "_Game\\"));
-      ff.Show();
+      EngineEditor ff = new EngineEditor(String.Format("{0}{1}{2}", path + "\\" + pname + "\\", pname, ".gem"), pname);
+
+			ff.Show();
     }
 
     private void ProPath_BTN_Click(object sender, RoutedEventArgs e)
