@@ -21,6 +21,8 @@ namespace BixBite
 		public int yCells { get; set; }
 		public Dictionary<String, object> Properties = new Dictionary<string, object>();
 		public bool bSaved = false; 
+		public bool bMainLevel { get; }
+
 		/// <summary>
 		/// This  variable stores all the anyonmous methods for event triggers.
 		/// </summary>
@@ -29,9 +31,10 @@ namespace BixBite
 
 		public Level() { Layers = new ObservableCollection<SpriteLayer>(); }
 
-		public Level(String desname)
+		public Level(String desname, bool MainLevel = false)
 		{
 			LevelName = desname;
+			bMainLevel = MainLevel;
 			Layers = new ObservableCollection<SpriteLayer>();
 		}
 

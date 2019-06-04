@@ -152,14 +152,14 @@ namespace AmethystEngine.Forms
       //FullMapGrid_Control.Template.FindName("")
     }
 
-    public EngineEditor(String FilePath)
+    public EngineEditor(String FilePath, String ProjectName = "")
     {
       InitializeComponent();
       ProjectFilePath = FilePath;
 
-      //we need to read this file. And set the project settings accordingly.
-
-      LoadInitalVars();
+			//we need to read this file. And set the project settings accordingly.
+			ProjectName_LBL.Content = ProjectName;
+			LoadInitalVars();
       LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\"));
     }
 

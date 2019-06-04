@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AmethystEngine"
         mc:Ignorable="d" Background="#FF0E0D0D"
-        Title="ProjectSettings" Height="500" Width="400" Foreground="{x:Null}" AllowsTransparency="True" WindowStyle="None">
+        Title="ProjectSettings" Height="500" Width="500" Foreground="{x:Null}" AllowsTransparency="True" WindowStyle="None">
 	<Window.Resources>
 
 	</Window.Resources>
@@ -40,34 +40,46 @@
 
 			</Grid>
 		</Grid>
-		<ScrollViewer Grid.Row="1" Height="250" VerticalAlignment="Top" HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Auto">
+		<ScrollViewer Grid.Row="1" Height="250" VerticalAlignment="Top" HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Auto" Margin="0,0,100,0">
 			<Grid Grid.Row="1">
 				<Grid.RowDefinitions>
+					<RowDefinition Height="45"/>
+					<RowDefinition Height="45"/>
 					<RowDefinition Height="40"/>
-					<RowDefinition Height="40"/>
-					<RowDefinition Height="40"/>
-					<RowDefinition Height="40"/>
-					<RowDefinition Height="40"/>
+					<RowDefinition Height="45"/>
+					<RowDefinition Height="45"/>
 				</Grid.RowDefinitions>
 
 				<Label Grid.Row="0" Content="Project Name:" Height="28" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-				<TextBox x:Name="ProjectName_TB" Grid.Row="0" Padding="20,0,0,0" Width="271" Height="30" Background="#FF484848" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="90,0,0,0"/>
+				<TextBox x:Name="ProjectName_TB" Grid.Row="0" Padding="0,0,0,0" Width="271" Height="30" Background="#FF484848" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="90,0,0,0" VerticalContentAlignment="Center" Foreground="White"/>
 
-				<Label Grid.Row="1" Content="Editor Location:" Height="28" Foreground="White"/>
-				<TextBox x:Name="EditorLocation_TB" Grid.Row="1" HorizontalAlignment="Left" Width="271" Height="30" Background="#FF484848" BorderBrush="Black" Margin="90,5,0,6"/>
+				<Label Grid.Row="1" Content="Game Location:" Height="28" Foreground="White"/>
+				<TextBox Name ="GameLocation_TB"  Grid.Row="1" HorizontalAlignment="Left" Height="30" Width="271" Background="#FF484848" BorderBrush="Black" Margin="90,6,0,5" VerticalAlignment="Center" VerticalContentAlignment="Center" Foreground="White"/>
 
-				<Label Grid.Row="2" Content="Game Location:" Height="28" Foreground="White"/>
-				<TextBox Name ="GameLocation_TB"  Grid.Row="2" HorizontalAlignment="Left" Height="30" Width="271" Background="#FF484848" BorderBrush="Black" Margin="90,6,0,5"/>
-
-				<Label Grid.Row="3" Content="Config Location:" Height="28" Foreground="White"/>
-				<TextBox x:Name="ConfigLoction_TB" Grid.Row="3" HorizontalAlignment="Left" Height="30" Width="271" Background="#FF484848" BorderBrush="Black" Margin="90,5,0,6"/>
+				<Label Grid.Row="2" Content="Config Location:" Height="28" Foreground="White"/>
+				<TextBox x:Name="ConfigLoction_TB" Grid.Row="2" HorizontalAlignment="Left" Height="30" Width="271" Background="#FF484848" BorderBrush="Black" Margin="90,5,0,6" VerticalAlignment="Center" VerticalContentAlignment="Center" Foreground="White"/>
 
 			</Grid>
 		</ScrollViewer>
-		<Label Grid.Row="2" Content="Inputs" Foreground="White" Margin="0,0,0,0"/>
-		<Button Grid.Row="2" Content="Add Input" Margin="50,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="30" Width="80" Background="#FF484848" Foreground="White"/>
-		<ScrollViewer Grid.Row="2" Margin="0,40,0,0" VerticalScrollBarVisibility="Auto">
-			
+
+		<Label Grid.Row="1" Content="Thumbnail" Foreground="White" Margin="412,19,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
+		<Image Height="80" HorizontalAlignment="Left" Margin="403,50,0,0" Name="ProjectThumbnail_IMG" Stretch="Fill" VerticalAlignment="Top" Width="80"  OpacityMask="Black" Source="/AmethystEngine;component/images/Ame_icon_small.png" Grid.Row="1" />
+		<Button Grid.Row="1" Content="Change Image" Margin="390,147,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="22" Width="100" Background="#FF484848" Foreground="White"/>
+
+		<Label Grid.Row="2" Content="Inputs" Foreground="White" Margin="0,4,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+		<Button Grid.Row="2" Content="Add Input" Margin="48,3,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="30" Width="80" Background="#FF484848" Foreground="White"/>
+		<ScrollViewer Grid.Row="2" Margin="0,40,250,0" VerticalScrollBarVisibility="Auto">
+
+
 		</ScrollViewer>
+
+
+		<Label Grid.Row="2" Content="Levels" Foreground="White" Margin="358,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+		<ScrollViewer Grid.Row="2" Margin="250,40,0,0" VerticalScrollBarVisibility="Auto">
+
+		</ScrollViewer>
+		<GridSplitter x:Name="gridSplitter" HorizontalAlignment="Left" Height="222" Margin="250,248,0,0" Grid.Row="1" VerticalAlignment="Top" Width="3" Background="#FF484848" Grid.RowSpan="2"/>
+		<GridSplitter x:Name="gridSplitter_Copy" HorizontalAlignment="Left" Height="3" Margin="0,245,0,0" Grid.Row="1" VerticalAlignment="Top" Width="500" Background="#FF484848"/>
+
 	</Grid>
 </Window>
