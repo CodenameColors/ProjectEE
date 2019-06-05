@@ -1,0 +1,14 @@
+-ProjectName:
+test1
+-Thumbnail:
+C:\Users\amorales\Pictures\tet.png
+-GameLocation:
+C:\Users\amorales\Documents\EETest\test1\test1_Game\bin\DesktopGL\AnyCPU\Debug\Game1.exe
+-ConfigLocation:
+C:\Users\amorales\Documents\EETest\test1\test1_Game\Content\Config
+-Levels:
+C:\Users\amorales\Documents\EETest\test1\test1_Game\Content\Levels
+-MainLevel
+C:\Users\amorales\Documents\EETest\test1\test1_Game\Content\Levels\level1_1.lvl
+-Dialogue:
+C:\Users\amorales\Documents\EETest\test1\test1_Game\Content\Dialogue

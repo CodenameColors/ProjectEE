@@ -51,20 +51,20 @@
 				</Grid.RowDefinitions>
 
 				<Label Grid.Row="0" Content="Project Name:" Height="28" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-				<TextBox x:Name="ProjectName_TB" Grid.Row="0" Padding="0,0,0,0" Width="271" Height="30" Background="#FF484848" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="90,0,0,0" VerticalContentAlignment="Center" Foreground="White"/>
+				<TextBox x:Name="ProjectName_TB" Grid.Row="0" Padding="0,0,0,0" Width="265" Height="30" Background="#FF484848" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="96,8,0,8" VerticalContentAlignment="Center" Foreground="White"/>
 
 				<Label Grid.Row="1" Content="Game Location:" Height="28" Foreground="White"/>
-				<TextBox Name ="GameLocation_TB"  Grid.Row="1" HorizontalAlignment="Left" Height="30" Width="271" Background="#FF484848" BorderBrush="Black" Margin="90,6,0,5" VerticalAlignment="Center" VerticalContentAlignment="Center" Foreground="White"/>
+				<TextBox Name ="GameLocation_TB"  Grid.Row="1" HorizontalAlignment="Left" Height="30" Width="265" Background="#FF484848" BorderBrush="Black" Margin="96,8,0,8" VerticalAlignment="Center" VerticalContentAlignment="Center" Foreground="White"/>
 
 				<Label Grid.Row="2" Content="Config Location:" Height="28" Foreground="White"/>
-				<TextBox x:Name="ConfigLoction_TB" Grid.Row="2" HorizontalAlignment="Left" Height="30" Width="271" Background="#FF484848" BorderBrush="Black" Margin="90,5,0,6" VerticalAlignment="Center" VerticalContentAlignment="Center" Foreground="White"/>
+				<TextBox x:Name="ConfigLoction_TB" Grid.Row="2" HorizontalAlignment="Left" Height="30" Width="265" Background="#FF484848" BorderBrush="Black" Margin="96,5,0,6" VerticalAlignment="Center" VerticalContentAlignment="Center" Foreground="White"/>
 
 			</Grid>
 		</ScrollViewer>
 
 		<Label Grid.Row="1" Content="Thumbnail" Foreground="White" Margin="412,19,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
 		<Image Height="80" HorizontalAlignment="Left" Margin="403,50,0,0" Name="ProjectThumbnail_IMG" Stretch="Fill" VerticalAlignment="Top" Width="80"  OpacityMask="Black" Source="/AmethystEngine;component/images/Ame_icon_small.png" Grid.Row="1" />
-		<Button Grid.Row="1" Content="Change Image" Margin="390,147,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="22" Width="100" Background="#FF484848" Foreground="White"/>
+		<Button x:Name="ChangeThumbnail_BTN" Grid.Row="1" Content="Change Image" Margin="390,147,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="22" Width="100" Background="#FF484848" Foreground="White" Click="ChangeThumbnail_BTN_Click"/>
 
 		<Label Grid.Row="2" Content="Inputs" Foreground="White" Margin="0,4,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
 		<Button Grid.Row="2" Content="Add Input" Margin="48,3,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="30" Width="80" Background="#FF484848" Foreground="White"/>
@@ -74,9 +74,17 @@
 		</ScrollViewer>
 
 
-		<Label Grid.Row="2" Content="Levels" Foreground="White" Margin="358,5,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+		<Label Grid.Row="2" Content="All Levels" Foreground="White" Margin="345,23,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.254,0.551" Height="27" Width="70"/>
+		<Label Grid.Row="2" Content="Main Level:" Foreground="White" Margin="253,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.254,0.551" Height="27" Width="70"/>
+		<TextBlock Grid.Row="2" x:Name="MainLevel_TB" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="328,5,0,0" Width="166" Background="#FF484848" Foreground="White"/>
 		<ScrollViewer Grid.Row="2" Margin="250,40,0,0" VerticalScrollBarVisibility="Auto">
-
+			<ListBox x:Name="Levels_LB" Background="#FF484848" BorderBrush="#00ABADB3" Foreground="White" Margin="6,4,4,4">
+				 <ListBox.ContextMenu>
+					<ContextMenu>
+						<MenuItem Header="Set Main Level" Click="SetMainLevel_Click"/>
+					</ContextMenu>
+				</ListBox.ContextMenu>
+			</ListBox>
 		</ScrollViewer>
 		<GridSplitter x:Name="gridSplitter" HorizontalAlignment="Left" Height="222" Margin="250,248,0,0" Grid.Row="1" VerticalAlignment="Top" Width="3" Background="#FF484848" Grid.RowSpan="2"/>
 		<GridSplitter x:Name="gridSplitter_Copy" HorizontalAlignment="Left" Height="3" Margin="0,245,0,0" Grid.Row="1" VerticalAlignment="Top" Width="500" Background="#FF484848"/>

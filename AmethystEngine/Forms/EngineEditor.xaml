@@ -176,11 +176,11 @@
 
 		<DataTemplate x:Key="CExplorer">
 			<Border     Width="75"
-                            Margin="5"
-                            BorderThickness="1"
-                            BorderBrush="Transparent"
-                            VerticalAlignment="Top"
-                            >
+                  Margin="5"
+                  BorderThickness="1"
+                  BorderBrush="Transparent"
+                  VerticalAlignment="Top"
+                  >
 
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
 					<Image Height="50" Grid.Column="0" HorizontalAlignment="Center" Stretch="Fill" VerticalAlignment="Top" Width="50">
@@ -282,7 +282,7 @@
 					<MenuItem Header="File">
 						<MenuItem Header="New Project" Foreground="Black" Click="CreateNewProject"/>
 						<MenuItem Header="Open Project" Foreground="Black"/>
-						<MenuItem Header="Save Project" Foreground="Black"/>
+						<MenuItem Header="Save Project" Foreground="Black" Click="SaveCurrentProject_Click"/>
 						<Separator />
 						<MenuItem Header="Exit" Foreground="Black"/>
 					</MenuItem>
