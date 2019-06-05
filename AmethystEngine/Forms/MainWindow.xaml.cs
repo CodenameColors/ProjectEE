@@ -90,20 +90,29 @@ namespace AmethystEngine.Forms
           }
           continue;
         }
-
-
-
+				
         String tline = "";
+				EditorObject TempEO = new EditorObject();
         while ((tline = file.ReadLine()) != null)
         {
           System.Console.WriteLine(tline);
           if (tline.Contains("ProjectName"))
           {
             tline = file.ReadLine();
-            recentprojs.Add(new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png", tline));
-            break;
+						TempEO.Name = tline;
+						//recentprojs.Add(new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png", tline));
           }
-        }
+					else if (tline.Contains("Thumbnail"))
+					{
+						tline = file.ReadLine();
+						if (tline.Contains(";"))
+							TempEO.SetThumbnail(tline);
+						else
+							TempEO.SetThumbnail(tline,false);
+						//recentprojs.Add(new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png", tline));
+					}
+				}
+				recentprojs.Add(TempEO);
       }
       RecentProj_LB.ItemsSource = recentprojs;
     }
@@ -161,14 +170,16 @@ namespace AmethystEngine.Forms
           StringBuilder sb = new StringBuilder();
           sb.AppendLine("-ProjectName:");
           sb.AppendLine(pname);
-          sb.AppendLine("-thumbnail:");
-          sb.AppendLine("[FILLINLATER]");
+          sb.AppendLine("-Thumbnail:");
+          sb.AppendLine("/AmethystEngine;component/images/Ame_icon_small.png");
           sb.AppendLine("-GameLocation:");
           sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game\\" + "bin\\DesktopGL\\AnyCPU\\Debug\\Game1.exe");
           sb.AppendLine("-ConfigLocation:");
           sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Config");
 					sb.AppendLine("-Levels:");
 					sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Levels");
+					sb.AppendLine("-MainLevel:");
+					sb.AppendLine("[FILLINLATER]");
 					sb.AppendLine("-Dialogue:");
 					sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Dialogue");
 					byte[] data = new UTF8Encoding(true).GetBytes(sb.ToString());

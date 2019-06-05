@@ -7,6 +7,7 @@ using BixBite.Characters;
 using ProjectE_E.Components;
 using System.Collections.Generic;
 using System.Threading;
+using System.IO;
 
 namespace ProjectE_E
 {
@@ -23,12 +24,40 @@ namespace ProjectE_E
 		Player Player;
 		Camera camera;
 
+		string MainLevelPath = "";
+
 		public Emeralds_Elements()
 		{
-				graphics = new GraphicsDeviceManager(this);
-				Content.RootDirectory = "Content";
+			graphics = new GraphicsDeviceManager(this);
+			Content.RootDirectory = "Content";
 			graphics.PreferredBackBufferHeight = 1000;
 			graphics.PreferredBackBufferWidth = 1000;
+
+			Directory.SetCurrentDirectory(@"..\..\..\..\..");
+			string TempDir = Directory.GetCurrentDirectory();
+			string[] filePaths = Directory.GetFiles(TempDir, "*.gem");
+			if (filePaths.Length == 0)
+			{
+				return;
+			}
+			using (StreamReader file = new StreamReader(filePaths[0]))
+			{
+				int counter = 0;
+				string ln;
+
+				while ((ln = file.ReadLine()) != null)
+				{
+					if (ln.Contains("MainLevel"))
+					{
+						ln = file.ReadLine();
+						MainLevelPath = ln;
+					}
+				}
+					counter++;
+				
+				file.Close();
+			}
+
 		}
 
 		/// <summary>
@@ -48,7 +77,7 @@ namespace ProjectE_E
 
 		protected async void Load_async()
 		{
-			map.level = await map.GetLevelFromFile("C:\\Users\\Antonio\\Documents\\LEvelTesting2_fillless.lvl");
+			map.level = await map.GetLevelFromFile(MainLevelPath);
 		}
 
     /// <summary>

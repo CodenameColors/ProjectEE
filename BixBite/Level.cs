@@ -20,8 +20,8 @@ namespace BixBite
 		public int xCells {get; set;}
 		public int yCells { get; set; }
 		public Dictionary<String, object> Properties = new Dictionary<string, object>();
-		public bool bSaved = false; 
-		public bool bMainLevel { get; }
+		public bool bSaved = false; //indicates whether the user has saved their progress.
+		public bool bMainLevel { get; set; } // ONLY ONE CAN BE TRUE in a project. this is the startup level.
 
 		/// <summary>
 		/// This  variable stores all the anyonmous methods for event triggers.
@@ -156,6 +156,7 @@ namespace BixBite
 						Console.WriteLine("Start Element {0}", reader.Name);
 						Console.WriteLine(reader.AttributeCount);
 						TempLevel.LevelName = reader.GetAttribute("Name");
+						TempLevel.bMainLevel = (reader.GetAttribute("MainLevel").ToLower() == "false" ? false : true);
 						TempLevel.xCells = Int32.Parse(reader.GetAttribute("Width")) / 40;
 						TempLevel.yCells = Int32.Parse(reader.GetAttribute("Height")) / 40;
 						//reader.ReadToNextSibling("TileSet");
@@ -165,6 +166,7 @@ namespace BixBite
 						//next up is the tilesets for the map.
 						while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "TileSet")
 						{
+							
 							String Name = reader.GetAttribute("Name");
 							String Location = reader.GetAttribute("Location");
 							int Width = Int32.Parse(reader.GetAttribute("TileWidth"));
@@ -276,6 +278,7 @@ namespace BixBite
 				//Level attritbutes instance
 				await writer.WriteStartElementAsync(null, "Level", null);
 				await writer.WriteAttributeStringAsync(null, "Name", null, LevelName);
+				await writer.WriteAttributeStringAsync(null, "MainLevel", null, bMainLevel.ToString().ToLower());
 				await writer.WriteAttributeStringAsync(null, "Width", null, (xCells * 40).ToString());
 				await writer.WriteAttributeStringAsync(null, "Height", null, (yCells * 40).ToString());
 

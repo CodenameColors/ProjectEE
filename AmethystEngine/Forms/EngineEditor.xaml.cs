@@ -1177,7 +1177,7 @@ namespace AmethystEngine.Forms
 					Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 					dlg.FileName = "picture"; //default file 
 					dlg.DefaultExt = ".png"; //default file extension
-					dlg.Filter = "PNG (.PNG)|*.png"; //filter files by extension
+					dlg.Filter = "PNG (.png)|*.png"; //filter files by extension
 
 					// Show save file dialog box
 					Nullable<bool> result = dlg.ShowDialog();
@@ -1952,6 +1952,7 @@ namespace AmethystEngine.Forms
 			dlg.FileName = ""; //default file name
 			dlg.Filter = "txt files (*.lvl)|*.lvl|All files (*.*)|*.*";
 			dlg.FilterIndex = 2;
+			dlg.InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Levels");
 			dlg.RestoreDirectory = true;
 
 			Nullable<bool> result = dlg.ShowDialog();
@@ -1985,6 +1986,7 @@ namespace AmethystEngine.Forms
 			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
 			dlg.Title = "New Level File";
 			dlg.FileName = ""; //default file name
+			dlg.InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Levels");
 			dlg.Filter = "txt files (*.xml)|*.xml|All files (*.*)|*.*";
 			dlg.FilterIndex = 2;
 			dlg.RestoreDirectory = true;
@@ -2061,7 +2063,7 @@ namespace AmethystEngine.Forms
 			dlg.FileName = "assets"; //default file 
 			dlg.Title = "Import New Assest";
 			dlg.DefaultExt = "All files (*.*)|*.*"; //default file extension
-			dlg.Filter = "Level files (*.lvl)|*.lvl| png file (*.PNG)|*.PNG | All files (*.*)|*.*";
+			dlg.Filter = "Level files (*.lvl)|*.lvl|png file (*.png)|*.png|All files (*.*)|*.*";
 
 			// Show save file dialog box
 			Nullable<bool> result = dlg.ShowDialog();
@@ -2101,6 +2103,12 @@ namespace AmethystEngine.Forms
 		{
 			//double clicked
 			Console.WriteLine("doubleclicked");
+		}
+
+		//saves the current project data into the project file (.gem)
+		private void SaveCurrentProject_Click(object sender, RoutedEventArgs e)
+		{
+
 		}
 	}
 }

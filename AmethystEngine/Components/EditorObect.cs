@@ -53,6 +53,19 @@ namespace AmethystEngine.Components
       width = 300;
     }
 
+		public void SetThumbnail(String desimg, bool rel = true)
+		{
+			if (rel)
+			{
+				Thumbnail = new Uri(desimg, UriKind.Relative);
+			}
+			else
+			{
+				Thumbnail = new Uri(desimg, UriKind.Absolute);
+			}
+			width = 300;
+		}
+
     public override string ToString()
     {
       return this.Name;
