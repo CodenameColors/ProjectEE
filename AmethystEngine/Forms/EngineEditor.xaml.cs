@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -36,7 +37,8 @@ namespace AmethystEngine.Forms
 		Eraser,
 		Move,
 		Brush,
-    Fill
+    Fill,
+		Image,
 	}
 
 	public class LevelEditorProp
@@ -89,6 +91,9 @@ namespace AmethystEngine.Forms
 		public ObservableCollection<Level> OpenLevels { get; set;}
 		public Level CurrentLevel = new Level();
 		public ImageBrush imgtilebrush { get; private set; }
+		public Control currentCC = new ContentControl();
+		public Rectangle curect = new Rectangle();
+
 		private Tuple<object, SceneObjectType> CurrentLevelEditorSceneObject;
     Point[] SelectionRectPoints = new Point[2];
 		Point[] shiftpoints = new Point[3]; //0 = mouse down , 1 = mouse up , 2 on shifting "tick"
@@ -108,6 +113,7 @@ namespace AmethystEngine.Forms
     double LevelEditorScreenRatio = 0.0f;
 
     String ProjectFilePath = "";
+		String MainLevelPath = "";
 
     public EngineEditor()
     {
@@ -148,20 +154,52 @@ namespace AmethystEngine.Forms
       NumOfCellsX = int.Parse(LEditorTS[1].PropertyData);
       NumOfCellsY = int.Parse(LEditorTS[2].PropertyData);
 
-      //scaleFullMapEditor();
-      //FullMapGrid_Control.Template.FindName("")
-    }
+			//scaleFullMapEditor();
+			//FullMapGrid_Control.Template.FindName("")
 
-    public EngineEditor(String FilePath, String ProjectName = "")
+			//load main level
+			LoadMainLevel(ProjectFilePath);
+
+		}
+
+    public EngineEditor(String FilePath, String ProjectName = "", String LevelPath = "")
     {
       InitializeComponent();
       ProjectFilePath = FilePath;
-
+			
 			//we need to read this file. And set the project settings accordingly.
 			ProjectName_LBL.Content = ProjectName;
+			MainLevelPath = LevelPath;
 			LoadInitalVars();
-      LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\"));
+			LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\"));
     }
+
+		private void LoadMainLevel(String filepath)
+		{
+			using (StreamReader file = new StreamReader(filepath))
+			{
+				int counter = 0;
+				string ln;
+
+				while ((ln = file.ReadLine()) != null)
+				{
+					if (ln.Contains("MainLevel"))
+					{
+						ln = file.ReadLine();
+						if (ln.Contains("FILL"))
+							return;
+						else
+						{
+							if (File.Exists(ln))
+								importLevel(ln);
+							else
+								Console.WriteLine("file DNE: " + ln);
+						}
+					}
+				}
+				file.Close();
+			}
+		}
 
     /// <summary>
     /// Load the item source
@@ -732,10 +770,24 @@ namespace AmethystEngine.Forms
 						Image img = new Image(); img.Source = bitmap;
 						Rectangle r = new Rectangle() { Width = currentimg.Width, Height = currentimg.Height, Fill = new ImageBrush(img.Source) };//Make a rectange teh size of the image
 						Canvas.SetLeft(r, pos.X); Canvas.SetTop(r, pos.Y); Canvas.SetZIndex(r, curLayer);
-						LevelEditor_Canvas.Children.Add(r);
+						//LevelEditor_Canvas.Children.Add(r);
+
+						ContentControl CC = ((ContentControl)this.TryFindResource("MoveableImages_Template"));
+						CC.Width = currentimg.Width;
+						CC.Height = currentimg.Height;
+
+						Canvas.SetLeft(CC, pos.X); Canvas.SetTop(CC, pos.Y); Canvas.SetZIndex(CC, curLayer);
+						Selector.SetIsSelected(CC, false);
+						CC.MouseRightButtonDown += ContentControl_MouseLeftButtonDown;
+						var m = (CC.FindName("ResizeImage_rect"));
+						((Rectangle)CC.Content).Fill = new ImageBrush(img.Source) ;
+						LevelEditor_Canvas.Children.Add(CC);
 
 					}
 				}
+
+
+
 
 				//is there a sprite selected?
 			}
@@ -745,7 +797,28 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-    private void LevelEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+
+		private void ContentControl_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			Console.WriteLine("testing");
+			Selector.SetIsSelected(((Control)currentCC), false);
+			curect.IsHitTestVisible = true;
+
+			currentCC = ((ContentControl)sender);
+			Selector.SetIsSelected(((Control)currentCC), true);
+			curect.IsHitTestVisible = false;
+		}
+
+		private void Rectangle_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			Console.WriteLine("sjdsjdns");
+			curect.IsHitTestVisible = true;
+			curect = ((Rectangle)sender);
+			curect.IsHitTestVisible = false;
+			//var m = Application.Current.MainWindow.FindResource("DesignerItemStyle");
+		}
+
+		private void LevelEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
 		{
 			if ((SceneExplorer_TreeView.SelectedValue) == null) return;
 			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
@@ -2032,12 +2105,12 @@ namespace AmethystEngine.Forms
 
 			}
 
-			CurrentLevel.ExportLevel(dlg.FileName + ".lvl", TileSetImages, celldim);
+			CurrentLevel.ExportLevel(dlg.FileName + (dlg.FileName.Contains(".lvl") ? "" : ".lvl"), TileSetImages, celldim);
 		}
 
 		private async void OpenLevel_MenuItem_ClickAsync(object sender, RoutedEventArgs e)
 		{
-			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 			dlg.Title = "New Level File";
 			dlg.FileName = ""; //default file name
 			dlg.InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Levels");
@@ -2056,7 +2129,14 @@ namespace AmethystEngine.Forms
 			}
 			else return; //invalid name
 			Console.WriteLine(dlg.FileName);
-			CurrentLevel = ((await Level.ImportLevel(dlg.FileName)));
+
+			await importLevelAsync(dlg.FileName);
+
+		}
+
+		private void importLevel(String filename)
+		{
+			CurrentLevel = ((Level.ImportLevel(filename)));
 			OpenLevels.Add(CurrentLevel);
 			//change focus:
 			SceneExplorer_TreeView.ItemsSource = OpenLevels;
@@ -2070,9 +2150,10 @@ namespace AmethystEngine.Forms
 			LevelEditor_Canvas.IsEnabled = true;
 			ContentLibaryImport_BTN.IsEnabled = true;
 			TileSets_CB.Items.Clear(); //remove the past data.
-			
+
 			//tilemaps
-			foreach (Tuple<String, String, int, int> tilesetTuples in CurrentLevel.TileSet) {
+			foreach (Tuple<String, String, int, int> tilesetTuples in CurrentLevel.TileSet)
+			{
 
 				Image image = new Image();
 				var pic = new System.Windows.Media.Imaging.BitmapImage();
@@ -2089,7 +2170,7 @@ namespace AmethystEngine.Forms
 				String Name = pic.UriSource.ToString().Substring(pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
 
 				TileSets_CB.Items.Add(Name);
-				
+
 				//CreateTileMap(tilesetTuples.Item2, tilesetTuples.Item3, tilesetTuples.Item4);
 			}
 			TileSets_CB.SelectedIndex = 0;
@@ -2099,10 +2180,60 @@ namespace AmethystEngine.Forms
 			//set visabilty. 
 			Grid Prob_Grid = (Grid)ContentLibrary_Control.Template.FindName("TileSetProperties_Grid", ContentLibrary_Control);
 			Prob_Grid.Visibility = Visibility.Hidden;
-			((ScrollViewer) ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).Visibility = Visibility.Visible;
-			((ComboBox) ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control)).Visibility = Visibility.Visible;
-			((Label) ContentLibrary_Control.Template.FindName("TileSet_LBL", ContentLibrary_Control)).Visibility = Visibility.Visible;
+			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).Visibility = Visibility.Visible;
+			((ComboBox)ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control)).Visibility = Visibility.Visible;
+			((Label)ContentLibrary_Control.Template.FindName("TileSet_LBL", ContentLibrary_Control)).Visibility = Visibility.Visible;
+		}
 
+		private async System.Threading.Tasks.Task importLevelAsync(String filename)
+		{
+			CurrentLevel = ((await Level.ImportLevelAsync(filename)));
+			OpenLevels.Add(CurrentLevel);
+			//change focus:
+			SceneExplorer_TreeView.ItemsSource = OpenLevels;
+			SceneExplorer_TreeView.Items.Refresh();
+			SceneExplorer_TreeView.UpdateLayout();
+
+			NewLevelData_CC.Visibility = Visibility.Hidden;
+			LevelEditor_BackCanvas.Visibility = Visibility.Visible;
+			LevelEditorStatusBar_Grid.Visibility = Visibility.Visible;
+			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).IsEnabled = true;
+			LevelEditor_Canvas.IsEnabled = true;
+			ContentLibaryImport_BTN.IsEnabled = true;
+			TileSets_CB.Items.Clear(); //remove the past data.
+
+			//tilemaps
+			foreach (Tuple<String, String, int, int> tilesetTuples in CurrentLevel.TileSet)
+			{
+
+				Image image = new Image();
+				var pic = new System.Windows.Media.Imaging.BitmapImage();
+				pic.BeginInit();
+				pic.UriSource = new Uri(tilesetTuples.Item2); // url is from the xml
+				pic.EndInit();
+
+				System.Drawing.Image img = System.Drawing.Image.FromFile(tilesetTuples.Item2);
+				image.Source = pic;
+				image.Width = img.Width;
+				image.Height = img.Height;
+
+				int len = pic.UriSource.ToString().LastIndexOf('.') - pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' });
+				String Name = pic.UriSource.ToString().Substring(pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
+
+				TileSets_CB.Items.Add(Name);
+
+				//CreateTileMap(tilesetTuples.Item2, tilesetTuples.Item3, tilesetTuples.Item4);
+			}
+			TileSets_CB.SelectedIndex = 0;
+			//draw the level
+			RedrawLevel(CurrentLevel);
+
+			//set visabilty. 
+			Grid Prob_Grid = (Grid)ContentLibrary_Control.Template.FindName("TileSetProperties_Grid", ContentLibrary_Control);
+			Prob_Grid.Visibility = Visibility.Hidden;
+			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).Visibility = Visibility.Visible;
+			((ComboBox)ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control)).Visibility = Visibility.Visible;
+			((Label)ContentLibrary_Control.Template.FindName("TileSet_LBL", ContentLibrary_Control)).Visibility = Visibility.Visible;
 		}
 
 		/// <summary>

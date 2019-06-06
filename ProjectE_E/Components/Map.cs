@@ -162,7 +162,7 @@ namespace ProjectE_E.Components
 
 		public async Task<Level> GetLevelFromFile(String FilePath)
 		{
-			Level l = await Level.ImportLevel(FilePath);
+			Level l = await Level.ImportLevelAsync(FilePath);
 			level = l; 
 			return l;
 		}

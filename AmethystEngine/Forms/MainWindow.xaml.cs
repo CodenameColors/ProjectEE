@@ -93,23 +93,27 @@ namespace AmethystEngine.Forms
 				
         String tline = "";
 				EditorObject TempEO = new EditorObject();
-        while ((tline = file.ReadLine()) != null)
-        {
-          System.Console.WriteLine(tline);
-          if (tline.Contains("ProjectName"))
-          {
-            tline = file.ReadLine();
+				while ((tline = file.ReadLine()) != null)
+				{
+					System.Console.WriteLine(tline);
+					if (tline.Contains("ProjectName"))
+					{
+						tline = file.ReadLine();
 						TempEO.Name = tline;
 						//recentprojs.Add(new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png", tline));
-          }
+					}
 					else if (tline.Contains("Thumbnail"))
 					{
 						tline = file.ReadLine();
 						if (tline.Contains(";"))
 							TempEO.SetThumbnail(tline);
-						else
-							TempEO.SetThumbnail(tline,false);
-						//recentprojs.Add(new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png", tline));
+						else {
+							if (File.Exists(tline)) {
+								TempEO.SetThumbnail(tline, false);
+							}
+							else { TempEO.SetThumbnail("/AmethystEngine;component/images/Ame_icon_small.png", true); }
+						}
+							//recentprojs.Add(new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png", tline));
 					}
 				}
 				recentprojs.Add(TempEO);
@@ -154,8 +158,6 @@ namespace AmethystEngine.Forms
         MessageBox.Show("Please enter vaild names, and a valid file location");
         return;
       }
-
-
 
       String path = ProjectPath_TB.Text;
       String pname = ProName_TB.Text;

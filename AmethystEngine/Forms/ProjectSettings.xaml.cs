@@ -62,8 +62,13 @@ namespace AmethystEngine.Forms
 						ln = file.ReadLine();
 						if(ln.Contains(";"))
 							ProjectThumbnail_IMG.Source = new BitmapImage(new Uri(ln, UriKind.Relative));
-						else
-							ProjectThumbnail_IMG.Source = new BitmapImage(new Uri(ln));
+						else {
+							if (File.Exists(ln))
+							{
+								ProjectThumbnail_IMG.Source = new BitmapImage(new Uri(ln));
+							}
+							else { ProjectThumbnail_IMG.Source = new BitmapImage(new Uri("/AmethystEngine;component/images/Ame_icon_small.png", UriKind.Relative)); }
+						}
 					}
 					else if (ln.Contains("MainLevel"))
 					{
