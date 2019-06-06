@@ -41,7 +41,7 @@
 		</ContextMenu>
 
 		<ControlTemplate x:Key="LevelEditorTileMap_Template">
-			<TabControl x:Name="LevelEditorLibary_TabControl" Background="#FF2B2B2B">
+			<TabControl x:Name="LevelEditorLibary_TabControl" Background="#FF2B2B2B" SelectionChanged="LevelEditorLibary_TabControl_SelectionChanged">
 
 				<TabItem Header="Tile Map" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 					<Grid>
@@ -361,7 +361,7 @@
 			</ContentControl>
 
 			<!--This is the main editor window-->
-			<Grid Grid.Column="1" Height="25" VerticalAlignment="Top" Margin="10,4,123,0">
+			<Grid x:Name="LevelEditorTileMap_ToolBar_Grid" Grid.Column="1" Height="25" VerticalAlignment="Top" Margin="10,4,123,0">
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="Auto"/>
