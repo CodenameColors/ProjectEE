@@ -139,7 +139,128 @@ namespace BixBite
 			}
 		}
 
-		async public static System.Threading.Tasks.Task<Level> ImportLevel(String filename)
+		public static Level ImportLevel(String filename)
+		{
+			Level TempLevel = new Level();
+
+			XmlReaderSettings settings = new XmlReaderSettings();
+			settings.Async = true;
+			//Create the Level object from the file
+			using (XmlReader reader = XmlReader.Create(filename, settings))
+			{
+				while (reader.Read())
+				{
+					//The first tag should be a level tag. it includes name, and map width/height
+					if (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Level")
+					{
+						Console.WriteLine("Start Element {0}", reader.Name);
+						Console.WriteLine(reader.AttributeCount);
+						TempLevel.LevelName = reader.GetAttribute("Name");
+						TempLevel.bMainLevel = (reader.GetAttribute("MainLevel").ToLower() == "false" ? false : true);
+						TempLevel.xCells = Int32.Parse(reader.GetAttribute("Width")) / 40;
+						TempLevel.yCells = Int32.Parse(reader.GetAttribute("Height")) / 40;
+						//reader.ReadToNextSibling("TileSet");
+						while (reader.Name.Trim() != "TileSet") //ignore whitespace
+							reader.Read();
+
+						//next up is the tilesets for the map.
+						while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "TileSet")
+						{
+
+							String Name = reader.GetAttribute("Name");
+							String Location = reader.GetAttribute("Location");
+							int Width = Int32.Parse(reader.GetAttribute("TileWidth"));
+							int Height = Int32.Parse(reader.GetAttribute("TileHeight"));
+							TempLevel.TileSet.Add(new Tuple<string, string, int, int>(Name, Location, Width, Height));
+							reader.Read(); reader.Read();
+						}
+
+						//the next thing is the layers . LOOPS
+						while ((reader.NodeType == XmlNodeType.EndElement && reader.Name.Trim() != "Layers") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Layers")) //loop through all the TileSets
+						{
+
+							//create a temp array.//Tile int[,]
+							List<List<int>> LevelData = new List<List<int>>();
+							reader.Read(); reader.Read(); //move to next element
+							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "TileLayer")
+							{
+
+								TempLevel.AddLayer(reader.GetAttribute("Name"), LayerType.Tile);
+								while (reader.Name.Trim() != "Row") //ignore whitespace
+									reader.Read();
+								while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Row")
+								{
+									List<int> rowdata = new List<int>();
+									reader.Read();
+									String s = ( reader.Value);
+									String[] row = s.Split(',');
+									foreach (string ss in row) //parse the ints
+										rowdata.Add(Int32.Parse(ss));
+									 reader.Read(); reader.Read();  reader.Read();
+									LevelData.Add(rowdata);
+
+								}
+
+							}
+							if (reader.NodeType == XmlNodeType.EndElement && reader.Name.Trim() == "TileLayer")
+							{
+								int[,] str = new int[LevelData.Count, LevelData[0].Count];
+								for (int j = 0; j < LevelData.Count; j++)
+								{
+									for (int i = 0; i < LevelData[j].Count; i++)
+									{
+										str[j, i] = LevelData[j][i];
+									}
+								}
+
+								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects = str;//we have the row data so add to the level data
+							}
+
+							//Sprite
+							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "SpriteLayer")
+							{
+								Console.WriteLine("SpriteLayer");
+							  reader.Read();
+							}
+							//gameevent int[,]
+							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameEvents")
+							{
+								Console.WriteLine("GameEventLayer");
+								reader.Read();
+							}
+						}
+					}
+				}
+			}
+			//	break;
+			//case XmlNodeType.Text:
+			//	Console.WriteLine("Text Node: {0}",
+			//					 await reader.GetValueAsync());
+			//	break;
+			//case XmlNodeType.EndElement:
+			//	Console.WriteLine("End Element {0}", reader.Name);
+			//	break;
+			//default:
+			//	Console.WriteLine("Other node {0} with value {1}",
+			//									reader.NodeType, reader.Value);
+			//	break;
+			return TempLevel;
+
+			//Create the Level object from the file
+
+			//The first tag should be a level tag. it includes name, and map width/height
+
+			//next up is the tilesets for the map.
+
+			//the next thing is the layers . LOOPS
+			//Tile int[,]
+			//Sprite
+			//gameevent int[,]
+
+			//GameEvents content includes group number and eventname LOOPS
+		}
+
+		async public static System.Threading.Tasks.Task<Level> ImportLevelAsync(String filename)
 		{
 			Level TempLevel = new Level();
 

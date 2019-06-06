@@ -8,243 +8,271 @@
 				xmlns:BixRen="clr-namespace:BixBite.Rendering;assembly=BixBite"
         mc:Ignorable="d" Background="#FF0E0D0D"
         Title="AmethystEngine" Height="1000" Width="1600" Foreground="{x:Null}" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
+
+
 	<Window.Resources>
+		<ResourceDictionary>
 
 
-		<Style x:Key="LeditorLV_Style" TargetType="{x:Type GridViewColumnHeader}">
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="{x:Type GridViewColumnHeader}">
-						<Border BorderThickness="0,0,0,1" BorderBrush="White" Background="Transparent">
-							<TextBlock x:Name="ContentHeader" Foreground="White" Text="{TemplateBinding Content}" Padding="5,5,5,0" Width="{TemplateBinding Width}" TextAlignment="Center" />
-						</Border>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
+			<Style x:Key="LeditorLV_Style" TargetType="{x:Type GridViewColumnHeader}">
+				<Setter Property="Template">
+					<Setter.Value>
+						<ControlTemplate TargetType="{x:Type GridViewColumnHeader}">
+							<Border BorderThickness="0,0,0,1" BorderBrush="White" Background="Transparent">
+								<TextBlock x:Name="ContentHeader" Foreground="White" Text="{TemplateBinding Content}" Padding="5,5,5,0" Width="{TemplateBinding Width}" TextAlignment="Center" />
+							</Border>
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
 
-			<Setter Property="OverridesDefaultStyle" Value="True" />
-			<Setter Property	="Foreground" Value="Black" />
-			<Setter Property="FontFamily" Value="Segoe UI" />
-			<Setter Property="FontSize" Value="12" />
-		</Style>
+				<Setter Property="OverridesDefaultStyle" Value="True" />
+				<Setter Property	="Foreground" Value="Black" />
+				<Setter Property="FontFamily" Value="Segoe UI" />
+				<Setter Property="FontSize" Value="12" />
+			</Style>
 
-		<ContextMenu x:Key="LevelContextMenu_Template">
-			<MenuItem Header="Add Tile Layer" Click="AddTileLayer_Click" />
-			<MenuItem Header="Add Sprite Layer" Click="SpriteLayer_Click" />
-			<MenuItem Header="Add Gameobject Layer" Click="GameObjectLayer_Click" />
-		</ContextMenu>
+			<ContextMenu x:Key="LevelContextMenu_Template">
+				<MenuItem Header="Add Tile Layer" Click="AddTileLayer_Click"/>
+				<MenuItem Header="Add Sprite Layer" Click="SpriteLayer_Click" />
+				<MenuItem Header="Add Gameobject Layer" Click="GameObjectLayer_Click" />
+			</ContextMenu>
 
-		<ContextMenu x:Key="LevelSpriteLayerContextMenu_Template">
-			<MenuItem Header="Add Tile Layer" />
-			<MenuItem Header="Add Sprite Layer" />
-			<MenuItem Header="Add Gameobject Layer" />
-		</ContextMenu>
+			<ContextMenu x:Key="LevelSpriteLayerContextMenu_Template">
+				<MenuItem Header="Add Tile Layer" />
+				<MenuItem Header="Add Sprite Layer" />
+				<MenuItem Header="Add Gameobject Layer" />
+			</ContextMenu>
 
-		<ControlTemplate x:Key="LevelEditorTileMap_Template">
-			<TabControl x:Name="LevelEditorLibary_TabControl" Background="#FF2B2B2B" SelectionChanged="LevelEditorLibary_TabControl_SelectionChanged">
+			<ControlTemplate x:Key="LevelEditorTileMap_Template">
+				<TabControl x:Name="LevelEditorLibary_TabControl" Background="#FF2B2B2B" SelectionChanged="LevelEditorLibary_TabControl_SelectionChanged">
 
-				<TabItem Header="Tile Map" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
-					<Grid>
-						<Grid.RowDefinitions>
-							<RowDefinition Height="30"/>
-							<RowDefinition Height="*"/>
-						</Grid.RowDefinitions>
-						<!--This is for the deciding width/height of the tiles.-->
-						<Grid x:Name="TileSetProperties_Grid" Grid.Row="1" >
+					<TabItem Header="Tile Map" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
+						<Grid>
 							<Grid.RowDefinitions>
 								<RowDefinition Height="30"/>
-								<RowDefinition Height="30"/>
-								<RowDefinition Height="30"/>
-								<RowDefinition Height="30"/>
+								<RowDefinition Height="*"/>
 							</Grid.RowDefinitions>
+							<!--This is for the deciding width/height of the tiles.-->
+							<Grid x:Name="TileSetProperties_Grid" Grid.Row="1" >
+								<Grid.RowDefinitions>
+									<RowDefinition Height="30"/>
+									<RowDefinition Height="30"/>
+									<RowDefinition Height="30"/>
+									<RowDefinition Height="30"/>
+								</Grid.RowDefinitions>
 
-							<Label Grid.Row="0" x:Name="TileMapName_LBL" Content="Name: " Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" />
-							<TextBox x:Name="TileMapName_TB" Text=""  Width="102" Height="25" Foreground="White" Margin="48,3,0,3" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Background="#FF383838" HorizontalContentAlignment="Right" IsEnabled="False"/>
+								<Label Grid.Row="0" x:Name="TileMapName_LBL" Content="Name: " Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" />
+								<TextBox x:Name="TileMapName_TB" Text=""  Width="102" Height="25" Foreground="White" Margin="48,3,0,3" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Background="#FF383838" HorizontalContentAlignment="Right" IsEnabled="False"/>
 
-							<Label Grid.Row="1" x:Name="TileWidth_LBL" Content="Tile Cell Width: " Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" />
-							<TextBox Grid.Row="1" x:Name="TileWidth_TB" Text="0"  Width="50" Height="25" Foreground="White" Margin="100,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Background="#FF383838" HorizontalContentAlignment="Right"/>
+								<Label Grid.Row="1" x:Name="TileWidth_LBL" Content="Tile Cell Width: " Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" />
+								<TextBox Grid.Row="1" x:Name="TileWidth_TB" Text="0"  Width="50" Height="25" Foreground="White" Margin="100,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Background="#FF383838" HorizontalContentAlignment="Right"/>
 
-							<Label Grid.Row="2" x:Name="TileHeight_LBL" Content="Tile Cell Height: " Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" />
-							<TextBox Grid.Row="2" x:Name="TileHeight_TB" Text="0"  Width="50" Height="25" Foreground="White" Margin="100,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Background="#FF383838" HorizontalContentAlignment="Right"/>
+								<Label Grid.Row="2" x:Name="TileHeight_LBL" Content="Tile Cell Height: " Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" />
+								<TextBox Grid.Row="2" x:Name="TileHeight_TB" Text="0"  Width="50" Height="25" Foreground="White" Margin="100,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" VerticalContentAlignment="Center" Background="#FF383838" HorizontalContentAlignment="Right"/>
 
-							<Button x:Name="CreateTileMap_BTN" Grid.Row="3" Width="Auto" Height="Auto" Content="Create Tile Map" Margin="48,8,10,0" Background="#FF383838" Foreground="White" Click="CreateTileMap_BTN_Click"/>
+								<Button x:Name="CreateTileMap_BTN" Grid.Row="3" Width="Auto" Height="Auto" Content="Create Tile Map" Margin="48,8,10,0" Background="#FF383838" Foreground="White" Click="CreateTileMap_BTN_Click"/>
 
-						</Grid>
+							</Grid>
 
-						<Label x:Name="TileSet_LBL" Grid.Row="0" Content="TileSet:" VerticalContentAlignment="Center" Foreground="White" Visibility="Hidden"/>
-						<ComboBox Grid.Row="0" x:Name="TileSetSelector_CB" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="50,5,5,5" SelectionChanged="TileSetSelector_CB_SelectionChanged" Visibility="Hidden" />
-						<ScrollViewer Grid.Row="1" x:Name="LevelEditorTIleMap_SV" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,5,5,7" IsEnabled="True" Background="Black" Visibility="Hidden">
-							<Canvas x:Name="TileMap_Canvas" IsHitTestVisible="True" MouseWheel="LevelEditor_Canvas_MouseWheel" Width="512" Height="512" MouseLeftButtonDown="TileMap_Canvas_MouseLeftButtonDown" 
+							<Label x:Name="TileSet_LBL" Grid.Row="0" Content="TileSet:" VerticalContentAlignment="Center" Foreground="White" Visibility="Hidden"/>
+							<ComboBox Grid.Row="0" x:Name="TileSetSelector_CB" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="50,5,5,5" SelectionChanged="TileSetSelector_CB_SelectionChanged" Visibility="Hidden" />
+							<ScrollViewer Grid.Row="1" x:Name="LevelEditorTIleMap_SV" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,5,5,7" IsEnabled="True" Background="Black" Visibility="Hidden">
+								<Canvas x:Name="TileMap_Canvas" IsHitTestVisible="True" MouseWheel="LevelEditor_Canvas_MouseWheel" Width="512" Height="512" MouseLeftButtonDown="TileMap_Canvas_MouseLeftButtonDown" 
 										MouseMove="TileMap_Canvas_MouseMove" HorizontalAlignment="Left" VerticalAlignment="Top" >
-								<Canvas.Background>
-									<VisualBrush x:Name="LevelEditorTileMapCanvas_VB" Stretch="None" TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute" >
-										<VisualBrush.Visual>
-											<Rectangle  Width="32" Height="32" Fill="Transparent" Stroke="White" StrokeThickness=".2" Visibility="Visible" />
-										</VisualBrush.Visual>
-									</VisualBrush>
-								</Canvas.Background>
-							</Canvas>
-						</ScrollViewer>
-					</Grid>
-				</TabItem>
-				<TabItem Header="Sprite Lib" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
-					<ListBox x:Name="SpriteLibary_LB" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
+									<Canvas.Background>
+										<VisualBrush x:Name="LevelEditorTileMapCanvas_VB" Stretch="None" TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute" >
+											<VisualBrush.Visual>
+												<Rectangle  Width="32" Height="32" Fill="Transparent" Stroke="White" StrokeThickness=".2" Visibility="Visible" />
+											</VisualBrush.Visual>
+										</VisualBrush>
+									</Canvas.Background>
+								</Canvas>
+							</ScrollViewer>
+						</Grid>
+					</TabItem>
+					<TabItem Header="Sprite Lib" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
+						<ListBox x:Name="SpriteLibary_LB" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
                Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" ItemTemplate="{DynamicResource BigEdit}" ScrollViewer.VerticalScrollBarVisibility="Hidden">
-						<ListBox.ItemsPanel>
-							<ItemsPanelTemplate>
-								<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>
-							</ItemsPanelTemplate>
-						</ListBox.ItemsPanel>
-					</ListBox>
-				</TabItem>
-				<TabItem Header="Custom Sets [WIP]" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
-				</TabItem>
-			</TabControl>
-		</ControlTemplate>
+							<ListBox.ItemsPanel>
+								<ItemsPanelTemplate>
+									<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>
+								</ItemsPanelTemplate>
+							</ListBox.ItemsPanel>
+						</ListBox>
+					</TabItem>
+					<TabItem Header="Custom Sets [WIP]" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
+					</TabItem>
+				</TabControl>
+			</ControlTemplate>
 
-		<ControlTemplate x:Key="ContentLibaray_LB_Template">
-			<ListBox x:Name="EditorObjects_LB" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
+			<ControlTemplate x:Key="ContentLibaray_LB_Template">
+				<ListBox x:Name="EditorObjects_LB" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
                Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" ItemsSource="{Binding Titles}" ItemTemplate="{DynamicResource BigEdit}" ScrollViewer.VerticalScrollBarVisibility="Hidden">
-				<ListBox.ItemsPanel>
-					<ItemsPanelTemplate>
-						<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>
-					</ItemsPanelTemplate>
-				</ListBox.ItemsPanel>
-			</ListBox>
-		</ControlTemplate>
+					<ListBox.ItemsPanel>
+						<ItemsPanelTemplate>
+							<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>
+						</ItemsPanelTemplate>
+					</ListBox.ItemsPanel>
+				</ListBox>
+			</ControlTemplate>
 
-		<ControlTemplate x:Key="LevelEditorProperty_Template">
-			<Grid VerticalAlignment="Stretch" Grid.Column="2" Margin="0,45,0,0" Background="#FF2B2B2B">
-				<Grid.RowDefinitions>
-					<RowDefinition Height="120*"/>
-					<RowDefinition Height="200*"/>
-				</Grid.RowDefinitions>
+			<ControlTemplate x:Key="LevelEditorProperty_Template">
+				<Grid VerticalAlignment="Stretch" Grid.Column="2" Margin="0,45,0,0" Background="#FF2B2B2B">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="120*"/>
+						<RowDefinition Height="200*"/>
+					</Grid.RowDefinitions>
 
-				<!--MINIMAP-->
-				<!--<Label Content="Full Map:" VerticalAlignment="Top" HorizontalAlignment="Stretch" Grid.Row="0" Foreground="Black"/>-->
-				<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,4,5,5">
-					<Canvas x:Name="LevelEditor_Canvas" IsHitTestVisible="True" Grid.Column="2"  Grid.Row="0" MouseWheel="LevelEditor_Canvas_MouseWheel" 
+					<!--MINIMAP-->
+					<!--<Label Content="Full Map:" VerticalAlignment="Top" HorizontalAlignment="Stretch" Grid.Row="0" Foreground="Black"/>-->
+					<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,4,5,5">
+						<Canvas x:Name="LevelEditor_Canvas" IsHitTestVisible="True" Grid.Column="2"  Grid.Row="0" MouseWheel="LevelEditor_Canvas_MouseWheel" 
                   Width="Auto" Height="Auto" >
-						<Canvas.Background>
-							<VisualBrush x:Name="FullLeditorGrid_VB" TileMode="Tile" Viewport="0,0,10,10" ViewportUnits="Absolute" >
-								<VisualBrush.Visual>
-									<Rectangle Width="10" Height="10" Fill="Black" Stroke="White" StrokeThickness=".1" />
-								</VisualBrush.Visual>
-							</VisualBrush>
-						</Canvas.Background>
-					</Canvas>
-				</ScrollViewer>
+							<Canvas.Background>
+								<VisualBrush x:Name="FullLeditorGrid_VB" TileMode="Tile" Viewport="0,0,10,10" ViewportUnits="Absolute" >
+									<VisualBrush.Visual>
+										<Rectangle Width="10" Height="10" Fill="Black" Stroke="White" StrokeThickness=".1" />
+									</VisualBrush.Visual>
+								</VisualBrush>
+							</Canvas.Background>
+						</Canvas>
+					</ScrollViewer>
 
-				<!--PROPERTIES-->
-				<!--<Label Content="Properties:" VerticalAlignment="Top" HorizontalAlignment="Stretch" Grid.Row="1" Foreground="White"/>-->
-				<ListView HorizontalAlignment="Stretch" Margin="0,4,0,0" Grid.Row="1" VerticalAlignment="Stretch" x:Name="LEditProperty_LB" ItemTemplate="{Binding LEditorT}"
+					<!--PROPERTIES-->
+					<!--<Label Content="Properties:" VerticalAlignment="Top" HorizontalAlignment="Stretch" Grid.Row="1" Foreground="White"/>-->
+					<ListView HorizontalAlignment="Stretch" Margin="0,4,0,0" Grid.Row="1" VerticalAlignment="Stretch" x:Name="LEditProperty_LB" ItemTemplate="{Binding LEditorT}"
 									ItemsSource="{Binding LEditorTS}" Background="Transparent" IsSynchronizedWithCurrentItem="True">
-					<ListView.View>
-						<!--<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>-->
-						<GridView ColumnHeaderContainerStyle="{StaticResource LeditorLV_Style}" >
-							<GridViewColumn Width="Auto" Header="Property">
-								<GridViewColumn.CellTemplate>
-									<DataTemplate>
-										<Label x:Name="Txt" Content="{Binding PropertyName}" Foreground="White" />
-									</DataTemplate>
-								</GridViewColumn.CellTemplate>
-							</GridViewColumn>
-							<GridViewColumn Header="Data" Width="100">
-								<GridViewColumn.CellTemplate >
-									<DataTemplate>
-										<TextBox x:Name="txtQuantity" MinWidth="75"  Text="{Binding PropertyData}" Foreground="Black"/>
-									</DataTemplate>
-								</GridViewColumn.CellTemplate>
-							</GridViewColumn>
-						</GridView>
-					</ListView.View>
-				</ListView>
-				<GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
-			</Grid>
-		</ControlTemplate>
+						<ListView.View>
+							<!--<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>-->
+							<GridView ColumnHeaderContainerStyle="{StaticResource LeditorLV_Style}" >
+								<GridViewColumn Width="Auto" Header="Property">
+									<GridViewColumn.CellTemplate>
+										<DataTemplate>
+											<Label x:Name="Txt" Content="{Binding PropertyName}" Foreground="White" />
+										</DataTemplate>
+									</GridViewColumn.CellTemplate>
+								</GridViewColumn>
+								<GridViewColumn Header="Data" Width="100">
+									<GridViewColumn.CellTemplate >
+										<DataTemplate>
+											<TextBox x:Name="txtQuantity" MinWidth="75"  Text="{Binding PropertyData}" Foreground="Black"/>
+										</DataTemplate>
+									</GridViewColumn.CellTemplate>
+								</GridViewColumn>
+							</GridView>
+						</ListView.View>
+					</ListView>
+					<GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+				</Grid>
+			</ControlTemplate>
 
-		<DataTemplate x:Key="LEditorT">
-			<Grid>
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition/>
-					<ColumnDefinition/>
-				</Grid.ColumnDefinitions>
-				<!--<Label Content="{Binding PropertyName}"/>-->
-				<TextBox Grid.Column="1" MinWidth="50" Text="{Binding PropertyData}"/>
-			</Grid>
-		</DataTemplate>
+			<DataTemplate x:Key="LEditorT">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition/>
+						<ColumnDefinition/>
+					</Grid.ColumnDefinitions>
+					<!--<Label Content="{Binding PropertyName}"/>-->
+					<TextBox Grid.Column="1" MinWidth="50" Text="{Binding PropertyData}"/>
+				</Grid>
+			</DataTemplate>
 
-		<DataTemplate x:Key="CExplorer">
-			<Border     Width="75"
+			<DataTemplate x:Key="CExplorer">
+				<Border     Width="75"
                   Margin="5"
                   BorderThickness="1"
                   BorderBrush="Transparent"
                   VerticalAlignment="Top"
                   >
 
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-					<Image Height="50" Grid.Column="0" HorizontalAlignment="Center" Stretch="Fill" VerticalAlignment="Top" Width="50">
-						<Image.Source>
-							<BitmapImage UriSource="{Binding Thumbnail}"/>
-						</Image.Source>
-					</Image>
-					<TextBlock Text="{Binding Name}" Foreground="White" HorizontalAlignment="Center" Width="50" Height="auto" TextWrapping="Wrap" FontSize="10"/>
-				</StackPanel>
-			</Border>
-		</DataTemplate>
+					<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+						<Image Height="50" Grid.Column="0" HorizontalAlignment="Center" Stretch="Fill" VerticalAlignment="Top" Width="50">
+							<Image.Source>
+								<BitmapImage UriSource="{Binding Thumbnail}"/>
+							</Image.Source>
+						</Image>
+						<TextBlock Text="{Binding Name}" Foreground="White" HorizontalAlignment="Center" Width="50" Height="auto" TextWrapping="Wrap" FontSize="10"/>
+					</StackPanel>
+				</Border>
+			</DataTemplate>
 
 
-		<DataTemplate x:Key="BigEdit">
-			<Border         Width="75" x:Name="EditorObject_Bor"
+			<DataTemplate x:Key="BigEdit">
+				<Border         Width="75" x:Name="EditorObject_Bor"
                             Margin="5"
                             BorderThickness="1"
                             BorderBrush="Transparent">
 
-				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" x:Name="TESTING_SP">
-					<Image Height="75" Grid.Column="0" HorizontalAlignment="Left" Stretch="Fill" VerticalAlignment="Top" Width="75">
-						<Image.Source>
-							<BitmapImage UriSource="{Binding Thumbnail}"/>
-						</Image.Source>
-					</Image>
-				</StackPanel>
-			</Border>
-		</DataTemplate>
+					<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" x:Name="TESTING_SP">
+						<Image Height="75" Grid.Column="0" HorizontalAlignment="Left" Stretch="Fill" VerticalAlignment="Top" Width="75">
+							<Image.Source>
+								<BitmapImage UriSource="{Binding Thumbnail}"/>
+							</Image.Source>
+						</Image>
+					</StackPanel>
+				</Border>
+			</DataTemplate>
 
-		<DataTemplate x:Key="BigEdit1">
-			<Border         Width="4000" x:Name="EditorObject_Bor"
+			<DataTemplate x:Key="BigEdit1">
+				<Border         Width="4000" x:Name="EditorObject_Bor"
                             Margin="5"
                             BorderThickness="1"
                             BorderBrush="Transparent">
 
-				<StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" x:Name="TESTING_SP">
-					<Image Height="30" Grid.Column="0" HorizontalAlignment="Left" Stretch="Fill" VerticalAlignment="Top" Width="30">
+					<StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" x:Name="TESTING_SP">
+						<Image Height="30" Grid.Column="0" HorizontalAlignment="Left" Stretch="Fill" VerticalAlignment="Top" Width="30">
+							<Image.Source>
+								<BitmapImage UriSource="{Binding Thumbnail}"/>
+							</Image.Source>
+						</Image>
+						<Label Content="{Binding Name}" Foreground="White" HorizontalAlignment="Left"/>
+					</StackPanel>
+				</Border>
+			</DataTemplate>
+
+
+			<DataTemplate x:Key="EObj_Small">
+				<Grid Margin=".2">
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="40" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+
+					<Image Height="30" Grid.Column="0" HorizontalAlignment="Left" Name="image1" Stretch="Fill" VerticalAlignment="Top" Width="30">
 						<Image.Source>
 							<BitmapImage UriSource="{Binding Thumbnail}"/>
 						</Image.Source>
 					</Image>
-					<Label Content="{Binding Name}" Foreground="White" HorizontalAlignment="Left"/>
-				</StackPanel>
-			</Border>
-		</DataTemplate>
+
+					<Label Content="{Binding Name}" Grid.Column="1" Foreground="White"/>
+				</Grid>
+			</DataTemplate>
+			
+			<!-- The x:shared = false is IMPORTANT it allows me to use the control multiple times.  -->
+			<ContentControl x:Key="MoveableImages_Template"
+											x:Shared="False" 
+											Width="130"
+											Height="130"
+											Canvas.Top="150"
+											Canvas.Left="470"
+											Selector.IsSelected="False"
+											Style="{DynamicResource DesignerItemStyle}" 
+											MouseLeftButtonDown="ContentControl_MouseLeftButtonDown">
+				<Rectangle x:Name="ResizeImage_rect" IsHitTestVisible="True"
+										Stretch="Fill" MouseLeftButtonDown="Rectangle_MouseLeftButtonDown">
+					<Rectangle.Fill>
+						<ImageBrush x:Name="ResizeImage_Image" ImageSource="/AmethystEngine;component/images/smol megumin.jpg" />
+					</Rectangle.Fill>
+				</Rectangle>
+			</ContentControl>
 
 
-		<DataTemplate x:Key="EObj_Small">
-			<Grid Margin=".2">
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="/AmethystEngine;component/Resources/DesignerItem.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
 
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="40" />
-					<ColumnDefinition Width="*" />
-				</Grid.ColumnDefinitions>
-
-				<Image Height="30" Grid.Column="0" HorizontalAlignment="Left" Name="image1" Stretch="Fill" VerticalAlignment="Top" Width="30">
-					<Image.Source>
-						<BitmapImage UriSource="{Binding Thumbnail}"/>
-					</Image.Source>
-				</Image>
-
-				<Label Content="{Binding Name}" Grid.Column="1" Foreground="White"/>
-			</Grid>
-		</DataTemplate>
+		</ResourceDictionary>
 	</Window.Resources>
 
 	<Grid x:Name="resizeGrid" Margin="0">
@@ -506,6 +534,15 @@
 								</VisualBrush>
 							</Canvas.Background>
 							<Canvas x:Name="LevelEditor_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+							<ContentControl Width="130"
+											Height="130"
+											Canvas.Top="150"
+											Canvas.Left="150"
+											Selector.IsSelected="False"
+											Style="{DynamicResource DesignerItemStyle}"
+											MouseLeftButtonDown="ContentControl_MouseLeftButtonDown">
+								<Rectangle IsHitTestVisible="True" Fill="Red" MouseLeftButtonDown="Rectangle_MouseLeftButtonDown"/>
+							</ContentControl>
 						</Canvas>
 
 
