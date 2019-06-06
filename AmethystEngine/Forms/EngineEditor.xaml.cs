@@ -622,173 +622,227 @@ namespace AmethystEngine.Forms
       String point = String.Format("({0}, {1})", (int)p.X, (int)p.Y);
       LevelEditorCords_TB.Text = point;
     }
-    #endregion
+		#endregion
 
-    #region "Main Editor Canvas"
-    /// <summary>
-    /// handles left mouse button down events.
-    /// Painting the tile canvas is handled here.
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
+		#region "Main Editor Canvas"
+		/// <summary>
+		/// handles left mouse button down events.
+		/// Painting the tile canvas is handled here.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
 			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
 
-			Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
+				Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
 			//Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_Canvas));
 			Point p = GetGridSnapCords(pos);
 			Console.WriteLine(String.Format("Snapped grid cords: {0}", p.ToString()));
 			//we need to get the current Sprite layer that is currently clicked.
 			int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
-			
-			if (CurrentTool == EditorTool.Brush)
+
+			if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Tile)
 			{
-				if(SelectedTile_Canvas.Children.Count == 0) return;
-				Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid. always 40 becasue thats the base. 
 
-				Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X , (int)pos.Y);
-        if (rr != null)
-        { Console.WriteLine(String.Format("Cell ({0},{1}) already is filled",(int)pos.X, (int)pos.Y)); return; }//check to see if the current tile exists. if so then don't add.
 
-				Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, curLayer); //place the tile position wise
-				LevelEditor_Canvas.Children.Add(r); //actual place it on the canvas
-
-				//add offset to point P to turn rel to Abs pos.
-				p.X += Math.Ceiling(Math.Abs(Canvas_grid.Viewport.X));
-				p.Y += Math.Ceiling(Math.Abs(Canvas_grid.Viewport.Y));
-				FullMapEditorFill(p, curLayer); //update the fullmap display to reflect this change
-			}
-			else if(CurrentTool == EditorTool.Select)
-			{
-				//find the tile
-				if (SceneExplorer_TreeView.SelectedValue is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Tile)
+				if (CurrentTool == EditorTool.Brush)
 				{
-					Rectangle r = new Rectangle() { Tag = "selection", Width = 40, Height = 40, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
+					if (SelectedTile_Canvas.Children.Count == 0) return;
+					Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid. always 40 becasue thats the base. 
+
 					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
-					Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, 100);
+					if (rr != null)
+					{ Console.WriteLine(String.Format("Cell ({0},{1}) already is filled", (int)pos.X, (int)pos.Y)); return; }//check to see if the current tile exists. if so then don't add.
 
-					//don't add another selection rectangle on an existing selection rectangle
-					Rectangle sr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 100, (int)pos.X, (int)pos.Y);
+					Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, curLayer); //place the tile position wise
+					LevelEditor_Canvas.Children.Add(r); //actual place it on the canvas
 
-          if (sr != null) return;
-					selectTool.SelectedTiles.Add(rr);
-					LevelEditor_Canvas.Children.Add(r);
-
-					SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+					//add offset to point P to turn rel to Abs pos.
+					p.X += Math.Ceiling(Math.Abs(Canvas_grid.Viewport.X));
+					p.Y += Math.Ceiling(Math.Abs(Canvas_grid.Viewport.Y));
+					FullMapEditorFill(p, curLayer); //update the fullmap display to reflect this change
 				}
-			}
-			else if (CurrentTool == EditorTool.Eraser)
-			{
-				//find the tile on the layer that is selected.
-				Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
-				if (rr == null) return; //if you click on a empty rect return
-																//find the rect in the current layers displayed tiles
-				int i = LevelEditor_Canvas.Children.IndexOf(rr);
-				int x = -1; int y = -1;
-				if(i >= 0)
+				else if (CurrentTool == EditorTool.Select)
 				{
-					y = (int)Canvas.GetLeft(rr) / 40;
-					x = (int)Canvas.GetTop(rr) / 40;
-					LevelEditor_Canvas.Children.RemoveAt(i); //delete it.
-				}
-				if(x < 0 || y < 0) { Console.WriteLine("desired cell to delete DNE"); return; }
-				//find the data in the level objects sprite layer. And then clear it.
-				SpriteLayer curlayer = (SpriteLayer)SceneExplorer_TreeView.SelectedValue;
-				curlayer.DeleteFromLayer(x, y);
+					//find the tile
+					if (SceneExplorer_TreeView.SelectedValue is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Tile)
+					{
+						Rectangle r = new Rectangle() { Tag = "selection", Width = 40, Height = 40, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
+						Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
+						Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, 100);
 
-				//delect
-				Deselect();
+						//don't add another selection rectangle on an existing selection rectangle
+						Rectangle sr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 100, (int)pos.X, (int)pos.Y);
+
+						if (sr != null) return;
+						selectTool.SelectedTiles.Add(rr);
+						LevelEditor_Canvas.Children.Add(r);
+
+						SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+					}
+				}
+				else if (CurrentTool == EditorTool.Eraser)
+				{
+					//find the tile on the layer that is selected.
+					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
+					if (rr == null) return; //if you click on a empty rect return
+																	//find the rect in the current layers displayed tiles
+					int i = LevelEditor_Canvas.Children.IndexOf(rr);
+					int x = -1; int y = -1;
+					if (i >= 0)
+					{
+						y = (int)Canvas.GetLeft(rr) / 40;
+						x = (int)Canvas.GetTop(rr) / 40;
+						LevelEditor_Canvas.Children.RemoveAt(i); //delete it.
+					}
+					if (x < 0 || y < 0) { Console.WriteLine("desired cell to delete DNE"); return; }
+					//find the data in the level objects sprite layer. And then clear it.
+					SpriteLayer curlayer = (SpriteLayer)SceneExplorer_TreeView.SelectedValue;
+					curlayer.DeleteFromLayer(x, y);
+
+					//delect
+					Deselect();
+				}
+				else if (CurrentTool == EditorTool.Move)
+				{
+					//SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+					shiftpoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+					shiftpoints[2] = shiftpoints[0];
+				}
 			}
-			else if (CurrentTool == EditorTool.Move)
+
+
+			else if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Sprite)
 			{
-        //SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
-				shiftpoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
-				shiftpoints[2] = shiftpoints[0];
+				TabControl Content_TC = (TabControl)(ContentLibrary_Control.Template.FindName("LevelEditorLibary_TabControl", ContentLibrary_Control));
+				//make sure we are in the correct tab of the level editor content libary
+				if (Content_TC.SelectedIndex == 1)
+				{
+					//is there a sprite selected?
+					ListBox Sprite_LB = (ListBox)(ContentLibrary_Control.Template.FindName("SpriteLibary_LB", ContentLibrary_Control));
+					if (Sprite_LB.SelectedIndex >= 0)
+					{
+						List<EditorObject> sprites = (List<EditorObject>)Sprite_LB.ItemsSource;
+						EditorObject currentobj = sprites[Sprite_LB.SelectedIndex];
+						Console.WriteLine(currentobj.Thumbnail.AbsolutePath); //prints the path
+
+						System.Drawing.Image currentimg = System.Drawing.Image.FromFile(currentobj.Thumbnail.AbsolutePath);
+						BitmapImage bitmap = new BitmapImage(new Uri(currentobj.Thumbnail.AbsolutePath, UriKind.Absolute));
+						Image img = new Image(); img.Source = bitmap;
+						Rectangle r = new Rectangle() { Width = currentimg.Width, Height = currentimg.Height, Fill = new ImageBrush(img.Source) };//Make a rectange teh size of the image
+						Canvas.SetLeft(r, pos.X); Canvas.SetTop(r, pos.Y); Canvas.SetZIndex(r, curLayer);
+						LevelEditor_Canvas.Children.Add(r);
+
+					}
+				}
+
+				//is there a sprite selected?
 			}
-    }
+			else if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.GameEvent)
+			{
+
+			}
+		}
 
     private void LevelEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-    {
-			if((SceneExplorer_TreeView.SelectedValue) == null) return;
+		{
+			if ((SceneExplorer_TreeView.SelectedValue) == null) return;
 			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
-			if (CurrentTool == EditorTool.Brush)
+			if ((SceneExplorer_TreeView.SelectedValue is SpriteLayer))
 			{
-
-			}
-			else if (CurrentTool == EditorTool.Select)
-			{
-
-				Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
-				//we need to get the current Sprite layer that is currently clicked.
-				if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue == null)) return;
-				int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
-
-				SelectionRectPoints[1] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y);
-				Console.WriteLine("Select MUP");
-
-				//At this point the entire selection area should be drawn.
-				int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
-				int columns = (int)(RelativeGridSnap(SelectionRectPoints[1]).X - RelativeGridSnap(SelectionRectPoints[0]).X);
-				int rows = (int)(RelativeGridSnap(SelectionRectPoints[1]).Y - RelativeGridSnap(SelectionRectPoints[0]).Y);
-
-				columns /= relgridsize;
-				rows /= relgridsize;
-
-				Point begginning = RelativeGridSnap(SelectionRectPoints[0]);
-				begginning.X = (int)begginning.X; begginning.Y = (int)begginning.Y;
-				for (int i = 0; i <= columns; i++)
+				if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Tile)
 				{
-					for (int j = 0; j <= rows; j++)
+					if (CurrentTool == EditorTool.Brush)
 					{
-						//find the rectangle
-						Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 
-							curLayer, (int)begginning.X + (relgridsize * i) +1, (int)begginning.Y + (relgridsize * j)+1);
-						if (!selectTool.SelectedTiles.Contains(rr))
+
+					}
+					else if (CurrentTool == EditorTool.Select)
+					{
+
+						Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
+						//we need to get the current Sprite layer that is currently clicked.
+						if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue == null)) return;
+						int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+
+						SelectionRectPoints[1] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y);
+						Console.WriteLine("Select MUP");
+
+						//At this point the entire selection area should be drawn.
+						int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
+						int columns = (int)(RelativeGridSnap(SelectionRectPoints[1]).X - RelativeGridSnap(SelectionRectPoints[0]).X);
+						int rows = (int)(RelativeGridSnap(SelectionRectPoints[1]).Y - RelativeGridSnap(SelectionRectPoints[0]).Y);
+
+						columns /= relgridsize;
+						rows /= relgridsize;
+
+						Point begginning = RelativeGridSnap(SelectionRectPoints[0]);
+						begginning.X = (int)begginning.X; begginning.Y = (int)begginning.Y;
+						for (int i = 0; i <= columns; i++)
 						{
-							if(rr != null)
-								selectTool.SelectedTiles.Add(rr);
+							for (int j = 0; j <= rows; j++)
+							{
+								//find the rectangle
+								Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(),
+									curLayer, (int)begginning.X + (relgridsize * i) + 1, (int)begginning.Y + (relgridsize * j) + 1);
+								if (!selectTool.SelectedTiles.Contains(rr))
+								{
+									if (rr != null)
+										selectTool.SelectedTiles.Add(rr);
+								}
+							}
+						}
+					}
+					else if (CurrentTool == EditorTool.Eraser)
+					{
+
+					}
+					else if (CurrentTool == EditorTool.Fill)
+					{
+
+					}
+					else if (CurrentTool == EditorTool.Move)
+					{
+						int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+						int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
+
+
+						Point begginning = RelativeGridSnap(SelectionRectPoints[0]);
+						begginning.X = (int)begginning.X; begginning.Y = (int)begginning.Y;
+						shiftpoints[1] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y);
+
+						int columns = (int)(RelativeGridSnap(SelectionRectPoints[1]).X - RelativeGridSnap(SelectionRectPoints[0]).X);
+						int rows = (int)(RelativeGridSnap(SelectionRectPoints[1]).Y - RelativeGridSnap(SelectionRectPoints[0]).Y);
+						//how much to move/shift the data.
+						int shiftcolumns = (int)(RelativeGridSnap(shiftpoints[1]).X - RelativeGridSnap(shiftpoints[0]).X);
+						int shiftrows = (int)(RelativeGridSnap(shiftpoints[1]).Y - RelativeGridSnap(shiftpoints[0]).Y);
+						int absrow = 0; int abscol = 0; Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
+						columns /= relgridsize; shiftcolumns /= relgridsize;
+						rows /= relgridsize; shiftrows /= relgridsize;
+						for (int i = 0; i <= columns; i++)
+						{
+							for (int j = 0; j <= rows; j++)
+							{
+								absrow = ((int)begginning.Y + (relgridsize * j) + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight;
+								abscol = ((int)begginning.X + (relgridsize * i) + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth;
+								CurrentLevel.Movedata(absrow, abscol, shiftrows, shiftcolumns, curLayer, LayerType.Tile);
+							}
 						}
 					}
 				}
-			}
-			else if (CurrentTool == EditorTool.Eraser)
-			{
 
-			}
-			else if (CurrentTool == EditorTool.Fill)
-			{
-
-			}
-			else if (CurrentTool == EditorTool.Move)
-			{
-				int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
-				int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
-
-				
-				Point begginning = RelativeGridSnap(SelectionRectPoints[0]);
-				begginning.X = (int)begginning.X; begginning.Y = (int)begginning.Y;
-				shiftpoints[1] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y);
-
-				int columns = (int)(RelativeGridSnap(SelectionRectPoints[1]).X - RelativeGridSnap(SelectionRectPoints[0]).X);
-				int rows = (int)(RelativeGridSnap(SelectionRectPoints[1]).Y - RelativeGridSnap(SelectionRectPoints[0]).Y);
-				//how much to move/shift the data.
-				int shiftcolumns = (int)(RelativeGridSnap(shiftpoints[1]).X - RelativeGridSnap(shiftpoints[0]).X);
-				int shiftrows = (int)(RelativeGridSnap(shiftpoints[1]).Y - RelativeGridSnap(shiftpoints[0]).Y);
-				int absrow = 0; int abscol = 0; Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
-				columns /= relgridsize; shiftcolumns /= relgridsize;
-				rows /= relgridsize; shiftrows /= relgridsize;
-				for (int i = 0; i <= columns; i++)
+				else if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Sprite)
 				{
-					for(int j = 0; j <= rows; j++)
-					{
-						absrow = ((int)begginning.Y + (relgridsize * j) + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight;
-						abscol = ((int)begginning.X + (relgridsize * i) + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth;
-						CurrentLevel.Movedata(absrow, abscol, shiftrows, shiftcolumns, curLayer, LayerType.Tile);
-					}
+
 				}
+				else if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.GameEvent)
+				{
+
+				}
+
 			}
 		}
+		
     
     private int GetTileZIndex(TreeView treeitem)
 		{
@@ -1176,8 +1230,8 @@ namespace AmethystEngine.Forms
 
 					Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 					dlg.FileName = "picture"; //default file 
-					dlg.DefaultExt = ".png"; //default file extension
-					dlg.Filter = "PNG (.png)|*.png"; //filter files by extension
+					dlg.DefaultExt = "*.png"; //default file extension
+					dlg.Filter = "png (*.png)|*.png"; //filter files by extension
 
 					// Show save file dialog box
 					Nullable<bool> result = dlg.ShowDialog();
@@ -1204,8 +1258,8 @@ namespace AmethystEngine.Forms
 				{
 					Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 					dlg.FileName = "picture"; //default file 
-					dlg.DefaultExt = ".png"; //default file extension
-					dlg.Filter = "PNG (.PNG)|*.png"; //filter files by extension
+					dlg.DefaultExt = "*.png"; //default file extension
+					dlg.Filter = "png (*.png)|*.png"; //filter files by extension
 
 					// Show save file dialog box
 					Nullable<bool> result = dlg.ShowDialog();
@@ -2109,6 +2163,25 @@ namespace AmethystEngine.Forms
 		private void SaveCurrentProject_Click(object sender, RoutedEventArgs e)
 		{
 
+		}
+
+		//cchanges the toolbar to the currenttool bar depedning on the tilemap tool selected
+		private void LevelEditorLibary_TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			TabControl LELibary_TC = (TabControl)ContentLibrary_Control.Template.FindName("LevelEditorLibary_TabControl", ContentLibrary_Control);
+			if (LELibary_TC.SelectedIndex == 0)
+			{
+				LevelEditorTileMap_ToolBar_Grid.Visibility = Visibility.Visible;
+
+			}
+			else if (LELibary_TC.SelectedIndex == 1)
+			{
+				LevelEditorTileMap_ToolBar_Grid.Visibility = Visibility.Hidden;
+			}
+			else if (LELibary_TC.SelectedIndex == 2)
+			{
+				LevelEditorTileMap_ToolBar_Grid.Visibility = Visibility.Hidden;
+			}
 		}
 	}
 }

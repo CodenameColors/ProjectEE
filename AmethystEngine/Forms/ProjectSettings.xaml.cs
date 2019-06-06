@@ -60,7 +60,10 @@ namespace AmethystEngine.Forms
 					}
 					else if (ln.Contains("Thumbnail")) {
 						ln = file.ReadLine();
-						ProjectThumbnail_IMG.Source = new BitmapImage(new Uri(ln));
+						if(ln.Contains(";"))
+							ProjectThumbnail_IMG.Source = new BitmapImage(new Uri(ln, UriKind.Relative));
+						else
+							ProjectThumbnail_IMG.Source = new BitmapImage(new Uri(ln));
 					}
 					else if (ln.Contains("MainLevel"))
 					{
@@ -94,8 +97,8 @@ namespace AmethystEngine.Forms
 		{
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 			dlg.Title = "Choose New Thumbnail";
-			dlg.DefaultExt = "png file (*.png)|*.png"; //default file extension
-			dlg.Filter = "png file (*.png)|*.png";
+			dlg.DefaultExt = "png file(*.png)|*.png"; //default file extension
+			dlg.Filter = "Image Files|*.png;*";
 
 			// Show save file dialog box
 			Nullable<bool> result = dlg.ShowDialog();
