@@ -534,15 +534,6 @@
 								</VisualBrush>
 							</Canvas.Background>
 							<Canvas x:Name="LevelEditor_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-							<ContentControl Width="130"
-											Height="130"
-											Canvas.Top="150"
-											Canvas.Left="150"
-											Selector.IsSelected="False"
-											Style="{DynamicResource DesignerItemStyle}"
-											MouseLeftButtonDown="ContentControl_MouseLeftButtonDown">
-								<Rectangle IsHitTestVisible="True" Fill="Red" MouseLeftButtonDown="Rectangle_MouseLeftButtonDown"/>
-							</ContentControl>
 						</Canvas>
 
 
@@ -568,6 +559,11 @@
 				</TabItem>
 				<TabItem Header="Particle Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 					<Grid Background="Black" />
+				</TabItem>
+				<TabItem Header="Game" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
+					<Grid Background="Black" >
+						<DockPanel></DockPanel>
+					</Grid>
 				</TabItem>
 			</TabControl>
 			<Button VerticalAlignment="Top" Height="22" Background="#FF383838" Foreground="White" Content="Compile" Margin="0,6,58,0" Grid.Column="1" HorizontalAlignment="Right" Width="60" />

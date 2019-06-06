@@ -173,7 +173,7 @@ namespace AmethystEngine.Forms
 			LoadInitalVars();
 			LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\"));
     }
-
+		
 		private void LoadMainLevel(String filepath)
 		{
 			using (StreamReader file = new StreamReader(filepath))
