@@ -39,6 +39,7 @@ namespace AmethystEngine.Forms
 		Brush,
     Fill,
 		Image,
+		Gameevent,
 	}
 
 	public class LevelEditorProp
@@ -270,10 +271,16 @@ namespace AmethystEngine.Forms
       w.Show();
     }
 
-    #region This handles all the windows GUI features. Resize, fullscreen. etc
+		private void ProjectSettingsMenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			Window w = new ProjectSettings(ProjectFilePath);
+			w.Show();
+		}
 
-    #region Resizing
-    private System.Windows.Interop.HwndSource _hwndSource;
+		#region This handles all the windows GUI features. Resize, fullscreen. etc
+
+		#region Resizing
+		private System.Windows.Interop.HwndSource _hwndSource;
 
     protected override void OnInitialized(EventArgs e)
     {
@@ -568,10 +575,59 @@ namespace AmethystEngine.Forms
         ListDirectory(ProjectContentExplorer, Path);
       }
     }
-    #endregion
 
-    #region "File Traverse Item View"
-    private void DirectoryBack_BTN_Click(object sender, RoutedEventArgs e)
+		/// <summary>
+		/// imports files to the current games content folder.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ContentExplorerImport_BTN_Click(object sender, RoutedEventArgs e)
+		{
+
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+			dlg.FileName = "assets"; //default file 
+			dlg.Title = "Import New Assest";
+			dlg.DefaultExt = "All files (*.*)|*.*"; //default file extension
+			dlg.Filter = "Level files (*.lvl)|*.lvl|png file (*.png)|*.png|All files (*.*)|*.*";
+
+			// Show save file dialog box
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results kicks out if the user doesn't select an item.
+			String importfilename, destfilename = "";
+			if (result == true)
+			{
+				importfilename = dlg.FileName;
+
+			}
+			else
+				return;
+
+			String importendlocation, importstartlocation = "";
+			importendlocation = ProjectFilePath.Replace(".gem", "_Game\\Content\\");
+			importstartlocation = dlg.FileName;
+
+			//filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			int len = importstartlocation.Length - importstartlocation.LastIndexOfAny(new char[] { '/', '\\' });
+			destfilename = importendlocation + importstartlocation.Substring(
+				importstartlocation.LastIndexOfAny(new char[] { '\\', '/' }) + 1, len - 1);
+
+			//copy the file
+			File.Copy(importfilename, destfilename, true);
+			//LoadInitalVars();
+			LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\")); //reload the project to show the new file.
+
+			Titles.Add(new EditorObject(destfilename, importstartlocation.Substring(
+				importstartlocation.LastIndexOfAny(new char[] { '\\', '/' }) + 1, len - 1), true, EObjectType.File));
+
+			SearchResultList.ItemsSource = null;
+			SearchResultList.ItemsSource = Titles;
+
+		}
+
+		#endregion
+
+		#region "File Traverse Item View"
+		private void DirectoryBack_BTN_Click(object sender, RoutedEventArgs e)
     {
 			if (((TreeViewItem)ProjectContentExplorer.SelectedItem) == null) return;	//you need to click on something...
 
@@ -719,6 +775,26 @@ namespace AmethystEngine.Forms
 
 						SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
 					}
+					else if(SceneExplorer_TreeView.SelectedValue is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.GameEvent)
+					{
+						//this selection works similar to tile. But instead it looks for borders not rectangles. It also will retrieve the game event group number
+						Rectangle r = new Rectangle() { Tag = "selection", Width = 40, Height = 40, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
+
+
+						//Rectangle r = new Rectangle() { Tag = "selection", Width = 40, Height = 40, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
+						//Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
+						//Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, 100);
+
+						////don't add another selection rectangle on an existing selection rectangle
+						//Rectangle sr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 100, (int)pos.X, (int)pos.Y);
+
+						//if (sr != null) return;
+						//selectTool.SelectedTiles.Add(rr);
+						//LevelEditor_Canvas.Children.Add(r);
+
+						//SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+
+					}
 				}
 				else if (CurrentTool == EditorTool.Eraser)
 				{
@@ -748,6 +824,7 @@ namespace AmethystEngine.Forms
 					shiftpoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
 					shiftpoints[2] = shiftpoints[0];
 				}
+				
 			}
 
 
@@ -755,7 +832,7 @@ namespace AmethystEngine.Forms
 			{
 				TabControl Content_TC = (TabControl)(ContentLibrary_Control.Template.FindName("LevelEditorLibary_TabControl", ContentLibrary_Control));
 				//make sure we are in the correct tab of the level editor content libary
-				if (Content_TC.SelectedIndex == 1)
+				if (Content_TC.SelectedIndex == 1 && CurrentTool == EditorTool.Image)
 				{
 					//is there a sprite selected?
 					ListBox Sprite_LB = (ListBox)(ContentLibrary_Control.Template.FindName("SpriteLibary_LB", ContentLibrary_Control));
@@ -799,11 +876,31 @@ namespace AmethystEngine.Forms
 			}
 			else if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.GameEvent)
 			{
+				if (CurrentTool == EditorTool.Gameevent)
+				{
+					TextBlock tb = new TextBlock()
+					{
+						HorizontalAlignment = HorizontalAlignment.Center,
+						VerticalAlignment = VerticalAlignment.Center,
+						TextAlignment = TextAlignment.Center,
+						TextWrapping = TextWrapping.Wrap,
+						Width = 40,
+						Height = 40,
+						FontSize = 18,
+						Text = "N",
+						Tag = "N",
+						Foreground = new SolidColorBrush(Colors.Black),
+						Background = new SolidColorBrush(Color.FromArgb(100, 100, 100, 100)),
+					};
+					Border b = new Border() { Width = 40, Height = 40 };
+					b.Child = tb;
 
+					Canvas.SetLeft(b, (int)p.X); Canvas.SetTop(b, (int)p.Y); Canvas.SetZIndex(b, curLayer); //place the tile position wise
+					LevelEditor_Canvas.Children.Add(b); //actual place it on the canvas
+				}
 			}
 		}
-
-
+		
 		private void ContentControl_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
 			Console.WriteLine("testing");
@@ -929,7 +1026,6 @@ namespace AmethystEngine.Forms
 			}
 		}
 		
-    
     private int GetTileZIndex(TreeView treeitem)
 		{
 			//are we clicked on a spritelayer? AND a tile layer?
@@ -999,43 +1095,7 @@ namespace AmethystEngine.Forms
       p.Y -= Math.Floor(p.Y - YOff) % EditorGridHeight;
       return p;
     }
-
-		/// <summary>
-		/// paint the full map editor for TILES
-		/// </summary>
-		/// <param name="p"></param>
-		/// <param name="zindex"></param>
-    private void FullMapEditorFill(Point p, int zindex)
-    {
-			SpriteLayer curlayer = (SpriteLayer)SceneExplorer_TreeView.SelectedValue;
-			curlayer.AddToLayer(
-				((int)p.Y + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight, //current row
-				((int)p.X + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth,	 // current column
-				int.Parse(((Rectangle)SelectedTile_Canvas.Children[0]).Tag.ToString())); //the value of data 
-
-			Rectangle r = new Rectangle() { Width = 10, Height = 10, Fill = imgtilebrush };
-
-      int setX = (10 * ((int)p.X / EditorGridWidth)) + ((int)GridOffset.X);
-      int setY = (10 * ((int)p.Y / EditorGridHeight)) + ((int)GridOffset.Y);
-
-      Canvas.SetLeft(r, setX); Canvas.SetTop(r, setY); Canvas.SetZIndex(r, zindex);
-      FullMapLEditor_Canvas.Children.Add(r);
-    }
-
-		/// <summary>
-		/// Paint the full map editor for SPRITES
-		/// </summary>
-		/// <param name="spr"></param>
-		/// <param name="i"></param>
-		/// <param name="zindex"></param>
-		private void FullMapEditorFill(Sprite spr,ImageBrush i, int zindex)
-		{
-			Rectangle r = new Rectangle() { Width = 10, Height = 10, Fill = i };
-			Canvas.SetLeft(r, spr.xpos/4); Canvas.SetTop(r, spr.ypos/4); Canvas.SetZIndex(r, zindex); // divide 4 because scaling.
-			FullMapLEditor_Canvas.Children.Add(r);
-		}
-
-
+		
 		/// <summary>
 		/// This method takes care of mouse movement events on the main level editor canvas.
 		/// Panning is handled in here.
@@ -1064,50 +1124,52 @@ namespace AmethystEngine.Forms
 			{
 				LevelEditorPan();
 			}
-      if (e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Brush)
-        Canvas_MouseLeftButtonDown(sender, new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left));
-      else if (e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Move)
-      {
-				BixBite.BixBiteTypes.CardinalDirection cd = GetDCirectionalMove(p, 0);                //TODO: CHANGE THE Z INDEX TO VARIABLE
-        switch (cd)
-        {
-          //TODO: ADD the logic to change the data positions.
-          case (BixBite.BixBiteTypes.CardinalDirection.N):
-						for(int i = 0; i < selectTool.SelectedTiles.Count; i++)
-						{
-							Canvas.SetTop(selectTool.SelectedTiles[i], Canvas.GetTop(selectTool.SelectedTiles[i]) - selectTool.SelectedTiles[i].ActualWidth);
-						}
-						shiftpoints[2] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
-						break;
-          case (BixBite.BixBiteTypes.CardinalDirection.S):
-						for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
-						{
-							Canvas.SetTop(selectTool.SelectedTiles[i], Canvas.GetTop(selectTool.SelectedTiles[i]) + selectTool.SelectedTiles[i].ActualWidth);
-						}
-						shiftpoints[2] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
-            break;
-          case (BixBite.BixBiteTypes.CardinalDirection.W):
-						for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
-						{
-							Canvas.SetLeft(selectTool.SelectedTiles[i], Canvas.GetLeft(selectTool.SelectedTiles[i]) - selectTool.SelectedTiles[i].ActualWidth);
-						}
+			if (((SpriteLayer)(SceneExplorer_TreeView.SelectedValue)).layerType == LayerType.Tile)
+			{
+				if (e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Brush)
+					Canvas_MouseLeftButtonDown(sender, new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left));
+				else if (e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Move)
+				{
+					BixBite.BixBiteTypes.CardinalDirection cd = GetDCirectionalMove(p, 0);                //TODO: CHANGE THE Z INDEX TO VARIABLE
+					switch (cd)
+					{
+						//TODO: ADD the logic to change the data positions.
+						case (BixBite.BixBiteTypes.CardinalDirection.N):
+							for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
+							{
+								Canvas.SetTop(selectTool.SelectedTiles[i], Canvas.GetTop(selectTool.SelectedTiles[i]) - selectTool.SelectedTiles[i].ActualWidth);
+							}
+							shiftpoints[2] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+							break;
+						case (BixBite.BixBiteTypes.CardinalDirection.S):
+							for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
+							{
+								Canvas.SetTop(selectTool.SelectedTiles[i], Canvas.GetTop(selectTool.SelectedTiles[i]) + selectTool.SelectedTiles[i].ActualWidth);
+							}
+							shiftpoints[2] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+							break;
+						case (BixBite.BixBiteTypes.CardinalDirection.W):
+							for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
+							{
+								Canvas.SetLeft(selectTool.SelectedTiles[i], Canvas.GetLeft(selectTool.SelectedTiles[i]) - selectTool.SelectedTiles[i].ActualWidth);
+							}
 
-						shiftpoints[2] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
-            break;
-          case (BixBite.BixBiteTypes.CardinalDirection.E):
-						for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
-						{
-							Canvas.SetLeft(selectTool.SelectedTiles[i], Canvas.GetLeft(selectTool.SelectedTiles[i]) + selectTool.SelectedTiles[i].ActualWidth);
-						}
+							shiftpoints[2] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+							break;
+						case (BixBite.BixBiteTypes.CardinalDirection.E):
+							for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
+							{
+								Canvas.SetLeft(selectTool.SelectedTiles[i], Canvas.GetLeft(selectTool.SelectedTiles[i]) + selectTool.SelectedTiles[i].ActualWidth);
+							}
 
-						shiftpoints[2] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
-            break;
-        }
-      }
-      else if(e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Select)
-      {
+							shiftpoints[2] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
+							break;
+					}
+				}
+				else if (e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Select)
+				{
 					Point pp = GetGridSnapCords(SelectionRectPoints[0]);
-					
+
 					Point Snapped = RelativeGridSnap(p); //If we have then find the bottom right cords of that cell.
 					int wid = (int)GetGridSnapCords(p).X - (int)pp.X + 40;
 					int heigh = (int)GetGridSnapCords(p).Y - (int)pp.Y + 40;
@@ -1115,16 +1177,17 @@ namespace AmethystEngine.Forms
 					//the drawing, and data manuplation will have to occur on LEFTMOUSEBUTTONUP
 					Rectangle r = new Rectangle() { Tag = "selection", Width = wid, Height = heigh, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
 					r.MouseLeftButtonUp += LevelEditor_BackCanvas_MouseLeftButtonUp;
-					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, layertiles: LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 
+					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, layertiles: LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(),
 																						 zindex: curLayer, x: (int)p.X, y: (int)p.Y);
 					Canvas.SetLeft(r, (int)pp.X); Canvas.SetTop(r, (int)pp.Y); Canvas.SetZIndex(r, 100);
 					Deselect();
-					
+
 					//selectTool.SelectedTiles.Add(rr);
 					LevelEditor_Canvas.Children.Add(r);
-				//}
+					//}
 
 
+				}
 			}
 
       MPos = e.GetPosition(LevelEditor_Canvas); //set this for the iteration
@@ -1154,6 +1217,54 @@ namespace AmethystEngine.Forms
       FullMapLEditor_Canvas.Children.Add(FullMapSelection_Rect);
 
     }
+
+		private void XCellsVal_TB_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			int numval, pixval = 0;
+			if (Int32.TryParse(((TextBox)sender).Text, out numval) && Int32.TryParse(XCellsWidth_TB.Text, out pixval))
+			{
+				LevelWidth_TB.Text = (numval * pixval).ToString();
+			}
+			else LevelWidth_TB.Text = "0";
+		}
+
+		private void YCellsVal_TB_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			int numval, pixval = 0;
+			if (Int32.TryParse(((TextBox)sender).Text, out numval) && Int32.TryParse(XCellsHeight_TB.Text, out pixval))
+			{
+				LevelHeight_TB.Text = (numval * pixval).ToString();
+			}
+			else LevelHeight_TB.Text = "0";
+		}
+
+		/// <summary>
+		/// Creates a new level. This method is here to grab all the properties.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void CreateLevel_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			String LName = LevelName_TB.Text;
+			bool bLName =
+				System.Text.RegularExpressions.Regex.IsMatch(LName, @"^[A-Za-z][A-Za-z0-9]+");
+
+			if (bLName)
+			{
+				Console.WriteLine("Valid");
+				int xnum, ynum = 0;
+				if (Int32.TryParse(XCellsVal_TB.Text, out xnum))
+				{
+					if (Int32.TryParse(YCellsVal_TB.Text, out ynum))
+					{
+						CreateLevel(LName, xnum, ynum);
+						//SceneExplorer_TreeView.ItemsSource = OpenLevels;
+					}
+				}
+			}
+			else MessageBox.Show("Invalid Level name");
+
+		}
 
 		#region "Panning"
 		/// <summary>
@@ -1259,6 +1370,43 @@ namespace AmethystEngine.Forms
 
       //LevelEditor_Canvas.se
     }
+
+
+		/// <summary>
+		/// paint the full map editor for TILES
+		/// </summary>
+		/// <param name="p"></param>
+		/// <param name="zindex"></param>
+		private void FullMapEditorFill(Point p, int zindex)
+		{
+			SpriteLayer curlayer = (SpriteLayer)SceneExplorer_TreeView.SelectedValue;
+			curlayer.AddToLayer(
+				((int)p.Y + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight, //current row
+				((int)p.X + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth,  // current column
+				int.Parse(((Rectangle)SelectedTile_Canvas.Children[0]).Tag.ToString())); //the value of data 
+
+			Rectangle r = new Rectangle() { Width = 10, Height = 10, Fill = imgtilebrush };
+
+			int setX = (10 * ((int)p.X / EditorGridWidth)) + ((int)GridOffset.X);
+			int setY = (10 * ((int)p.Y / EditorGridHeight)) + ((int)GridOffset.Y);
+
+			Canvas.SetLeft(r, setX); Canvas.SetTop(r, setY); Canvas.SetZIndex(r, zindex);
+			FullMapLEditor_Canvas.Children.Add(r);
+		}
+
+		/// <summary>
+		/// Paint the full map editor for SPRITES
+		/// </summary>
+		/// <param name="spr"></param>
+		/// <param name="i"></param>
+		/// <param name="zindex"></param>
+		private void FullMapEditorFill(Sprite spr, ImageBrush i, int zindex)
+		{
+			Rectangle r = new Rectangle() { Width = 10, Height = 10, Fill = i };
+			Canvas.SetLeft(r, spr.xpos / 4); Canvas.SetTop(r, spr.ypos / 4); Canvas.SetZIndex(r, zindex); // divide 4 because scaling.
+			FullMapLEditor_Canvas.Children.Add(r);
+		}
+
 		#region "Property Hot Reloading"
 
 		#endregion
@@ -1269,15 +1417,12 @@ namespace AmethystEngine.Forms
 		{
 			CurrentTool = EditorTool.Select;
 		}
-
-		
+	
 		private void LevelEditorBrush_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentTool = EditorTool.Brush;
 		}
 
-
-		//TODO: This only works for base 40...
 		private void Fill_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentTool = EditorTool.Fill;
@@ -1309,7 +1454,524 @@ namespace AmethystEngine.Forms
 			}
 			Deselect();
 		}
+
+		private void DownLaverLevelEditor_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			//we need to make sure that we have selected a sprite layer in the tree view.
+			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
+
+			if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Tile)
+			{
+				if (selectTool.SelectedTiles.Count == 0) return;//Do we have a selected area?
+																												//is there a layer above the current to transfer the data to?
+																												//we need to get the current Sprite layer that is currently clicked.
+				int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+				if (curLayer - 1 < 0) return;
+
+				//from here all the prereqs are fulfilled so we can apply the up layer VISUALLY 
+				for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
+				{
+					Canvas.SetZIndex(selectTool.SelectedTiles[i], Canvas.GetZIndex(selectTool.SelectedTiles[i]) - 1);
+				}
+
+				//Change the data for the level objects 
+				int absrow = 0; int abscol = 0; Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
+				int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
+				int columns = (int)(RelativeGridSnap(SelectionRectPoints[1]).X - RelativeGridSnap(SelectionRectPoints[0]).X);
+				int rows = (int)(RelativeGridSnap(SelectionRectPoints[1]).Y - RelativeGridSnap(SelectionRectPoints[0]).Y);
+
+				columns /= relgridsize;
+				rows /= relgridsize;
+
+				Point begginning = RelativeGridSnap(SelectionRectPoints[0]);
+				begginning.X = (int)begginning.X; begginning.Y = (int)begginning.Y;
+				for (int i = 0; i <= columns; i++)
+				{
+					for (int j = 0; j <= rows; j++)
+					{
+						absrow = ((int)begginning.Y + (relgridsize * j) + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight;
+						abscol = ((int)begginning.X + (relgridsize * i) + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth;
+						CurrentLevel.ChangeLayer(absrow, abscol, curLayer, curLayer - 1, LayerType.Tile);
+					}
+				}
+			}
+			else if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Sprite)
+			{
+				
+			}
+			else if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.GameEvent)
+			{
+
+			}
+		}
+
+		private void UpLaverLevelEditor_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			//we need to make sure that we have selected a sprite layer in the tree view.
+			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
+			if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Tile)
+			{
+				if (selectTool.SelectedTiles.Count == 0) return;//Do we have a selected area?
+																												//is there a layer above the current to transfer the data to?
+																												//we need to get the current Sprite layer that is currently clicked.
+				int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+				if (CurrentLevel.Layers.Count - 1 == curLayer) return;
+
+				//from here all the prereqs are fulfilled so we can apply the up layer VISUALLY 
+				for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
+				{
+					Canvas.SetZIndex(selectTool.SelectedTiles[i], Canvas.GetZIndex(selectTool.SelectedTiles[i]) + 1);
+				}
+
+				//Change the data for the level objects 
+				int absrow = 0; int abscol = 0; Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
+				int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
+				int columns = (int)(RelativeGridSnap(SelectionRectPoints[1]).X - RelativeGridSnap(SelectionRectPoints[0]).X);
+				int rows = (int)(RelativeGridSnap(SelectionRectPoints[1]).Y - RelativeGridSnap(SelectionRectPoints[0]).Y);
+
+				columns /= relgridsize;
+				rows /= relgridsize;
+
+				Point begginning = RelativeGridSnap(SelectionRectPoints[0]);
+				begginning.X = (int)begginning.X; begginning.Y = (int)begginning.Y;
+				for (int i = 0; i <= columns; i++)
+				{
+					for (int j = 0; j <= rows; j++)
+					{
+						absrow = ((int)begginning.Y + (relgridsize * j) + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight;
+						abscol = ((int)begginning.X + (relgridsize * i) + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth;
+						CurrentLevel.ChangeLayer(absrow, abscol, curLayer, curLayer + 1, LayerType.Tile);
+					}
+				}
+			}
+			else if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Sprite)
+			{
+
+			}
+			else if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.GameEvent)
+			{
+
+			}
+		}
+
+		private void LevelEditorEraser_Click(object sender, RoutedEventArgs e)
+		{
+			CurrentTool = EditorTool.Eraser;
+
+		}
+
+		private void LevelEditorMove_Click(object sender, RoutedEventArgs e)
+		{
+			CurrentTool = EditorTool.Move;
+		}
+
+		private void SaveLevel_MenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+			dlg.Title = "New Level File";
+			dlg.FileName = ""; //default file name
+			dlg.Filter = "txt files (*.lvl)|*.lvl|All files (*.*)|*.*";
+			dlg.FilterIndex = 2;
+			dlg.InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Levels");
+			dlg.RestoreDirectory = true;
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+			Console.WriteLine(dlg.FileName);
+
+			List<Tuple<int, int>> celldim = new List<Tuple<int, int>>();
+
+			//layer moving test.
+			List<String> TileSetImages = new List<string>();
+			foreach (Tuple<String, String, int, int> tilesetstuple in CurrentLevel.TileSet)
+			{
+				TileSetImages.Add(tilesetstuple.Item2); //URI isn't supported so turn it local!
+				celldim.Add(new Tuple<int, int>(tilesetstuple.Item3, tilesetstuple.Item4));
+
+			}
+
+			CurrentLevel.ExportLevel(dlg.FileName + (dlg.FileName.Contains(".lvl") ? "" : ".lvl"), TileSetImages, celldim);
+		}
+
+		private async void OpenLevel_MenuItem_ClickAsync(object sender, RoutedEventArgs e)
+		{
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+			dlg.Title = "New Level File";
+			dlg.FileName = ""; //default file name
+			dlg.InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Levels");
+			dlg.Filter = "txt files (*.xml)|*.xml|All files (*.*)|*.*";
+			dlg.FilterIndex = 2;
+			dlg.RestoreDirectory = true;
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+			Console.WriteLine(dlg.FileName);
+
+			await importLevelAsync(dlg.FileName);
+
+		}
+
+		private void GameEvent_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			CurrentTool = EditorTool.Gameevent;
+		}
+
+		private void NewLevel_MenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			NewLevelData_CC.Visibility = Visibility.Visible;
+			LevelEditor_BackCanvas.Visibility = Visibility.Hidden;
+			LevelEditorStatusBar_Grid.Visibility = Visibility.Hidden;
+		}
+
+		private void Deselect()
+		{
+			//delete the selection area display. Its on zindex 100.
+			List<UIElement> ue = new List<UIElement>();
+			foreach (UIElement fe in LevelEditor_Canvas.Children)
+			{
+				int z = Canvas.GetZIndex(fe);
+				Console.WriteLine(z);
+				if (z == 100)
+				{
+					ue.Add(fe);
+				}
+			}
+
+			foreach (UIElement ueee in ue)
+			{
+				LevelEditor_Canvas.Children.Remove(ueee);
+			}
+			ue.Clear();
+			selectTool.SelectedTiles.Clear();
+		}
+
+		private void LevelEditorImage_Click(object sender, RoutedEventArgs e)
+		{
+			CurrentTool = EditorTool.Image;
+		}
+
 		#endregion
+
+		//cchanges the toolbar to the currenttool bar depedning on the tilemap tool selected
+		private void LevelEditorLibary_TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			TabControl LELibary_TC = (TabControl)ContentLibrary_Control.Template.FindName("LevelEditorLibary_TabControl", ContentLibrary_Control);
+			if (LELibary_TC.SelectedIndex == 0)
+			{
+				EditorToolBar_CC.Template = (ControlTemplate)this.TryFindResource("LevelEditorTileMapToolBar_Template");
+
+			}
+			else if (LELibary_TC.SelectedIndex == 1)
+			{
+				EditorToolBar_CC.Template = (ControlTemplate)this.TryFindResource("LevelEditorSpriteToolBar_Template");
+			}
+			else if (LELibary_TC.SelectedIndex == 2)
+			{
+				EditorToolBar_CC.Template = null;
+			}
+		}
+
+		private void RedrawLevel(Level LevelToDraw)
+		{
+			LevelEditor_Canvas.Children.Clear(); // CLEAR EVERYTHING!
+
+			//redraw each layer of the new level!
+			foreach (SpriteLayer layer in CurrentLevel.Layers)
+			{
+				int Zindex = CurrentLevel.Layers.IndexOf(layer);
+				if (layer.layerType == LayerType.Tile)
+				{
+					int[,] tilemap = (int[,])layer.LayerObjects; //tile map.
+					List<int> TileMapThresholds = new List<int>();
+					//find out the thresholds per tile map.
+					foreach (Tuple<String, String, int, int> tilesetstuple in CurrentLevel.TileSet)
+					{
+						//find out the next tile data number using the tuple
+						//this is wrong. It needs to be (imgwidth / tilewidth) * (imgHeight / tileHieght)
+						System.Drawing.Image imgTemp = System.Drawing.Image.FromFile(tilesetstuple.Item2);
+						TileMapThresholds.Add((TileMapThresholds.Count == 0 ? (imgTemp.Width / tilesetstuple.Item3) * (imgTemp.Height / tilesetstuple.Item4)
+																	: (int)TileMapThresholds.Last() + (imgTemp.Width / tilesetstuple.Item3) * (imgTemp.Height / tilesetstuple.Item4)));
+					}
+					TileMapThresholds.Insert(0, 0);
+					//scan through the 2D array of int data
+					for (int i = 0; i < tilemap.GetLength(0); i++) //rows
+					{
+						for (int j = 0; j < tilemap.GetLength(1); j++) //columns
+						{
+							//retrieve the tileset value, position to crop.
+							int CurTileData = (int)((int[,])layer.LayerObjects).GetValue(i, j);
+							if (CurTileData == -1) continue; //this indicates no tile data, so ignore.
+							int TilesetInc = 1;
+							String Tilesetpath = CurrentLevel.TileSet[0].Item2; //init the first set
+
+							//using the tile data determine the tileset that is being used. offset wise 
+							while (CurTileData > TileMapThresholds[TilesetInc]) //if cur is greater than move to the next tileset.
+							{
+								Tilesetpath = CurrentLevel.TileSet[TilesetInc].Item2;
+								TilesetInc++;
+							}
+
+							//create/get the tilebrush of the current tile.
+							imgtilebrush = null;
+
+							var pic = new System.Windows.Media.Imaging.BitmapImage();
+							pic.BeginInit();
+							pic.UriSource = new Uri(Tilesetpath); // url is from the xml
+							pic.EndInit();
+
+							int rowtilemappos;
+							int coltilemappos;
+							if (TilesetInc - 1 == 0)
+							{
+								rowtilemappos = (int)CurTileData / (pic.PixelWidth / CurrentLevel.TileSet[TilesetInc - 1].Item3);
+								coltilemappos = (int)CurTileData % (pic.PixelHeight / CurrentLevel.TileSet[TilesetInc - 1].Item4);
+							}
+							else
+							{
+								rowtilemappos = (CurTileData - TileMapThresholds[TilesetInc - 1]) / (pic.PixelWidth / CurrentLevel.TileSet[TilesetInc - 1].Item3);
+								coltilemappos = (CurTileData - TileMapThresholds[TilesetInc - 1]) % (pic.PixelHeight / CurrentLevel.TileSet[TilesetInc - 1].Item4);
+							}
+
+							//crop based on the current 
+							CroppedBitmap crop = new CroppedBitmap(pic, new Int32Rect(coltilemappos * CurrentLevel.TileSet[TilesetInc - 1].Item3,
+																															 rowtilemappos * CurrentLevel.TileSet[TilesetInc - 1].Item4,
+																															 CurrentLevel.TileSet[TilesetInc - 1].Item3,
+																															 CurrentLevel.TileSet[TilesetInc - 1].Item4));
+							Image TileBrushImage = new Image
+							{
+								Source = crop //cropped
+							};
+
+							imgtilebrush = new ImageBrush(TileBrushImage.Source);
+
+							Rectangle ToPaint = new Rectangle()
+							{
+								Width = 40,
+								Height = 40,
+								Fill = new ImageBrush(TileBrushImage.Source)
+							};
+
+							Canvas.SetLeft(ToPaint, j * 40);
+							Canvas.SetTop(ToPaint, i * 40);
+							Canvas.SetZIndex(ToPaint, Zindex);
+
+							LevelEditor_Canvas.Children.Add(ToPaint);
+
+							Rectangle r = new Rectangle() { Width = 10, Height = 10, Fill = imgtilebrush };
+
+							Canvas.SetLeft(r, j * 10); Canvas.SetTop(r, i * 10); Canvas.SetZIndex(r, Zindex);
+							FullMapLEditor_Canvas.Children.Add(r);
+							//clear memory
+							ToPaint = null;
+							crop.Source = null;
+							pic = null;
+							crop = null;
+							TileBrushImage = null;
+							ToPaint = null;
+							//paint the current tile with said brush
+						}
+						if (i % 50 == 0)
+						{
+							//GC.Collect();
+						}
+						Console.WriteLine(i);
+					}
+				}
+				else if (layer.layerType == LayerType.Sprite)
+				{
+					//the current layer is a spritelayer which contains a list of sprite objects
+					foreach (Sprite sprite in ((List<Sprite>)layer.LayerObjects))
+					{
+						BitmapImage bitmap = new BitmapImage(new Uri(sprite.ImgPathLocation, UriKind.Absolute));
+						Image img = new Image(); img.Source = bitmap;
+						Rectangle r = new Rectangle() { Width = sprite.Width, Height = sprite.Height, Fill = new ImageBrush(img.Source) };//Make a rectange teh size of the image
+
+						ContentControl CC = ((ContentControl)this.TryFindResource("MoveableImages_Template"));
+						CC.Width = sprite.Width;
+						CC.Height = sprite.Height;
+
+						Canvas.SetLeft(CC, sprite.xpos); Canvas.SetTop(CC, sprite.ypos); Canvas.SetZIndex(CC, Zindex);
+						Selector.SetIsSelected(CC, false);
+						CC.MouseRightButtonDown += ContentControl_MouseLeftButtonDown;
+						((Rectangle)CC.Content).Fill = new ImageBrush(img.Source);
+						LevelEditor_Canvas.Children.Add(CC);
+					}
+				}
+				else if (layer.layerType == LayerType.GameEvent)
+				{
+					Console.WriteLine("Gameevent");
+				}
+				Zindex++;
+			}
+		}
+
+		private void importLevel(String filename)
+		{
+			CurrentLevel = ((Level.ImportLevel(filename)));
+			OpenLevels.Add(CurrentLevel);
+			//change focus:
+			SceneExplorer_TreeView.ItemsSource = OpenLevels;
+			SceneExplorer_TreeView.Items.Refresh();
+			SceneExplorer_TreeView.UpdateLayout();
+
+			NewLevelData_CC.Visibility = Visibility.Hidden;
+			LevelEditor_BackCanvas.Visibility = Visibility.Visible;
+			LevelEditorStatusBar_Grid.Visibility = Visibility.Visible;
+			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).IsEnabled = true;
+			LevelEditor_Canvas.IsEnabled = true;
+			ContentLibaryImport_BTN.IsEnabled = true;
+			TileSets_CB.Items.Clear(); //remove the past data.
+
+			//tilemaps
+			foreach (Tuple<String, String, int, int> tilesetTuples in CurrentLevel.TileSet)
+			{
+
+				Image image = new Image();
+				var pic = new System.Windows.Media.Imaging.BitmapImage();
+				pic.BeginInit();
+				pic.UriSource = new Uri(tilesetTuples.Item2); // url is from the xml
+				pic.EndInit();
+
+				System.Drawing.Image img = System.Drawing.Image.FromFile(tilesetTuples.Item2);
+				image.Source = pic;
+				image.Width = img.Width;
+				image.Height = img.Height;
+
+				int len = pic.UriSource.ToString().LastIndexOf('.') - pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' });
+				String Name = pic.UriSource.ToString().Substring(pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
+
+				TileSets_CB.Items.Add(Name);
+
+				//CreateTileMap(tilesetTuples.Item2, tilesetTuples.Item3, tilesetTuples.Item4);
+			}
+
+			foreach (Tuple<string, string> t in CurrentLevel.sprites)
+			{
+				SpriteObjectList.Add(new EditorObject(t.Item2, t.Item1, false));
+			}
+			ListBox SpriteLibary_LB = (ListBox)ContentLibrary_Control.Template.FindName("SpriteLibary_LB", ContentLibrary_Control);
+			SpriteLibary_LB.ItemsSource = null;
+			SpriteLibary_LB.ItemsSource = SpriteObjectList;
+
+			TileSets_CB.SelectedIndex = 0;
+			//draw the level
+			RedrawLevel(CurrentLevel);
+
+			//set visabilty. 
+			Grid Prob_Grid = (Grid)ContentLibrary_Control.Template.FindName("TileSetProperties_Grid", ContentLibrary_Control);
+			Prob_Grid.Visibility = Visibility.Hidden;
+			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).Visibility = Visibility.Visible;
+			((ComboBox)ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control)).Visibility = Visibility.Visible;
+			((Label)ContentLibrary_Control.Template.FindName("TileSet_LBL", ContentLibrary_Control)).Visibility = Visibility.Visible;
+		}
+
+		private async System.Threading.Tasks.Task importLevelAsync(String filename)
+		{
+			CurrentLevel = ((await Level.ImportLevelAsync(filename)));
+			OpenLevels.Add(CurrentLevel);
+			//change focus:
+			SceneExplorer_TreeView.ItemsSource = OpenLevels;
+			SceneExplorer_TreeView.Items.Refresh();
+			SceneExplorer_TreeView.UpdateLayout();
+
+			NewLevelData_CC.Visibility = Visibility.Hidden;
+			LevelEditor_BackCanvas.Visibility = Visibility.Visible;
+			LevelEditorStatusBar_Grid.Visibility = Visibility.Visible;
+			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).IsEnabled = true;
+			LevelEditor_Canvas.IsEnabled = true;
+			ContentLibaryImport_BTN.IsEnabled = true;
+			TileSets_CB.Items.Clear(); //remove the past data.
+
+			//tilemaps
+			foreach (Tuple<String, String, int, int> tilesetTuples in CurrentLevel.TileSet)
+			{
+
+				Image image = new Image();
+				var pic = new System.Windows.Media.Imaging.BitmapImage();
+				pic.BeginInit();
+				pic.UriSource = new Uri(tilesetTuples.Item2); // url is from the xml
+				pic.EndInit();
+
+				System.Drawing.Image img = System.Drawing.Image.FromFile(tilesetTuples.Item2);
+				image.Source = pic;
+				image.Width = img.Width;
+				image.Height = img.Height;
+
+				int len = pic.UriSource.ToString().LastIndexOf('.') - pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' });
+				String Name = pic.UriSource.ToString().Substring(pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
+
+				TileSets_CB.Items.Add(Name);
+
+				//CreateTileMap(tilesetTuples.Item2, tilesetTuples.Item3, tilesetTuples.Item4);
+			}
+			TileSets_CB.SelectedIndex = 0;
+			//draw the level
+			RedrawLevel(CurrentLevel);
+
+			//set visabilty. 
+			Grid Prob_Grid = (Grid)ContentLibrary_Control.Template.FindName("TileSetProperties_Grid", ContentLibrary_Control);
+			Prob_Grid.Visibility = Visibility.Hidden;
+			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).Visibility = Visibility.Visible;
+			((ComboBox)ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control)).Visibility = Visibility.Visible;
+			((Label)ContentLibrary_Control.Template.FindName("TileSet_LBL", ContentLibrary_Control)).Visibility = Visibility.Visible;
+		}
+		
+		private void CreateLevel(String LevelName, int XCellsVal, int YCellsVal)
+		{
+			//create new Level
+			Level TempLevel = new Level(LevelName);
+			SpriteLayer TempLevelChild = new SpriteLayer(LayerType.Tile, TempLevel) { LayerName = "Background" };
+			TempLevelChild.DefineLayerDataType(LayerType.Tile, XCellsVal, YCellsVal);
+			TempLevel.Layers.Add(TempLevelChild);
+			TempLevelChild = new SpriteLayer(LayerType.GameEvent, TempLevel) { LayerName = "Collision" };
+			TempLevelChild.DefineLayerDataType(LayerType.GameEvent, XCellsVal, YCellsVal);
+			TempLevel.Layers.Add(TempLevelChild);
+			TempLevelChild = new SpriteLayer(LayerType.Sprite, TempLevel) { LayerName = "Sprite" };
+			TempLevelChild.DefineLayerDataType(LayerType.Sprite, XCellsVal, YCellsVal);
+			TempLevel.Layers.Add(TempLevelChild);
+
+			TempLevel.xCells = XCellsVal;
+			TempLevel.yCells = YCellsVal;
+
+			CurrentLevel = TempLevel;
+
+			//change focus:
+			OpenLevels.Add(TempLevel);
+			SceneExplorer_TreeView.ItemsSource = OpenLevels;
+			SceneExplorer_TreeView.Items.Refresh();
+			SceneExplorer_TreeView.UpdateLayout();
+
+			NewLevelData_CC.Visibility = Visibility.Hidden;
+			LevelEditor_BackCanvas.Visibility = Visibility.Visible;
+			LevelEditorStatusBar_Grid.Visibility = Visibility.Visible;
+			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).IsEnabled = true;
+			LevelEditor_Canvas.IsEnabled = true;
+			ContentLibaryImport_BTN.IsEnabled = true;
+
+			LEditorTS = new List<LevelEditorProp>()
+			{
+				new LevelEditorProp(){ PropertyName = "Level Name", PropertyData="Default" },
+				new LevelEditorProp(){ PropertyName = "Map Width(cells)", PropertyData="30" },
+				new LevelEditorProp(){ PropertyName = "Map Height(cells)", PropertyData="50" },
+				//new LevelEditorProp("test 2")								
+			};
+		}
 		#endregion
 
 		#region "Content Library"
@@ -1484,7 +2146,21 @@ namespace AmethystEngine.Forms
 		#endregion
 
 		#region "Scene Viewer"
-
+		//TODO: make it work with background tile grid sizes.
+		private void AddTileLayer_Click(object sender, RoutedEventArgs e)
+		{
+			Level TempLevel = ((Level)SceneExplorer_TreeView.SelectedValue);
+			TempLevel.AddLayer("new tile", LayerType.Tile);
+			TempLevel.Layers.Last().DefineLayerDataType(LayerType.Tile, TempLevel.xCells, TempLevel.yCells);
+		}
+		private void SpriteLayer_Click(object sender, RoutedEventArgs e)
+		{
+			((Level)SceneExplorer_TreeView.SelectedValue).AddLayer("new sprite", LayerType.Sprite);
+		}
+		private void GameObjectLayer_Click(object sender, RoutedEventArgs e)
+		{
+			((Level)SceneExplorer_TreeView.SelectedValue).AddLayer("new GOL", LayerType.GameEvent);
+		}
 		#endregion
 
 		#region GetImageFromCanvas
@@ -1535,11 +2211,7 @@ namespace AmethystEngine.Forms
       return null;
     }
 
-    private void ProjectSettingsMenuItem_Click(object sender, RoutedEventArgs e)
-    {
-      Window w = new ProjectSettings(ProjectFilePath);
-      w.Show();
-    }
+    
     
     public void ProcessOutputDataHandler(object sendingProcess, DataReceivedEventArgs outLine)
     {
@@ -1557,57 +2229,7 @@ namespace AmethystEngine.Forms
 
       }
     }
-
-		private void NewLevel_MenuItem_Click(object sender, RoutedEventArgs e)
-		{
-			NewLevelData_CC.Visibility = Visibility.Visible;
-			LevelEditor_BackCanvas.Visibility = Visibility.Hidden;
-			LevelEditorStatusBar_Grid.Visibility = Visibility.Hidden;
-		}
-
-		private void CreateLevel(String LevelName, int XCellsVal, int YCellsVal)
-		{
-			//create new Level
-			Level TempLevel = new Level(LevelName);
-			SpriteLayer TempLevelChild = new SpriteLayer(LayerType.Tile, TempLevel) { LayerName = "Background" };
-			TempLevelChild.DefineLayerDataType(LayerType.Tile, XCellsVal, YCellsVal);
-			TempLevel.Layers.Add(TempLevelChild);
-			TempLevelChild = new SpriteLayer(LayerType.GameEvent, TempLevel) { LayerName = "Collision" };
-			TempLevelChild.DefineLayerDataType(LayerType.GameEvent, XCellsVal, YCellsVal);
-			TempLevel.Layers.Add(TempLevelChild);
-			TempLevelChild = new SpriteLayer(LayerType.Sprite, TempLevel) { LayerName = "Sprite" };
-			TempLevelChild.DefineLayerDataType(LayerType.Sprite, XCellsVal, YCellsVal);
-			TempLevel.Layers.Add(TempLevelChild);
-
-			TempLevel.xCells = XCellsVal;
-			TempLevel.yCells = YCellsVal;
-
-			CurrentLevel = TempLevel;
-
-			//change focus:
-			OpenLevels.Add(TempLevel);
-			SceneExplorer_TreeView.ItemsSource = OpenLevels;
-			SceneExplorer_TreeView.Items.Refresh();
-			SceneExplorer_TreeView.UpdateLayout();
-			
-			NewLevelData_CC.Visibility = Visibility.Hidden;
-			LevelEditor_BackCanvas.Visibility = Visibility.Visible;
-			LevelEditorStatusBar_Grid.Visibility = Visibility.Visible;
-			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).IsEnabled = true;
-			LevelEditor_Canvas.IsEnabled = true;
-			ContentLibaryImport_BTN.IsEnabled = true;
-
-			LEditorTS = new List<LevelEditorProp>()
-			{
-				new LevelEditorProp(){ PropertyName = "Level Name", PropertyData="Default" },
-				new LevelEditorProp(){ PropertyName = "Map Width(cells)", PropertyData="30" },
-				new LevelEditorProp(){ PropertyName = "Map Height(cells)", PropertyData="50" },
-				//new LevelEditorProp("test 2")								
-			};
-
-
-		}
-
+		
 		public static TreeViewItem FindTviFromObjectRecursive(ItemsControl ic, object o)
 		{
 			//Search for the object model in first level children (recursively)
@@ -1623,56 +2245,7 @@ namespace AmethystEngine.Forms
 			}
 			return null;
 		}
-
-		/// <summary>
-		/// Creates a new level. This method is here to grab all the properties.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void CreateLevel_BTN_Click(object sender, RoutedEventArgs e)
-		{
-			String LName = LevelName_TB.Text;
-			bool bLName =
-				System.Text.RegularExpressions.Regex.IsMatch(LName, @"^[A-Za-z][A-Za-z0-9]+");
-
-			if (bLName)
-			{
-				Console.WriteLine("Valid");
-				int xnum, ynum = 0;
-				if (Int32.TryParse(XCellsVal_TB.Text, out xnum))
-				{
-					if (Int32.TryParse(YCellsVal_TB.Text, out ynum))
-					{
-						CreateLevel(LName,xnum, ynum);
-						//SceneExplorer_TreeView.ItemsSource = OpenLevels;
-					}
-				}
-			}
-			else MessageBox.Show("Invalid Level name");
-
-		}
 		
-
-		private void XCellsVal_TB_TextChanged(object sender, TextChangedEventArgs e)
-		{
-			int numval, pixval = 0;
-			if(Int32.TryParse(((TextBox)sender).Text, out numval) && Int32.TryParse(XCellsWidth_TB.Text, out pixval))
-			{
-				LevelWidth_TB.Text = (numval * pixval).ToString();
-			}
-			else LevelWidth_TB.Text = "0";
-		}
-
-		private void YCellsVal_TB_TextChanged(object sender, TextChangedEventArgs e)
-		{
-			int numval, pixval = 0;
-			if (Int32.TryParse(((TextBox)sender).Text, out numval) && Int32.TryParse(XCellsHeight_TB.Text, out pixval))
-			{
-				LevelHeight_TB.Text = (numval * pixval).ToString();
-			}
-			else LevelHeight_TB.Text = "0";
-		}
-
 		private void SceneExplorer_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			Console.WriteLine("Changed Scene Object");
@@ -1763,25 +2336,7 @@ namespace AmethystEngine.Forms
 				}
 			}
 		}
-
-		//TODO: make it work with background tile grid sizes.
-		private void AddTileLayer_Click(object sender, RoutedEventArgs e)
-		{
-			Level TempLevel = ((Level)SceneExplorer_TreeView.SelectedValue);
-			TempLevel.AddLayer("new tile", LayerType.Tile); 
-			TempLevel.Layers.Last().DefineLayerDataType(LayerType.Tile, TempLevel.xCells, TempLevel.yCells);
-		}
-		private void SpriteLayer_Click(object sender, RoutedEventArgs e)
-		{
-			((Level)SceneExplorer_TreeView.SelectedValue).AddLayer("new sprite", LayerType.Sprite); 
-		}
-		private void GameObjectLayer_Click(object sender, RoutedEventArgs e)
-		{
-			((Level)SceneExplorer_TreeView.SelectedValue).AddLayer("new GOL", LayerType.GameEvent);
-		}
-
 		
-
     private void Test_Click(object sender, RoutedEventArgs e)
 		{
 			//moving test
@@ -1799,142 +2354,7 @@ namespace AmethystEngine.Forms
 			RedrawLevel(CurrentLevel);
 
 		}
-
-		private void RedrawLevel(Level LevelToDraw)
-		{
-			LevelEditor_Canvas.Children.Clear(); // CLEAR EVERYTHING!
-
-			//redraw each layer of the new level!
-			foreach(SpriteLayer layer in CurrentLevel.Layers)
-			{
-				int Zindex = CurrentLevel.Layers.IndexOf(layer);
-				if(layer.layerType == LayerType.Tile)
-				{
-					int[,] tilemap = (int[,])layer.LayerObjects; //tile map.
-					List<int> TileMapThresholds = new List<int>();
-					//find out the thresholds per tile map.
-					foreach (Tuple<String, String, int, int> tilesetstuple in CurrentLevel.TileSet)
-					{
-						//find out the next tile data number using the tuple
-						//this is wrong. It needs to be (imgwidth / tilewidth) * (imgHeight / tileHieght)
-						System.Drawing.Image imgTemp = System.Drawing.Image.FromFile(tilesetstuple.Item2);
-						TileMapThresholds.Add((TileMapThresholds.Count == 0 ? (imgTemp.Width / tilesetstuple.Item3) * (imgTemp.Height / tilesetstuple.Item4)
-																	: (int)TileMapThresholds.Last() + (imgTemp.Width / tilesetstuple.Item3) * (imgTemp.Height / tilesetstuple.Item4)));
-					}
-					TileMapThresholds.Insert(0, 0);
-					//scan through the 2D array of int data
-					for (int i = 0; i < tilemap.GetLength(0); i++) //rows
-					{
-						for(int j =0; j < tilemap.GetLength(1); j++) //columns
-						{
-							//retrieve the tileset value, position to crop.
-							int CurTileData = (int)((int[,])layer.LayerObjects).GetValue(i, j);
-							if (CurTileData == -1) continue; //this indicates no tile data, so ignore.
-							int TilesetInc = 1;
-							String Tilesetpath = CurrentLevel.TileSet[0].Item2; //init the first set
-
-							//using the tile data determine the tileset that is being used. offset wise 
-							while (CurTileData > TileMapThresholds[TilesetInc]) //if cur is greater than move to the next tileset.
-							{
-								Tilesetpath = CurrentLevel.TileSet[TilesetInc].Item2;
-								TilesetInc++;
-							}
-
-							//create/get the tilebrush of the current tile.
-							imgtilebrush = null;
-							
-							var pic = new System.Windows.Media.Imaging.BitmapImage();
-							pic.BeginInit();
-							pic.UriSource = new Uri(Tilesetpath); // url is from the xml
-							pic.EndInit();
-
-							int rowtilemappos;
-							int coltilemappos;
-							if (TilesetInc-1 == 0)
-							{
-								rowtilemappos = (int)CurTileData / (pic.PixelWidth / CurrentLevel.TileSet[TilesetInc - 1].Item3);
-								coltilemappos = (int)CurTileData % (pic.PixelHeight / CurrentLevel.TileSet[TilesetInc - 1].Item4);
-							}
-							else
-							{
-								rowtilemappos = (CurTileData - TileMapThresholds[TilesetInc - 1] ) / (pic.PixelWidth / CurrentLevel.TileSet[TilesetInc - 1].Item3);
-								coltilemappos = (CurTileData - TileMapThresholds[TilesetInc - 1]) % (pic.PixelHeight / CurrentLevel.TileSet[TilesetInc - 1].Item4);
-							}
-
-							//crop based on the current 
-							CroppedBitmap crop = new CroppedBitmap(pic, new Int32Rect(coltilemappos * CurrentLevel.TileSet[TilesetInc-1].Item3,
-																															 rowtilemappos * CurrentLevel.TileSet[TilesetInc-1].Item4,
-																															 CurrentLevel.TileSet[TilesetInc-1].Item3,
-																															 CurrentLevel.TileSet[TilesetInc-1].Item4));
-							Image TileBrushImage = new Image
-							{
-								Source = crop //cropped
-							};
-
-							imgtilebrush = new ImageBrush(TileBrushImage.Source);
-
-							Rectangle ToPaint = new Rectangle()
-							{
-								Width = 40,
-								Height = 40,
-								Fill = new ImageBrush(TileBrushImage.Source)
-							};
-
-							Canvas.SetLeft(ToPaint, j*40);
-							Canvas.SetTop(ToPaint, i*40);
-							Canvas.SetZIndex(ToPaint, Zindex);
-
-							LevelEditor_Canvas.Children.Add(ToPaint);
-
-							Rectangle r = new Rectangle() { Width = 10, Height = 10, Fill = imgtilebrush };
-							
-							Canvas.SetLeft(r, j * 10); Canvas.SetTop(r, i * 10); Canvas.SetZIndex(r, Zindex);
-							FullMapLEditor_Canvas.Children.Add(r);
-							//clear memory
-							ToPaint = null;
-							crop.Source = null;
-							pic = null;
-							crop = null;
-							TileBrushImage = null;
-							ToPaint = null;
-							//paint the current tile with said brush
-						}
-						if (i % 50 ==0)
-						{
-							//GC.Collect();
-						}
-						Console.WriteLine(i);
-					}
-				}
-				else if (layer.layerType == LayerType.Sprite)
-				{
-					//the current layer is a spritelayer which contains a list of sprite objects
-					foreach (Sprite sprite in ((List<Sprite>)layer.LayerObjects))
-					{
-						BitmapImage bitmap = new BitmapImage(new Uri(sprite.ImgPathLocation, UriKind.Absolute));
-						Image img = new Image(); img.Source = bitmap;
-						Rectangle r = new Rectangle() { Width = sprite.Width, Height = sprite.Height, Fill = new ImageBrush(img.Source) };//Make a rectange teh size of the image
-
-						ContentControl CC = ((ContentControl)this.TryFindResource("MoveableImages_Template"));
-						CC.Width = sprite.Width;
-						CC.Height = sprite.Height;
-
-						Canvas.SetLeft(CC, sprite.xpos); Canvas.SetTop(CC, sprite.ypos); Canvas.SetZIndex(CC, Zindex);
-						Selector.SetIsSelected(CC, false);
-						CC.MouseRightButtonDown += ContentControl_MouseLeftButtonDown;
-						((Rectangle)CC.Content).Fill = new ImageBrush(img.Source);
-						LevelEditor_Canvas.Children.Add(CC);
-					}
-				}
-				else if (layer.layerType == LayerType.GameEvent)
-				{
-					Console.WriteLine("Gameevent");
-				}
-				Zindex++;
-			}
-		}
-
-
+		
 		//this is methods that im working now... they suck for now.
 		#region "WIP"
 
@@ -1964,117 +2384,7 @@ namespace AmethystEngine.Forms
 
 			return false;
 		}
-
-		private void DownLaverLevelEditor_BTN_Click(object sender, RoutedEventArgs e)
-		{
-			//we need to make sure that we have selected a sprite layer in the tree view.
-			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
-			if (selectTool.SelectedTiles.Count == 0) return;//Do we have a selected area?
-																											//is there a layer above the current to transfer the data to?
-																											//we need to get the current Sprite layer that is currently clicked.
-			int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
-			if (curLayer -1 < 0) return;
-
-			//from here all the prereqs are fulfilled so we can apply the up layer VISUALLY 
-			for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
-			{
-				Canvas.SetZIndex(selectTool.SelectedTiles[i], Canvas.GetZIndex(selectTool.SelectedTiles[i]) - 1);
-			}
-			
-			//Change the data for the level objects 
-			int absrow = 0; int abscol = 0; Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
-			int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
-			int columns = (int)(RelativeGridSnap(SelectionRectPoints[1]).X - RelativeGridSnap(SelectionRectPoints[0]).X);
-			int rows = (int)(RelativeGridSnap(SelectionRectPoints[1]).Y - RelativeGridSnap(SelectionRectPoints[0]).Y);
-
-			columns /= relgridsize;
-			rows /= relgridsize;
-
-			Point begginning = RelativeGridSnap(SelectionRectPoints[0]);
-			begginning.X = (int)begginning.X; begginning.Y = (int)begginning.Y;
-			for (int i = 0; i <= columns; i++)
-			{
-				for (int j = 0; j <= rows; j++)
-				{
-					absrow = ((int)begginning.Y + (relgridsize * j) + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight;
-					abscol = ((int)begginning.X + (relgridsize * i)+ (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth;
-					CurrentLevel.ChangeLayer(absrow, abscol, curLayer, curLayer - 1, LayerType.Tile);
-				}
-			}
-		}
-
-		private void UpLaverLevelEditor_BTN_Click(object sender, RoutedEventArgs e)
-		{
-			//we need to make sure that we have selected a sprite layer in the tree view.
-			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
-			if (selectTool.SelectedTiles.Count == 0) return;//Do we have a selected area?
-			//is there a layer above the current to transfer the data to?
-			//we need to get the current Sprite layer that is currently clicked.
-			int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
-			if (CurrentLevel.Layers.Count - 1 == curLayer) return;
-
-			//from here all the prereqs are fulfilled so we can apply the up layer VISUALLY 
-			for(int i = 0; i < selectTool.SelectedTiles.Count; i++)
-			{
-				Canvas.SetZIndex(selectTool.SelectedTiles[i], Canvas.GetZIndex(selectTool.SelectedTiles[i])+ 1);
-			}
-
-			//Change the data for the level objects 
-			int absrow = 0; int abscol = 0; Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_BackCanvas));
-			int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
-			int columns = (int)(RelativeGridSnap(SelectionRectPoints[1]).X - RelativeGridSnap(SelectionRectPoints[0]).X);
-			int rows = (int)(RelativeGridSnap(SelectionRectPoints[1]).Y - RelativeGridSnap(SelectionRectPoints[0]).Y);
-
-			columns /= relgridsize;
-			rows /= relgridsize;
-
-			Point begginning = RelativeGridSnap(SelectionRectPoints[0]);
-			begginning.X = (int)begginning.X; begginning.Y = (int)begginning.Y;
-			for (int i = 0; i <= columns; i++)
-			{
-				for (int j = 0; j <= rows; j++)
-				{
-					absrow = ((int)begginning.Y + (relgridsize * j) + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight;
-					abscol = ((int)begginning.X + (relgridsize * i) + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth;
-					CurrentLevel.ChangeLayer(absrow, abscol, curLayer, curLayer + 1, LayerType.Tile);
-				}
-			}
-
-		}
-
-		private void LevelEditorEraser_Click(object sender, RoutedEventArgs e)
-		{
-			CurrentTool = EditorTool.Eraser;
-
-		}
-
-		private void LevelEditorMove_Click(object sender, RoutedEventArgs e)
-		{
-			CurrentTool = EditorTool.Move;
-		}
-
-		private void Deselect()
-		{
-			//delete the selection area display. Its on zindex 100.
-			List<UIElement> ue = new List<UIElement>();
-			foreach (UIElement fe in LevelEditor_Canvas.Children)
-			{
-				int z = Canvas.GetZIndex(fe);
-				Console.WriteLine(z);
-				if (z == 100)
-				{
-					ue.Add(fe);
-				}
-			}
-
-			foreach (UIElement ueee in ue)
-			{
-				LevelEditor_Canvas.Children.Remove(ueee);
-			}
-			ue.Clear();
-			selectTool.SelectedTiles.Clear();
-		}
-
+		
     /// <summary>
     /// this method is here to determine whether the user has moved to the next cell.
     /// </summary>
@@ -2122,227 +2432,6 @@ namespace AmethystEngine.Forms
 			MessageBox.Show("WIP Not ready yet...");
 		}
 
-		private void SaveLevel_MenuItem_Click(object sender, RoutedEventArgs e)
-		{
-			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-			dlg.Title = "New Level File";
-			dlg.FileName = ""; //default file name
-			dlg.Filter = "txt files (*.lvl)|*.lvl|All files (*.*)|*.*";
-			dlg.FilterIndex = 2;
-			dlg.InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Levels");
-			dlg.RestoreDirectory = true;
-
-			Nullable<bool> result = dlg.ShowDialog();
-			// Process save file dialog box results
-			string filename = "";
-			if (result == true)
-			{
-				// Save document
-				filename = dlg.FileName;
-				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
-			}
-			else return; //invalid name
-			Console.WriteLine(dlg.FileName);
-
-			List<Tuple<int, int>> celldim = new List<Tuple<int, int>>();
-
-			//layer moving test.
-			List<String> TileSetImages = new List<string>();
-			foreach (Tuple<String, String, int, int> tilesetstuple in CurrentLevel.TileSet)
-			{
-				TileSetImages.Add(tilesetstuple.Item2); //URI isn't supported so turn it local!
-				celldim.Add(new Tuple<int, int>(tilesetstuple.Item3, tilesetstuple.Item4));
-
-			}
-
-			CurrentLevel.ExportLevel(dlg.FileName + (dlg.FileName.Contains(".lvl") ? "" : ".lvl"), TileSetImages, celldim);
-		}
-
-		private async void OpenLevel_MenuItem_ClickAsync(object sender, RoutedEventArgs e)
-		{
-			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-			dlg.Title = "New Level File";
-			dlg.FileName = ""; //default file name
-			dlg.InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Levels");
-			dlg.Filter = "txt files (*.xml)|*.xml|All files (*.*)|*.*";
-			dlg.FilterIndex = 2;
-			dlg.RestoreDirectory = true;
-
-			Nullable<bool> result = dlg.ShowDialog();
-			// Process save file dialog box results
-			string filename = "";
-			if (result == true)
-			{
-				// Save document
-				filename = dlg.FileName;
-				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
-			}
-			else return; //invalid name
-			Console.WriteLine(dlg.FileName);
-
-			await importLevelAsync(dlg.FileName);
-
-		}
-
-		private void importLevel(String filename)
-		{
-			CurrentLevel = ((Level.ImportLevel(filename)));
-			OpenLevels.Add(CurrentLevel);
-			//change focus:
-			SceneExplorer_TreeView.ItemsSource = OpenLevels;
-			SceneExplorer_TreeView.Items.Refresh();
-			SceneExplorer_TreeView.UpdateLayout();
-
-			NewLevelData_CC.Visibility = Visibility.Hidden;
-			LevelEditor_BackCanvas.Visibility = Visibility.Visible;
-			LevelEditorStatusBar_Grid.Visibility = Visibility.Visible;
-			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).IsEnabled = true;
-			LevelEditor_Canvas.IsEnabled = true;
-			ContentLibaryImport_BTN.IsEnabled = true;
-			TileSets_CB.Items.Clear(); //remove the past data.
-
-			//tilemaps
-			foreach (Tuple<String, String, int, int> tilesetTuples in CurrentLevel.TileSet)
-			{
-
-				Image image = new Image();
-				var pic = new System.Windows.Media.Imaging.BitmapImage();
-				pic.BeginInit();
-				pic.UriSource = new Uri(tilesetTuples.Item2); // url is from the xml
-				pic.EndInit();
-
-				System.Drawing.Image img = System.Drawing.Image.FromFile(tilesetTuples.Item2);
-				image.Source = pic;
-				image.Width = img.Width;
-				image.Height = img.Height;
-
-				int len = pic.UriSource.ToString().LastIndexOf('.') - pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' });
-				String Name = pic.UriSource.ToString().Substring(pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
-
-				TileSets_CB.Items.Add(Name);
-
-				//CreateTileMap(tilesetTuples.Item2, tilesetTuples.Item3, tilesetTuples.Item4);
-			}
-
-			foreach (Tuple<string,string> t in CurrentLevel.sprites)
-			{
-				SpriteObjectList.Add(new EditorObject(t.Item2, t.Item1, false));
-			}
-			ListBox SpriteLibary_LB = (ListBox)ContentLibrary_Control.Template.FindName("SpriteLibary_LB", ContentLibrary_Control);
-			SpriteLibary_LB.ItemsSource = null;
-			SpriteLibary_LB.ItemsSource = SpriteObjectList;
-			
-			TileSets_CB.SelectedIndex = 0;
-			//draw the level
-			RedrawLevel(CurrentLevel);
-
-			//set visabilty. 
-			Grid Prob_Grid = (Grid)ContentLibrary_Control.Template.FindName("TileSetProperties_Grid", ContentLibrary_Control);
-			Prob_Grid.Visibility = Visibility.Hidden;
-			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).Visibility = Visibility.Visible;
-			((ComboBox)ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control)).Visibility = Visibility.Visible;
-			((Label)ContentLibrary_Control.Template.FindName("TileSet_LBL", ContentLibrary_Control)).Visibility = Visibility.Visible;
-		}
-
-		private async System.Threading.Tasks.Task importLevelAsync(String filename)
-		{
-			CurrentLevel = ((await Level.ImportLevelAsync(filename)));
-			OpenLevels.Add(CurrentLevel);
-			//change focus:
-			SceneExplorer_TreeView.ItemsSource = OpenLevels;
-			SceneExplorer_TreeView.Items.Refresh();
-			SceneExplorer_TreeView.UpdateLayout();
-
-			NewLevelData_CC.Visibility = Visibility.Hidden;
-			LevelEditor_BackCanvas.Visibility = Visibility.Visible;
-			LevelEditorStatusBar_Grid.Visibility = Visibility.Visible;
-			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).IsEnabled = true;
-			LevelEditor_Canvas.IsEnabled = true;
-			ContentLibaryImport_BTN.IsEnabled = true;
-			TileSets_CB.Items.Clear(); //remove the past data.
-
-			//tilemaps
-			foreach (Tuple<String, String, int, int> tilesetTuples in CurrentLevel.TileSet)
-			{
-
-				Image image = new Image();
-				var pic = new System.Windows.Media.Imaging.BitmapImage();
-				pic.BeginInit();
-				pic.UriSource = new Uri(tilesetTuples.Item2); // url is from the xml
-				pic.EndInit();
-
-				System.Drawing.Image img = System.Drawing.Image.FromFile(tilesetTuples.Item2);
-				image.Source = pic;
-				image.Width = img.Width;
-				image.Height = img.Height;
-
-				int len = pic.UriSource.ToString().LastIndexOf('.') - pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' });
-				String Name = pic.UriSource.ToString().Substring(pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
-
-				TileSets_CB.Items.Add(Name);
-
-				//CreateTileMap(tilesetTuples.Item2, tilesetTuples.Item3, tilesetTuples.Item4);
-			}
-			TileSets_CB.SelectedIndex = 0;
-			//draw the level
-			RedrawLevel(CurrentLevel);
-
-			//set visabilty. 
-			Grid Prob_Grid = (Grid)ContentLibrary_Control.Template.FindName("TileSetProperties_Grid", ContentLibrary_Control);
-			Prob_Grid.Visibility = Visibility.Hidden;
-			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).Visibility = Visibility.Visible;
-			((ComboBox)ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control)).Visibility = Visibility.Visible;
-			((Label)ContentLibrary_Control.Template.FindName("TileSet_LBL", ContentLibrary_Control)).Visibility = Visibility.Visible;
-		}
-
-		/// <summary>
-		/// imports files to the current games content folder.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void ContentExplorerImport_BTN_Click(object sender, RoutedEventArgs e)
-		{
-
-			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-			dlg.FileName = "assets"; //default file 
-			dlg.Title = "Import New Assest";
-			dlg.DefaultExt = "All files (*.*)|*.*"; //default file extension
-			dlg.Filter = "Level files (*.lvl)|*.lvl|png file (*.png)|*.png|All files (*.*)|*.*";
-
-			// Show save file dialog box
-			Nullable<bool> result = dlg.ShowDialog();
-			// Process save file dialog box results kicks out if the user doesn't select an item.
-			String importfilename, destfilename = "";
-			if (result == true)
-			{
-				importfilename = dlg.FileName;
-				
-			}
-			else
-				return;
-
-			String importendlocation, importstartlocation = "";
-			importendlocation = ProjectFilePath.Replace(".gem", "_Game\\Content\\");
-			importstartlocation = dlg.FileName;
-
-			//filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
-			int len = importstartlocation.Length - importstartlocation.LastIndexOfAny(new char[] { '/', '\\' });
-			destfilename = importendlocation + importstartlocation.Substring(
-				importstartlocation.LastIndexOfAny(new char[] { '\\', '/' }) + 1, len-1);
-
-			//copy the file
-			File.Copy(importfilename, destfilename, true);
-			//LoadInitalVars();
-			LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\")); //reload the project to show the new file.
-
-			Titles.Add(new EditorObject(destfilename, importstartlocation.Substring(
-				importstartlocation.LastIndexOfAny(new char[] { '\\', '/' }) + 1, len - 1), true ,EObjectType.File));
-
-			SearchResultList.ItemsSource = null;
-			SearchResultList.ItemsSource = Titles;
-
-		}
-
 		private void SearchResultList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 			//double clicked
@@ -2353,25 +2442,6 @@ namespace AmethystEngine.Forms
 		private void SaveCurrentProject_Click(object sender, RoutedEventArgs e)
 		{
 
-		}
-
-		//cchanges the toolbar to the currenttool bar depedning on the tilemap tool selected
-		private void LevelEditorLibary_TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			TabControl LELibary_TC = (TabControl)ContentLibrary_Control.Template.FindName("LevelEditorLibary_TabControl", ContentLibrary_Control);
-			if (LELibary_TC.SelectedIndex == 0)
-			{
-				LevelEditorTileMap_ToolBar_Grid.Visibility = Visibility.Visible;
-
-			}
-			else if (LELibary_TC.SelectedIndex == 1)
-			{
-				LevelEditorTileMap_ToolBar_Grid.Visibility = Visibility.Hidden;
-			}
-			else if (LELibary_TC.SelectedIndex == 2)
-			{
-				LevelEditorTileMap_ToolBar_Grid.Visibility = Visibility.Hidden;
-			}
 		}
 
 		private void ResizeRect_MouseLMBTN_Up(object sender, MouseButtonEventArgs e)
@@ -2388,11 +2458,12 @@ namespace AmethystEngine.Forms
 		{
 			Console.WriteLine("changed selection CC Sprite");
 		}
+
+		
 	}
 }
 
 //NOTES TO MY SELF
-
 /*
  * System.drawing.Image casuses memory leaks
  * RenderTargetBitmap also causes memory leaks

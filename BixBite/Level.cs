@@ -234,7 +234,29 @@ namespace BixBite
 							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "SpriteLayer")
 							{
 								Console.WriteLine("SpriteLayer");
-							  reader.Read();
+								String SLName = reader.GetAttribute("Name");
+								while (reader.Name.Trim() != "Sprite" || (reader.Name.Trim() == "Sprites" && reader.NodeType == XmlNodeType.EndElement)) //ignore whitespace
+									reader.Read();
+
+								//we have found a list of sprites we need to parse
+								List<Sprite> sprites_ = new List<Sprite>();
+
+								while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Sprite")
+								{
+									String SpriteName = reader.GetAttribute("Name");
+									String SpriteLoc = reader.GetAttribute("Location");
+									int w = Int32.Parse(reader.GetAttribute("Width"));
+									int h = Int32.Parse(reader.GetAttribute("Height"));
+									int x = Int32.Parse(reader.GetAttribute("x"));
+									int y = Int32.Parse(reader.GetAttribute("y"));
+
+									sprites_.Add(new Sprite(SpriteName, SpriteLoc, x, y, w, h));
+									reader.Read(); reader.Read();
+								}
+								TempLevel.Layers.Add(new SpriteLayer(LayerType.Sprite, TempLevel));
+								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerName = SLName;
+								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects = sprites_;
+								reader.Read();
 							}
 							//gameevent int[,]
 							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameEvents")

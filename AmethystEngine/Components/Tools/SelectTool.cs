@@ -53,6 +53,19 @@ namespace AmethystEngine.Components.Tools
 			return null;
 		}
 
+		public static Border FindTile(Canvas backcanvas, List<Border> layertiles, int zindex, int x, int y)
+		{
+			foreach (Border r in layertiles)
+			{
+				if (inTile(backcanvas, r, x, y))
+				{
+					if (Canvas.GetZIndex(r as System.Windows.UIElement) == zindex)
+						return r;
+				}
+			}
+			return null;
+		}
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -82,6 +95,20 @@ namespace AmethystEngine.Components.Tools
 			if (x >= left && x <= right)
 			{
 				if (y >= top && y <= bottom )
+					return true;
+			}
+			return false;
+		}
+
+		public static bool inTile(Canvas backcanvas, Border tile, int x, int y)
+		{
+			int left = (int)(Canvas.GetLeft(tile) * backcanvas.RenderTransform.Value.M11);
+			int right = left + (int)(tile.ActualWidth * backcanvas.RenderTransform.Value.M11);
+			int top = (int)(Canvas.GetTop(tile) * backcanvas.RenderTransform.Value.M11);
+			int bottom = top + (int)(tile.ActualHeight * backcanvas.RenderTransform.Value.M11);
+			if (x >= left && x <= right)
+			{
+				if (y >= top && y <= bottom)
 					return true;
 			}
 			return false;
