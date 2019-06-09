@@ -20,7 +20,9 @@ namespace AmethystEngine.Components
   {
     None,
     Folder,
-    File
+    File,
+		Sprite,
+		GameEvent
   };
 
 

@@ -83,6 +83,8 @@ namespace AmethystEngine.Forms
 				}
 				file.Close();
 				Console.WriteLine($"File has {counter} lines.");
+				//GameEvent game = new GameEvent();
+				
 			}
 
 			//show levels
