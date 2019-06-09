@@ -18,7 +18,6 @@ namespace ProjectE_E
 	{
 		GraphicsDeviceManager graphics;
 		SpriteBatch spriteBatch;
-		Sprite TestSprite = new Sprite();
 		Texture2D t2;
 		Map map;
 		Player Player;
@@ -93,7 +92,7 @@ namespace ProjectE_E
 			//Texture2D t = this.Content.Load<Texture2D>("smolmegumin");
 
 
-			TestSprite.setTexture(t); //set the image.
+			//TestSprite.setTexture(t); //set the image.
 			Tile.Content = this.Content;
 
 			camera = new Camera(GraphicsDevice.Viewport);
@@ -109,6 +108,7 @@ namespace ProjectE_E
 			Thread.Sleep(System.TimeSpan.FromMilliseconds(50));
 
 			map.LoadTileMaps(this.GraphicsDevice, map.level);
+			map.LoadSprites(this.GraphicsDevice, map.level);
 			map.GenerateLevel(map.level, this.GraphicsDevice, spriteBatch);
 
 			Player.Load(this.Content);

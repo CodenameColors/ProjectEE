@@ -10,28 +10,36 @@ namespace BixBite.Rendering
 {
 	public class Sprite
 	{
-		public Vector2 Screen_pos;
-		public Vector2 Screen_scale;
-		public String PathLocation;
+		public String ImgPathLocation;
 		public String Name { get; set; }
-		public int Width;
-		public int Hieght;
+		public int Width, Height;
+		public int xpos, ypos;
 
-		protected Texture2D text;
+		public Sprite(String Name, String imgLoc, int x, int y, int w, int h)
+		{
+			this.Name = Name;
+			this.ImgPathLocation = imgLoc;
+			this.xpos = x;
+			this.ypos = y;
+			this.Width = w;
+			this.Height = h;
+		}
 
-		public void setTexture(Texture2D text)
-		{
-			this.text = text;
-		}
-		public Texture2D getTexture()
-		{
-			return text;
-		}
+		//protected Texture2D text;
 
-		public void Draw(SpriteBatch sb)
-		{
-			sb.Draw(text, Screen_pos);
-		}
+		//public void setTexture(Texture2D text)
+		//{
+		//	this.text = text;
+		//}
+		//public Texture2D getTexture()
+		//{
+		//	return text;
+		//}
+
+		//public void Draw(SpriteBatch sb)
+		//{
+		//	sb.Draw(text, Screen_pos);
+		//}
 	}
 	
 }

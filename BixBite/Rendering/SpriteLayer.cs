@@ -40,6 +40,7 @@ namespace BixBite.Rendering
 
 		/// <summary>
 		/// This method allows the "hot reloading" of the tile grids MAX size
+		/// This method allows the "hot reloading" of the tile grids MAX size
 		/// </summary>
 		/// <param name="x"></param>
 		/// <param name="y"></param>
@@ -73,7 +74,7 @@ namespace BixBite.Rendering
 					LayerObjects = new List<Sprite>();
 					break;
 				case (LayerType.GameEvent):
-					LayerObjects = new List<GameEvent>();
+					LayerObjects = new Tuple<int[,], List<GameEvent>>(new int[height, width], new List<GameEvent>());
 					break;
 			}
 		}
@@ -82,37 +83,56 @@ namespace BixBite.Rendering
 		/// Add objects to the current sprite layer depending on type.
 		/// </summary>
 		/// <param name="newLayerObject">Desired object to add.</param>
-		public void AddToLayer(object newLayerObject, int xcell = 0, int ycell = 0, int tiledata = 0)
+		public void AddToLayer(int xcell = 0, int ycell = 0, int tiledata = 0)
 		{
 			Console.WriteLine("tttt");
-			switch (layerType)
+			if (LayerObjects is Array && ((Array)LayerObjects).Rank == 2)
 			{
-				case (LayerType.None):
-					throw new SpriteLayerException(LayerType.None);
-				case (LayerType.Sprite):
-					if (newLayerObject is Sprite)
-					{
-						if (LayerObjects is List<Sprite>)
-							((List<Sprite>)LayerObjects).Add((Sprite)newLayerObject);
-						else Console.WriteLine("Invalid defined Layerobject type. Not a List of Sprites");
-					}
-					return;
-				case (LayerType.Tile):
-					if (LayerObjects is Array && ((Array)LayerObjects).Rank == 2)
-					{
-						((Array)LayerObjects).SetValue(tiledata, xcell, ycell);
-					}
-					//((int[,])LayerObjects)[xcell, ycell] = tiledata;
-					else Console.WriteLine("Invalid defined Layerobject type. Not a List of Tiles");
-					return;
-				case (LayerType.GameEvent):
-					if (newLayerObject is GameEvent)
-					{
-						if (LayerObjects is List<GameEvent>)
-							((List<GameEvent>)LayerObjects).Add((GameEvent)newLayerObject);
-						else Console.WriteLine("Invalid defined Layerobject type. Not a List of GameObjects");
-					}
-					return;
+				((Array)LayerObjects).SetValue(tiledata, xcell, ycell);
+			}
+			else Console.WriteLine("Invalid defined Layerobject type. Not a List of Tiles");
+			return;
+		}
+	
+
+		public void AddToLayer(String SpriteName, String imglogc, int x, int y, int w, int h)
+		{
+			if (layerType == LayerType.None)
+				throw new SpriteLayerException(LayerType.None);
+			if (layerType == LayerType.Sprite) {
+				if (LayerObjects is List<Sprite>)
+					((List<Sprite>)LayerObjects).Add(new Sprite(SpriteName, imglogc, x, y, w, h));
+				else Console.WriteLine("incorrect layer type!");
+			return;
+			}
+		}
+
+		public void AddToLayer(Sprite s)
+		{
+			if (layerType == LayerType.None)
+				throw new SpriteLayerException(LayerType.None);
+			if (layerType == LayerType.Sprite)
+			{
+				if (LayerObjects is List<Sprite>)
+					((List<Sprite>)LayerObjects).Add(s);
+				else Console.WriteLine("incorrect layer type!");
+				return;
+			}
+		}
+
+		public void AddToLayer(int groupnum, int xcell, int ycell, GameEvent g )
+		{
+			if (layerType == LayerType.None)
+				throw new SpriteLayerException(LayerType.None);
+			if (layerType == LayerType.GameEvent)
+			{
+				if (LayerObjects is Tuple<int[,], List<GameEvent>>)
+				{
+					((Tuple<int[,], List<GameEvent>>)LayerObjects).Item1.SetValue(groupnum, xcell, ycell); //change the tile group num data
+					((Tuple<int[,], List<GameEvent>>)LayerObjects).Item2.Add(g); //add the game event data!
+				}
+				else Console.WriteLine("Incorrect Layer type!");
+				return;
 			}
 		}
 
