@@ -16,6 +16,7 @@ namespace BixBite
 		/// Item1: TileSetName Item2: TileSet Image Location Item3: TileWidth Item4:TileHeight
 		/// </summary>
 		public List<Tuple<String, String, int, int>> TileSet = new List<Tuple<string, string, int, int>>();
+		public List<Tuple<String, String>> sprites = new  List<Tuple<string, string>>();
 		public ObservableCollection<SpriteLayer> Layers { get; set; }
 		public int xCells {get; set;}
 		public int yCells { get; set; }
@@ -175,6 +176,19 @@ namespace BixBite
 							reader.Read(); reader.Read();
 						}
 
+
+						while (reader.Name.Trim() != "Sprites") //ignore whitespace
+							reader.Read();
+
+						//next up is the tilesets for the map.
+						while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Sprites")
+						{
+							String Name = reader.GetAttribute("Name");
+							String Location = reader.GetAttribute("Location");
+							TempLevel.sprites.Add(new Tuple<string, String>(Name, Location));
+							reader.Read(); reader.Read();
+						}
+
 						//the next thing is the layers . LOOPS
 						while ((reader.NodeType == XmlNodeType.EndElement && reader.Name.Trim() != "Layers") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Layers")) //loop through all the TileSets
 						{
@@ -296,6 +310,18 @@ namespace BixBite
 							await reader.ReadAsync(); await reader.ReadAsync();
 						}
 
+						while (reader.Name.Trim() != "Sprites") //ignore whitespace
+							await reader.ReadAsync();
+
+						//next up is the tilesets for the map.
+						while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Sprites")
+						{
+							String Name = reader.GetAttribute("Name");
+							String Location = reader.GetAttribute("Location");
+							TempLevel.sprites.Add(new Tuple<string,String>(Name, Location));
+							await reader.ReadAsync(); await reader.ReadAsync();
+						}
+
 						//the next thing is the layers . LOOPS
 						while ((reader.NodeType == XmlNodeType.EndElement && reader.Name.Trim() != "Layers") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Layers")) //loop through all the TileSets
 						{
@@ -341,6 +367,28 @@ namespace BixBite
 							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "SpriteLayer")
 							{
 								Console.WriteLine("SpriteLayer");
+								String SLName = reader.GetAttribute("Name");
+								while (reader.Name.Trim() != "Sprite" || (reader.Name.Trim() == "Sprites" && reader.NodeType == XmlNodeType.EndElement)) //ignore whitespace
+									await reader.ReadAsync();
+
+								//we have found a list of sprites we need to parse
+								List<Sprite> sprites_ = new List<Sprite>();
+
+								while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Sprite")
+								{
+									String SpriteName  = reader.GetAttribute("Name");
+									String SpriteLoc = reader.GetAttribute("Location");
+									int w = Int32.Parse(reader.GetAttribute("Width"));
+									int h = Int32.Parse(reader.GetAttribute("Height"));
+									int x = Int32.Parse(reader.GetAttribute("x"));
+									int y = Int32.Parse(reader.GetAttribute("y")) ;
+
+									sprites_.Add(new Sprite(SpriteName, SpriteLoc, x, y, w, h));
+									await reader.ReadAsync(); await reader.ReadAsync();
+								}
+								TempLevel.Layers.Add(new SpriteLayer(LayerType.Sprite, TempLevel));
+								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerName = SLName;
+								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects = sprites_;
 								await reader.ReadAsync();
 							}
 							//gameevent int[,]
@@ -403,12 +451,8 @@ namespace BixBite
 				await writer.WriteAttributeStringAsync(null, "Width", null, (xCells * 40).ToString());
 				await writer.WriteAttributeStringAsync(null, "Height", null, (yCells * 40).ToString());
 
-				//TileSets
-				//foreach(String imgloc in TileSets)
-				//{
 				for(int i = 0; i < TileSets.Count; i++)
 				{ 
-					Thread.Sleep(100);
 					System.Drawing.Image img = System.Drawing.Image.FromFile(TileSets[i]);
 					int len = TileSets[i].LastIndexOf('.') - TileSets[i].LastIndexOfAny(new char[] { '/', '\\' });
 					String name = TileSets[i].Substring(TileSets[i].LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
@@ -419,6 +463,17 @@ namespace BixBite
 					await writer.WriteAttributeStringAsync(null, "MapHeight", null, img.Height.ToString());
 					await writer.WriteAttributeStringAsync(null, "TileWidth", null, CellDimen[i].Item1.ToString());
 					await writer.WriteAttributeStringAsync(null, "TileHeight", null, CellDimen[i].Item2.ToString());
+					await writer.WriteEndElementAsync();//end of tile set
+				}
+
+				for (int i = 0; i < sprites.Count; i++)
+				{
+					System.Drawing.Image img = System.Drawing.Image.FromFile(TileSets[i]);
+					int len = TileSets[i].LastIndexOf('.') - TileSets[i].LastIndexOfAny(new char[] { '/', '\\' });
+					String name = sprites[i].Item2.Substring(sprites[i].Item2.LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
+					await writer.WriteStartElementAsync(null, "Sprites", null);
+					await writer.WriteAttributeStringAsync(null, "Name", null, sprites[i].Item2);
+					await writer.WriteAttributeStringAsync(null, "Location", null, sprites[i].Item2);
 					await writer.WriteEndElementAsync();//end of tile set
 				}
 
@@ -459,11 +514,11 @@ namespace BixBite
 						{
 							await writer.WriteStartElementAsync(null, "Sprite", null);
 							await writer.WriteAttributeStringAsync(null, "Name", null, sprite.Name);
-							await writer.WriteAttributeStringAsync(null, "Location", null, sprite.PathLocation);
+							await writer.WriteAttributeStringAsync(null, "Location", null, sprite.ImgPathLocation);
 							await writer.WriteAttributeStringAsync(null, "Width", null, sprite.Width.ToString());
-							await writer.WriteAttributeStringAsync(null, "Height", null, sprite.Hieght.ToString());
-							await writer.WriteAttributeStringAsync(null, "x", null, sprite.Screen_pos.X.ToString());
-							await writer.WriteAttributeStringAsync(null, "y", null, sprite.Screen_pos.Y.ToString());
+							await writer.WriteAttributeStringAsync(null, "Height", null, sprite.Height.ToString());
+							await writer.WriteAttributeStringAsync(null, "x", null, sprite.xpos.ToString());
+							await writer.WriteAttributeStringAsync(null, "y", null, sprite.ypos.ToString());
 							await writer.WriteEndElementAsync();
 						}
 

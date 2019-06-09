@@ -17,6 +17,7 @@ namespace ProjectE_E.Components
 		String MapName;
 		private int mapwidth, mapheight;
 		private List<Tuple<Texture2D,int>> TileMaps = new List<Tuple<Texture2D,int>>();
+		private Dictionary<String, Texture2D> sprites = new Dictionary<string, Texture2D>();
 		public Level level = new Level();
 		private List<GameEvent> MapEvents;
 		List<Tile> MapTiles = new List<Tile>();
@@ -53,21 +54,30 @@ namespace ProjectE_E.Components
 		{
 			foreach (Tuple<String, String, int, int> tuplestileset in currentLevel.TileSet)
 			{
-
-				//byte[] byteArray = Encoding.UTF8.GetBytes(tuplestileset.Item2);
-				//Stream stream = new MemoryStream(byteArray);
-
 				Texture2D text;
 
 				using (var stream = new System.IO.FileStream(tuplestileset.Item2, FileMode.Open))
 				{
-					//using (Bitmap img = (Bitmap)Bitmap.FromStream(stream))
-					{
-						var texture = Texture2D.FromStream(graphicsDevice, stream);
-						text = Texture2D.FromStream(graphicsDevice, stream);
-					}
+					var texture = Texture2D.FromStream(graphicsDevice, stream);
+					text = Texture2D.FromStream(graphicsDevice, stream);
 				}
 				TileMaps.Add(new Tuple<Texture2D, int>(text, tuplestileset.Item3));
+			}
+		}
+
+		public void LoadSprites(GraphicsDevice graphicsDevice, Level currentLevel)
+		{
+			foreach(Tuple<String, String> tuple in currentLevel.sprites)
+			{
+				Texture2D text;
+
+				using (var stream = new System.IO.FileStream(tuple.Item2, FileMode.Open))
+				{
+					//using (Bitmap img = (Bitmap)Bitmap.FromStream(stream))
+					var texture = Texture2D.FromStream(graphicsDevice, stream);
+					text = Texture2D.FromStream(graphicsDevice, stream);
+				}
+				sprites.Add(tuple.Item2.Replace("\\","/"), text);
 			}
 		}
 
@@ -89,7 +99,10 @@ namespace ProjectE_E.Components
 				{
 					GenerateTileMap(((int[,])spriteLayer.LayerObjects), graphicsDevice, spriteBatch);
 				}
-
+				else if (spriteLayer.layerType == LayerType.Sprite)
+				{
+					GenerateSprites(((List<Sprite>)spriteLayer.LayerObjects), graphicsDevice, spriteBatch);
+				}
 			}
 		}
 
@@ -159,6 +172,21 @@ namespace ProjectE_E.Components
 				}
 			}
 		}
+
+		public void GenerateSprites(List<Sprite> sprites_, GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
+		{
+			foreach(Sprite spr in sprites_)
+			{
+				Texture2D texture = sprites[spr.ImgPathLocation];
+				Rectangle r = new Rectangle();
+				r.X = spr.xpos;
+				r.Y = spr.ypos;
+				r.Width = spr.Width;
+				r.Height = spr.Height;
+				MapTiles.Add(new Tile(texture, r));
+			}
+		}
+
 
 		public async Task<Level> GetLevelFromFile(String FilePath)
 		{
