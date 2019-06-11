@@ -83,9 +83,7 @@ namespace AmethystEngine.Forms
 		ComboBox TileSets_CB = new ComboBox();
 		Rectangle TileMapTiles_Rect = new Rectangle();
 		Rectangle FullMapSelection_Rect = new Rectangle();
-
-
-
+		
 		EditorTool CurrentTool = EditorTool.None;
 		SelectTool selectTool = new SelectTool();
 
@@ -109,8 +107,7 @@ namespace AmethystEngine.Forms
     List<String> CMDOutput = new List<string>();
     public double ZoomLevel = 1;
     BixBite.BixBiteTypes.CardinalDirection MouseMovement = BixBite.BixBiteTypes.CardinalDirection.None;
-
-
+		
     double LevelEditorScreenRatio = 0.0f;
 
     String ProjectFilePath = "";
@@ -148,7 +145,8 @@ namespace AmethystEngine.Forms
 
 
 			ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
-      LB.ItemsSource = LEditorTS;
+			LB.ItemsSource = null;
+			LB.ItemsSource = LEditorTS;
 
       LevelEditorScreenRatio = double.Parse(LEditorTS[1].PropertyData) / double.Parse(LEditorTS[2].PropertyData);
       Console.WriteLine(LevelEditorScreenRatio);
@@ -826,8 +824,6 @@ namespace AmethystEngine.Forms
 				}
 				
 			}
-
-
 			else if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Sprite)
 			{
 				TabControl Content_TC = (TabControl)(ContentLibrary_Control.Template.FindName("LevelEditorLibary_TabControl", ContentLibrary_Control));
@@ -868,10 +864,6 @@ namespace AmethystEngine.Forms
 
 					}
 				}
-
-
-
-
 				//is there a sprite selected?
 			}
 			else if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.GameEvent)
@@ -897,6 +889,12 @@ namespace AmethystEngine.Forms
 
 					Canvas.SetLeft(b, (int)p.X); Canvas.SetTop(b, (int)p.Y); Canvas.SetZIndex(b, curLayer); //place the tile position wise
 					LevelEditor_Canvas.Children.Add(b); //actual place it on the canvas
+				}
+				else if (CurrentTool == EditorTool.Select) //selected a game event square.
+				{
+					Console.WriteLine("GE - Selected");
+
+					
 				}
 			}
 		}
@@ -1182,15 +1180,19 @@ namespace AmethystEngine.Forms
 					Canvas.SetLeft(r, (int)pp.X); Canvas.SetTop(r, (int)pp.Y); Canvas.SetZIndex(r, 100);
 					Deselect();
 
-					//selectTool.SelectedTiles.Add(rr);
 					LevelEditor_Canvas.Children.Add(r);
-					//}
-
-
 				}
 			}
+			else if (((SpriteLayer)(SceneExplorer_TreeView.SelectedValue)).layerType == LayerType.Sprite)
+			{
 
-      MPos = e.GetPosition(LevelEditor_Canvas); //set this for the iteration
+			}
+			else if (((SpriteLayer)(SceneExplorer_TreeView.SelectedValue)).layerType == LayerType.GameEvent)
+			{
+
+			}
+
+				MPos = e.GetPosition(LevelEditor_Canvas); //set this for the iteration
     }
 
     //this method is here to update the size of rectangle on the fullmap on the right.
@@ -2459,7 +2461,11 @@ namespace AmethystEngine.Forms
 			Console.WriteLine("changed selection CC Sprite");
 		}
 
-		
+		private void TxtQuantity_KeyDown(object sender, KeyEventArgs e)
+		{
+			Console.WriteLine("Text Property Key down " + ((TextBox)sender).Tag.ToString());
+
+		}
 	}
 }
 

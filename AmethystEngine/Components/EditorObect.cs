@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
-
+using ObservableDictionarySample;
 
 namespace AmethystEngine.Components
 {
@@ -28,10 +28,17 @@ namespace AmethystEngine.Components
 
   public class EditorObject
   {
-    public Uri Thumbnail { get; set; }
+
+
+		private ObservableStyleDictionary _observableButtonStyles = null;
+
+		public Uri Thumbnail { get; set; }
     public String Name { get; set; }
     public int width { get; set; }
     public EObjectType EditObjType;
+
+		
+
 
     public EditorObject()
     {
