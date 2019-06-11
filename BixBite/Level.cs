@@ -177,7 +177,7 @@ namespace BixBite
 						}
 
 
-						while (reader.Name.Trim() != "Sprites") //ignore whitespace
+						while (reader.Name.Trim() != "Sprites" &&  reader.Name.Trim() != "Layers") //ignore whitespace
 							reader.Read();
 
 						//next up is the tilesets for the map.

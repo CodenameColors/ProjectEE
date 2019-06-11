@@ -6,9 +6,11 @@
         xmlns:local="clr-namespace:AmethystEngine" 
 				xmlns:Bix="clr-namespace:BixBite;assembly=BixBite"
 				xmlns:BixRen="clr-namespace:BixBite.Rendering;assembly=BixBite"
-				xmlns:src="clr-namespace:ObservableDictionarySample"
+				xmlns:BixRes="clr-namespace:BixBite.Resources"
+				xmlns:src="clr-namespace:AmethystEngine.Resources"
+				xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
 				mc:Ignorable="d" Background="#FF0E0D0D"
-        Title="AmethystEngine" Height="1000" Width="1600" Foreground="{x:Null}" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
+        Title="AmethystEngine" Height="1000" Width="1600" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
 
 
 	<Window.Resources>
@@ -44,13 +46,35 @@
 				<MenuItem Header="Add Gameobject Layer" />
 			</ContextMenu>
 
-			<src:ObservableStyleDictionary x:Key="ButtonStyles" />
-			<DataTemplate x:Key="ButtonTemplate">
-				<Button Style="{Binding Value}">Sample</Button>
-			</DataTemplate>
+			<!--<src:ObservableStyleDictionary x:Key="ButtonStyles" />
 			<DataTemplate x:Key="StyleNameTemplate">
 				<TextBlock Text="{Binding Key}" />
 			</DataTemplate>
+			<DataTemplate x:Key="ComboBoxPropertyTemplate">
+				<ComboBox Style="{Binding Value}"></ComboBox>
+			</DataTemplate>-->
+
+			<!--#region Propertydictionary-->
+			<DataTemplate x:Key="TextBoxPropertyTemplate">
+				<TextBox Width="50" Text="{Binding Value.Item2, Mode=OneWay}"></TextBox>
+			</DataTemplate>
+			<DataTemplate x:Key="ComboBoxPropertyTemplate">
+				<ComboBox Width="50">
+					<Style TargetType="ComboBox">
+						<Setter Property="Visibility" Value="Visible"/>
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding Value.Item2, Mode=OneWay}" Value="TextBoxPropertyTemplate">
+								<Setter Property="Visibility" Value="Hidden"/>
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</ComboBox>
+			</DataTemplate>
+
+
+
+			<BixRes:ObservablePropertyDictionary x:Key="PropertyStyles"/>
+			<!--#endregion-->
 
 			<!--#region EdtiorToolbars-->
 			<ControlTemplate x:Key="LevelEditorTileMapToolBar_Template">
@@ -278,8 +302,8 @@
 
 
 					<!--<Label Content="Properties:" VerticalAlignment="Top" HorizontalAlignment="Stretch" Grid.Row="1" Foreground="White"/>-->
-					<ListView HorizontalAlignment="Stretch" Margin="0,4,0,0" Grid.Row="1" VerticalAlignment="Stretch" x:Name="LEditProperty_LB" ItemTemplate="{Binding LEditorT}"
-									ItemsSource="{Binding Source={StaticResource ButtonStyles}}" Background="Transparent" IsSynchronizedWithCurrentItem="True">
+					<ListView HorizontalAlignment="Stretch" Margin="0,4,0,0" Grid.Row="1" VerticalAlignment="Stretch" x:Name="LEditProperty_LB"
+									ItemsSource="{Binding Source={StaticResource PropertyStyles}}" Background="Transparent" IsSynchronizedWithCurrentItem="True">
 						<ListView.ItemContainerStyle>
 							<Style TargetType="{x:Type ListViewItem}">
 								<Style.Resources>
@@ -295,8 +319,12 @@
 						<ListView.View>
 							<!--<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>-->
 							<GridView ColumnHeaderContainerStyle="{StaticResource LeditorLV_Style}" >
-								<GridViewColumn Header="Style Name" DisplayMemberBinding="{Binding Key}" />
-								<GridViewColumn Width="75" Header="Sample" CellTemplate="{StaticResource ButtonTemplate}"/>
+								<GridViewColumn Header="Property" DisplayMemberBinding="{Binding Key}">
+								</GridViewColumn>
+								<GridViewColumn Width="100" Header="Data" CellTemplate="{DynamicResource TextBoxPropertyTemplate}">
+								</GridViewColumn>
+								<GridViewColumn Width="100" Header="Data" CellTemplate="{DynamicResource ComboBoxPropertyTemplate}">
+								</GridViewColumn>
 							</GridView>
 						</ListView.View>
 					</ListView>

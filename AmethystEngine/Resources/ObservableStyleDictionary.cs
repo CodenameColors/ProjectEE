@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
-using DrWPF.Windows.Data;
 using System.Collections;
+using BixBite.Resources;
 
-namespace ObservableDictionarySample
+namespace AmethystEngine.Resources
 {
     public class ObservableStyleDictionary : ObservableSortedDictionary<string, Style>
     {
