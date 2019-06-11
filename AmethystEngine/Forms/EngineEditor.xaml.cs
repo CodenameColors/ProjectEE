@@ -151,9 +151,9 @@ namespace AmethystEngine.Forms
 
 			ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
 			LB.ItemsSource = null;
-			//LB.ItemsSource = LEditorTS;
+			LB.ItemsSource = LEditorTS;
 
-      LevelEditorScreenRatio = double.Parse(LEditorTS[1].PropertyData) / double.Parse(LEditorTS[2].PropertyData);
+			LevelEditorScreenRatio = double.Parse(LEditorTS[1].PropertyData) / double.Parse(LEditorTS[2].PropertyData);
       Console.WriteLine(LevelEditorScreenRatio);
       NumOfCellsX = int.Parse(LEditorTS[1].PropertyData);
       NumOfCellsY = int.Parse(LEditorTS[2].PropertyData);
