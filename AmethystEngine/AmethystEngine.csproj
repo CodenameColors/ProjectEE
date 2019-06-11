@@ -65,6 +65,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ResizeThumb.cs" />
+    <Compile Include="Resources\ObservableDictionary.cs" />
+    <Compile Include="Resources\ObservableSortedDictionary.cs" />
+    <Compile Include="Resources\ObservableStyleDictionary.cs" />
     <Compile Include="RotateThumb.cs" />
     <Page Include="Forms\EngineEditor.xaml">
       <SubType>Designer</SubType>

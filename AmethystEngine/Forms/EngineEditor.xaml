@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:AmethystEngine" 
 				xmlns:Bix="clr-namespace:BixBite;assembly=BixBite"
 				xmlns:BixRen="clr-namespace:BixBite.Rendering;assembly=BixBite"
-        mc:Ignorable="d" Background="#FF0E0D0D"
+				xmlns:src="clr-namespace:ObservableDictionarySample"
+				mc:Ignorable="d" Background="#FF0E0D0D"
         Title="AmethystEngine" Height="1000" Width="1600" Foreground="{x:Null}" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
 
 
@@ -42,6 +43,14 @@
 				<MenuItem Header="Add Sprite Layer" />
 				<MenuItem Header="Add Gameobject Layer" />
 			</ContextMenu>
+
+			<src:ObservableStyleDictionary x:Key="ButtonStyles" />
+			<DataTemplate x:Key="ButtonTemplate">
+				<Button Style="{Binding Value}">Sample</Button>
+			</DataTemplate>
+			<DataTemplate x:Key="StyleNameTemplate">
+				<TextBlock Text="{Binding Key}" />
+			</DataTemplate>
 
 			<!--#region EdtiorToolbars-->
 			<ControlTemplate x:Key="LevelEditorTileMapToolBar_Template">
@@ -267,33 +276,45 @@
 						</Canvas>
 					</ScrollViewer>
 
-					<!--PROPERTIES-->
+
 					<!--<Label Content="Properties:" VerticalAlignment="Top" HorizontalAlignment="Stretch" Grid.Row="1" Foreground="White"/>-->
 					<ListView HorizontalAlignment="Stretch" Margin="0,4,0,0" Grid.Row="1" VerticalAlignment="Stretch" x:Name="LEditProperty_LB" ItemTemplate="{Binding LEditorT}"
-									ItemsSource="{Binding LEditorTS}" Background="Transparent" IsSynchronizedWithCurrentItem="True">
+									ItemsSource="{Binding Source={StaticResource ButtonStyles}}" Background="Transparent" IsSynchronizedWithCurrentItem="True">
+						<ListView.ItemContainerStyle>
+							<Style TargetType="{x:Type ListViewItem}">
+								<Style.Resources>
+									<!-- Foreground for Selected ListViewItem -->
+									<SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" 
+                                 Color="Black"/>
+									<!-- Background for Selected ListViewItem -->
+									<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                 Color="Transparent"/>
+								</Style.Resources>
+							</Style>
+						</ListView.ItemContainerStyle>
 						<ListView.View>
 							<!--<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>-->
 							<GridView ColumnHeaderContainerStyle="{StaticResource LeditorLV_Style}" >
-								<GridViewColumn Width="Auto" Header="Property">
-									<GridViewColumn.CellTemplate>
-										<DataTemplate>
-											<Label x:Name="Txt" Content="{Binding PropertyName}" Foreground="White" />
-										</DataTemplate>
-									</GridViewColumn.CellTemplate>
-								</GridViewColumn>
-								<GridViewColumn Header="Data" Width="100">
-									<GridViewColumn.CellTemplate >
-										<DataTemplate>
-											<TextBox x:Name="txtQuantity" MinWidth="75"  Text="{Binding PropertyData}" Foreground="Black"/>
-										</DataTemplate>
-									</GridViewColumn.CellTemplate>
-								</GridViewColumn>
+								<GridViewColumn Header="Style Name" DisplayMemberBinding="{Binding Key}" />
+								<GridViewColumn Width="75" Header="Sample" CellTemplate="{StaticResource ButtonTemplate}"/>
 							</GridView>
 						</ListView.View>
 					</ListView>
 					<GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
 				</Grid>
 			</ControlTemplate>
+
+			<DataTemplate x:Key="LevelEditorProperty_TB_Template">
+				<TextBox x:Name="txtQuantity" MinWidth="75"  Text="{Binding PropertyData}" Tag="{Binding PropertyName}" Foreground="Black" KeyDown="TxtQuantity_KeyDown" />
+			</DataTemplate>
+
+			<DataTemplate x:Key="LevelEditorProperty_CB_Template">
+				<ComboBox x:Name="EditorObjectType" MinWidth="75" Foreground="Black" >
+
+				</ComboBox>
+			</DataTemplate>
+
+			<!--#endregion PROPERTIES-->
 
 			<DataTemplate x:Key="LEditorT">
 				<Grid>
@@ -395,6 +416,7 @@
 					</Rectangle.Fill>
 				</Rectangle>
 			</ContentControl>
+
 
 
 			<ResourceDictionary.MergedDictionaries>
