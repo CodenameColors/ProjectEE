@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using BixBite.Resources;
 
 namespace AmethystEngine.Forms
 {
@@ -113,6 +114,8 @@ namespace AmethystEngine.Forms
     String ProjectFilePath = "";
 		String MainLevelPath = "";
 
+		ObservablePropertyDictionary EditorObjectProperties = new ObservablePropertyDictionary();
+
     public EngineEditor()
     {
       InitializeComponent();
@@ -141,12 +144,14 @@ namespace AmethystEngine.Forms
 				//new LevelEditorProp("test 2")								
 			};
 
+
+
 			OpenLevels = new ObservableCollection<Level>();
 
 
 			ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
 			LB.ItemsSource = null;
-			LB.ItemsSource = LEditorTS;
+			//LB.ItemsSource = LEditorTS;
 
       LevelEditorScreenRatio = double.Parse(LEditorTS[1].PropertyData) / double.Parse(LEditorTS[2].PropertyData);
       Console.WriteLine(LevelEditorScreenRatio);
@@ -159,9 +164,16 @@ namespace AmethystEngine.Forms
 			//load main level
 			LoadMainLevel(ProjectFilePath);
 
+
+			//can i get the property dictionary to work?
+			EditorObjectProperties.Add("Name", new Tuple<String, string>("TextBoxPropertyTemplate", "50"));
+			EditorObjectProperties.Add("Width", new Tuple<String, string>("TextBoxPropertyTemplate", "50"));
+			EditorObjectProperties.Add("Height", new Tuple<String, string>("TextBoxPropertyTemplate", "50"));
+			LB.ItemsSource = EditorObjectProperties;
+
 		}
 
-    public EngineEditor(String FilePath, String ProjectName = "", String LevelPath = "")
+		public EngineEditor(String FilePath, String ProjectName = "", String LevelPath = "")
     {
       InitializeComponent();
       ProjectFilePath = FilePath;
@@ -1874,7 +1886,7 @@ namespace AmethystEngine.Forms
 			TileSets_CB.SelectedIndex = 0;
 			//draw the level
 			RedrawLevel(CurrentLevel);
-
+			
 			//set visabilty. 
 			Grid Prob_Grid = (Grid)ContentLibrary_Control.Template.FindName("TileSetProperties_Grid", ContentLibrary_Control);
 			Prob_Grid.Visibility = Visibility.Hidden;

@@ -34,7 +34,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
-namespace DrWPF.Windows.Data
+namespace BixBite.Resources
 {
     [Serializable]
     public class ObservableSortedDictionary<TKey, TValue> : ObservableDictionary<TKey, TValue>, ISerializable, IDeserializationCallback

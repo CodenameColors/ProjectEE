@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
-using ObservableDictionarySample;
+using BixBite.Resources;
 
 namespace AmethystEngine.Components
 {
@@ -30,7 +30,7 @@ namespace AmethystEngine.Components
   {
 
 
-		private ObservableStyleDictionary _observableButtonStyles = null;
+		private ObservablePropertyDictionary _observableButtonStyles = null;
 
 		public Uri Thumbnail { get; set; }
     public String Name { get; set; }

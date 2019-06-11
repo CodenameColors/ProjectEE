@@ -58,6 +58,9 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="Xceed.Wpf.Toolkit">
+      <HintPath>Resources\Extended.WPF.Toolkit.Binaries.NET.4.x\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -65,8 +68,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ResizeThumb.cs" />
-    <Compile Include="Resources\ObservableDictionary.cs" />
-    <Compile Include="Resources\ObservableSortedDictionary.cs" />
+    <Compile Include="Resources\ObservablePropertyDictionary.cs" />
     <Compile Include="Resources\ObservableStyleDictionary.cs" />
     <Compile Include="RotateThumb.cs" />
     <Page Include="Forms\EngineEditor.xaml">

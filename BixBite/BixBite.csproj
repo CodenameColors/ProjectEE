@@ -57,6 +57,9 @@
     <Compile Include="GameEvent.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="Property.cs" />
+    <Compile Include="Resources\ObservableDictionary.cs" />
+    <Compile Include="Resources\ObservablePropertyDictionary.cs" />
+    <Compile Include="Resources\ObservableSortedDictionary.cs" />
     <Compile Include="SceneObject\GameObject.cs" />
     <Compile Include="SceneObject\Prop.cs" />
     <Compile Include="Rendering\GameImage.cs" />
