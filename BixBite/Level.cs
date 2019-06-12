@@ -549,8 +549,8 @@ namespace BixBite
 					else if (layer.layerType == LayerType.GameEvent)
 					{
 						await writer.WriteStartElementAsync(null, "GameEvents", null);
-						if (!(layer.LayerObjects is int[,])) goto Skiplayer;
-						int[,] tiledata = ((int[,])layer.LayerObjects);
+						int[,] tiledata = ((Tuple<int[,], List<GameEvent>>)layer.LayerObjects).Item1;
+						if (tiledata == null) goto Skiplayer;
 						for (int i = 0; i < tiledata.GetLength(0); i++)
 						{
 							String rowdata = "";
