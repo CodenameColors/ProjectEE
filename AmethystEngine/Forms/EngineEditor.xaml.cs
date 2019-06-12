@@ -19,6 +19,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using BixBite.Resources;
+using PropertyGridEditor;
 
 namespace AmethystEngine.Forms
 {
@@ -149,9 +150,12 @@ namespace AmethystEngine.Forms
 			OpenLevels = new ObservableCollection<Level>();
 
 
-			ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
-			LB.ItemsSource = null;
-			LB.ItemsSource = LEditorTS;
+			PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+			LB.AddProperty("LevelName", new TextBox(), "Level1");
+			LB.AddProperty("Width", new TextBox(), "50");
+			LB.AddProperty("Height", new TextBox(), "50");
+			LB.AddProperty("MainLevel?", new CheckBox(), true);
+
 
 			LevelEditorScreenRatio = double.Parse(LEditorTS[1].PropertyData) / double.Parse(LEditorTS[2].PropertyData);
       Console.WriteLine(LevelEditorScreenRatio);
@@ -169,7 +173,7 @@ namespace AmethystEngine.Forms
 			EditorObjectProperties.Add("Name", new Tuple<String, string>("TextBoxPropertyTemplate", "50"));
 			EditorObjectProperties.Add("Width", new Tuple<String, string>("TextBoxPropertyTemplate", "50"));
 			EditorObjectProperties.Add("Height", new Tuple<String, string>("TextBoxPropertyTemplate", "50"));
-			LB.ItemsSource = EditorObjectProperties;
+			//LB.ItemsSource = EditorObjectProperties;
 
 		}
 
@@ -2296,9 +2300,9 @@ namespace AmethystEngine.Forms
 					new LevelEditorProp(){ PropertyName = "Map Height(cells)", PropertyData=((Level)e.NewValue).yCells.ToString() },
 					//new LevelEditorProp("test 2")								
 				};
-				ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
-				LB.ItemsSource = null;
-				LB.ItemsSource = LEditorTS;
+				//ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
+				//LB.ItemsSource = null;
+				//LB.ItemsSource = LEditorTS;
 
 				TileSets_CB.Items.Clear(); //remove the past data.
 				foreach (Tuple<String, String, int, int> tilesetTuples in ((Level)e.NewValue).TileSet)
@@ -2335,9 +2339,9 @@ namespace AmethystEngine.Forms
 					new LevelEditorProp(){ PropertyName = "Layer Type:", PropertyData=((SpriteLayer)e.NewValue).layerType.ToString() },
 					//new LevelEditorProp("test 2")								
 				};
-				ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
-				LB.ItemsSource = null;
-				LB.ItemsSource = LEditorTS;
+				//ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
+				//LB.ItemsSource = null;
+				//LB.ItemsSource = LEditorTS;
 			}
 			
 
