@@ -901,6 +901,20 @@ namespace AmethystEngine.Forms
 
 					Canvas.SetLeft(b, (int)p.X); Canvas.SetTop(b, (int)p.Y); Canvas.SetZIndex(b, curLayer); //place the tile position wise
 					LevelEditor_Canvas.Children.Add(b); //actual place it on the canvas
+
+					//create event data for the game event.
+					CurrentLevel.Layers[curLayer].AddToLayer(1, (int)p.Y/40, (int)p.X/40, new GameEvent("Trigger", EventType.Trigger, (int)p.X, (int)p.Y, 40, 40, 1));
+					EventData ed = new EventData()
+					{
+						newx = 0,
+						newy = 0,
+						MoveTime = 0,
+						NewFileToLoad = ""
+					};
+
+					//add the event data. how the palyer will change FROM this event
+					((Tuple<int[,], List<GameEvent>>)((SpriteLayer)CurrentLevel.Layers[curLayer]).LayerObjects).
+						Item2.Last().AddEventData(ed, "DeleTest1", "NULL");
 				}
 				else if (CurrentTool == EditorTool.Select) //selected a game event square.
 				{
@@ -2169,11 +2183,17 @@ namespace AmethystEngine.Forms
 		}
 		private void SpriteLayer_Click(object sender, RoutedEventArgs e)
 		{
-			((Level)SceneExplorer_TreeView.SelectedValue).AddLayer("new sprite", LayerType.Sprite);
+			Level TempLevel = ((Level)SceneExplorer_TreeView.SelectedValue);
+			TempLevel.AddLayer("new sprite", LayerType.Sprite);
+			TempLevel.Layers.Last().DefineLayerDataType(LayerType.Sprite);
 		}
 		private void GameObjectLayer_Click(object sender, RoutedEventArgs e)
 		{
-			((Level)SceneExplorer_TreeView.SelectedValue).AddLayer("new GOL", LayerType.GameEvent);
+			Level TempLevel = ((Level)SceneExplorer_TreeView.SelectedValue);
+			TempLevel.AddLayer("new GOL", LayerType.GameEvent);
+			TempLevel.Layers.Last().DefineLayerDataType(LayerType.GameEvent, TempLevel.xCells, TempLevel.yCells);
+
+
 		}
 		#endregion
 

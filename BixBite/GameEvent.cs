@@ -85,7 +85,6 @@ namespace BixBite
 					datatoload = ed;
 					this.DelegateEventName = newDeleName;
 					this.ActivationButton = ButtonName;
-
 					//for a Level transisition activation should occur from a "trigger" trigger, and or a button press.
 					return;
 				case (EventType.Trigger):
