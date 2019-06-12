@@ -10,6 +10,7 @@
 				xmlns:src="clr-namespace:AmethystEngine.Resources"
 				xmlns:WpfToolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
 				xmlns:DiagramDesigner="clr-namespace:DiagramDesigner" x:Class="AmethystEngine.Forms.EngineEditor"
+				xmlns:pgrid ="clr-namespace:PropertyGridEditor;assembly=PropertyGridEditor"
 				mc:Ignorable="d" Background="#FF0E0D0D"
         Title="AmethystEngine" Height="1000" Width="1600" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
 
@@ -83,7 +84,7 @@
 
 
 
-			<BixRes:ObservablePropertyDictionary x:Key="PropertyStyles"/>
+			<!--<BixRes:ObservablePropertyDictionary x:Key="PropertyStyles"/>-->
 			<!--#region EdtiorToolbars-->
 			<ControlTemplate x:Key="LevelEditorTileMapToolBar_Template">
 				<Grid x:Name="LevelEditorTileMap_ToolBar_Grid" Grid.Column="1" Height="25" VerticalAlignment="Top" Margin="10,4,123,0">
@@ -291,16 +292,20 @@
 						</Canvas>
 					</ScrollViewer>
 
+					<pgrid:PropGrid x:Name="Properties_Grid" Grid.Row="1">
+						
+					</pgrid:PropGrid>
+					
 					<!--<Label Content="Properties:" VerticalAlignment="Top" HorizontalAlignment="Stretch" Grid.Row="1" Foreground="White"/>-->
-					<ListView HorizontalAlignment="Stretch" Margin="0,4,0,0" Grid.Row="1" VerticalAlignment="Stretch" x:Name="LEditProperty_LB"
+					<!--<ListView HorizontalAlignment="Stretch" Margin="0,4,0,0" Grid.Row="1" VerticalAlignment="Stretch" x:Name="LEditProperty_LB"
 									ItemsSource="{Binding Source={StaticResource PropertyStyles}}" Background="Transparent" IsSynchronizedWithCurrentItem="True">
 						<ListView.ItemContainerStyle>
 							<Style TargetType="{x:Type ListViewItem}">
 								<Style.Resources>
-									<!--Foreground for Selected ListViewItem-->
+									--><!--Foreground for Selected ListViewItem--><!--
 									<SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" 
                                  Color="Black"/>
-									<!--Background for Selected ListViewItem-->
+									--><!--Background for Selected ListViewItem--><!--
 									<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
                                  Color="Transparent"/>
 								</Style.Resources>
@@ -308,7 +313,7 @@
 						</ListView.ItemContainerStyle>
 						<ListView.View>
 
-							<!--<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>-->
+							--><!--<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>--><!--
 
 							<GridView ColumnHeaderContainerStyle="{StaticResource LeditorLV_Style}" >
 								<GridViewColumn Header="Property" DisplayMemberBinding="{Binding Key}">
@@ -319,7 +324,7 @@
 								</GridViewColumn>
 							</GridView>
 						</ListView.View>
-					</ListView>
+					</ListView>-->
 					
 					<GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
 				</Grid>
