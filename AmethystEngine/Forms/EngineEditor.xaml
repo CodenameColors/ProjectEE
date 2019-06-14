@@ -3,14 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+				xmlns:pgrid ="clr-namespace:PropertyGridEditor;assembly=PropertyGridEditor"
         xmlns:local="clr-namespace:AmethystEngine" 
 				xmlns:Bix="clr-namespace:BixBite;assembly=BixBite"
 				xmlns:BixRen="clr-namespace:BixBite.Rendering;assembly=BixBite"
-				xmlns:BixRes="clr-namespace:BixBite.Resources"
+				xmlns:BixRes="clr-namespace:BixBite.Resources;assembly=BixBite"
 				xmlns:src="clr-namespace:AmethystEngine.Resources"
 				xmlns:WpfToolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
 				xmlns:DiagramDesigner="clr-namespace:DiagramDesigner" x:Class="AmethystEngine.Forms.EngineEditor"
-				xmlns:pgrid ="clr-namespace:PropertyGridEditor;assembly=PropertyGridEditor"
+				
 				mc:Ignorable="d" Background="#FF0E0D0D"
         Title="AmethystEngine" Height="1000" Width="1600" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
 
@@ -293,8 +294,12 @@
 					</ScrollViewer>
 
 					<pgrid:PropGrid x:Name="Properties_Grid" Grid.Row="1">
-						
+
 					</pgrid:PropGrid>
+
+					<!--<pgrid:PropGrid x:Name="Properties_Grid" Grid.Row="1">
+						
+					</pgrid:PropGrid>-->
 					
 					<!--<Label Content="Properties:" VerticalAlignment="Top" HorizontalAlignment="Stretch" Grid.Row="1" Foreground="White"/>-->
 					<!--<ListView HorizontalAlignment="Stretch" Margin="0,4,0,0" Grid.Row="1" VerticalAlignment="Stretch" x:Name="LEditProperty_LB"
