@@ -736,7 +736,7 @@ namespace AmethystEngine.Forms
 		{
 			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
 
-				Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
+			Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
 			//Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_Canvas));
 			Point p = GetGridSnapCords(pos);
 			Console.WriteLine(String.Format("Snapped grid cords: {0}", p.ToString()));
@@ -786,21 +786,6 @@ namespace AmethystEngine.Forms
 					{
 						//this selection works similar to tile. But instead it looks for borders not rectangles. It also will retrieve the game event group number
 						Rectangle r = new Rectangle() { Tag = "selection", Width = 40, Height = 40, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
-
-
-						//Rectangle r = new Rectangle() { Tag = "selection", Width = 40, Height = 40, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
-						//Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
-						//Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, 100);
-
-						////don't add another selection rectangle on an existing selection rectangle
-						//Rectangle sr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 100, (int)pos.X, (int)pos.Y);
-
-						//if (sr != null) return;
-						//selectTool.SelectedTiles.Add(rr);
-						//LevelEditor_Canvas.Children.Add(r);
-
-						//SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
-
 					}
 				}
 				else if (CurrentTool == EditorTool.Eraser)
@@ -929,6 +914,11 @@ namespace AmethystEngine.Forms
 		/// <param name="e"></param>
 		private void ContentControl_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
+			//are we on a sprite layer?
+			if (!(SceneExplorer_TreeView.SelectedItem is SpriteLayer)) return;
+			if (((SpriteLayer)SceneExplorer_TreeView.SelectedItem).layerType != LayerType.Sprite) return;
+
+
 			Console.WriteLine("testing");
 			Selector.SetIsSelected(((Control)currentCC), false);
 			curect.IsHitTestVisible = true;
@@ -950,11 +940,36 @@ namespace AmethystEngine.Forms
 
 		private void Rectangle_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
+			//are we on a sprite layer?
+			if (!(SceneExplorer_TreeView.SelectedItem is SpriteLayer)) return;
+			if (((SpriteLayer)SceneExplorer_TreeView.SelectedItem).layerType != LayerType.Sprite) return;
+
 			Console.WriteLine("sjdsjdns");
 			curect.IsHitTestVisible = true;
 			curect = ((Rectangle)sender);
 			curect.IsHitTestVisible = false;
 			//var m = Application.Current.MainWindow.FindResource("DesignerItemStyle");
+
+			//find out what sprite have we clicked on!
+			Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
+			int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+			List<Sprite> lsprites = (List<Sprite>)((SpriteLayer)SceneExplorer_TreeView.SelectedItem).LayerObjects;
+
+			ContentControl cc = SelectTool.FindSpriteControl(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<ContentControl>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
+			Sprite spr = SelectTool.FindSprite(lsprites, cc);
+
+			int i = 0;
+			PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+			LB.ClearProperties();
+			foreach (object o in spr.getProperties().Values)
+			{
+				if (o is String || o is int)
+				{
+					LB.AddProperty(spr.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), spr.PropertyTBCallback);
+				}
+				i++;
+			}
+
 		}
 
 		private void LevelEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
