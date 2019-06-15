@@ -355,6 +355,7 @@ namespace BixBite
 								}
 
 								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects = str;//we have the row data so add to the level data
+
 							}
 
 							//Sprite
@@ -383,6 +384,9 @@ namespace BixBite
 								TempLevel.Layers.Add(new SpriteLayer(LayerType.Sprite, TempLevel));
 								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerName = SLName;
 								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects = sprites_;
+								TempLevel.Layers[TempLevel.Layers.Count - 1].SetProperty("LayerName", SLName);
+								TempLevel.Layers[TempLevel.Layers.Count - 1].SetProperty("LayerType", LayerType.Sprite.ToString());
+								TempLevel.Layers[TempLevel.Layers.Count - 1].SetProperty("#LayerObjects", sprites_.Count);
 								reader.Read();
 							}
 							//gameevent int[,]
@@ -667,10 +671,10 @@ namespace BixBite
 							await writer.WriteStartElementAsync(null, "Sprite", null);
 							await writer.WriteAttributeStringAsync(null, "Name", null, sprite.Name);
 							await writer.WriteAttributeStringAsync(null, "Location", null, sprite.ImgPathLocation);
-							await writer.WriteAttributeStringAsync(null, "Width", null, sprite.Width.ToString());
-							await writer.WriteAttributeStringAsync(null, "Height", null, sprite.Height.ToString());
-							await writer.WriteAttributeStringAsync(null, "x", null, sprite.xpos.ToString());
-							await writer.WriteAttributeStringAsync(null, "y", null, sprite.ypos.ToString());
+							await writer.WriteAttributeStringAsync(null, "Width", null, sprite.GetProperty("width").ToString());
+							await writer.WriteAttributeStringAsync(null, "Height", null, sprite.GetProperty("height").ToString());
+							await writer.WriteAttributeStringAsync(null, "x", null, sprite.GetProperty("x").ToString());
+							await writer.WriteAttributeStringAsync(null, "y", null, sprite.GetProperty("y").ToString());
 							await writer.WriteEndElementAsync();
 						}
 

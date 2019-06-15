@@ -179,10 +179,10 @@ namespace ProjectE_E.Components
 			{
 				Texture2D texture = sprites[spr.ImgPathLocation];
 				Rectangle r = new Rectangle();
-				r.X = spr.xpos;
-				r.Y = spr.ypos;
-				r.Width = spr.Width;
-				r.Height = spr.Height;
+				r.X = (int)spr.GetProperty("x");
+				r.Y = (int)spr.GetProperty("y");
+				r.Width = (int)spr.GetProperty("width");
+				r.Height = (int)spr.GetProperty("height");
 				MapTiles.Add(new Tile(texture, r));
 			}
 		}

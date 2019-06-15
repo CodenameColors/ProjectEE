@@ -922,6 +922,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 		
+		/// <summary>
+		/// This method will be called when mousedown occurs on a SPRITE object.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void ContentControl_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
 			Console.WriteLine("testing");
@@ -938,6 +943,9 @@ namespace AmethystEngine.Forms
 			currentCC = ((ContentControl)sender);
 			Selector.SetIsSelected(((Control)currentCC), true);
 			curect.IsHitTestVisible = false;
+
+
+
 		}
 
 		private void Rectangle_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -1427,7 +1435,7 @@ namespace AmethystEngine.Forms
 		private void FullMapEditorFill(Sprite spr, ImageBrush i, int zindex)
 		{
 			Rectangle r = new Rectangle() { Width = 10, Height = 10, Fill = i };
-			Canvas.SetLeft(r, spr.xpos / 4); Canvas.SetTop(r, spr.ypos / 4); Canvas.SetZIndex(r, zindex); // divide 4 because scaling.
+			Canvas.SetLeft(r, (int)spr.GetProperty("x") / 4); Canvas.SetTop(r, (int)spr.GetProperty("y") / 4); Canvas.SetZIndex(r, zindex); // divide 4 because scaling.
 			FullMapLEditor_Canvas.Children.Add(r);
 		}
 
@@ -1824,13 +1832,13 @@ namespace AmethystEngine.Forms
 					{
 						BitmapImage bitmap = new BitmapImage(new Uri(sprite.ImgPathLocation, UriKind.Absolute));
 						Image img = new Image(); img.Source = bitmap;
-						Rectangle r = new Rectangle() { Width = sprite.Width, Height = sprite.Height, Fill = new ImageBrush(img.Source) };//Make a rectange teh size of the image
+						Rectangle r = new Rectangle() { Width = (int)sprite.GetProperty("width"), Height = (int)sprite.GetProperty("height"), Fill = new ImageBrush(img.Source) };//Make a rectange the size of the image
 
 						ContentControl CC = ((ContentControl)this.TryFindResource("MoveableImages_Template"));
-						CC.Width = sprite.Width;
-						CC.Height = sprite.Height;
+						CC.Width = (int)sprite.GetProperty("width");
+						CC.Height = (int)sprite.GetProperty("height");
 
-						Canvas.SetLeft(CC, sprite.xpos); Canvas.SetTop(CC, sprite.ypos); Canvas.SetZIndex(CC, Zindex);
+						Canvas.SetLeft(CC, (int)sprite.GetProperty("x")); Canvas.SetTop(CC, (int)sprite.GetProperty("y")); Canvas.SetZIndex(CC, Zindex);
 						Selector.SetIsSelected(CC, false);
 						CC.MouseRightButtonDown += ContentControl_MouseLeftButtonDown;
 						((Rectangle)CC.Content).Fill = new ImageBrush(img.Source);
