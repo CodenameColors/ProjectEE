@@ -150,11 +150,11 @@ namespace AmethystEngine.Forms
 			OpenLevels = new ObservableCollection<Level>();
 
 
-			PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
-			LB.AddProperty("LevelName", new TextBox(), "Level1");
-			LB.AddProperty("Width", new TextBox(), "50");
-			LB.AddProperty("Height", new TextBox(), "50");
-			LB.AddProperty("MainLevel?", new CheckBox(), true);
+			//PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+			//LB.AddProperty("LevelName", new TextBox(), "Level1");
+			//LB.AddProperty("Width", new TextBox(), "50");
+			//LB.AddProperty("Height", new TextBox(), "50");
+			//LB.AddProperty("MainLevel?", new CheckBox(), true);
 
 
 			LevelEditorScreenRatio = double.Parse(LEditorTS[1].PropertyData) / double.Parse(LEditorTS[2].PropertyData);
@@ -167,13 +167,6 @@ namespace AmethystEngine.Forms
 
 			//load main level
 			LoadMainLevel(ProjectFilePath);
-
-
-			//can i get the property dictionary to work?
-			EditorObjectProperties.Add("Name", new Tuple<String, string>("TextBoxPropertyTemplate", "50"));
-			EditorObjectProperties.Add("Width", new Tuple<String, string>("TextBoxPropertyTemplate", "50"));
-			EditorObjectProperties.Add("Height", new Tuple<String, string>("TextBoxPropertyTemplate", "50"));
-			//LB.ItemsSource = EditorObjectProperties;
 
 		}
 
@@ -1290,7 +1283,6 @@ namespace AmethystEngine.Forms
 					if (Int32.TryParse(YCellsVal_TB.Text, out ynum))
 					{
 						CreateLevel(LName, xnum, ynum);
-						//SceneExplorer_TreeView.ItemsSource = OpenLevels;
 					}
 				}
 			}
@@ -1375,8 +1367,8 @@ namespace AmethystEngine.Forms
     {
 			Level TempLevel = CurrentLevel;
 			if (TempLevel == null) return; //TODO: Remove after i make force select work on tree view.
-			FullMapLEditor_Canvas.Width = TempLevel.xCells * 10;
-      FullMapLEditor_Canvas.Height = TempLevel.yCells * 10;
+			FullMapLEditor_Canvas.Width = (int)TempLevel.GetProperty("xCells") * 10;
+      FullMapLEditor_Canvas.Height = (int)TempLevel.GetProperty("yCells") * 10;
 
       FullMapLEditor_VB.Viewport = new Rect(0, 0, 10, 10);
 			
@@ -1911,6 +1903,27 @@ namespace AmethystEngine.Forms
 			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).Visibility = Visibility.Visible;
 			((ComboBox)ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control)).Visibility = Visibility.Visible;
 			((Label)ContentLibrary_Control.Template.FindName("TileSet_LBL", ContentLibrary_Control)).Visibility = Visibility.Visible;
+
+
+			int i = 0;
+			PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+			foreach (object o in CurrentLevel.getProperties().Values)
+			{
+				if (o is String || o is int)
+				{
+					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
+				}
+				else if (o is bool)
+				{
+					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
+				}
+
+				i++;
+			}
+			//CurrentLevel.setProperties(((PropGrid)FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)).PropDictionary);
+			//((PropGrid)FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)).PropDictionary = CurrentLevel.getProperties();
+
+
 		}
 
 		private async System.Threading.Tasks.Task importLevelAsync(String filename)
@@ -1956,6 +1969,25 @@ namespace AmethystEngine.Forms
 			//draw the level
 			RedrawLevel(CurrentLevel);
 
+			int i = 0;
+			PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+			foreach (object o in CurrentLevel.getProperties().Values)
+			{
+				if (o is String || o is int)
+				{
+					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
+				}
+				else if (o is bool)
+				{
+					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
+				}
+
+				i++;
+			}
+			//CurrentLevel.setProperties(((PropGrid)FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)).PropDictionary);
+			//((PropGrid)FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)).PropDictionary = CurrentLevel.getProperties();
+
+
 			//set visabilty. 
 			Grid Prob_Grid = (Grid)ContentLibrary_Control.Template.FindName("TileSetProperties_Grid", ContentLibrary_Control);
 			Prob_Grid.Visibility = Visibility.Hidden;
@@ -1978,8 +2010,8 @@ namespace AmethystEngine.Forms
 			TempLevelChild.DefineLayerDataType(LayerType.Sprite, XCellsVal, YCellsVal);
 			TempLevel.Layers.Add(TempLevelChild);
 
-			TempLevel.xCells = XCellsVal;
-			TempLevel.yCells = YCellsVal;
+			TempLevel.SetProperty("xCells", XCellsVal);
+			TempLevel.SetProperty("yCells",YCellsVal);
 
 			CurrentLevel = TempLevel;
 
@@ -2003,8 +2035,26 @@ namespace AmethystEngine.Forms
 				new LevelEditorProp(){ PropertyName = "Map Height(cells)", PropertyData="50" },
 				//new LevelEditorProp("test 2")								
 			};
+			int i = 0;
+			PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+			foreach (object o in CurrentLevel.getProperties().Values)
+			{
+				if (o is String || o is int)
+				{
+					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
+				}
+				else if (o is bool)
+				{
+					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
+				}
+
+				i++;
+			}
+			//CurrentLevel.setProperties(((PropGrid)FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)).PropDictionary);
+			//((PropGrid)FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)).PropDictionary = CurrentLevel.getProperties();
 		}
 		#endregion
+
 
 		#region "Content Library"
 		/// <summary>
@@ -2183,7 +2233,7 @@ namespace AmethystEngine.Forms
 		{
 			Level TempLevel = ((Level)SceneExplorer_TreeView.SelectedValue);
 			TempLevel.AddLayer("new tile", LayerType.Tile);
-			TempLevel.Layers.Last().DefineLayerDataType(LayerType.Tile, TempLevel.xCells, TempLevel.yCells);
+			TempLevel.Layers.Last().DefineLayerDataType(LayerType.Tile, (int)TempLevel.GetProperty("xCells"), (int)TempLevel.GetProperty("yCells"));
 		}
 		private void SpriteLayer_Click(object sender, RoutedEventArgs e)
 		{
@@ -2195,7 +2245,7 @@ namespace AmethystEngine.Forms
 		{
 			Level TempLevel = ((Level)SceneExplorer_TreeView.SelectedValue);
 			TempLevel.AddLayer("new GOL", LayerType.GameEvent);
-			TempLevel.Layers.Last().DefineLayerDataType(LayerType.GameEvent, TempLevel.xCells, TempLevel.yCells);
+			TempLevel.Layers.Last().DefineLayerDataType(LayerType.GameEvent, (int)TempLevel.GetProperty("xCells"), (int)TempLevel.GetProperty("yCells"));
 
 
 		}
@@ -2292,18 +2342,6 @@ namespace AmethystEngine.Forms
 				//set the current level PTR
 				CurrentLevel = (Level)e.NewValue;
 
-
-				LEditorTS = new List<LevelEditorProp>()
-				{
-					new LevelEditorProp(){ PropertyName = "Level Name", PropertyData=((Level)e.NewValue).LevelName },
-					new LevelEditorProp(){ PropertyName = "Map Width(cells)", PropertyData=((Level)e.NewValue).xCells.ToString() },
-					new LevelEditorProp(){ PropertyName = "Map Height(cells)", PropertyData=((Level)e.NewValue).yCells.ToString() },
-					//new LevelEditorProp("test 2")								
-				};
-				//ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
-				//LB.ItemsSource = null;
-				//LB.ItemsSource = LEditorTS;
-
 				TileSets_CB.Items.Clear(); //remove the past data.
 				foreach (Tuple<String, String, int, int> tilesetTuples in ((Level)e.NewValue).TileSet)
 				{
@@ -2326,7 +2364,23 @@ namespace AmethystEngine.Forms
 					String Name = pic.UriSource.ToString().Substring(pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
 
 					TileSets_CB.SelectedIndex = 0;
+				}
 
+				int i = 0;
+				PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+				LB.ClearProperties();
+				foreach (object o in ((Level)e.NewValue).getProperties().Values)
+				{
+					if (o is String || o is int)
+					{
+						LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), ((Level)e.NewValue).PropertyTBCallback);
+					}
+					else if (o is bool)
+					{
+						LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, ((Level)e.NewValue).PropertyCheckBoxCallback);
+					}
+
+					i++;
 				}
 
 			}
@@ -2339,6 +2393,25 @@ namespace AmethystEngine.Forms
 					new LevelEditorProp(){ PropertyName = "Layer Type:", PropertyData=((SpriteLayer)e.NewValue).layerType.ToString() },
 					//new LevelEditorProp("test 2")								
 				};
+
+				int i = 0;
+				PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+				SpriteLayer SL = (SpriteLayer)e.NewValue;
+				LB.ClearProperties();
+				foreach (object o in SL.getProperties().Values)
+				{
+					if (o is String || o is int)
+					{
+						LB.AddProperty(SL.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), SL.PropertyTBCallback);
+					}
+					else if (o is bool)
+					{
+						LB.AddProperty(SL.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, SL.PropertyCheckBoxCallback);
+					}
+
+					i++;
+				}
+
 				//ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
 				//LB.ItemsSource = null;
 				//LB.ItemsSource = LEditorTS;

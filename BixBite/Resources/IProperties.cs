@@ -8,13 +8,10 @@ namespace BixBite.Resources
 {
 	interface IProperties
 	{
-		//name, data
-		ObservableDictionary<String, object> Properties { get; set; }
-
 		/// <summary>
 		/// Use this to MANUALLY set the properties dictionary
 		/// </summary>
-		void UpdateProperties();
+		void UpdateProperties(Dictionary<String, object> newdict);
 
 		/// <summary>
 		/// Uses this to clear all the properties in the dictionary
@@ -24,6 +21,14 @@ namespace BixBite.Resources
 		/// <summary>
 		/// Use this to add a property to the dictionary
 		/// </summary>
-		void AddProperty(String Pname, object data, );
+		void AddProperty(String Pname, object data);
+
+		void SetProperty(String PName, object data);
+
+		object GetProperty(String Pname);
+
+		ObservableDictionary<String, object> getProperties();
+
+		void setProperties(ObservableDictionary<String, object> newprops);
 	}
 }
