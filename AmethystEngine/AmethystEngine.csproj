@@ -44,7 +44,8 @@
       <HintPath>..\BixBite\bin\Debug\BixBite.dll</HintPath>
     </Reference>
     <Reference Include="PropertyGridEditor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\..\Downloads\PropertyGridEditor.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Visual Studio 2017\Projects\PropertyGridControl\PropertyGridEditor\bin\Debug\PropertyGridEditor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
