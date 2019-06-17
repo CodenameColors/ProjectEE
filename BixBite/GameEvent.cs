@@ -37,7 +37,7 @@ namespace BixBite
 		//public String ActivationButton, , DelegateEventName = String.Empty;
 		public String EventName;
 		public EventType eventType = new EventType();
-		private EventData datatoload = new EventData(); ///this is the data that will load on an activation of this event.
+		public  EventData datatoload = new EventData(); ///this is the data that will load on an activation of this event.
 		//private bool isActive = true; //this determines where or not this event should be checked for.
 
 		ObservableDictionary<string, object> Properties { get; set; }
@@ -57,6 +57,11 @@ namespace BixBite
 			AddProperty("ActivationButton", "");
 			AddProperty("EventName", "");
 			AddProperty("DelegateEventName", "");
+
+			datatoload.MoveTime = 0;
+			datatoload.newx = 0;
+			datatoload.newy = 0;
+			datatoload.NewFileToLoad = "";
 		}
 
 		#region Properties

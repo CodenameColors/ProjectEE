@@ -72,10 +72,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Forms\GameEventsSettings.xaml.cs">
+      <DependentUpon>GameEventsSettings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ResizeThumb.cs" />
     <Compile Include="Resources\ObservableStyleDictionary.cs" />
     <Compile Include="RotateThumb.cs" />
     <Page Include="Forms\EngineEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Forms\GameEventsSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
