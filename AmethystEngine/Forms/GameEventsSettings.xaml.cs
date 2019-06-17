@@ -39,6 +39,7 @@ namespace AmethystEngine.Forms
 			GameEventLayers_LB.SelectedIndex = 0;
 			if (TCindex == 0)
 			{
+				if (GameEventLayers_LB.Items.Count == 0) return; //there are no game event layers...
 				SetGameEvents(CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]]);
 				GameEvents_LB.SelectedIndex = 0;
 				if (GameEvents_LB.Items.Count == 0) return; // there is no game events... 
