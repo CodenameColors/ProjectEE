@@ -135,7 +135,12 @@
 						<MenuItem Header="Down Laver" Click="DownLaverLevelEditor_BTN_Click"/>
 					</Menu>
 					<Menu DockPanel.Dock="Top" Grid.Column="8" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
-						<MenuItem Header="Game Events" Click="GameEvent_BTN_Click"/>
+						<MenuItem Header="Game Events" Click="GameEvent_BTN_Click" Foreground="White">
+							<MenuItem x:Name="NewGameEvent" Header="Add GameEvent" Foreground="Black" Click="AddGameEvent_Click"/>
+							<MenuItem x:Name="EditGameEvents" Header="Edit GameEvents" Foreground="Black" Click="EditGameEvents_Click"/>
+							<MenuItem Header="Declare GameEvent" Foreground="Black" Click="GameEvent_BTN_Click"/>
+							<MenuItem Header="Select GameEvent" Foreground="Black" Click="LevelEditorSelection_Click"/>
+						</MenuItem>
 					</Menu>
 					<Menu DockPanel.Dock="Top" Grid.Column="9" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
 						<MenuItem Header="Test" Click="Test_Click"/>
@@ -564,7 +569,7 @@
 			<ContentControl x:Name="FullMapGrid_Control" Template="{DynamicResource LevelEditorProperty_Template}" Grid.Column="2" Grid.ColumnSpan="2"/>
 
 			<ContentControl x:Name="EditorToolBar_CC" Grid.Column="1" Height="25" VerticalAlignment="Top" Margin="10,4,123,0"
-											Template="{DynamicResource LevelEditorSpriteToolBar_Template}"/>
+											Template="{DynamicResource LevelEditorTileMapToolBar_Template}"/>
 
 			<!--This is the main editor window-->
 
