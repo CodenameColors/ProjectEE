@@ -42,20 +42,15 @@ namespace BixBite
 
 		ObservableDictionary<string, object> Properties { get; set; }
 
-		public GameEvent(String Name, EventType eventType, int xpos, int ypos, int w, int h, int group)
+		public GameEvent(String Name, EventType eventType, int group)
 		{
 			Properties = new ObservableDictionary<string, object>();
 			this.EventName = Name;
-			AddProperty("Name", Name);
 			this.eventType = eventType;
-			AddProperty("xpos", xpos);
-			AddProperty("ypos", ypos);
-			AddProperty("width", w);
-			AddProperty("height", h);
+			AddProperty("EventName", Name);
 			AddProperty("group", group);
 			AddProperty("isActive", true);
 			AddProperty("ActivationButton", "");
-			AddProperty("EventName", "");
 			AddProperty("DelegateEventName", "");
 
 			datatoload.MoveTime = 0;
