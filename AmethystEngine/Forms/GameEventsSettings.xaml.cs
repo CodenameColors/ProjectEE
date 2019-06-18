@@ -78,7 +78,7 @@ namespace AmethystEngine.Forms
 
 		private void SetGameEventProperties(GameEvent curGameEvent)
 		{
-			EventName_TB.Text = curGameEvent.GetProperty("Name").ToString();
+			EventName_TB.Text = curGameEvent.GetProperty("EventName").ToString();
 			int num = (int)curGameEvent.eventType; EventType_CB.SelectedItem = EventType_CB.Items[num]; 
 			EventGroup_TB.Text = curGameEvent.GetProperty("group").ToString();
 			EventDelegateName_TB.Text = curGameEvent.GetProperty("DelegateEventName").ToString();
@@ -118,20 +118,127 @@ namespace AmethystEngine.Forms
 		private bool CanCreateEvent()
 		{
 			bool ret = true;
-			String s = EventName_TB.Text;
-			//EventName_TB.Text = curGameEvent.GetProperty("Name").ToString();
-			//int num = (int)curGameEvent.eventType; EventType_CB.SelectedItem = EventType_CB.Items[num];
-			//EventGroup_TB.Text = curGameEvent.GetProperty("group").ToString();
-			//EventDelegateName_TB.Text = curGameEvent.GetProperty("DelegateEventName").ToString();
-			////TODO: Add the inputs after the input section in the project settings is added.
+			bool bLName = true;
+			String s = "";
+			ret &= (AddEventName_TB.Text == "" ? false : true);
+			ret &= (AddEventGroup_TB.Text == "" ? false : true);
+			ret &= (AddEventDelegateName_TB.Text == "" ? false : true); ;
+			ret &= (AddEventGroup_TB.Text == "" ? false : true); ;
 
-			//FileToLoad_CB.Text = curGameEvent.datatoload.NewFileToLoad;
-			//EventNewPosX_TB.Text = curGameEvent.datatoload.newx.ToString();
-			//EventNewPosY_TB.Text = curGameEvent.datatoload.newy.ToString();
-			//EventMoveTime_TB.Text = curGameEvent.datatoload.MoveTime.ToString();
 
-			return ret;
+			//okay so all of those should be filled out to have a valid event!
+			bLName = System.Text.RegularExpressions.Regex.IsMatch(AddEventName_TB.Text, @"^[A-Za-z][A-Za-z0-9]+");
+			bLName &= System.Text.RegularExpressions.Regex.IsMatch(AddEventDelegateName_TB.Text, @"^[A-Za-z][A-Za-z0-9]+");
+			int group, newx, newy, movetime = 0;
+
+
+			//What Event Type is this?
+			if (AddEventType_CB.SelectedIndex == 4 || AddEventType_CB.SelectedIndex == 5)
+			{
+				AddEventData_CC.Visibility = Visibility.Hidden;
+
+				if (ret && bLName)
+				{
+					return true;
+				}
+				else
+				{
+					Console.WriteLine("Invaild Data given to create game event");
+					return false; //not valid
+				}
+			}
+			else
+			{
+				bLName &= Int32.TryParse(AddEventGroup_TB.Text, out group);
+				bLName &= Int32.TryParse(AddEventNewPosX_TB.Text, out newx);
+				bLName &= Int32.TryParse(AddEventNewPosY_TB.Text, out newy);
+				bLName &= Int32.TryParse(AddEventMoveTime_TB.Text, out movetime);
+				AddEventData_CC.Visibility = Visibility.Visible;
+				ret &= (AddFileToLoad_TB_TB.Text == "" ? false : true);
+				ret &= (AddEventNewPosX_TB.Text == "" ? false : true);
+				ret &= (AddEventNewPosY_TB.Text == "" ? false : true);
+				ret &= (AddEventMoveTime_TB.Text == "" ? false : true);
+
+				if (ret && bLName)
+				{
+					return true;
+				}
+				else
+				{
+					Console.WriteLine("Invaild Data given to create game event");
+					return false; //not valid
+				}
+
+			}
 		}
+
+		private void CreateNewGameEvent_Click(object sender, RoutedEventArgs e)
+		{
+			if (CanCreateEvent())
+			{
+				bool bLName = true;
+				int group, newx, newy, movetime = 0;
+				bLName &= Int32.TryParse(AddEventGroup_TB.Text, out group);
+				bLName &= Int32.TryParse(AddEventNewPosX_TB.Text, out newx);
+				bLName &= Int32.TryParse(AddEventNewPosY_TB.Text, out newy);
+				bLName &= Int32.TryParse(AddEventMoveTime_TB.Text, out movetime);
+
+				//create a new GameEvent
+				GameEvent ge = new GameEvent(AddEventName_TB.Text, (EventType)AddEventType_CB.SelectedIndex, group);
+				//properties!
+				//ge.SetProperty("ActivationButton", )
+				ge.SetProperty("DelegateEventName", AddEventDelegateName_TB.Text);
+				ge.SetProperty("ActivationButton", "NONE");
+
+
+				if (AddEventType_CB.SelectedIndex != 4 || AddEventType_CB.SelectedIndex != 5)
+				{ 
+					ge.datatoload.MoveTime = movetime;
+					ge.datatoload.newx = newx;
+					ge.datatoload.newy = newy;
+					////ge.datatoload.NewFileToLoad= movetime;
+				}
+
+				//add the event!
+				((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].LayerObjects).Item2.Add(ge);
+
+			}
+		}
+
+		private void AddEventType_CB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (AddEventType_CB.SelectedIndex == 4 || AddEventType_CB.SelectedIndex == 5)
+			{
+				AddEventData_CC.Visibility = Visibility.Hidden;
+			}
+			else
+			{
+				AddEventData_CC.Visibility = Visibility.Visible;
+			}
+		}
+
+		private void GameEvents_LB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (GameEvents_LB.SelectedIndex == -1) return;
+				SetGameEventProperties(((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].LayerObjects).Item2[GameEvents_LB.SelectedIndex]);
+		}
+
+
+
+		//Allowed Event Names since i need to auto gen this code later
+
+
+		//EventName_TB.Text = curGameEvent.GetProperty("Name").ToString();
+		//int num = (int)curGameEvent.eventType; EventType_CB.SelectedItem = EventType_CB.Items[num];
+		//EventGroup_TB.Text = curGameEvent.GetProperty("group").ToString();
+		//EventDelegateName_TB.Text = curGameEvent.GetProperty("DelegateEventName").ToString();
+		////TODO: Add the inputs after the input section in the project settings is added.
+
+		//FileToLoad_CB.Text = curGameEvent.datatoload.NewFileToLoad;
+		//EventNewPosX_TB.Text = curGameEvent.datatoload.newx.ToString();
+		//EventNewPosY_TB.Text = curGameEvent.datatoload.newy.ToString();
+		//EventMoveTime_TB.Text = curGameEvent.datatoload.MoveTime.ToString();
+
 
 		private void GameEventSettings_DragMove(object sender, MouseButtonEventArgs e)
 		{
@@ -168,6 +275,114 @@ namespace AmethystEngine.Forms
 			//load the new game events list.
 			GameEvents_LB.Items.Clear();
 			SetGameEvents(CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]]);
+		}
+
+		private void EventName_TB_KeyDown(object sender, KeyEventArgs e)
+		{
+			if(e.Key == Key.Enter)
+			{
+				if (System.Text.RegularExpressions.Regex.IsMatch(((TextBox)sender).Text, @"^[A-Za-z][A-Za-z0-9]+"))
+				{
+					//change the property on this layer and event
+					GameEvent g = ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].
+						LayerObjects).Item2[GameEvents_LB.SelectedIndex];
+					g.EventName = ((TextBox)sender).Text;
+					g.SetProperty("EventName", ((TextBox)sender).Text);
+
+				}
+			}
+		}
+
+		private void EventType_CB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (AddEventType_CB.SelectedIndex == 4 || AddEventType_CB.SelectedIndex == 5)
+			{
+				AddEventData_CC.Visibility = Visibility.Hidden;
+			}
+			else
+			{
+				AddEventData_CC.Visibility = Visibility.Visible;
+			}
+			int num = 0;
+				//change the property on this layer and event
+				GameEvent g = ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].
+					LayerObjects).Item2[GameEvents_LB.SelectedIndex];
+				g.eventType = (EventType)EventType_CB.SelectedIndex;
+		}
+
+		private void EventGroup_TB_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter)
+			{
+				int num = 0;
+				if (Int32.TryParse(((TextBox)sender).Text, out num))
+				{
+					//change the property on this layer and event
+					GameEvent g = ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].
+						LayerObjects).Item2[GameEvents_LB.SelectedIndex];
+					g.SetProperty("group", num);
+				}
+			}
+		}
+
+		private void EventDelegateName_TB_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter)
+			{
+				if (System.Text.RegularExpressions.Regex.IsMatch(((TextBox)sender).Text, @"^[A-Za-z][A-Za-z0-9]+"))
+				{
+					//change the property on this layer and event
+					GameEvent g = ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].
+						LayerObjects).Item2[GameEvents_LB.SelectedIndex];
+					g.EventName = ((TextBox)sender).Text;
+					g.SetProperty("DelegateEventName", ((TextBox)sender).Text);
+				}
+			}
+		}
+
+		private void EventNewPosX_TB_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter)
+			{
+				int num = 0;
+				if (Int32.TryParse(((TextBox)sender).Text, out num))
+				{
+					//change the property on this layer and event
+					GameEvent g = ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].
+						LayerObjects).Item2[GameEvents_LB.SelectedIndex];
+					g.datatoload.newx = num;
+				}
+			}
+		}
+
+		private void EventNewPosY_TB_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter)
+			{
+				int num = 0;
+				if (Int32.TryParse(((TextBox)sender).Text, out num))
+				{
+					//change the property on this layer and event
+					GameEvent g = ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].
+						LayerObjects).Item2[GameEvents_LB.SelectedIndex];
+					g.datatoload.newy = num;
+				}
+			}
+		}
+
+		private void EventMoveTime_TB_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter)
+			{
+				int num = 0;
+				if (Int32.TryParse(((TextBox)sender).Text, out num))
+				{
+					//change the property on this layer and event
+					GameEvent g = ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].
+						LayerObjects).Item2[GameEvents_LB.SelectedIndex];
+					g.datatoload.MoveTime = num;
+				}
+			}
 		}
 	}
 }

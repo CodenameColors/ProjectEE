@@ -885,7 +885,7 @@ namespace AmethystEngine.Forms
 					LevelEditor_Canvas.Children.Add(b); //actual place it on the canvas
 
 					//create event data for the game event.
-					CurrentLevel.Layers[curLayer].AddToLayer(1, (int)p.Y/40, (int)p.X/40, new GameEvent("Trigger", EventType.Trigger, (int)p.X, (int)p.Y, 40, 40, 1));
+					CurrentLevel.Layers[curLayer].AddToLayer(1, (int)p.Y/40, (int)p.X/40, new GameEvent("Trigger", EventType.Trigger,  1));
 					EventData ed = new EventData()
 					{
 						newx = 0,
@@ -895,8 +895,8 @@ namespace AmethystEngine.Forms
 					};
 
 					//add the event data. how the palyer will change FROM this event
-					((Tuple<int[,], List<GameEvent>>)((SpriteLayer)CurrentLevel.Layers[curLayer]).LayerObjects).
-						Item2.Last().AddEventData(ed, "DeleTest1", "NULL");
+					//((Tuple<int[,], List<GameEvent>>)((SpriteLayer)CurrentLevel.Layers[curLayer]).LayerObjects).
+					//	Item2.Last().AddEventData(ed, "DeleTest1", "NULL");
 				}
 				else if (CurrentTool == EditorTool.Select) //selected a game event square.
 				{
