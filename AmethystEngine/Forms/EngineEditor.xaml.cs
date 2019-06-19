@@ -19,6 +19,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using BixBite.Resources;
+using PropertyGridEditor;
 
 namespace AmethystEngine.Forms
 {
@@ -99,6 +100,8 @@ namespace AmethystEngine.Forms
 		Point[] shiftpoints = new Point[3]; //0 = mouse down , 1 = mouse up , 2 on shifting "tick"
 		private List<Image> TileSets = new List<Image>();
 
+		private int GameEventNum;
+
 		int EditorGridHeight = 40;
     int EditorGridWidth = 40;
     int NumOfCellsX = 10;
@@ -149,11 +152,14 @@ namespace AmethystEngine.Forms
 			OpenLevels = new ObservableCollection<Level>();
 
 
-			ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
-			LB.ItemsSource = null;
-			//LB.ItemsSource = LEditorTS;
+			//PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+			//LB.AddProperty("LevelName", new TextBox(), "Level1");
+			//LB.AddProperty("Width", new TextBox(), "50");
+			//LB.AddProperty("Height", new TextBox(), "50");
+			//LB.AddProperty("MainLevel?", new CheckBox(), true);
 
-      LevelEditorScreenRatio = double.Parse(LEditorTS[1].PropertyData) / double.Parse(LEditorTS[2].PropertyData);
+
+			LevelEditorScreenRatio = double.Parse(LEditorTS[1].PropertyData) / double.Parse(LEditorTS[2].PropertyData);
       Console.WriteLine(LevelEditorScreenRatio);
       NumOfCellsX = int.Parse(LEditorTS[1].PropertyData);
       NumOfCellsY = int.Parse(LEditorTS[2].PropertyData);
@@ -163,13 +169,6 @@ namespace AmethystEngine.Forms
 
 			//load main level
 			LoadMainLevel(ProjectFilePath);
-
-
-			//can i get the property dictionary to work?
-			EditorObjectProperties.Add("Name", new Tuple<String, string>("TextBoxPropertyTemplate", "50"));
-			EditorObjectProperties.Add("Width", new Tuple<String, string>("TextBoxPropertyTemplate", "50"));
-			EditorObjectProperties.Add("Height", new Tuple<String, string>("TextBoxPropertyTemplate", "50"));
-			LB.ItemsSource = EditorObjectProperties;
 
 		}
 
@@ -739,7 +738,7 @@ namespace AmethystEngine.Forms
 		{
 			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
 
-				Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
+			Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
 			//Point p = GetGridSnapCords(Mouse.GetPosition(LevelEditor_Canvas));
 			Point p = GetGridSnapCords(pos);
 			Console.WriteLine(String.Format("Snapped grid cords: {0}", p.ToString()));
@@ -789,21 +788,6 @@ namespace AmethystEngine.Forms
 					{
 						//this selection works similar to tile. But instead it looks for borders not rectangles. It also will retrieve the game event group number
 						Rectangle r = new Rectangle() { Tag = "selection", Width = 40, Height = 40, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
-
-
-						//Rectangle r = new Rectangle() { Tag = "selection", Width = 40, Height = 40, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
-						//Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
-						//Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, 100);
-
-						////don't add another selection rectangle on an existing selection rectangle
-						//Rectangle sr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 100, (int)pos.X, (int)pos.Y);
-
-						//if (sr != null) return;
-						//selectTool.SelectedTiles.Add(rr);
-						//LevelEditor_Canvas.Children.Add(r);
-
-						//SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
-
 					}
 				}
 				else if (CurrentTool == EditorTool.Eraser)
@@ -882,6 +866,10 @@ namespace AmethystEngine.Forms
 			{
 				if (CurrentTool == EditorTool.Gameevent)
 				{
+
+					List<GameEvent> layergameevents = ((Tuple<int[,], List<GameEvent>>)((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerObjects).Item2;
+					if (GameEventNum < 0) return;
+
 					TextBlock tb = new TextBlock()
 					{
 						HorizontalAlignment = HorizontalAlignment.Center,
@@ -891,8 +879,8 @@ namespace AmethystEngine.Forms
 						Width = 40,
 						Height = 40,
 						FontSize = 18,
-						Text = "N",
-						Tag = "N",
+						Text = layergameevents[GameEventNum].GetProperty("group").ToString(),
+						Tag = layergameevents[GameEventNum].GetProperty("group").ToString(),
 						Foreground = new SolidColorBrush(Colors.Black),
 						Background = new SolidColorBrush(Color.FromArgb(100, 100, 100, 100)),
 					};
@@ -901,6 +889,22 @@ namespace AmethystEngine.Forms
 
 					Canvas.SetLeft(b, (int)p.X); Canvas.SetTop(b, (int)p.Y); Canvas.SetZIndex(b, curLayer); //place the tile position wise
 					LevelEditor_Canvas.Children.Add(b); //actual place it on the canvas
+
+					//create event data for the game event.
+					
+					
+					CurrentLevel.Layers[curLayer].AddToLayer(GameEventNum, (int)p.Y/40, (int)p.X/40, null);
+					EventData ed = new EventData()
+					{
+						newx = 0,
+						newy = 0,
+						MoveTime = 0,
+						NewFileToLoad = ""
+					};
+
+					//add the event data. how the palyer will change FROM this event
+					//((Tuple<int[,], List<GameEvent>>)((SpriteLayer)CurrentLevel.Layers[curLayer]).LayerObjects).
+					//	Item2.Last().AddEventData(ed, "DeleTest1", "NULL");
 				}
 				else if (CurrentTool == EditorTool.Select) //selected a game event square.
 				{
@@ -911,8 +915,18 @@ namespace AmethystEngine.Forms
 			}
 		}
 		
+		/// <summary>
+		/// This method will be called when mousedown occurs on a SPRITE object.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void ContentControl_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
+			//are we on a sprite layer?
+			if (!(SceneExplorer_TreeView.SelectedItem is SpriteLayer)) return;
+			if (((SpriteLayer)SceneExplorer_TreeView.SelectedItem).layerType != LayerType.Sprite) return;
+
+
 			Console.WriteLine("testing");
 			Selector.SetIsSelected(((Control)currentCC), false);
 			curect.IsHitTestVisible = true;
@@ -927,15 +941,43 @@ namespace AmethystEngine.Forms
 			currentCC = ((ContentControl)sender);
 			Selector.SetIsSelected(((Control)currentCC), true);
 			curect.IsHitTestVisible = false;
+
+
+
 		}
 
 		private void Rectangle_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
+			//are we on a sprite layer?
+			if (!(SceneExplorer_TreeView.SelectedItem is SpriteLayer)) return;
+			if (((SpriteLayer)SceneExplorer_TreeView.SelectedItem).layerType != LayerType.Sprite) return;
+
 			Console.WriteLine("sjdsjdns");
 			curect.IsHitTestVisible = true;
 			curect = ((Rectangle)sender);
 			curect.IsHitTestVisible = false;
 			//var m = Application.Current.MainWindow.FindResource("DesignerItemStyle");
+
+			//find out what sprite have we clicked on!
+			Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
+			int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+			List<Sprite> lsprites = (List<Sprite>)((SpriteLayer)SceneExplorer_TreeView.SelectedItem).LayerObjects;
+
+			ContentControl cc = SelectTool.FindSpriteControl(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<ContentControl>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
+			Sprite spr = SelectTool.FindSprite(lsprites, cc);
+
+			int i = 0;
+			PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+			LB.ClearProperties();
+			foreach (object o in spr.getProperties().Values)
+			{
+				if (o is String || o is int)
+				{
+					LB.AddProperty(spr.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), spr.PropertyTBCallback);
+				}
+				i++;
+			}
+
 		}
 
 		private void LevelEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -1272,7 +1314,6 @@ namespace AmethystEngine.Forms
 					if (Int32.TryParse(YCellsVal_TB.Text, out ynum))
 					{
 						CreateLevel(LName, xnum, ynum);
-						//SceneExplorer_TreeView.ItemsSource = OpenLevels;
 					}
 				}
 			}
@@ -1357,8 +1398,8 @@ namespace AmethystEngine.Forms
     {
 			Level TempLevel = CurrentLevel;
 			if (TempLevel == null) return; //TODO: Remove after i make force select work on tree view.
-			FullMapLEditor_Canvas.Width = TempLevel.xCells * 10;
-      FullMapLEditor_Canvas.Height = TempLevel.yCells * 10;
+			FullMapLEditor_Canvas.Width = (int)TempLevel.GetProperty("xCells") * 10;
+      FullMapLEditor_Canvas.Height = (int)TempLevel.GetProperty("yCells") * 10;
 
       FullMapLEditor_VB.Viewport = new Rect(0, 0, 10, 10);
 			
@@ -1417,7 +1458,7 @@ namespace AmethystEngine.Forms
 		private void FullMapEditorFill(Sprite spr, ImageBrush i, int zindex)
 		{
 			Rectangle r = new Rectangle() { Width = 10, Height = 10, Fill = i };
-			Canvas.SetLeft(r, spr.xpos / 4); Canvas.SetTop(r, spr.ypos / 4); Canvas.SetZIndex(r, zindex); // divide 4 because scaling.
+			Canvas.SetLeft(r, (int)spr.GetProperty("x") / 4); Canvas.SetTop(r, (int)spr.GetProperty("y") / 4); Canvas.SetZIndex(r, zindex); // divide 4 because scaling.
 			FullMapLEditor_Canvas.Children.Add(r);
 		}
 
@@ -1814,13 +1855,13 @@ namespace AmethystEngine.Forms
 					{
 						BitmapImage bitmap = new BitmapImage(new Uri(sprite.ImgPathLocation, UriKind.Absolute));
 						Image img = new Image(); img.Source = bitmap;
-						Rectangle r = new Rectangle() { Width = sprite.Width, Height = sprite.Height, Fill = new ImageBrush(img.Source) };//Make a rectange teh size of the image
+						Rectangle r = new Rectangle() { Width = (int)sprite.GetProperty("width"), Height = (int)sprite.GetProperty("height"), Fill = new ImageBrush(img.Source) };//Make a rectange the size of the image
 
 						ContentControl CC = ((ContentControl)this.TryFindResource("MoveableImages_Template"));
-						CC.Width = sprite.Width;
-						CC.Height = sprite.Height;
+						CC.Width = (int)sprite.GetProperty("width");
+						CC.Height = (int)sprite.GetProperty("height");
 
-						Canvas.SetLeft(CC, sprite.xpos); Canvas.SetTop(CC, sprite.ypos); Canvas.SetZIndex(CC, Zindex);
+						Canvas.SetLeft(CC, (int)sprite.GetProperty("x")); Canvas.SetTop(CC, (int)sprite.GetProperty("y")); Canvas.SetZIndex(CC, Zindex);
 						Selector.SetIsSelected(CC, false);
 						CC.MouseRightButtonDown += ContentControl_MouseLeftButtonDown;
 						((Rectangle)CC.Content).Fill = new ImageBrush(img.Source);
@@ -1893,6 +1934,27 @@ namespace AmethystEngine.Forms
 			((ScrollViewer)ContentLibrary_Control.Template.FindName("LevelEditorTIleMap_SV", ContentLibrary_Control)).Visibility = Visibility.Visible;
 			((ComboBox)ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control)).Visibility = Visibility.Visible;
 			((Label)ContentLibrary_Control.Template.FindName("TileSet_LBL", ContentLibrary_Control)).Visibility = Visibility.Visible;
+
+
+			int i = 0;
+			PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+			foreach (object o in CurrentLevel.getProperties().Values)
+			{
+				if (o is String || o is int)
+				{
+					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
+				}
+				else if (o is bool)
+				{
+					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
+				}
+
+				i++;
+			}
+			//CurrentLevel.setProperties(((PropGrid)FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)).PropDictionary);
+			//((PropGrid)FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)).PropDictionary = CurrentLevel.getProperties();
+
+
 		}
 
 		private async System.Threading.Tasks.Task importLevelAsync(String filename)
@@ -1938,6 +2000,25 @@ namespace AmethystEngine.Forms
 			//draw the level
 			RedrawLevel(CurrentLevel);
 
+			int i = 0;
+			PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+			foreach (object o in CurrentLevel.getProperties().Values)
+			{
+				if (o is String || o is int)
+				{
+					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
+				}
+				else if (o is bool)
+				{
+					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
+				}
+
+				i++;
+			}
+			//CurrentLevel.setProperties(((PropGrid)FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)).PropDictionary);
+			//((PropGrid)FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)).PropDictionary = CurrentLevel.getProperties();
+
+
 			//set visabilty. 
 			Grid Prob_Grid = (Grid)ContentLibrary_Control.Template.FindName("TileSetProperties_Grid", ContentLibrary_Control);
 			Prob_Grid.Visibility = Visibility.Hidden;
@@ -1960,8 +2041,8 @@ namespace AmethystEngine.Forms
 			TempLevelChild.DefineLayerDataType(LayerType.Sprite, XCellsVal, YCellsVal);
 			TempLevel.Layers.Add(TempLevelChild);
 
-			TempLevel.xCells = XCellsVal;
-			TempLevel.yCells = YCellsVal;
+			TempLevel.SetProperty("xCells", XCellsVal);
+			TempLevel.SetProperty("yCells",YCellsVal);
 
 			CurrentLevel = TempLevel;
 
@@ -1985,8 +2066,26 @@ namespace AmethystEngine.Forms
 				new LevelEditorProp(){ PropertyName = "Map Height(cells)", PropertyData="50" },
 				//new LevelEditorProp("test 2")								
 			};
+			int i = 0;
+			PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+			foreach (object o in CurrentLevel.getProperties().Values)
+			{
+				if (o is String || o is int)
+				{
+					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
+				}
+				else if (o is bool)
+				{
+					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
+				}
+
+				i++;
+			}
+			//CurrentLevel.setProperties(((PropGrid)FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)).PropDictionary);
+			//((PropGrid)FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)).PropDictionary = CurrentLevel.getProperties();
 		}
 		#endregion
+
 
 		#region "Content Library"
 		/// <summary>
@@ -2165,15 +2264,21 @@ namespace AmethystEngine.Forms
 		{
 			Level TempLevel = ((Level)SceneExplorer_TreeView.SelectedValue);
 			TempLevel.AddLayer("new tile", LayerType.Tile);
-			TempLevel.Layers.Last().DefineLayerDataType(LayerType.Tile, TempLevel.xCells, TempLevel.yCells);
+			TempLevel.Layers.Last().DefineLayerDataType(LayerType.Tile, (int)TempLevel.GetProperty("xCells"), (int)TempLevel.GetProperty("yCells"));
 		}
 		private void SpriteLayer_Click(object sender, RoutedEventArgs e)
 		{
-			((Level)SceneExplorer_TreeView.SelectedValue).AddLayer("new sprite", LayerType.Sprite);
+			Level TempLevel = ((Level)SceneExplorer_TreeView.SelectedValue);
+			TempLevel.AddLayer("new sprite", LayerType.Sprite);
+			TempLevel.Layers.Last().DefineLayerDataType(LayerType.Sprite);
 		}
 		private void GameObjectLayer_Click(object sender, RoutedEventArgs e)
 		{
-			((Level)SceneExplorer_TreeView.SelectedValue).AddLayer("new GOL", LayerType.GameEvent);
+			Level TempLevel = ((Level)SceneExplorer_TreeView.SelectedValue);
+			TempLevel.AddLayer("new GOL", LayerType.GameEvent);
+			TempLevel.Layers.Last().DefineLayerDataType(LayerType.GameEvent, (int)TempLevel.GetProperty("xCells"), (int)TempLevel.GetProperty("yCells"));
+
+
 		}
 		#endregion
 
@@ -2268,18 +2373,6 @@ namespace AmethystEngine.Forms
 				//set the current level PTR
 				CurrentLevel = (Level)e.NewValue;
 
-
-				LEditorTS = new List<LevelEditorProp>()
-				{
-					new LevelEditorProp(){ PropertyName = "Level Name", PropertyData=((Level)e.NewValue).LevelName },
-					new LevelEditorProp(){ PropertyName = "Map Width(cells)", PropertyData=((Level)e.NewValue).xCells.ToString() },
-					new LevelEditorProp(){ PropertyName = "Map Height(cells)", PropertyData=((Level)e.NewValue).yCells.ToString() },
-					//new LevelEditorProp("test 2")								
-				};
-				ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
-				LB.ItemsSource = null;
-				LB.ItemsSource = LEditorTS;
-
 				TileSets_CB.Items.Clear(); //remove the past data.
 				foreach (Tuple<String, String, int, int> tilesetTuples in ((Level)e.NewValue).TileSet)
 				{
@@ -2302,7 +2395,23 @@ namespace AmethystEngine.Forms
 					String Name = pic.UriSource.ToString().Substring(pic.UriSource.ToString().LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
 
 					TileSets_CB.SelectedIndex = 0;
+				}
 
+				int i = 0;
+				PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+				LB.ClearProperties();
+				foreach (object o in ((Level)e.NewValue).getProperties().Values)
+				{
+					if (o is String || o is int)
+					{
+						LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), ((Level)e.NewValue).PropertyTBCallback);
+					}
+					else if (o is bool)
+					{
+						LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, ((Level)e.NewValue).PropertyCheckBoxCallback);
+					}
+
+					i++;
 				}
 
 			}
@@ -2315,9 +2424,28 @@ namespace AmethystEngine.Forms
 					new LevelEditorProp(){ PropertyName = "Layer Type:", PropertyData=((SpriteLayer)e.NewValue).layerType.ToString() },
 					//new LevelEditorProp("test 2")								
 				};
-				ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
-				LB.ItemsSource = null;
-				LB.ItemsSource = LEditorTS;
+
+				int i = 0;
+				PropGrid LB = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+				SpriteLayer SL = (SpriteLayer)e.NewValue;
+				LB.ClearProperties();
+				foreach (object o in SL.getProperties().Values)
+				{
+					if (o is String || o is int)
+					{
+						LB.AddProperty(SL.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), SL.PropertyTBCallback);
+					}
+					else if (o is bool)
+					{
+						LB.AddProperty(SL.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, SL.PropertyCheckBoxCallback);
+					}
+
+					i++;
+				}
+
+				//ListBox LB = ((ListBox)(FullMapGrid_Control.Template.FindName("LEditProperty_LB", FullMapGrid_Control)));
+				//LB.ItemsSource = null;
+				//LB.ItemsSource = LEditorTS;
 			}
 			
 
@@ -2477,6 +2605,53 @@ namespace AmethystEngine.Forms
 		{
 			Console.WriteLine("Text Property Key down " + ((TextBox)sender).Tag.ToString());
 
+		}
+
+		private void AddGameEvent_Click(object sender, RoutedEventArgs e)
+		{
+			if (CurrentLevel == null) return;
+			GameEventsSettings ff = new GameEventsSettings(ref CurrentLevel, 1);
+			ff.Show();
+		}
+
+		private void EditGameEvents_Click(object sender, RoutedEventArgs e)
+		{
+			if (CurrentLevel == null) return;
+			GameEventsSettings ff = new GameEventsSettings(ref CurrentLevel, 0);
+			ff.Show();
+		}
+
+		private void DeclareGameEvent_MI_Click(object sender, RoutedEventArgs e)
+		{
+			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
+			if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.GameEvent)
+			{
+				//clicked on the event
+				MenuItem MI = ((MenuItem)(EditorToolBar_CC.Template.FindName("DeclareGameEvent_MI", EditorToolBar_CC)));
+				//TODO: This needs to have the offset. Since there can be multiple GameEventLayers. similar to how the tile map has an offset.
+				GameEventNum = Int32.Parse(((MenuItem)sender).Tag.ToString());
+				Console.WriteLine(GameEventNum);
+				CurrentTool = EditorTool.Gameevent;
+			}
+		}
+
+		private void MenuItem_MouseEnter(object sender, MouseEventArgs e)
+		{
+			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
+			if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.GameEvent)
+			{
+				//we are clicked on a gameevent layer!
+				List<GameEvent> layergameevents = ((Tuple<int[,], List<GameEvent>>)((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerObjects).Item2;
+				MenuItem MI = ((MenuItem)(EditorToolBar_CC.Template.FindName("DeclareGameEvent_MI", EditorToolBar_CC)));
+				MI.Items.Clear(); int i = 0; 
+				foreach (GameEvent ge in layergameevents)
+				{
+					MI.Items.Add(new MenuItem() { Header = ge.EventName ,Tag = i});
+					((MenuItem)MI.Items[MI.Items.Count - 1]).Click += DeclareGameEvent_MI_Click;
+					i++;
+				}
+
+			}
 		}
 	}
 }

@@ -1,0 +1,147 @@
+﻿<Window x:Class="AmethystEngine.Forms.GameEventsSettings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AmethystEngine.Forms"
+        mc:Ignorable="d" Background="#FF0E0D0D"
+        Title="Level Game Events" Height="500" Width="800" Foreground="White" AllowsTransparency="True" WindowStyle="None">
+	<Window.Resources>
+
+	</Window.Resources>
+
+	<Grid>
+
+		<Grid.RowDefinitions>
+			<RowDefinition Height="30"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="99*"/>
+			<ColumnDefinition Width="301*"/>
+		</Grid.ColumnDefinitions>
+
+
+		<Grid Grid.Row="0" Grid.ColumnSpan="2" Background="#FF484848" MouseLeftButtonDown="GameEventSettings_DragMove" Height="30" VerticalAlignment="Top">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="Auto"/>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
+			<Image Height="30" HorizontalAlignment="Left" Margin="3,0,0,0" Name="AmeIcon_im" Stretch="None" VerticalAlignment="Top" Width="30"  OpacityMask="Black" Source="/AmethystEngine;component/images/Ame_icon_small.png" />
+
+
+			<Label x:Name="ProjectName_LBL" Content="Level Game Events" Grid.Column="2" HorizontalAlignment="Center" Foreground="White"/>
+			<Button Content="_" Background="Transparent" BorderBrush="Transparent" Foreground="White" HorizontalAlignment="Center" Grid.Column="4" Width="20" Click="GameEventSettings_Minimize"/>
+			<Button Content="[  ]" Background="Transparent" BorderBrush="Transparent" Foreground="White" HorizontalAlignment="Center" Grid.Column="5" Width="20" Click="GameEventSettings_FullScreen"/>
+			<Button Content="X" Background="Transparent" BorderBrush="Transparent" Foreground="White" HorizontalAlignment="Center" Grid.Column="16" Width="20" Click="GameEventSettings_close" />
+
+		</Grid>
+
+		<!--Game event layers-->
+		<Label Grid.Row="1" Grid.Column="0" Content="Game Event Layers" Foreground="White" Margin="5" VerticalAlignment="Top" HorizontalContentAlignment="Center" />
+		<ListBox x:Name="GameEventLayers_LB" Grid.Row="1" Grid.Column="0" Margin="5,30,5,5" Background="Transparent" Foreground="White" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectionChanged="GameEventLayers_LB_SelectionChanged">
+		</ListBox>
+
+		<TabControl x:Name="GameEvent_TC" Grid.Row="1" Grid.Column="1" Margin="5">
+			<TabItem Header="Game Event Settings" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
+				<Grid Background="Black" >
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="239*"/>
+						<ColumnDefinition Width="347*"/>
+					</Grid.ColumnDefinitions>
+					<ListBox Name="GameEvents_LB" Background="Transparent" Foreground="White" SelectionChanged="GameEvents_LB_SelectionChanged">
+
+					</ListBox>
+
+					<Label Content="Event Name:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,11,0,0" Width="132"/>
+					<TextBox x:Name="EventName_TB" Grid.Column="1" Width="246" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="91,12,0,0" KeyDown="EventName_TB_KeyDown"/>
+					<Label Content="Event Type:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,42,0,0" Width="132"/>
+					<ComboBox x:Name="EventType_CB" Grid.Column="1" Width="116" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="91,43,0,0" SelectionChanged="EventType_CB_SelectionChanged">
+						<ComboBoxItem Name="cbi1">None</ComboBoxItem>
+						<ComboBoxItem Name="cbi2">Level Transistion</ComboBoxItem>
+						<ComboBoxItem Name="cbi3">Dialogue Scene Transistion</ComboBoxItem>
+						<ComboBoxItem Name="cbi4">Cutscene Transistion</ComboBoxItem>
+						<ComboBoxItem Name="cbi5">Trigger Area</ComboBoxItem>
+						<ComboBoxItem Name="cbi6">Collision Area</ComboBoxItem>
+						<ComboBoxItem Name="cbi7">Music Change</ComboBoxItem>
+					</ComboBox>
+					<Label Content="Event Group:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,73,0,0" Width="132"/>
+					<TextBox x:Name="EventGroup_TB" Grid.Column="1" Width="116" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="91,74,0,0" KeyDown="EventGroup_TB_KeyDown"/>
+					<Label Content="Event Delegate Name:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,104,0,0" Width="132"/>
+					<TextBox x:Name="EventDelegateName_TB" Grid.Column="1" Width="195" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="142,105,0,0" KeyDown="EventDelegateName_TB_KeyDown"/>
+
+					<Label Content="Event Activation:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,135,0,0" Width="132"/>
+					<ComboBox x:Name="EventActivation_TB" Grid.Column="1" Width="195" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="142,135,0,0">
+
+					</ComboBox>
+
+					<ContentControl Grid.Column="1" Name="EventData_CC">
+						<Grid>
+							<Label Content="Event Data:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,166,0,0" FontWeight="Bold"/>
+							<TextBox x:Name="EventNewPosX_TB" Width="70" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="193,227,0,0" KeyDown="EventNewPosX_TB_KeyDown" />
+							<Label Content="New Position of Player (x):" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,226,0,0" FontWeight="Thin"/>
+							<TextBox x:Name="EventNewPosY_TB" Width="70" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="193,258,0,0" KeyDown="EventNewPosY_TB_KeyDown" />
+							<Label Content="New Position of Player (y):" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,257,0,0" FontWeight="Thin"/>
+							<TextBox x:Name="EventMoveTime_TB" Width="117" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="146,289,0,0" KeyDown="EventMoveTime_TB_KeyDown" />
+							<Label Content="Movement Time:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,288,0,0" FontWeight="Thin"/>
+							<ComboBox x:Name="FileToLoad_CB" Width="214" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="123,196,0,0" />
+							<Label Content="File to Load:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50,195,0,0" FontWeight="Thin"/>
+						</Grid>
+
+					</ContentControl>
+
+					<GridSplitter HorizontalAlignment="Left" Grid.Column="1" Width="3" Background="#FF484848"/>
+				</Grid>
+			</TabItem>
+			<TabItem Header="Add Game Event" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D" Height="22" VerticalAlignment="Bottom">
+				<Grid Background="Black" >
+
+					<Label Content="Event Name:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,11,0,0" Width="132"/>
+					<TextBox x:Name="AddEventName_TB" Grid.Column="1" Width="246" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="91,12,0,0"/>
+					<Label Content="Event Type:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,42,0,0" Width="132"/>
+					<ComboBox x:Name="AddEventType_CB" Grid.Column="1" Width="116" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="91,43,0,0" SelectionChanged="AddEventType_CB_SelectionChanged">
+						<ComboBoxItem Name="acbi1">None</ComboBoxItem>
+						<ComboBoxItem Name="acbi2">Level Transistion</ComboBoxItem>
+						<ComboBoxItem Name="acbi3">Dialogue Scene Transistion</ComboBoxItem>
+						<ComboBoxItem Name="acbi4">Cutscene Transistion</ComboBoxItem>
+						<ComboBoxItem Name="acbi5">Trigger Area</ComboBoxItem>
+						<ComboBoxItem Name="acbi6">Collision Area</ComboBoxItem>
+						<ComboBoxItem Name="acbi7">Music Change</ComboBoxItem>
+					</ComboBox>
+					<Label Content="Event Group:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,73,0,0" Width="132"/>
+					<TextBox x:Name="AddEventGroup_TB" Grid.Column="1" Width="116" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="91,74,0,0"/>
+					<Label Content="Event Delegate Name:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,104,0,0" Width="132"/>
+					<TextBox x:Name="AddEventDelegateName_TB" Grid.Column="1" Width="195" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="142,105,0,0"/>
+
+					<Label Content="Event Activation:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,135,0,0" Width="132"/>
+					<ComboBox x:Name="AddEventActivation_TB" Grid.Column="1" Width="195" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="142,135,0,0"/>
+
+					<ContentControl Grid.Column="1" Name="AddEventData_CC">
+						<Grid HorizontalAlignment="Left" VerticalAlignment="Top">
+							<Label Content="Event Data:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,166,0,0" FontWeight="Bold"/>
+							<TextBox x:Name="AddEventNewPosX_TB" Width="70" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="193,227,0,0" />
+							<Label Content="New Position of Player (x):" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,226,0,0" FontWeight="Thin"/>
+							<TextBox x:Name="AddEventNewPosY_TB" Width="70" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="193,258,0,0" />
+							<Label Content="New Position of Player (y):" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,257,0,0" FontWeight="Thin"/>
+							<TextBox x:Name="AddEventMoveTime_TB" Width="117" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="146,289,0,0" />
+							<Label Content="Movement Time:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,288,0,0" FontWeight="Thin"/>
+							<TextBox x:Name="AddFileToLoad_TB_TB" Width="214" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="123,196,0,0" />
+							<Label Content="File to Load:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50,195,0,0" FontWeight="Thin"/>
+							
+						</Grid>
+
+					</ContentControl>
+					<Button Content="Add Event" Margin="254,329,249,67" Click="CreateNewGameEvent_Click" />
+				</Grid>
+			</TabItem>
+		</TabControl>
+
+		<GridSplitter HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1" Width="3" Background="#FF484848" />
+	</Grid>
+</Window>
+

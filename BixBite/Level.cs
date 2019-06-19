@@ -3,41 +3,162 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Xml;
 using BixBite.Rendering;
+using BixBite.Resources;
 
 namespace BixBite
 {
-	public class Level
+	public class Level : IProperties
 	{
 		//instance variables
-		public String LevelName { get; set; }
+		
 		/// <summary>
 		/// Item1: TileSetName Item2: TileSet Image Location Item3: TileWidth Item4:TileHeight
 		/// </summary>
 		public List<Tuple<String, String, int, int>> TileSet = new List<Tuple<string, string, int, int>>();
 		public List<Tuple<String, String>> sprites = new  List<Tuple<string, string>>();
 		public ObservableCollection<SpriteLayer> Layers { get; set; }
-		public int xCells {get; set;}
-		public int yCells { get; set; }
-		public Dictionary<String, object> Properties = new Dictionary<string, object>();
-		public bool bSaved = false; //indicates whether the user has saved their progress.
-		public bool bMainLevel { get; set; } // ONLY ONE CAN BE TRUE in a project. this is the startup level.
+
+
+		ObservableDictionary<string, object> Properties
+		{
+			get; set;
+		}
+
+		//public bool bSaved = false; //indicates whether the user has saved their progress.
+		//public bool bMainLevel { get; set; } // ONLY ONE CAN BE TRUE in a project. this is the startup level.
+		//public int xCells {get; set;}
+		//public int yCells { get; set; }
+
+		//keeping this for databinding of tree view scene viewer.
+		public String LevelName { get; set; }
 
 		/// <summary>
 		/// This  variable stores all the anyonmous methods for event triggers.
 		/// </summary>
-		private Dictionary<string, System.Reflection.MethodInfo> EventsLUT = new Dictionary<string, System.Reflection.MethodInfo>();
+		//private Dictionary<string, System.Reflection.MethodInfo> EventsLUT = new Dictionary<string, System.Reflection.MethodInfo>();
+		public Level()
+		{
+			Properties = new ObservableDictionary<string, object>();
+			Layers = new ObservableCollection<SpriteLayer>();
+			Properties.Add("LevelName", "");
+			Properties.Add("bMainLevel", false);
+			Properties.Add("xCells", 0);
+			Properties.Add("yCells", 0);
+			Properties.Add("bSaved", false);
 
-
-		public Level() { Layers = new ObservableCollection<SpriteLayer>(); }
+		}
 
 		public Level(String desname, bool MainLevel = false)
 		{
 			LevelName = desname;
-			bMainLevel = MainLevel;
+			Properties = new ObservableDictionary<string, object>();
+			Properties.Add("LevelName", desname);
+			Properties.Add("bMainLevel", MainLevel);
+			Properties.Add("xCells", 0);
+			Properties.Add("yCells", 0);
+			Properties.Add("bSaved", false);
 			Layers = new ObservableCollection<SpriteLayer>();
 		}
+
+		//PROPERTIES 
+		#region Properties
+		public void UpdateProperties(Dictionary<String, object> newdict)
+		{
+			Properties = new ObservableDictionary<string, object>(newdict);
+		}
+
+		public void ClearProperties()
+		{
+			Properties.Clear();
+		}
+
+		public void AddProperty(string Pname, object data)
+		{
+			Properties.Add(Pname, data);
+		}
+
+
+		public ObservableDictionary<string, object> getProperties()
+		{
+			return Properties;
+		}
+
+		public void setProperties(ObservableDictionary<string, object> newprops)
+		{
+			Properties = newprops;
+		}
+
+		public void SetProperty(string PName, object data)
+		{
+			Properties[PName] = data;
+		}
+
+		public object GetProperty(String PName)
+		{
+			return Properties[PName];
+		}
+
+		#endregion
+
+		#region PropertyCallbacks
+
+		public void PropertyTBCallback(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter)
+			{
+				String PName = ((TextBox)sender).Tag.ToString();
+				if (GetProperty(PName) is bool)
+				{
+					SetProperty("Pname", ((CheckBox)sender).IsChecked);
+				}
+				else if(GetProperty(PName) is int)
+				{
+					int num = 0;
+					if (Int32.TryParse((((TextBox)sender).Tag.ToString()), out num)) {
+						if (PName == "xCells")
+						{
+							SetProperty(PName, num);
+							//TODO:Add hot reload logic for spritelayers
+						}
+						else if (PName == "yCells")
+						{
+							SetProperty(PName, num);
+							//TODO:Add hot reload logic for spritelayers
+						}
+					}
+				}
+				else
+				{
+					SetProperty(PName, ((TextBox)sender).Text);
+				}
+				
+			}
+		}
+
+		public void PropertyCheckBoxCallback(object sender, RoutedEventArgs e)
+		{
+			String PName = ((CheckBox)sender).Tag.ToString();
+			if (GetProperty(PName) is bool)
+			{
+				
+				if(PName == "bMainLevel")
+				{
+					SetProperty(PName, ((CheckBox)sender).IsChecked);
+				}
+				else{
+					Console.WriteLine("Others... Saved should be enabled= false...");
+				}
+
+
+			}
+			
+		}
+
+		#endregion
 
 		/// <summary>
 		/// This method is here to add a new sprite layer to the current level object
@@ -57,8 +178,11 @@ namespace BixBite
 				}
 			}
 			Layers.Add(new SpriteLayer(deslayertype, this) { LayerName = LayerName }); //add the layer
+			Layers[Layers.Count - 1].SetProperty("LayerName", LayerName);
+			Layers[Layers.Count - 1].SetProperty("LayerType", deslayertype.ToString());
+
 		}
-		
+
 		/// <summary>
 		/// Finds the SpriteLayer in the current levels layers array. 
 		/// </summary>
@@ -156,11 +280,14 @@ namespace BixBite
 					{
 						Console.WriteLine("Start Element {0}", reader.Name);
 						Console.WriteLine(reader.AttributeCount);
+
+						//set properties
+						TempLevel.Properties["LevelName"] = reader.GetAttribute("Name");
 						TempLevel.LevelName = reader.GetAttribute("Name");
-						TempLevel.bMainLevel = (reader.GetAttribute("MainLevel").ToLower() == "false" ? false : true);
-						TempLevel.xCells = Int32.Parse(reader.GetAttribute("Width")) / 40;
-						TempLevel.yCells = Int32.Parse(reader.GetAttribute("Height")) / 40;
-						//reader.ReadToNextSibling("TileSet");
+						TempLevel.Properties["bMainLevel"] = (reader.GetAttribute("MainLevel").ToLower() == "false" ? false : true);
+						TempLevel.Properties["xCells"] = Int32.Parse(reader.GetAttribute("Width")) / 40;
+						TempLevel.Properties["yCells"] = Int32.Parse(reader.GetAttribute("Height")) / 40;
+
 						while (reader.Name.Trim() != "TileSet") //ignore whitespace
 							reader.Read();
 
@@ -228,6 +355,7 @@ namespace BixBite
 								}
 
 								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects = str;//we have the row data so add to the level data
+
 							}
 
 							//Sprite
@@ -256,6 +384,9 @@ namespace BixBite
 								TempLevel.Layers.Add(new SpriteLayer(LayerType.Sprite, TempLevel));
 								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerName = SLName;
 								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects = sprites_;
+								TempLevel.Layers[TempLevel.Layers.Count - 1].SetProperty("LayerName", SLName);
+								TempLevel.Layers[TempLevel.Layers.Count - 1].SetProperty("LayerType", LayerType.Sprite.ToString());
+								TempLevel.Layers[TempLevel.Layers.Count - 1].SetProperty("#LayerObjects", sprites_.Count);
 								reader.Read();
 							}
 							//gameevent int[,]
@@ -312,11 +443,14 @@ namespace BixBite
 					{
 						Console.WriteLine("Start Element {0}", reader.Name);
 						Console.WriteLine(reader.AttributeCount);
+
+						//set properties
+						TempLevel.Properties["LevelName"] = reader.GetAttribute("Name");
 						TempLevel.LevelName = reader.GetAttribute("Name");
-						TempLevel.bMainLevel = (reader.GetAttribute("MainLevel").ToLower() == "false" ? false : true);
-						TempLevel.xCells = Int32.Parse(reader.GetAttribute("Width")) / 40;
-						TempLevel.yCells = Int32.Parse(reader.GetAttribute("Height")) / 40;
-						//reader.ReadToNextSibling("TileSet");
+						TempLevel.Properties["bMainLevel"] = (reader.GetAttribute("MainLevel").ToLower() == "false" ? false : true);
+						TempLevel.Properties["xCells"] = Int32.Parse(reader.GetAttribute("Width")) / 40;
+						TempLevel.Properties["yCells"] = Int32.Parse(reader.GetAttribute("Height")) / 40;
+
 						while (reader.Name.Trim() != "TileSet") //ignore whitespace
 							await reader.ReadAsync();
 
@@ -468,10 +602,10 @@ namespace BixBite
 			{
 				//Level attritbutes instance
 				await writer.WriteStartElementAsync(null, "Level", null);
-				await writer.WriteAttributeStringAsync(null, "Name", null, LevelName);
-				await writer.WriteAttributeStringAsync(null, "MainLevel", null, bMainLevel.ToString().ToLower());
-				await writer.WriteAttributeStringAsync(null, "Width", null, (xCells * 40).ToString());
-				await writer.WriteAttributeStringAsync(null, "Height", null, (yCells * 40).ToString());
+				await writer.WriteAttributeStringAsync(null, "Name", null, Properties["LevelName"].ToString());
+				await writer.WriteAttributeStringAsync(null, "MainLevel", null, Properties["bMainLevel"].ToString().ToLower());
+				await writer.WriteAttributeStringAsync(null, "Width", null, ((int)Properties["xCells"] * 40).ToString());
+				await writer.WriteAttributeStringAsync(null, "Height", null, ((int)Properties["yCells"] * 40).ToString());
 
 				for(int i = 0; i < TileSets.Count; i++)
 				{ 
@@ -537,10 +671,10 @@ namespace BixBite
 							await writer.WriteStartElementAsync(null, "Sprite", null);
 							await writer.WriteAttributeStringAsync(null, "Name", null, sprite.Name);
 							await writer.WriteAttributeStringAsync(null, "Location", null, sprite.ImgPathLocation);
-							await writer.WriteAttributeStringAsync(null, "Width", null, sprite.Width.ToString());
-							await writer.WriteAttributeStringAsync(null, "Height", null, sprite.Height.ToString());
-							await writer.WriteAttributeStringAsync(null, "x", null, sprite.xpos.ToString());
-							await writer.WriteAttributeStringAsync(null, "y", null, sprite.ypos.ToString());
+							await writer.WriteAttributeStringAsync(null, "Width", null, sprite.GetProperty("width").ToString());
+							await writer.WriteAttributeStringAsync(null, "Height", null, sprite.GetProperty("height").ToString());
+							await writer.WriteAttributeStringAsync(null, "x", null, sprite.GetProperty("x").ToString());
+							await writer.WriteAttributeStringAsync(null, "y", null, sprite.GetProperty("y").ToString());
 							await writer.WriteEndElementAsync();
 						}
 
@@ -548,9 +682,9 @@ namespace BixBite
 					}
 					else if (layer.layerType == LayerType.GameEvent)
 					{
-						await writer.WriteStartElementAsync(null, "GameEvents", null);
-						if (!(layer.LayerObjects is int[,])) goto Skiplayer;
-						int[,] tiledata = ((int[,])layer.LayerObjects);
+						await writer.WriteStartElementAsync(null, "GameEventsLayer", null);
+						int[,] tiledata = ((Tuple<int[,], List<GameEvent>>)layer.LayerObjects).Item1;
+						if (tiledata == null) goto Skiplayer;
 						for (int i = 0; i < tiledata.GetLength(0); i++)
 						{
 							String rowdata = "";
@@ -590,5 +724,7 @@ namespace BixBite
 				await writer.FlushAsync();
 			}
 		}
+
+		
 	}
 }

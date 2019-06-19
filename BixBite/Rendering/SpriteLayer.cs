@@ -5,6 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using BixBite.SceneObject;
 using BixBite.Effects;
+using BixBite.Resources;
+using System.Windows.Input;
+using System.Windows.Controls;
+using System.Windows;
 
 namespace BixBite.Rendering
 {
@@ -17,17 +21,18 @@ namespace BixBite.Rendering
 		GameEvent		//used for location to indicate script triggers. 
 	};
 
-	public class SpriteLayer
+	public class SpriteLayer : IProperties
 	{
 		//instance variables
 		public String LayerName { get; set; }
 		public LayerType layerType = LayerType.None;
 
-		private Dictionary<String, object> Properties = new Dictionary<string, object>();
+		private ObservableDictionary<String, object> Properties = new ObservableDictionary<string, object>();
 		public object LayerObjects = new object(); //contains the objects for this layer. 
 		ImageEffect layereffect = new ImageEffect(); //and image effect that will effect THE WHOLE layer. So windDistort for example.
 		public Level ParentLevel;
 
+		
 		public SpriteLayer()
 		{
 		}
@@ -36,7 +41,90 @@ namespace BixBite.Rendering
 		{
 			DefineLayerDataType(layerType = desltype); //set the objectdata datatype
 			ParentLevel = Parent;
+
+			Properties = new ObservableDictionary<string, object>();
+			AddProperty("LayerName", "");
+			AddProperty("#LayerObjects", 0);
+			AddProperty("LayerType", "");
+
 		}
+		
+		#region Properties
+		public void UpdateProperties(Dictionary<String, object> newdict)
+		{
+			Properties = new ObservableDictionary<string, object>(newdict);
+		}
+
+		public void ClearProperties()
+		{
+			Properties.Clear();
+		}
+
+		public void AddProperty(string Pname, object data)
+		{
+			Properties.Add(Pname, data);
+		}
+
+
+		public ObservableDictionary<string, object> getProperties()
+		{
+			return Properties;
+		}
+
+		public void setProperties(ObservableDictionary<string, object> newprops)
+		{
+			Properties = newprops;
+		}
+
+		public void SetProperty(string PName, object data)
+		{
+			Properties[PName] = data;
+		}
+
+		public object GetProperty(String PName)
+		{
+			return Properties[PName];
+		}
+		#endregion
+
+
+		#region PropertyCallbacks
+
+		public void PropertyTBCallback(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter)
+			{
+				String PName = ((TextBox)sender).Tag.ToString();
+				if (GetProperty(PName) is String)
+				{
+					SetProperty(PName, ((TextBox)sender).Text);
+				}
+
+			}
+		}
+
+		public void PropertyCheckBoxCallback(object sender, RoutedEventArgs e)
+		{
+			String PName = ((CheckBox)sender).Tag.ToString();
+			if (GetProperty(PName) is bool)
+			{
+
+				if (PName == "bMainLevel")
+				{
+					SetProperty(PName, ((CheckBox)sender).IsChecked);
+				}
+				else
+				{
+					Console.WriteLine("Others... Saved should be enabled= false...");
+				}
+
+
+			}
+
+		}
+
+		#endregion
+
 
 		/// <summary>
 		/// This method allows the "hot reloading" of the tile grids MAX size
@@ -118,6 +206,7 @@ namespace BixBite.Rendering
 				else Console.WriteLine("incorrect layer type!");
 				return;
 			}
+			SetProperty("#LayerObjects", (int)(GetProperty("#LayerObjects")));
 		}
 
 		public void AddToLayer(int groupnum, int xcell, int ycell, GameEvent g )
@@ -129,12 +218,14 @@ namespace BixBite.Rendering
 				if (LayerObjects is Tuple<int[,], List<GameEvent>>)
 				{
 					((Tuple<int[,], List<GameEvent>>)LayerObjects).Item1.SetValue(groupnum, xcell, ycell); //change the tile group num data
-					((Tuple<int[,], List<GameEvent>>)LayerObjects).Item2.Add(g); //add the game event data!
+					if(g != null)
+						((Tuple<int[,], List<GameEvent>>)LayerObjects).Item2.Add(g); //add the game event data!
 				}
 				else Console.WriteLine("Incorrect Layer type!");
 				return;
 			}
 		}
+
 
 		/// <summary>
 		/// ADeletes objects from the sprite layers ONLY for tiles.
@@ -162,61 +253,7 @@ namespace BixBite.Rendering
 			}
 		}
 
-		/// <summary>
-		/// Get the data of a desired property. MUST EXIST ALREADY. 
-		/// </summary>
-		/// <param name="PropertyName"></param>
-		/// <returns>Property Data if exists \n Returns null if it doens't exist</returns>
-		public object GetProperty(String PropertyName)
-		{
-			if (Properties.ContainsKey(PropertyName))
-			{
-				return Properties[PropertyName];
-			}
-			return null;
-		}
 
-		/// <summary>
-		/// Adds a new property IF it doesn't exist already
-		/// </summary>
-		/// <param name="PropertyName">The Property name that you would like to add</param>
-		/// <param name="newpData"> new property data.</param>
-		public void AddProperty(String PropertyName, object PropertyData)
-		{
-			if (Properties.ContainsKey(PropertyName))
-			{
-				return;
-			}
-			else
-			{
-				Properties.Add(PropertyName, PropertyData);
-			}
-		}
-
-		/// <summary>
-		/// Set a property to a new value
-		/// </summary>
-		/// <param name="PropertyName">The Property name that you would like to change</param>
-		/// <param name="newpData"> new property data. MUST MATCH TYPE</param>
-		public void ChangeProperty(String PropertyName, object newpData)
-		{
-			if (Properties.ContainsKey(PropertyName))
-			{
-				if (Properties[PropertyName].GetType() == newpData.GetType())
-					Properties[PropertyName] = newpData;
-			}
-			return;
-		}
-
-		/// <summary>
-		/// Handles the drawing of the current layer.
-		/// </summary>
-		public void Draw()
-		{
-
-		}
-
-	
 		class SpriteLayerException : Exception
 		{
 			public SpriteLayerException()

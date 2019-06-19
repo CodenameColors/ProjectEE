@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using BixBite.Resources;
 
 namespace BixBite
 {
@@ -29,40 +30,86 @@ namespace BixBite
 		BGM,
 	}
 
-	public class GameEvent
+	public class GameEvent : IProperties
 	{
 		//these varibles determine the cell of the gameeven trigger as well as the grouping.
-		public int xpos, ypos, width, height, group = 0; ///This is the area of activation :: 0 is top left ; 1 is bottom right
-		public String ActivationButton, EventName, DelegateEventName = String.Empty;
-		
+		//public int xpos, ypos, width, height, group = 0; ///This is the area of activation :: 0 is top left ; 1 is bottom right
+		//public String ActivationButton, , DelegateEventName = String.Empty;
+		public String EventName;
 		public EventType eventType = new EventType();
-		private EventData datatoload = new EventData(); ///this is the data that will load on an activation of this event.
-		private bool isActive = true; //this determines where or not this event should be checked for.
+		public  EventData datatoload = new EventData(); ///this is the data that will load on an activation of this event.
+		//private bool isActive = true; //this determines where or not this event should be checked for.
 
-		public GameEvent(String Name, EventType eventType, int xpos, int ypos, int w, int h, int group)
+		ObservableDictionary<string, object> Properties { get; set; }
+
+		public GameEvent(String Name, EventType eventType, int group)
 		{
+			Properties = new ObservableDictionary<string, object>();
 			this.EventName = Name;
 			this.eventType = eventType;
-			this.xpos = xpos;
-			this.ypos = ypos;
-			this.width = w;
-			this.height = h;
-			this.group = group;
+			AddProperty("EventName", Name);
+			AddProperty("group", group);
+			AddProperty("isActive", true);
+			AddProperty("ActivationButton", "");
+			AddProperty("DelegateEventName", "");
+
+			datatoload.MoveTime = 0;
+			datatoload.newx = 0;
+			datatoload.newy = 0;
+			datatoload.NewFileToLoad = "";
 		}
+
+		#region Properties
+		public void UpdateProperties(Dictionary<String, object> newdict)
+		{
+			Properties = new ObservableDictionary<string, object>(newdict);
+		}
+
+		public void ClearProperties()
+		{
+			Properties.Clear();
+		}
+
+		public void AddProperty(string Pname, object data)
+		{
+			Properties.Add(Pname, data);
+		}
+
+
+		public ObservableDictionary<string, object> getProperties()
+		{
+			return Properties;
+		}
+
+		public void setProperties(ObservableDictionary<string, object> newprops)
+		{
+			Properties = newprops;
+		}
+
+		public void SetProperty(string PName, object data)
+		{
+			Properties[PName] = data;
+		}
+
+		public object GetProperty(String PName)
+		{
+			return Properties[PName];
+		}
+		#endregion
 
 		public void ChangeGroup(int newgroup)
 		{
-			this.group = newgroup;
+			SetProperty("group", newgroup);
 		}
 
 		public bool GetActiveState()
 		{
-			return this.isActive;
+			return (bool)GetProperty("isActive");
 		}
 
 		public void SetActiveState(bool activestate)
 		{
-			this.isActive = activestate;
+			SetProperty("isActive", activestate);
 		}
 
 		public void AddEventData(EventData ed, String newDeleName, String ButtonName)
@@ -83,9 +130,8 @@ namespace BixBite
 					return;
 				case (EventType.LevelTransistion):
 					datatoload = ed;
-					this.DelegateEventName = newDeleName;
-					this.ActivationButton = ButtonName;
-
+					SetProperty("DelegateEventName", newDeleName);
+					SetProperty("ActivationButton", ButtonName);
 					//for a Level transisition activation should occur from a "trigger" trigger, and or a button press.
 					return;
 				case (EventType.Trigger):
@@ -103,5 +149,6 @@ namespace BixBite
 			}
 		}
 
+		
 	}
 }

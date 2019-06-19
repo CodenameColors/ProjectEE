@@ -53,15 +53,37 @@ namespace AmethystEngine.Components.Tools
 			return null;
 		}
 
-		public static Border FindTile(Canvas backcanvas, List<Border> layertiles, int zindex, int x, int y)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="LSprites">all the sprites on a given layer</param>
+		/// <param name="x">the x position of the mouse in relative origin to the canvas</param>
+		/// <param name="y">the y position of the mouse in relative origin to the canvas</param>
+		/// <returns>Returns the rectangle that the mouse has clicked on. NULL if not found.</returns>
+		public static ContentControl FindSpriteControl(Canvas backcanvas, List<ContentControl> LSprites, int zindex, int x, int y)
 		{
-			foreach (Border r in layertiles)
+			foreach (ContentControl r in LSprites)
 			{
-				if (inTile(backcanvas, r, x, y))
+				if (inBorder(backcanvas, r, x, y))
 				{
 					if (Canvas.GetZIndex(r as System.Windows.UIElement) == zindex)
 						return r;
 				}
+			}
+			return null;
+		}
+
+		public static Sprite FindSprite(List<Sprite> sprites, ContentControl cc)
+		{
+			foreach(Sprite spr in sprites)
+			{
+				//since the top, left are doubles check both Math.Floor, and Math.Ceil
+				if ((int)spr.GetProperty("x") == Math.Floor(Canvas.GetLeft(cc)) &&
+					(int)spr.GetProperty("y") == Math.Floor(Canvas.GetTop(cc)))
+					return spr;
+				else if ((int)spr.GetProperty("x") == Math.Ceiling(Canvas.GetLeft(cc)) &&
+					(int)spr.GetProperty("y") == Math.Ceiling(Canvas.GetTop(cc)))
+					return spr;
 			}
 			return null;
 		}
@@ -100,12 +122,12 @@ namespace AmethystEngine.Components.Tools
 			return false;
 		}
 
-		public static bool inTile(Canvas backcanvas, Border tile, int x, int y)
+		public static bool inBorder(Canvas backcanvas, ContentControl bor, int x, int y)
 		{
-			int left = (int)(Canvas.GetLeft(tile) * backcanvas.RenderTransform.Value.M11);
-			int right = left + (int)(tile.ActualWidth * backcanvas.RenderTransform.Value.M11);
-			int top = (int)(Canvas.GetTop(tile) * backcanvas.RenderTransform.Value.M11);
-			int bottom = top + (int)(tile.ActualHeight * backcanvas.RenderTransform.Value.M11);
+			int left = (int)(Canvas.GetLeft(bor) * backcanvas.RenderTransform.Value.M11);
+			int right = left + (int)(bor.ActualWidth * backcanvas.RenderTransform.Value.M11);
+			int top = (int)(Canvas.GetTop(bor) * backcanvas.RenderTransform.Value.M11);
+			int bottom = top + (int)(bor.ActualHeight * backcanvas.RenderTransform.Value.M11);
 			if (x >= left && x <= right)
 			{
 				if (y >= top && y <= bottom)
@@ -113,6 +135,5 @@ namespace AmethystEngine.Components.Tools
 			}
 			return false;
 		}
-
 	}
 }
