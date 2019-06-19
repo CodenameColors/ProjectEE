@@ -218,12 +218,14 @@ namespace BixBite.Rendering
 				if (LayerObjects is Tuple<int[,], List<GameEvent>>)
 				{
 					((Tuple<int[,], List<GameEvent>>)LayerObjects).Item1.SetValue(groupnum, xcell, ycell); //change the tile group num data
-					((Tuple<int[,], List<GameEvent>>)LayerObjects).Item2.Add(g); //add the game event data!
+					if(g != null)
+						((Tuple<int[,], List<GameEvent>>)LayerObjects).Item2.Add(g); //add the game event data!
 				}
 				else Console.WriteLine("Incorrect Layer type!");
 				return;
 			}
 		}
+
 
 		/// <summary>
 		/// ADeletes objects from the sprite layers ONLY for tiles.

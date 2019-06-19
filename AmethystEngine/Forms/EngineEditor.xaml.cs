@@ -100,6 +100,8 @@ namespace AmethystEngine.Forms
 		Point[] shiftpoints = new Point[3]; //0 = mouse down , 1 = mouse up , 2 on shifting "tick"
 		private List<Image> TileSets = new List<Image>();
 
+		private int GameEventNum;
+
 		int EditorGridHeight = 40;
     int EditorGridWidth = 40;
     int NumOfCellsX = 10;
@@ -864,6 +866,10 @@ namespace AmethystEngine.Forms
 			{
 				if (CurrentTool == EditorTool.Gameevent)
 				{
+
+					List<GameEvent> layergameevents = ((Tuple<int[,], List<GameEvent>>)((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerObjects).Item2;
+					if (GameEventNum < 0) return;
+
 					TextBlock tb = new TextBlock()
 					{
 						HorizontalAlignment = HorizontalAlignment.Center,
@@ -873,8 +879,8 @@ namespace AmethystEngine.Forms
 						Width = 40,
 						Height = 40,
 						FontSize = 18,
-						Text = "N",
-						Tag = "N",
+						Text = layergameevents[GameEventNum].GetProperty("group").ToString(),
+						Tag = layergameevents[GameEventNum].GetProperty("group").ToString(),
 						Foreground = new SolidColorBrush(Colors.Black),
 						Background = new SolidColorBrush(Color.FromArgb(100, 100, 100, 100)),
 					};
@@ -885,7 +891,9 @@ namespace AmethystEngine.Forms
 					LevelEditor_Canvas.Children.Add(b); //actual place it on the canvas
 
 					//create event data for the game event.
-					CurrentLevel.Layers[curLayer].AddToLayer(1, (int)p.Y/40, (int)p.X/40, new GameEvent("Trigger", EventType.Trigger,  1));
+					
+					
+					CurrentLevel.Layers[curLayer].AddToLayer(GameEventNum, (int)p.Y/40, (int)p.X/40, null);
 					EventData ed = new EventData()
 					{
 						newx = 0,
@@ -2611,6 +2619,39 @@ namespace AmethystEngine.Forms
 			if (CurrentLevel == null) return;
 			GameEventsSettings ff = new GameEventsSettings(ref CurrentLevel, 0);
 			ff.Show();
+		}
+
+		private void DeclareGameEvent_MI_Click(object sender, RoutedEventArgs e)
+		{
+			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
+			if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.GameEvent)
+			{
+				//clicked on the event
+				MenuItem MI = ((MenuItem)(EditorToolBar_CC.Template.FindName("DeclareGameEvent_MI", EditorToolBar_CC)));
+				//TODO: This needs to have the offset. Since there can be multiple GameEventLayers. similar to how the tile map has an offset.
+				GameEventNum = Int32.Parse(((MenuItem)sender).Tag.ToString());
+				Console.WriteLine(GameEventNum);
+				CurrentTool = EditorTool.Gameevent;
+			}
+		}
+
+		private void MenuItem_MouseEnter(object sender, MouseEventArgs e)
+		{
+			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
+			if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.GameEvent)
+			{
+				//we are clicked on a gameevent layer!
+				List<GameEvent> layergameevents = ((Tuple<int[,], List<GameEvent>>)((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerObjects).Item2;
+				MenuItem MI = ((MenuItem)(EditorToolBar_CC.Template.FindName("DeclareGameEvent_MI", EditorToolBar_CC)));
+				MI.Items.Clear(); int i = 0; 
+				foreach (GameEvent ge in layergameevents)
+				{
+					MI.Items.Add(new MenuItem() { Header = ge.EventName ,Tag = i});
+					((MenuItem)MI.Items[MI.Items.Count - 1]).Click += DeclareGameEvent_MI_Click;
+					i++;
+				}
+
+			}
 		}
 	}
 }
