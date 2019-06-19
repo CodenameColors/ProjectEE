@@ -71,6 +71,7 @@ namespace AmethystEngine.Forms
 
 		private void SetGameEvents(SpriteLayer spriteLayer)
 		{
+			GameEvents_LB.Items.Clear();
 			List<GameEvent> lge = ((Tuple<int[,], List<GameEvent>>)spriteLayer.LayerObjects).Item2;
 			foreach (GameEvent ge in lge)
 				GameEvents_LB.Items.Add(ge.EventName);
@@ -210,9 +211,15 @@ namespace AmethystEngine.Forms
 			if (AddEventType_CB.SelectedIndex == 4 || AddEventType_CB.SelectedIndex == 5)
 			{
 				AddEventData_CC.Visibility = Visibility.Hidden;
+				if(AddEventType_CB.SelectedIndex == 5)
+				{
+					AddEventGroup_TB.IsEnabled = false;
+					AddEventGroup_TB.Text= "-1";
+				}
 			}
 			else
 			{
+				AddEventGroup_TB.IsEnabled = true;
 				AddEventData_CC.Visibility = Visibility.Visible;
 			}
 		}

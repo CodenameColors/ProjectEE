@@ -135,10 +135,12 @@
 						<MenuItem Header="Down Laver" Click="DownLaverLevelEditor_BTN_Click"/>
 					</Menu>
 					<Menu DockPanel.Dock="Top" Grid.Column="8" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
-						<MenuItem Header="Game Events" Click="GameEvent_BTN_Click" Foreground="White">
+						<MenuItem Header="Game Events" Foreground="White">
 							<MenuItem x:Name="NewGameEvent" Header="Add GameEvent" Foreground="Black" Click="AddGameEvent_Click"/>
 							<MenuItem x:Name="EditGameEvents" Header="Edit GameEvents" Foreground="Black" Click="EditGameEvents_Click"/>
-							<MenuItem Header="Declare GameEvent" Foreground="Black" Click="GameEvent_BTN_Click"/>
+							<MenuItem x:Name="DeclareGameEvent_MI" Header="Declare GameEvent" Foreground="Black" MouseEnter="MenuItem_MouseEnter">
+								<MenuItem  />
+							</MenuItem>
 							<MenuItem Header="Select GameEvent" Foreground="Black" Click="LevelEditorSelection_Click"/>
 						</MenuItem>
 					</Menu>
