@@ -180,6 +180,7 @@ namespace AmethystEngine.Forms
 				bool bLName = true;
 				int group, newx, newy, movetime = 0;
 				bLName &= Int32.TryParse(AddEventGroup_TB.Text, out group);
+				bLName &= group > 0; //-1 = collision, 0 is nothing. Only allow 1 -> n
 				bLName &= Int32.TryParse(AddEventNewPosX_TB.Text, out newx);
 				bLName &= Int32.TryParse(AddEventNewPosY_TB.Text, out newy);
 				bLName &= Int32.TryParse(AddEventMoveTime_TB.Text, out movetime);
@@ -216,6 +217,7 @@ namespace AmethystEngine.Forms
 					AddEventGroup_TB.IsEnabled = false;
 					AddEventGroup_TB.Text= "-1";
 				}
+				else AddEventGroup_TB.IsEnabled = true;
 			}
 			else
 			{
