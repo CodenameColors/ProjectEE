@@ -893,7 +893,7 @@ namespace AmethystEngine.Forms
 					//create event data for the game event.
 					
 					
-					CurrentLevel.Layers[curLayer].AddToLayer(GameEventNum, (int)p.Y/40, (int)p.X/40, null);
+					CurrentLevel.Layers[curLayer].AddToLayer((int)layergameevents[GameEventNum].GetProperty("group"), (int)p.Y/40, (int)p.X/40, null);
 					EventData ed = new EventData()
 					{
 						newx = 0,
