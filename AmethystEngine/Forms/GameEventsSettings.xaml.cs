@@ -121,6 +121,7 @@ namespace AmethystEngine.Forms
 			bool ret = true;
 			bool bLName = true;
 			String s = "";
+			ret &= GameEventLayers_LB.Items.Count > 0;
 			ret &= (AddEventName_TB.Text == "" ? false : true);
 			ret &= (AddEventGroup_TB.Text == "" ? false : true);
 			ret &= (AddEventDelegateName_TB.Text == "" ? false : true); ;
@@ -128,7 +129,7 @@ namespace AmethystEngine.Forms
 
 
 			//okay so all of those should be filled out to have a valid event!
-			bLName = System.Text.RegularExpressions.Regex.IsMatch(AddEventName_TB.Text, @"^[A-Za-z][A-Za-z0-9]+");
+			bLName &= System.Text.RegularExpressions.Regex.IsMatch(AddEventName_TB.Text, @"^[A-Za-z][A-Za-z0-9]+");
 			bLName &= System.Text.RegularExpressions.Regex.IsMatch(AddEventDelegateName_TB.Text, @"^[A-Za-z][A-Za-z0-9]+");
 			int group, newx, newy, movetime = 0;
 
@@ -198,7 +199,7 @@ namespace AmethystEngine.Forms
 					ge.datatoload.MoveTime = movetime;
 					ge.datatoload.newx = newx;
 					ge.datatoload.newy = newy;
-					////ge.datatoload.NewFileToLoad= movetime;
+					ge.datatoload.NewFileToLoad= AddFileToLoad_TB_TB.Text;
 				}
 
 				//add the event!
