@@ -1871,6 +1871,39 @@ namespace AmethystEngine.Forms
 				else if (layer.layerType == LayerType.GameEvent)
 				{
 					Console.WriteLine("Gameevent");
+
+					int[,] griddata = ((Tuple<int[,], List<GameEvent>>)layer.LayerObjects).Item1;
+
+					//scan through the 2D array of gameevent locations
+					for (int i = 0; i < griddata.GetLength(0); i++) //rows
+					{
+						for (int j = 0; j < griddata.GetLength(1); j++) //columns
+						{
+							if(griddata[i,j] != 0)
+							{
+								TextBlock tb = new TextBlock()
+								{
+									HorizontalAlignment = HorizontalAlignment.Center,
+									VerticalAlignment = VerticalAlignment.Center,
+									TextAlignment = TextAlignment.Center,
+									TextWrapping = TextWrapping.Wrap,
+									Width = 40,
+									Height = 40,
+									FontSize = 18,
+									Text = griddata[i, j].ToString(),
+									Tag = griddata[i, j].ToString(),
+									Foreground = new SolidColorBrush(Colors.Black),
+									Background = new SolidColorBrush(Color.FromArgb(100, 100, 100, 100)),
+								};
+								Border b = new Border() { Width = 40, Height = 40 };
+								b.Child = tb;
+
+								Canvas.SetLeft(b, j*40); Canvas.SetTop(b, i*40); Canvas.SetZIndex(b, Zindex); //place the tile position wise
+								LevelEditor_Canvas.Children.Add(b); //actual place it on the canvas
+
+							}
+						}
+					}
 				}
 				Zindex++;
 			}
