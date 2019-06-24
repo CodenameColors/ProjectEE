@@ -1909,7 +1909,7 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-		private void importLevel(String filename)
+		public void importLevel(String filename)
 		{
 			CurrentLevel = ((Level.ImportLevel(filename)));
 			OpenLevels.Add(CurrentLevel);
@@ -1990,7 +1990,7 @@ namespace AmethystEngine.Forms
 
 		}
 
-		private async System.Threading.Tasks.Task importLevelAsync(String filename)
+		public async System.Threading.Tasks.Task importLevelAsync(String filename)
 		{
 			CurrentLevel = ((await Level.ImportLevelAsync(filename)));
 			OpenLevels.Add(CurrentLevel);
@@ -2685,6 +2685,26 @@ namespace AmethystEngine.Forms
 				}
 
 			}
+		}
+
+		/// <summary>
+		/// this button will auto generate and MSBuild the games project files to allow game evnent use. IF code compiles w/no errors
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void CodeCompiling_BTN_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void GameTestRun_BTN_Click(object sender, RoutedEventArgs e)
+		{
+
 		}
 	}
 }

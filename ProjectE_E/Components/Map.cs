@@ -22,6 +22,10 @@ namespace ProjectE_E.Components
 		private List<GameEvent> MapEvents;
 		List<Tile> MapTiles = new List<Tile>();
 
+		//Look up table of this maps Gameevents
+		private Dictionary<int, System.Reflection.MethodInfo> EventLUT = new Dictionary<int, System.Reflection.MethodInfo>();
+
+
 		public int Width
 		{
 			get { return mapwidth; }
@@ -193,6 +197,31 @@ namespace ProjectE_E.Components
 			Level l = await Level.ImportLevelAsync(FilePath);
 			level = l; 
 			return l;
+		}
+
+		public void ClearEventLUT()
+		{
+			EventLUT.Clear();
+		}
+
+		public void FillDictLUT(List<GameEvent> gameEvents)
+		{
+			foreach(GameEvent ge in gameEvents)
+			{
+				EventLUT.Add(
+					(int)ge.GetProperty("group"),
+					Type.GetType("ProjectE_E.Components.GeneratedFiles").GetMethod(ge.GetProperty("DelegateEventName").ToString())
+					);
+			}		
+		}
+
+		public System.Reflection.MethodInfo GetMapEvent(int key)
+		{
+			if (EventLUT.ContainsKey(key))
+			{
+				return EventLUT[key];
+			}
+			return null;
 		}
 
 		public void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)

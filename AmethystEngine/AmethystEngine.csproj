@@ -72,6 +72,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Components\Tools\Cuprite.cs" />
     <Compile Include="Forms\GameEventsSettings.xaml.cs">
       <DependentUpon>GameEventsSettings.xaml</DependentUpon>
     </Compile>

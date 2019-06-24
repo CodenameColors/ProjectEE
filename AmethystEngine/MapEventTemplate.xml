@@ -1,0 +1,38 @@
+<EventTypeTemplates>
+    <LevelTransition>
+    public static void [NAMEHERE](String FileName, int newx, int newy, int movetime)
+    {
+
+    }
+    </LevelTransition>
+    <DialogueSceneTransistion>
+    public static void [NAMEHERE](String FileName, int newx, int newy, int movetime)
+    {
+
+    }
+    </DialogueSceneTransistion>
+    <Cutscene>
+    public static void [NAMEHERE](String FileName, int newx, int newy, int movetime)
+    {
+
+    }
+    </Cutscene>
+    <Trigger>
+    public static void [NAMEHERE]()
+    {
+
+    }
+    </Trigger>
+    <Collision>
+    public static void [NAMEHERE]()
+    {
+
+    }
+    </Collision>
+    <BGMTransition>
+    public static void [NAMEHERE](String FileName, int newx, int newy, int movetime)
+    {
+
+    }
+    </BGMTransition>
+</EventTypeTemplates>

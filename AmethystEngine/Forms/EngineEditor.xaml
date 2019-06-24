@@ -685,8 +685,8 @@
 					</Grid>
 				</TabItem>
 			</TabControl>
-			<Button VerticalAlignment="Top" Height="22" Background="#FF383838" Foreground="White" Content="Compile" Margin="0,6,58,0" Grid.Column="1" HorizontalAlignment="Right" Width="60" />
-			<Button Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Height="22" Background="#FF383838" Foreground="White" Content="Play" Width="52" Margin="0,6,2,0" />
+			<Button x:Name="CodeCompiling_BTN" VerticalAlignment="Top" Height="22" Background="#FF383838" Foreground="White" Content="Compile" Margin="0,6,58,0" Grid.Column="1" HorizontalAlignment="Right" Width="60" Click="CodeCompiling_BTN_Click" />
+			<Button x:Name="GameTestRun_BTN" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top" Height="22" Background="#FF383838" Foreground="White" Content="Play" Width="52" Margin="0,6,2,0" Click="GameTestRun_BTN_Click" />
 
 		</Grid>
 
