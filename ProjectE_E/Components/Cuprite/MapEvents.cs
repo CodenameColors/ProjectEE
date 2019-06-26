@@ -8,7 +8,7 @@ using BixBite;
 namespace ProjectE_E.Components.Cuprite
 {
 	/// <summary>
-	/// This class is here to store all the methods that are created from the generation via MAP EVENTS
+	/// This class is here to store all the methods that are created from the generation via Cuprite
 	/// When you create a delegate in the editor namewise, it will be auto generated here. It allows for changes. 
 	/// Once it has been created once it will not over write.
 	/// 
