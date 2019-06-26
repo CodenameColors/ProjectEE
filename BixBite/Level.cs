@@ -433,9 +433,10 @@ namespace BixBite
 								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects = new Tuple<int[,], List<GameEvent>>(str, new List<GameEvent>());//we have the row data so add to the level data
 							}
 						}
-						reader.Read(); //skip past end of layers
-						reader.Read(); //skip past end of layers
-													 //Game events!
+						//advance
+						while (reader.NodeType != XmlNodeType.Element)
+							reader.Read();
+						//Game events!
 						while ((reader.NodeType != XmlNodeType.EndElement && reader.Name.Trim() == "GameEvents") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Event")) //loop through all the TileSets
 																																																																																									 //while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameEvents")
 						{
@@ -487,6 +488,7 @@ namespace BixBite
 									ge.datatoload = ed;
 								}
 								//add to layer object list.
+								//TODO: THIS currently will break. Also doesn't add the GE to the right layer...
 								((Tuple<int[,], List<GameEvent>>)TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects).Item2.Add(ge);
 
 								//advance
@@ -691,8 +693,8 @@ namespace BixBite
 								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects = new Tuple<int[,], List<GameEvent>>(str, new List<GameEvent>());//we have the row data so add to the level data
 							}
 						}
-						await reader.ReadAsync(); //skip past end of layers
-						await reader.ReadAsync(); //skip past end of layers
+						while (reader.NodeType != XmlNodeType.Element)
+							await reader.ReadAsync();
 						//Game events!
 						while ((reader.NodeType != XmlNodeType.EndElement && reader.Name.Trim() == "GameEvents") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Event")) //loop through all the TileSets
 						//while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameEvents")
