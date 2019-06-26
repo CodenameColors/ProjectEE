@@ -37,20 +37,6 @@ namespace ProjectE_E.Components
 		private List<CollisionTiles> collisionTiles = new List<CollisionTiles>();
 
 		public List<CollisionTiles> CollisionTiles;
-		//{
-		//	get { return collisionTiles; }
-
-		//}
-		//private int width, height;
-
-		//public int Width
-		//{
-		//	get { return width; }
-		//}
-		//public int Height
-		//{
-		//	get { return height; }
-		//}
 
 		public Map(){ }
 
@@ -222,6 +208,19 @@ namespace ProjectE_E.Components
 				return EventLUT[key];
 			}
 			return null;
+		}
+
+		/// <summary>
+		/// Unload the map from screen and memory
+		/// </summary>
+		public void UnloadMap()
+		{
+			foreach(Tile tile in MapTiles)
+			{
+				tile.UnloadTile();
+			}
+			MapTiles = null;
+			GC.Collect(); //clear memory 
 		}
 
 		public void Draw(Microsoft.Xna.Framework.Graphics.SpriteBatch spriteBatch)

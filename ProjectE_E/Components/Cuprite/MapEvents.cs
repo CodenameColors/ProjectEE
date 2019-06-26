@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProjectE_E.Components.GeneratedFiles
+namespace ProjectE_E.Components.Cuprite
 {
 	/// <summary>
 	/// This class is here to store all the methods that are created from the generation via MAP EVENTS

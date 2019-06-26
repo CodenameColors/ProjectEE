@@ -143,9 +143,23 @@ namespace ProjectE_E
 			//foreach (CollisionTiles tile in map.CollisionTiles)
 			//{
 			//	Player.Collision(tile.Rectangle, map.Width, map.Height);
-			camera.Update(Player.Position, map.Width, map.Height);
+			if (map != null)
+			{
+				camera.Update(Player.Position, map.Width, map.Height);
+				if (Player.Position.Y > 400)
+				{
+					map.UnloadMap();
+					map = null;
+				}
+			}
+			else
+			{
+				camera.Update(Player.Position, 0, 0);
+			}
 			//}
+
 			
+
 			base.Update(gameTime);
 		}
 
@@ -160,7 +174,8 @@ namespace ProjectE_E
 			//SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform
 			spriteBatch.Begin();
 			//spriteBatch.Draw(t2, new Vector2(0, 0));
-			map.Draw(spriteBatch);
+			if(map != null)
+				map.Draw(spriteBatch);
 			Player.Draw(spriteBatch);
 			spriteBatch.End();
 			base.Draw(gameTime);
