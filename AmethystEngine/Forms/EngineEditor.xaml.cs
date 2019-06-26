@@ -2702,6 +2702,23 @@ namespace AmethystEngine.Forms
 					codelines.Add(Cuprite.GetMethodTemplate(ge));
 			}
 
+			System.Collections.Generic.IEnumerable<String> l = File.ReadLines(Cuprite.GetFilePath(ProjectFilePath));
+			List<String> lines = l.ToList();
+			foreach (String Key in ProjGE.Keys)
+			{ int i = 0;
+				foreach(List<String> linesofcode in codelines)
+				{
+					Cuprite.GenerateMethod(linesofcode, ref lines, ProjGE[Key][i++].GetProperty("DelegateEventName").ToString(), Key);
+				}
+			}
+
+			using (StreamWriter writer = new StreamWriter(Cuprite.GetFilePath(ProjectFilePath), false))
+			{
+				foreach(String s in lines)
+					writer.WriteLine(s);
+			}
+
+
 		}
 
 		/// <summary>

@@ -58,31 +58,159 @@ namespace AmethystEngine.Components.Tools
 			return CodeLines; //return the lines to gen.
 		}
 
-		public static void GenerateMethod(List<String> CodeLines, String ProjectPath, String Region)
+		public static void GenerateMethod(List<String> CodeLines, ref List<String> FileCodeLines, String MethodName, String Region)
 		{
-			//scan through EVERY level file in the project.
-			int len = ProjectPath.Length - ProjectPath.LastIndexOfAny(new char[] { '\\', '/' }) - 5;
-			String ProjectName = ProjectPath.Substring(ProjectPath.LastIndexOfAny(new char[] { '\\', '/' }) + 1, len);
-			ProjectPath = ProjectPath.Substring(0, ProjectPath.LastIndexOfAny(new char[] { '\\', '/' }) + 1);
-			ProjectPath += String.Format("{0}_Game\\Components\\Cuprite\\MapEvents.cs", ProjectName);
-
-
-
-
+			int num = GetFileWriteLocation(ref FileCodeLines, Region, MethodName); //where to write?
+			if (num > 0) //should we write?
+			{
+				for (int i = 0; i < CodeLines.Count; i++) //insert the lines code!
+				{
+					FileCodeLines.Insert(num+i, CodeLines[i]);
+				}
+			}
 		}
 
-		public static bool isRegionCreated(String CodeFilePath, String RegionName)
-		{
+		//public static void GenerateMethod(String ProjectPath, String MethodName, String Region)
+		//{
+		//	//scan through EVERY level file in the project.
+		//	ProjectPath += GetFilePath(ref ProjectPath);
+		//	int num = GetFileWriteLocation(CodeLines, Region, MethodName);
+		//	if (num > 0)
+		//	{
 
+		//	}
+
+
+
+		//}
+
+
+		private static int GetFileWriteLocation(ref List<String> FileCodeLines, String RegionName, String MethodName)
+		{
+			if (!isMethodCreated(FileCodeLines, MethodName)) //Does this method exist?
+			{
+				int num = GetEndOfRegion(ref FileCodeLines, RegionName);
+				if (num > 0) //Is the region created?
+					return num;
+				else //the region is not created. so... create it at the end of the class!
+				{
+					num = GetEndOfClass(FileCodeLines);
+
+					FileCodeLines.Insert(num - 1, String.Format("	#region {0}", RegionName));
+					FileCodeLines.Insert(num, "");
+					FileCodeLines.Insert(num + 1, "	#endregion");
+					return num;
+				}
+			}
+			return -1;
 		}
 
-		public static bool isMethodCreated(String CodeFilePath, String Methodname)
+		private static bool isRegionCreated(String CodeFilePath, String RegionName)
 		{
+			using (StreamReader sr = new StreamReader(CodeFilePath))
+			{
+				String ln = "";
+				while ((ln = sr.ReadLine()) != null)
+				{
+					if (ln.Contains(RegionName))
+						return true;
+				}
+			}
+			return false;
+		}
+		
+		private static bool isRegionCreated(List<String> CodeFileLines, String RegionName)
+		{
+			foreach (String s in CodeFileLines)
+			{
+				if (s.Contains("#region") && s.Contains(RegionName))
+					return true;
+			}
 			return false;
 		}
 
-		private static String GetFilePath(ref String ProjectPath, String FileType)
+		private static int GetEndOfClass(List<String> CodeFileLines)
 		{
+			for (int i = 0; i < CodeFileLines.Count; i++)
+			{
+				Stack<String> Blocks = new Stack<string>();
+				String line = CodeFileLines[i];
+				if (line.Contains("class"))
+				{
+					//white space ignore
+					while (!line.Contains("{"))
+						line = CodeFileLines[i++];
+					Blocks.Push("{");
+
+					while (Blocks.Count > 0)
+					{
+						line = CodeFileLines[i++];
+						if (line.Contains("{")) Blocks.Push("{");
+						else if (line.Contains("}"))
+						{
+							if (Blocks.Peek() == "{")
+								Blocks.Pop();
+							else return -1; //Incorrect code blocks!
+						}
+					}
+					return i;
+				}
+			}
+			return -1;
+		}
+
+		private static int GetEndOfRegion(ref List<String> CodeFileLines, String RegionName)
+		{
+			if (isRegionCreated(CodeFileLines, RegionName)) //does this region exist?
+			{
+				for(int i = 0; i < CodeFileLines.Count; i++) //scan all lines for the beginning region
+				{
+					if (CodeFileLines[i].Contains(RegionName)) //found beginning of the region
+					{
+						//there can be multiple regions in this code... because i hate myself. so use a stack
+						Stack<String> RegionStack = new Stack<string>(); RegionStack.Push(CodeFileLines[i++]);
+						while (RegionStack.Count > 0) //scan through the lines UNTIL the stack is empty
+						{
+							if (CodeFileLines[i].Contains("endregion")) //pop
+								RegionStack.Pop();
+							else if (CodeFileLines[i].Contains("#region")) //push
+								RegionStack.Push(CodeFileLines[i]);
+							i++;
+						}
+						return i-1;
+					}
+				}
+			}
+			return -1;
+		}
+
+		private static bool isMethodCreated(String CodeFilePath, String Methodname)
+		{
+			using (StreamReader sr = new StreamReader(CodeFilePath))
+			{
+				String ln = "";
+				while ((ln = sr.ReadLine()) != null)
+				{
+					if (ln.Contains(Methodname))
+						return true;
+				}
+			}
+				return false;
+		}
+
+		private static bool isMethodCreated(List<String> CodeFileLines, String Methodname)
+		{
+			foreach (String s in CodeFileLines)
+			{
+				if (s.Contains(Methodname))
+					return true;
+			}
+			return false;
+		}
+
+		public static String GetFilePath(String ProjPath, String FileType = "Level")
+		{
+			String ProjectPath = ProjPath;
 			if(FileType == "Level")
 			{
 				int len = ProjectPath.Length - ProjectPath.LastIndexOfAny(new char[] { '\\', '/' }) - 5;
@@ -103,7 +231,7 @@ namespace AmethystEngine.Components.Tools
 			ProjectPath = ProjectPath.Substring(0, ProjectPath.LastIndexOfAny(new char[] { '\\', '/' })+1);
 			ProjectPath += String.Format("{0}_Game\\Content\\Levels", ProjectName); 
 			List<String> LevelFiles = Directory.GetFiles(ProjectPath).ToList();
-
+			
 			foreach (String path in LevelFiles)
 			{
 				String Levelname = path.Substring(path.LastIndexOfAny(new char[] { '/', '\\' })+1);
