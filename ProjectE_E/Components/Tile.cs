@@ -35,9 +35,16 @@ namespace ProjectE_E.Components
 			this.rectangle = r;
 		}
 		
+		public void UnloadTile()
+		{
+			texture = null;
+			
+		}
+
 		public void Draw(SpriteBatch spriteBatch)
 		{
-			spriteBatch.Draw(texture, rectangle, Color.White);
+			if(texture != null)
+				spriteBatch.Draw(texture, rectangle, Color.White);
 		}
 	}
 

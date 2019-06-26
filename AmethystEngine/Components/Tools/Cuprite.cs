@@ -22,20 +22,20 @@ namespace AmethystEngine.Components.Tools
 		
 		#region MapEventGeneration
 
-		public static List<String> GetMethodTemplate(EventType etype)
-		{
+		//public static List<String> GetMethodTemplate(EventType etype)
+		//{
 			
-		}
+		//}
 
-		public static void GenerateMethod()
-		{
+		//public static void GenerateMethod()
+		//{
 
-		}
+		//}
 
-		public static bool isMethodCreated(String Methodname)
-		{
+		//public static bool isMethodCreated(String Methodname)
+		//{
 
-		}
+		//}
 
 		public static Dictionary<String, List<GameEvent>> GetProjectGameEvents(String ProjectPath)
 		{

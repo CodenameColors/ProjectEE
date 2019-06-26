@@ -196,7 +196,7 @@ namespace AmethystEngine.Forms
 					if (ln.Contains("MainLevel"))
 					{
 						ln = file.ReadLine();
-						if (ln.Contains("FILL"))
+						if (ln.Contains("FILL") || ln == "")
 							return;
 						else
 						{
