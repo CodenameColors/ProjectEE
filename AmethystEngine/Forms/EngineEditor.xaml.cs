@@ -2694,6 +2694,13 @@ namespace AmethystEngine.Forms
 		/// <param name="e"></param>
 		private void CodeCompiling_BTN_Click(object sender, RoutedEventArgs e)
 		{
+			Dictionary<String, List<GameEvent>> ProjGE = Cuprite.GetProjectGameEvents(ProjectFilePath);
+			List<List<String>> codelines = new List<List<string>>();
+			foreach(String s in ProjGE.Keys)
+			{
+				foreach (GameEvent ge in ProjGE[s])
+					codelines.Add(Cuprite.GetMethodTemplate(ge));
+			}
 
 		}
 
