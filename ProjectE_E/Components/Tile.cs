@@ -29,10 +29,18 @@ namespace ProjectE_E.Components
 			set { content = value; }
 		}
 
-		public Tile(Texture2D text, Rectangle r)
+		private int eventgroup;
+		public int EventGroup
+		{
+			get { return eventgroup; }
+			set { eventgroup = value; }
+		}
+
+		public Tile(Texture2D text, Rectangle r, int TileEventType)
 		{
 			this.texture = text;
 			this.rectangle = r;
+			this.eventgroup = TileEventType;
 		}
 		
 		public void UnloadTile()
@@ -56,7 +64,7 @@ namespace ProjectE_E.Components
 		//	texture = Content.Load<Texture2D>("Images/Tile" + i);
 		//	this.Rectangle = newRectangle;
 		//}
-		public CollisionTiles(Texture2D text, Rectangle r) : base(text, r)
+		public CollisionTiles(Texture2D text, Rectangle r, int TileEventType) : base(text, r, TileEventType)
 		{
 
 		}

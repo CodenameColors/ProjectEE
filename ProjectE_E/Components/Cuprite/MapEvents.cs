@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BixBite;
+using BixBite.Characters;
 
 namespace ProjectE_E.Components.Cuprite
 {
@@ -19,5 +20,18 @@ namespace ProjectE_E.Components.Cuprite
 	{
 		//auto gen start here.
 
+		#region level1_test.lvl
+		public static void TileCollisionFound(ref Player player)
+		{
+			Console.WriteLine(String.Format("Collision Activated {0}", "WIP"));
+		}
+
+
+		public static void TrigTestDele()
+		{
+			Console.WriteLine(String.Format("Activated Trigger Area {0}", "TrigTestDele"));
+		}
+
+		#endregion
 	}
 }
