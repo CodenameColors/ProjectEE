@@ -8,6 +8,9 @@ using BixBite;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using Microsoft.Build.Construction;
+using Microsoft.Build.Evaluation;
+using Microsoft.Build.Execution;
 
 namespace AmethystEngine.Components.Tools
 {
@@ -17,9 +20,35 @@ namespace AmethystEngine.Components.Tools
   public static class Cuprite
   {
 		
-		public static void BuildGameProjectFiles()
+		public static bool BuildGameProjectFiles(String ProjectFilePath)
 		{
-			
+			string projectFilePath = ProjectFilePath.Replace(".gem", "_Game\\");
+			string[] ProjFileName = Directory.GetFiles(projectFilePath, "*.csproj");
+			if (ProjFileName.Length > 0)
+			{
+				Console.WriteLine(ProjFileName[0]);
+
+				ProjectCollection pc = new ProjectCollection();
+
+				// THERE ARE A LOT OF PROPERTIES HERE, THESE MAP TO THE MSBUILD CLI PROPERTIES
+				Dictionary<string, string> globalProperty = new Dictionary<string, string>();
+				globalProperty.Add("Configuration", "Debug");
+				globalProperty.Add("Platform", "Any CPU");
+				globalProperty.Add("OutputPath", @"bin\DesktopGL\AnyCPU\Debug");
+
+				BuildParameters bp = new BuildParameters(pc);
+				BuildRequestData buildRequest = new BuildRequestData(ProjFileName[0], globalProperty, "4.0", new string[] { "Build" }, null);
+				// THIS IS WHERE THE MAGIC HAPPENS - IN PROCESS MSBUILD
+				BuildResult buildResult = BuildManager.DefaultBuildManager.Build(bp, buildRequest);
+				// A SIMPLE WAY TO CHECK THE RESULT
+				if (buildResult.OverallResult == BuildResultCode.Success)
+				{
+					Console.WriteLine("Build Successful!");
+					return true;
+				}
+				return false;
+			}
+			return false;
 		}
 
 		#region MapEventGeneration
