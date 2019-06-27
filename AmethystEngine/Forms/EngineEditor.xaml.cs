@@ -21,6 +21,8 @@ using System.Windows.Threading;
 using BixBite.Resources;
 using PropertyGridEditor;
 
+
+
 namespace AmethystEngine.Forms
 {
 
@@ -2514,20 +2516,6 @@ namespace AmethystEngine.Forms
 		
     private void Test_Click(object sender, RoutedEventArgs e)
 		{
-			//moving test
-			//Canvas.SetLeft(selectTool.SelectedTiles[0], Canvas.GetLeft(selectTool.SelectedTiles[0]) + selectTool.SelectedTiles[0].ActualWidth);
-
-			//layer moving test.
-			List<String> TileSetImages = new List<string>();
-			foreach (Tuple<String, String, int, int> tilesetstuple in CurrentLevel.TileSet)
-			{
-				TileSetImages.Add(tilesetstuple.Item2); //URI isn't supported so turn it local!
-			}
-			//CurrentLevel.ExportLevel("C: \\Users\\Antonio\\Documents\\text.xml", TileSetImages);
-			CurrentLevel.Layers[2].AddToLayer("Testing", "",0,0,0,0);
-
-			RedrawLevel(CurrentLevel);
-
 		}
 		
 		//this is methods that im working now... they suck for now.
@@ -2717,7 +2705,7 @@ namespace AmethystEngine.Forms
 				foreach(String s in lines)
 					writer.WriteLine(s);
 			}
-
+			Cuprite.BuildGameProjectFiles(ProjectFilePath);
 
 		}
 
