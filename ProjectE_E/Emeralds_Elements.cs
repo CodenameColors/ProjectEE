@@ -157,8 +157,13 @@ namespace ProjectE_E
 				camera.Update(Player.Position, 0, 0);
 			}
 			//}
-
-			
+			if (Keyboard.GetState().IsKeyDown(Keys.T)) {
+				foreach (SpriteLayer sl in map.level.Layers) {
+					if (sl.layerType == LayerType.GameEvent) {
+						map.FillDictLUT(((System.Tuple<int[,], List<GameEvent>>)sl.LayerObjects).Item2);
+					}
+				}
+			}
 
 			base.Update(gameTime);
 		}

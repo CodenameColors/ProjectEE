@@ -154,7 +154,7 @@ namespace ProjectE_E.Components
 					texture.GetData(0, r, data, 0, r.Width * r.Height);
 					croppedTexture.SetData(data);
 
-					MapTiles.Add(new Tile(croppedTexture, new Rectangle(j*40, i*40, 40, 40)));
+					MapTiles.Add(new Tile(croppedTexture, new Rectangle(j*40, i*40, 40, 40), 0));
 
 					//Tile tileTemp = new Tile(croppedTexture, r);
 					//tileTemp.Draw(spriteBatch);
@@ -173,7 +173,7 @@ namespace ProjectE_E.Components
 				r.Y = (int)spr.GetProperty("y");
 				r.Width = (int)spr.GetProperty("width");
 				r.Height = (int)spr.GetProperty("height");
-				MapTiles.Add(new Tile(texture, r));
+				MapTiles.Add(new Tile(texture, r, 0));
 			}
 		}
 
@@ -196,7 +196,7 @@ namespace ProjectE_E.Components
 			{
 				EventLUT.Add(
 					(int)ge.GetProperty("group"),
-					Type.GetType("ProjectE_E.Components.GeneratedFiles").GetMethod(ge.GetProperty("DelegateEventName").ToString())
+					Type.GetType("ProjectE_E.Components.Cuprite.MapEvents").GetMethod(ge.GetProperty("DelegateEventName").ToString())
 					);
 			}		
 		}
