@@ -56,7 +56,6 @@ namespace ProjectE_E
 				
 				file.Close();
 			}
-
 		}
 
 		/// <summary>
@@ -112,8 +111,6 @@ namespace ProjectE_E
 			map.GenerateLevel(map.level, this.GraphicsDevice, spriteBatch);
 
 			Player.Load(this.Content);
-			
-
 			// TODO: use this.Content to load your game content here
 		}
 
@@ -140,10 +137,18 @@ namespace ProjectE_E
 			Player.Update(gameTime);
 
 			//this is collision detection
-			//foreach (CollisionTiles tile in map.CollisionTiles)
-			//{
-			//	Player.Collision(tile.Rectangle, map.Width, map.Height);
-			if (map != null)
+			foreach (Tile tile in map.MapTiles)
+			{
+				Player.Collision(tile.Rectangle, map.Width, map.Height, tile.EventGroup);
+				if(map.EventLUT.Count > 0 && tile.EventGroup > 0 && (int)Player.Position.X/40 == tile.Rectangle.X/40 && (int)Player.Position.Y / 40 == tile.Rectangle.Y / 40)
+				{
+					var v = map.GetMapEvent(tile.EventGroup);
+					if (v != null)
+						v.Invoke(null, null);
+				}
+
+			}
+				if (map != null)
 			{
 				camera.Update(Player.Position, map.Width, map.Height);
 				if (Player.Position.Y > 400)

@@ -20,10 +20,10 @@ namespace ProjectE_E.Components
 		private Dictionary<String, Texture2D> sprites = new Dictionary<string, Texture2D>();
 		public Level level = new Level();
 		private List<GameEvent> MapEvents;
-		List<Tile> MapTiles = new List<Tile>();
+		public List<Tile> MapTiles = new List<Tile>();
 
 		//Look up table of this maps Gameevents
-		private Dictionary<int, System.Reflection.MethodInfo> EventLUT = new Dictionary<int, System.Reflection.MethodInfo>();
+		public Dictionary<int, System.Reflection.MethodInfo> EventLUT = new Dictionary<int, System.Reflection.MethodInfo>();
 
 
 		public int Width
@@ -38,7 +38,11 @@ namespace ProjectE_E.Components
 
 		public List<CollisionTiles> CollisionTiles;
 
-		public Map(){ }
+		public Map(){
+
+			mapwidth = 1000;
+			mapheight = 500;
+		}
 
 		public void LoadTileMaps(GraphicsDevice graphicsDevice, Level currentLevel)
 		{
@@ -85,14 +89,12 @@ namespace ProjectE_E.Components
 		{
 			foreach(SpriteLayer spriteLayer in level.Layers)
 			{
-				if(spriteLayer.layerType == LayerType.Tile)
-				{
+				if (spriteLayer.layerType == LayerType.Tile)
 					GenerateTileMap(((int[,])spriteLayer.LayerObjects), graphicsDevice, spriteBatch);
-				}
 				else if (spriteLayer.layerType == LayerType.Sprite)
-				{
 					GenerateSprites(((List<Sprite>)spriteLayer.LayerObjects), graphicsDevice, spriteBatch);
-				}
+				else if (spriteLayer.layerType == LayerType.GameEvent)
+					GenerateGameEvents(((Tuple<int[,], List<GameEvent>>)spriteLayer.LayerObjects).Item1);
 			}
 		}
 
@@ -177,6 +179,44 @@ namespace ProjectE_E.Components
 			}
 		}
 
+		public void GenerateGameEvents(int[,] GELocations)
+		{
+
+			List<Tile> GETiles = new List<Tile>();//MapTiles.Where(item => item.EventGroup != 0);
+			foreach (Tile t in MapTiles)
+			{
+				if (t.EventGroup != 0)
+					GETiles.Add(t);
+			}
+
+			//scan through the 2D array
+			for (int i = 0; i < GELocations.GetLength(1); i++)
+			{
+				for (int j = 0; j < GELocations.GetLength(0); j++)
+				{
+					// a value of 0 is NOTHING don't create a game event
+					if (GELocations[i, j] == 0) continue;
+					
+					foreach (Tile t in GETiles)
+					{
+						if (t.Rectangle.X == j * 40 && t.Rectangle.Y == i * 40)
+							continue; //this tile already has an event... don't add it.
+					}
+					
+					//create the Tile for game events.
+					Rectangle GErect = new Rectangle()
+					{
+						X = j * 40,
+						Y = i * 40,
+						Width = 40,
+						Height = 40
+					};
+					Tile tt = new Tile(null, GErect, GELocations[i, j]);
+					MapTiles.Add(tt); //update map;
+					GETiles.Add(tt); //update checking of map tiles.
+				}
+			}
+		}
 
 		public async Task<Level> GetLevelFromFile(String FilePath)
 		{
@@ -194,6 +234,7 @@ namespace ProjectE_E.Components
 		{
 			foreach(GameEvent ge in gameEvents)
 			{
+				if (EventLUT.ContainsKey((int)ge.GetProperty("group"))) continue;
 				EventLUT.Add(
 					(int)ge.GetProperty("group"),
 					Type.GetType("ProjectE_E.Components.Cuprite.MapEvents").GetMethod(ge.GetProperty("DelegateEventName").ToString())

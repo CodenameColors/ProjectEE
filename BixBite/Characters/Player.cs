@@ -26,7 +26,7 @@ namespace BixBite.Characters
 
 		public Player()
 		{
-			//position = new Vector2(200, 200);
+			position = new Vector2(0, 0);
 		}
 
 		public void Load(ContentManager Content)
@@ -41,8 +41,10 @@ namespace BixBite.Characters
 
 			Input(gameTime);
 
-			if (velocity.Y < 10)
-				velocity.Y += .4f;
+			//UNCOMMENT FOR PLATFORMING
+			//if (velocity.Y < 10)
+			//	velocity.Y += .4f;
+
 		}
 
 		private void Input(GameTime gameTime)
@@ -55,16 +57,33 @@ namespace BixBite.Characters
 
 			else velocity.X = 0f;
 
-			if (Keyboard.GetState().IsKeyDown(Keys.Space) && hasJumped == false)
+			//UNCOMMENT FOR PLATFORMING
+			//if (Keyboard.GetState().IsKeyDown(Keys.Space) && hasJumped == false)
+			//{
+			//	position.Y -= 5f;
+			//	velocity.Y = -9f;
+			//	hasJumped = true;
+			//}
+			if (Keyboard.GetState().IsKeyDown(Keys.S))
+				velocity.Y = (float)gameTime.ElapsedGameTime.TotalMilliseconds / 3;
+
+			else if (Keyboard.GetState().IsKeyDown(Keys.W))
+				velocity.Y = -(float)gameTime.ElapsedGameTime.TotalMilliseconds / 3;
+
+			else velocity.Y = 0f;
+
+
+			if (Keyboard.GetState().IsKeyDown(Keys.LeftControl) && Keyboard.GetState().IsKeyDown(Keys.T))
 			{
-				position.Y -= 5f;
-				velocity.Y = -9f;
-				hasJumped = true;
+				Console.WriteLine("Testing Button for Character");
 			}
+
 		}
 
-		public void Collision(Rectangle newRectangle, int xOffset, int yOffset)
+		public void Collision(Rectangle newRectangle, int xOffset, int yOffset, int EventGroup)
 		{
+			if (EventGroup != -1) return;
+
 			if (rectangle.TouchTopOf(newRectangle))
 			{
 				rectangle.Y = newRectangle.Y - rectangle.Height;
@@ -81,14 +100,20 @@ namespace BixBite.Characters
 			}
 			if (rectangle.TouchBottomOf(newRectangle))
 			{
-				velocity.Y = 1f;
+				velocity.Y = 0;
 			}
 
+			//this is for checking the map. Don't allow out of bounds.
 			if (position.X < 0) position.X = 0;
 			if (position.X > xOffset - rectangle.Width) position.X = xOffset - rectangle.Width;
 			if (position.Y < 0) velocity.Y = 1f;
 			if (position.Y > yOffset - rectangle.Height) position.Y = yOffset - rectangle.Height;
 
+		}
+
+		public void Triggering(int EventGroup)
+		{
+			
 		}
 
 		public void Draw(SpriteBatch spriteBatch)

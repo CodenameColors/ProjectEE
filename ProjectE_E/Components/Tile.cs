@@ -38,7 +38,8 @@ namespace ProjectE_E.Components
 
 		public Tile(Texture2D text, Rectangle r, int TileEventType)
 		{
-			this.texture = text;
+			if(text != null)
+				this.texture = text;
 			this.rectangle = r;
 			this.eventgroup = TileEventType;
 		}
