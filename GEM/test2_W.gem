@@ -1,7 +1,7 @@
 -ProjectName:
 test2
 -Thumbnail:
-C:\Users\amorales\Documents\createst\test2\test2_Game\Content\Images\smol megumin.jpg
+C:\Users\amorales\Documents\createst\test2\test2_W_Game\Content\Images\smol megumin.jpg
 -GameLocation:
 C:\Users\amorales\Documents\createst\test2\test2_Game\bin\DesktopGL\AnyCPU\Debug\Game1.exe
 -ConfigLocation:
@@ -9,6 +9,6 @@ C:\Users\amorales\Documents\createst\test2\test2_Game\Content\Config
 -Levels:
 C:\Users\amorales\Documents\createst\test2\test2_Game\Content\Levels
 -MainLevel:
-C:\Users\amorales\Documents\createst\test2\test2_Game\Content\Levels\level1.lvl
+C:\Users\amorales\Documents\createst\test2\test2_W_Game\Content\Levels\level1_test.lvl
 -Dialogue:
 C:\Users\amorales\Documents\createst\test2\test2_Game\Content\Dialogue
