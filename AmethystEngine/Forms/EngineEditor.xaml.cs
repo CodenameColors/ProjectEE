@@ -513,8 +513,6 @@ namespace AmethystEngine.Forms
     //TODO: Multi lined label
     private void ProjectContentExplorer_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
-
-
       String TempPic = "/AmethystEngine;component/images/Ame_icon_small.png";
       CurTreeView = (TreeView)sender; Titles.Clear();
 			if (CurTreeView.Items.Count == 0) return; 

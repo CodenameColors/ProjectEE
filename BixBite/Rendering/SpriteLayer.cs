@@ -149,10 +149,10 @@ namespace BixBite.Rendering
 			switch (layerType)
 			{
 				case (LayerType.Tile):
-					LayerObjects = new int[width,height];
-					for(int i = 0; i < width; i++)
+					LayerObjects = new int[height, width];
+					for(int i = 0; i < height; i++)
 					{
-						for(int j = 0; j < height; j++)
+						for(int j = 0; j < width; j++)
 						{
 							((int[,])LayerObjects)[i, j] = -1;
 						}
