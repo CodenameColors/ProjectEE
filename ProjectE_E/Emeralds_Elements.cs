@@ -20,6 +20,7 @@ namespace ProjectE_E
 		SpriteBatch spriteBatch;
 		Texture2D t2;
 		Map map;
+		Map C_map; //for map change testing
 		Player Player;
 		Camera camera;
 
@@ -68,6 +69,7 @@ namespace ProjectE_E
 		{
 			//create map
 			map = new Map();
+			C_map = new Map();
 			Player = new Player();
 			base.Initialize();
 		}
@@ -76,6 +78,7 @@ namespace ProjectE_E
 		protected async void Load_async()
 		{
 			map.level = await map.GetLevelFromFile(MainLevelPath);
+			
 		}
 
     /// <summary>
@@ -109,9 +112,13 @@ namespace ProjectE_E
 			map.LoadTileMaps(this.GraphicsDevice, map.level);
 			map.LoadSprites(this.GraphicsDevice, map.level);
 			map.GenerateLevel(map.level, this.GraphicsDevice, spriteBatch);
+			
 
 			Player.Load(this.Content);
 			// TODO: use this.Content to load your game content here
+
+			C_map.level = Level.ImportLevel("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\Levels\\LevelChangeTest.lvl");
+
 		}
 
 		/// <summary>
@@ -167,7 +174,17 @@ namespace ProjectE_E
 					if (sl.layerType == LayerType.GameEvent) {
 						map.FillDictLUT(((System.Tuple<int[,], List<GameEvent>>)sl.LayerObjects).Item2);
 					}
+					System.Console.WriteLine("T DOWN");
 				}
+			}
+
+			if (Keyboard.GetState().IsKeyDown(Keys.M))
+			{
+				map = C_map;
+				map.LoadTileMaps(this.GraphicsDevice, map.level);
+				map.LoadSprites(this.GraphicsDevice, map.level);
+				map.GenerateLevel(map.level, this.GraphicsDevice, spriteBatch);
+				System.Console.WriteLine("M DOWN");
 			}
 
 			base.Update(gameTime);

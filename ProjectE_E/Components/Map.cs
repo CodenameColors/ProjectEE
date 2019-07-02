@@ -41,7 +41,7 @@ namespace ProjectE_E.Components
 		public Map(){
 
 			mapwidth = 1000;
-			mapheight = 500;
+			mapheight = 1000;
 		}
 
 		public void LoadTileMaps(GraphicsDevice graphicsDevice, Level currentLevel)
@@ -94,7 +94,7 @@ namespace ProjectE_E.Components
 				else if (spriteLayer.layerType == LayerType.Sprite)
 					GenerateSprites(((List<Sprite>)spriteLayer.LayerObjects), graphicsDevice, spriteBatch);
 				else if (spriteLayer.layerType == LayerType.GameEvent)
-					GenerateGameEvents(((Tuple<int[,], List<GameEvent>>)spriteLayer.LayerObjects).Item1);
+					GenerateGameEvents(((Tuple<int[,], List<GameEvent>>)spriteLayer.LayerObjects).Item1, ((Tuple<int[,], List<GameEvent>>)spriteLayer.LayerObjects).Item2);
 			}
 		}
 
@@ -105,11 +105,11 @@ namespace ProjectE_E.Components
 			{
 				thresholds.Add(GetTileMapThreshold(t.Item1, t.Item2));
 			}
-			
 
-			for (int i = 0; i < map.GetLength(1); i++)
+			Console.WriteLine(map.GetLength(1));
+			for (int i = 0; i < map.GetLength(0); i++)
 			{
-				for(int j = 0; j < map.GetLength(0); j++)
+				for(int j = 0; j < map.GetLength(1); j++)
 				{
 					if (map[i, j] == -1) continue; //this tile is null so don't draw.
 					 
@@ -156,7 +156,7 @@ namespace ProjectE_E.Components
 					texture.GetData(0, r, data, 0, r.Width * r.Height);
 					croppedTexture.SetData(data);
 
-					MapTiles.Add(new Tile(croppedTexture, new Rectangle(j*40, i*40, 40, 40), 0));
+					MapTiles.Add(new Tile(croppedTexture, new Rectangle(j*40, i*40, 40, 40), 0, 0));
 
 					//Tile tileTemp = new Tile(croppedTexture, r);
 					//tileTemp.Draw(spriteBatch);
@@ -175,11 +175,11 @@ namespace ProjectE_E.Components
 				r.Y = (int)spr.GetProperty("y");
 				r.Width = (int)spr.GetProperty("width");
 				r.Height = (int)spr.GetProperty("height");
-				MapTiles.Add(new Tile(texture, r, 0));
+				MapTiles.Add(new Tile(texture, r, 0, 0));
 			}
 		}
 
-		public void GenerateGameEvents(int[,] GELocations)
+		public void GenerateGameEvents(int[,] GELocations, List<GameEvent> gameEvents)
 		{
 
 			List<Tile> GETiles = new List<Tile>();//MapTiles.Where(item => item.EventGroup != 0);
@@ -190,9 +190,9 @@ namespace ProjectE_E.Components
 			}
 
 			//scan through the 2D array
-			for (int i = 0; i < GELocations.GetLength(1); i++)
+			for (int i = 0; i < GELocations.GetLength(0); i++)
 			{
-				for (int j = 0; j < GELocations.GetLength(0); j++)
+				for (int j = 0; j < GELocations.GetLength(1); j++)
 				{
 					// a value of 0 is NOTHING don't create a game event
 					if (GELocations[i, j] == 0) continue;
@@ -211,7 +211,21 @@ namespace ProjectE_E.Components
 						Width = 40,
 						Height = 40
 					};
-					Tile tt = new Tile(null, GErect, GELocations[i, j]);
+					int eventnum = 0;
+					if (gameEvents.Count > 0)
+					{
+						foreach(GameEvent g in gameEvents)
+						{
+							if((int)g.GetProperty("group") == GELocations[i, j])
+							{
+								eventnum = (int)g.eventType;
+									break;
+							}
+						}
+					}
+						//eventnum = (int)(gameEvents.Find(t => (int)t.GetProperty("group") == GELocations[i, j]).eventType);
+
+					Tile tt = new Tile(null, GErect, GELocations[i, j], eventnum);
 					MapTiles.Add(tt); //update map;
 					GETiles.Add(tt); //update checking of map tiles.
 				}
