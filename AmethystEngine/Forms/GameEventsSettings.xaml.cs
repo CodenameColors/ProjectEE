@@ -86,7 +86,7 @@ namespace AmethystEngine.Forms
 			//TODO: Add the inputs after the input section in the project settings is added.
 
 			if (curGameEvent.eventType == EventType.Cutscene || curGameEvent.eventType == EventType.DialougeScene
-				|| curGameEvent.eventType == EventType.LevelTransistion || curGameEvent.eventType == EventType.BGM)
+				|| curGameEvent.eventType == EventType.LevelTransition || curGameEvent.eventType == EventType.BGM)
 				EventData_CC.Visibility = Visibility.Visible;
 			else
 			{

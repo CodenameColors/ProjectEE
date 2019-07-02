@@ -12,7 +12,7 @@ using BixBite.Rendering;
 
 namespace ProjectE_E.Components
 {
-	class Map
+	public class Map
 	{
 		String MapName;
 		private int mapwidth, mapheight;

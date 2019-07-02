@@ -660,8 +660,6 @@
 							</Canvas.Background>
 							<Canvas x:Name="LevelEditor_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 						</Canvas>
-
-
 					</Grid>
 				</TabItem>
 				<TabItem Header="Animation Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">

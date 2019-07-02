@@ -957,8 +957,8 @@ namespace BixBite
 								await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
 								await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
 								break;
-							case (EventType.LevelTransistion):
-								await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.LevelTransistion).ToString());
+							case (EventType.LevelTransition):
+								await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.LevelTransition).ToString());
 								await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
 								await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
 								await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name

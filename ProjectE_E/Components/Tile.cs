@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ProjectE_E.Components
 {
-	class Tile
+	public class Tile
 	{
 		protected Texture2D texture;
 
@@ -57,7 +57,7 @@ namespace ProjectE_E.Components
 		}
 	}
 
-	class CollisionTiles : Tile
+	public class CollisionTiles : Tile
 	{
 		//public CollisionTiles(int i, Rectangle newRectangle)
 		//{
