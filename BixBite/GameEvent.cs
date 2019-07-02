@@ -22,7 +22,7 @@ namespace BixBite
 	public enum EventType
 	{
 		None,
-		LevelTransistion,
+		LevelTransition,
 		DialougeScene,
 		Cutscene,
 		Trigger,
@@ -128,7 +128,7 @@ namespace BixBite
 					datatoload.NewFileToLoad = "dialogue scene WIP... not working";
 					//for a dialogue activation should occur from a "trigger" trigger, and or a button press.
 					return;
-				case (EventType.LevelTransistion):
+				case (EventType.LevelTransition):
 					datatoload = ed;
 					SetProperty("DelegateEventName", newDeleName);
 					SetProperty("ActivationButton", ButtonName);

@@ -33,5 +33,22 @@ namespace ProjectE_E.Components.Cuprite
 		}
 
 		#endregion
+
+
+		#region level1_ge_test_1.lvl
+
+		//Used for changing the map/level. given a new position
+		public static void LevelTestDele1(ref Map CurrentMap, String FileName, int newx, int newy, int movetime)
+		{
+			//unload the map
+			CurrentMap.UnloadMap();
+			//get the level file!
+			Level NewLevel = Level.ImportLevel(FileName);
+			//Create New Map
+			CurrentMap = new Map() { level = NewLevel };
+		}
+
+		#endregion
+
 	}
 }

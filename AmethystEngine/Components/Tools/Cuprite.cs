@@ -174,7 +174,12 @@ namespace AmethystEngine.Components.Tools
 					while (Blocks.Count > 0)
 					{
 						line = CodeFileLines[i++];
-						if (line.Contains("{")) Blocks.Push("{");
+						if (line.Contains("{"))
+						{
+							Blocks.Push("{");
+							if (line.Substring(line.IndexOf("{") + 1).Contains("}"))
+								Blocks.Pop();
+						}
 						else if (line.Contains("}"))
 						{
 							if (Blocks.Peek() == "{")
