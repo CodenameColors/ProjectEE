@@ -333,11 +333,11 @@ namespace BixBite
 								{
 									List<int> rowdata = new List<int>();
 									reader.Read();
-									String s = ( reader.Value);
+									String s = (reader.Value);
 									String[] row = s.Split(',');
 									foreach (string ss in row) //parse the ints
 										rowdata.Add(Int32.Parse(ss));
-									 reader.Read(); reader.Read();  reader.Read();
+									reader.Read(); reader.Read(); reader.Read();
 									LevelData.Add(rowdata);
 
 								}
@@ -419,7 +419,7 @@ namespace BixBite
 								}
 
 							}
-							if (reader.NodeType == XmlNodeType.EndElement && reader.Name.Trim() == "GameEventsLayer")
+							if (reader.NodeType == XmlNodeType.EndElement && reader.Name.Trim() == "Data")
 							{
 								int[,] str = new int[LevelData.Count, LevelData[0].Count];
 								for (int j = 0; j < LevelData.Count; j++)
@@ -429,103 +429,84 @@ namespace BixBite
 										str[j, i] = LevelData[j][i];
 									}
 								}
-
 								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects = new Tuple<int[,], List<GameEvent>>(str, new List<GameEvent>());//we have the row data so add to the level data
-							}
-						}
-						//advance
-						while (reader.NodeType != XmlNodeType.Element)
-							reader.Read();
-						//Game events!
-						while ((reader.NodeType != XmlNodeType.EndElement && reader.Name.Trim() == "GameEvents") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Event")) //loop through all the TileSets
-																																																																																									 //while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameEvents")
-						{
-							Console.WriteLine("GameEvents Found");
-							reader.Read();
-							reader.Read();
+																																																																					 //advance to the next beginning element
+								while (reader.NodeType != XmlNodeType.Element || reader.Name.ToLower() != "gameeventslayer" && reader.NodeType == XmlNodeType.EndElement)
+									reader.Read();
 
-							//Create a Event to add to the layers Game events
-							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Event")
+								//Does the Game Event tag exist?
+								if (reader.Name.ToLower() == "gameeventslayer")
+									continue;
+							}
+
+							//Game events!
+							while ((reader.NodeType != XmlNodeType.EndElement && reader.Name.Trim() == "GameEvents") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Event")) //loop through all the TileSets
+																																																																																										 //while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameEvents")
 							{
-								String GEName = reader.GetAttribute("Name");
-								String DeleName = reader.GetAttribute("Function");
-								String ActButton = reader.GetAttribute("Activation");
-								bool isActive = (reader.GetAttribute("isActive") == "false" ? false : true);
-								EventType etype = (EventType)Int32.Parse(reader.GetAttribute("Type"));
-								int group = Int32.Parse(reader.GetAttribute("Group"));
+								Console.WriteLine("GameEvents Found");
+								reader.Read();
+								reader.Read();
 
-								GameEvent ge = new GameEvent(GEName, etype, group);
-								ge.SetProperty("DelegateEventName", DeleName);
-								ge.SetProperty("ActivationButton", ActButton);
-								ge.SetProperty("isActive", isActive);
-
-								//advance
-								if (!reader.IsEmptyElement)
+								//Create a Event to add to the layers Game events
+								while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Event")
 								{
-									reader.Read();
-									reader.Read();
-								}
+									String GEName = reader.GetAttribute("Name");
+									String DeleName = reader.GetAttribute("Function");
+									String ActButton = reader.GetAttribute("Activation");
+									bool isActive = (reader.GetAttribute("isActive") == "false" ? false : true);
+									EventType etype = (EventType)Int32.Parse(reader.GetAttribute("Type"));
+									int group = Int32.Parse(reader.GetAttribute("Group"));
 
-								//do we have data?
-								if (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "EventData" && etype == EventType.Collision)
-								{
-									reader.Read(); reader.Read(); reader.Read(); reader.Read();
+									GameEvent ge = new GameEvent(GEName, etype, group);
+									ge.SetProperty("DelegateEventName", DeleName);
+									ge.SetProperty("ActivationButton", ActButton);
+									ge.SetProperty("isActive", isActive);
 
-								}
-								else if (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "EventData")
-								{
-									String FileToAdd = reader.GetAttribute("FileToLoad");
-									int xnew = Int32.Parse(reader.GetAttribute("Newxpos"));
-									int ynew = Int32.Parse(reader.GetAttribute("Newypos"));
-									int movet = Int32.Parse(reader.GetAttribute("MoveTime"));
-									EventData ed = new EventData()
+									//advance
+									if (!reader.IsEmptyElement)
 									{
-										NewFileToLoad = FileToAdd,
-										newx = xnew,
-										newy = ynew,
-										MoveTime = movet
-									};
-									ge.datatoload = ed;
-								}
-								//add to layer object list.
-								//TODO: THIS currently will break. Also doesn't add the GE to the right layer...
-								((Tuple<int[,], List<GameEvent>>)TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects).Item2.Add(ge);
+										reader.Read();
+										reader.Read();
+									}
 
-								//advance
-								reader.Read();
-								reader.Read();
-							}
-							Console.WriteLine(reader.Value);
+									//do we have data?
+									if (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "EventData" && etype == EventType.Collision)
+									{
+										reader.Read(); reader.Read(); reader.Read(); reader.Read();
+
+									}
+									else if (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "EventData")
+									{
+										String FileToAdd = reader.GetAttribute("FileToLoad");
+										int xnew = Int32.Parse(reader.GetAttribute("Newxpos"));
+										int ynew = Int32.Parse(reader.GetAttribute("Newypos"));
+										int movet = Int32.Parse(reader.GetAttribute("MoveTime"));
+										EventData ed = new EventData()
+										{
+											NewFileToLoad = FileToAdd,
+											newx = xnew,
+											newy = ynew,
+											MoveTime = movet
+										};
+										ge.datatoload = ed;
+									}
+									//add to layer object list.
+									//TODO: THIS currently will break. Also doesn't add the GE to the right layer...
+									((Tuple<int[,], List<GameEvent>>)TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects).Item2.Add(ge);
+
+									//advance
+									reader.Read();
+									reader.Read();
+								}
+								//get to the next beginning tag
+								while ((reader.NodeType == XmlNodeType.EndElement || reader.NodeType == XmlNodeType.Whitespace) && reader.Name.ToLower() != "gameeventslayer") //ignore whitespace
+									reader.Read();
+							} //end of game layer events
 						}
 					}
 				}
 			}
-			//	break;
-			//case XmlNodeType.Text:
-			//	Console.WriteLine("Text Node: {0}",
-			//					 await reader.GetValueAsync());
-			//	break;
-			//case XmlNodeType.EndElement:
-			//	Console.WriteLine("End Element {0}", reader.Name);
-			//	break;
-			//default:
-			//	Console.WriteLine("Other node {0} with value {1}",
-			//									reader.NodeType, reader.Value);
-			//	break;
 			return TempLevel;
-
-			//Create the Level object from the file
-
-			//The first tag should be a level tag. it includes name, and map width/height
-
-			//next up is the tilesets for the map.
-
-			//the next thing is the layers . LOOPS
-			//Tile int[,]
-			//Sprite
-			//gameevent int[,]
-
-			//GameEvents content includes group number and eventname LOOPS
 		}
 
 		async public static System.Threading.Tasks.Task<Level> ImportLevelAsync(String filename)
@@ -618,6 +599,7 @@ namespace BixBite
 								}
 
 								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects = str;//we have the row data so add to the level data
+								continue;
 							}
 
 							//Sprite
@@ -679,7 +661,7 @@ namespace BixBite
 								}
 
 							}
-							if (reader.NodeType == XmlNodeType.EndElement && reader.Name.Trim() == "GameEventsLayer")
+							if (reader.NodeType == XmlNodeType.EndElement && reader.Name.Trim() == "Data")
 							{
 								int[,] str = new int[LevelData.Count, LevelData[0].Count];
 								for (int j = 0; j < LevelData.Count; j++)
@@ -691,99 +673,85 @@ namespace BixBite
 								}
 
 								TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects = new Tuple<int[,], List<GameEvent>>(str, new List<GameEvent>());//we have the row data so add to the level data
-							}
-						}
-						while (reader.NodeType != XmlNodeType.Element)
-							await reader.ReadAsync();
-						//Game events!
-						while ((reader.NodeType != XmlNodeType.EndElement && reader.Name.Trim() == "GameEvents") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Event")) //loop through all the TileSets
-						//while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameEvents")
-						{
-							Console.WriteLine("GameEvents Found");
-							await reader.ReadAsync();
-							await reader.ReadAsync();
 
-							//Create a Event to add to the layers Game events
-							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Event")
+								//advance to the next beginning element
+								while (reader.NodeType != XmlNodeType.Element || reader.Name.ToLower() != "gameeventslayer" && reader.NodeType == XmlNodeType.EndElement)
+									await reader.ReadAsync();
+
+								//Does the Game Event tag exist?
+								if (reader.Name.ToLower() == "gameeventslayer")
+									continue;
+							}
+							
+							//Game events!
+							while ((reader.NodeType != XmlNodeType.EndElement && reader.Name.Trim() == "GameEvents") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Event")) //loop through all the TileSets
+																																																																																										 //while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameEvents")
 							{
-								String GEName = reader.GetAttribute("Name");
-								String DeleName = reader.GetAttribute("Function");
-								String ActButton = reader.GetAttribute("Activation");
-								bool isActive = (reader.GetAttribute("isActive") == "false" ? false : true);
-								EventType etype = (EventType)Int32.Parse(reader.GetAttribute("Type"));
-								int group = Int32.Parse(reader.GetAttribute("Group"));
+								Console.WriteLine("GameEvents Found");
+								await reader.ReadAsync();
+								await reader.ReadAsync();
 
-								GameEvent ge = new GameEvent(GEName, etype, group);
-								ge.SetProperty("DelegateEventName", DeleName);
-								ge.SetProperty("ActivationButton", ActButton);
-								ge.SetProperty("isActive", isActive);
-
-								//advance
-								if (!reader.IsEmptyElement)
+								//Create a Event to add to the layers Game events
+								while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Event")
 								{
-									await reader.ReadAsync();
-									await reader.ReadAsync();
-								}
+									String GEName = reader.GetAttribute("Name");
+									String DeleName = reader.GetAttribute("Function");
+									String ActButton = reader.GetAttribute("Activation");
+									bool isActive = (reader.GetAttribute("isActive") == "false" ? false : true);
+									EventType etype = (EventType)Int32.Parse(reader.GetAttribute("Type"));
+									int group = Int32.Parse(reader.GetAttribute("Group"));
 
-								//do we have data?
-								if(reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "EventData" && etype == EventType.Collision)
-								{
-									await reader.ReadAsync(); await reader.ReadAsync(); await reader.ReadAsync(); await reader.ReadAsync();
+									GameEvent ge = new GameEvent(GEName, etype, group);
+									ge.SetProperty("DelegateEventName", DeleName);
+									ge.SetProperty("ActivationButton", ActButton);
+									ge.SetProperty("isActive", isActive);
 
-								}
-								else if(reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "EventData")
-								{
-									String FileToAdd = reader.GetAttribute("FileToLoad");
-									int xnew = Int32.Parse(reader.GetAttribute("Newxpos"));
-									int ynew = Int32.Parse(reader.GetAttribute("Newypos"));
-									int movet = Int32.Parse(reader.GetAttribute("MoveTime"));
-									EventData ed = new EventData()
+									//advance
+									if (!reader.IsEmptyElement)
 									{
-										NewFileToLoad = FileToAdd,
-										newx = xnew,
-										newy = ynew,
-										MoveTime = movet
-									};
-									ge.datatoload = ed;
-								}
-								//add to layer object list.
-								((Tuple<int[,], List<GameEvent>>)TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects).Item2.Add(ge);
+										await reader.ReadAsync();
+										await reader.ReadAsync();
+									}
 
-								//advance
-								await reader.ReadAsync();
-								await reader.ReadAsync();
-							}
-							Console.WriteLine(reader.Value);
+									//do we have data?
+									if (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "EventData" && etype == EventType.Collision)
+									{
+										await reader.ReadAsync(); await reader.ReadAsync(); await reader.ReadAsync(); await reader.ReadAsync();
+
+									}
+									else if (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "EventData")
+									{
+										String FileToAdd = reader.GetAttribute("FileToLoad");
+										int xnew = Int32.Parse(reader.GetAttribute("Newxpos"));
+										int ynew = Int32.Parse(reader.GetAttribute("Newypos"));
+										int movet = Int32.Parse(reader.GetAttribute("MoveTime"));
+										EventData ed = new EventData()
+										{
+											NewFileToLoad = FileToAdd,
+											newx = xnew,
+											newy = ynew,
+											MoveTime = movet
+										};
+										ge.datatoload = ed;
+									}
+									//add to layer object list.
+									((Tuple<int[,], List<GameEvent>>)TempLevel.Layers[TempLevel.Layers.Count - 1].LayerObjects).Item2.Add(ge);
+
+									//advance
+									await reader.ReadAsync();
+									await reader.ReadAsync();
+								}
+								Console.WriteLine(reader.Value);
+
+								//get to the next beginning tag
+								while ((reader.NodeType == XmlNodeType.EndElement || reader.NodeType == XmlNodeType.Whitespace) && reader.Name.ToLower() != "gameeventslayer") //ignore whitespace
+									await reader.ReadAsync();
+							} //end of game layer events
 						}
 					}
 				}
 			}
-//	break;
-						//case XmlNodeType.Text:
-						//	Console.WriteLine("Text Node: {0}",
-						//					 await reader.GetValueAsync());
-						//	break;
-						//case XmlNodeType.EndElement:
-						//	Console.WriteLine("End Element {0}", reader.Name);
-						//	break;
-						//default:
-						//	Console.WriteLine("Other node {0} with value {1}",
-						//									reader.NodeType, reader.Value);
-						//	break;
 			return TempLevel;
-
-			//Create the Level object from the file
-
-			//The first tag should be a level tag. it includes name, and map width/height
-
-			//next up is the tilesets for the map.
-
-			//the next thing is the layers . LOOPS
-			//Tile int[,]
-			//Sprite
-			//gameevent int[,]
-
-			//GameEvents content includes group number and eventname LOOPS
 		}
 
 		async public void ExportLevel(String FilePath, List<String> TileSets, List<Tuple<int, int>> CellDimen = null)
@@ -887,6 +855,7 @@ namespace BixBite
 						await writer.WriteAttributeStringAsync(null, "Name", null, layer.LayerName);
 						int[,] tiledata = ((Tuple<int[,], List<GameEvent>>)layer.LayerObjects).Item1;
 						if (tiledata == null) goto Skiplayer;
+						await writer.WriteStartElementAsync(null, "Data", null); //Data Tag
 						for (int i = 0; i < tiledata.GetLength(0); i++)
 						{
 							String rowdata = "";
@@ -898,6 +867,95 @@ namespace BixBite
 							await writer.WriteStringAsync(rowdata.Substring(0, rowdata.Length - 1));
 							await writer.WriteEndElementAsync(); //end of row
 						}
+
+						await writer.WriteEndElementAsync(); //Data Tag End
+
+						await writer.WriteStartElementAsync(null, "GameEvents", null); //GameEvents Tag
+
+						List<GameEvent> LGE = ((Tuple<int[,], List<GameEvent>>)layer.LayerObjects).Item2;
+						foreach (GameEvent ge in LGE)
+						{
+							await writer.WriteStartElementAsync(null, "Event", null); //create new event
+							await writer.WriteAttributeStringAsync(null, "Name", null, ge.EventName);
+							switch (ge.eventType)
+							{
+								//TODO YO ASSHOLE... MAKE A METHOD FOR THIS. FOR THE LOVE GOD ITS DISGUSTING...
+								case (EventType.None):
+									break;
+								case (EventType.Collision):
+									await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.Collision).ToString());
+									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
+									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "Activation", null, "NONE");
+									break;
+								case (EventType.Trigger):
+									await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.Trigger).ToString());
+									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
+									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
+									break;
+								case (EventType.LevelTransition):
+									await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.LevelTransition).ToString());
+									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
+									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
+
+
+									await writer.WriteStartElementAsync(null, "EventData", null); //Event Data
+									await writer.WriteAttributeStringAsync(null, "Newxpos", null, ge.datatoload.newx.ToString());
+									await writer.WriteAttributeStringAsync(null, "Newypos", null, ge.datatoload.newy.ToString());
+									await writer.WriteAttributeStringAsync(null, "MoveTime", null, ge.datatoload.MoveTime.ToString());
+									await writer.WriteAttributeStringAsync(null, "FileToLoad", null, ge.datatoload.NewFileToLoad);
+									await writer.WriteEndElementAsync(); //end of event data
+
+									break;
+								case (EventType.DialougeScene):
+									await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.DialougeScene).ToString());
+									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
+									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
+
+									await writer.WriteStartElementAsync(null, "EventData", null); //Event Data
+									await writer.WriteAttributeStringAsync(null, "Newxpos", null, ge.datatoload.newx.ToString());
+									await writer.WriteAttributeStringAsync(null, "Newypos", null, ge.datatoload.newy.ToString());
+									await writer.WriteAttributeStringAsync(null, "MoveTime", null, ge.datatoload.MoveTime.ToString());
+									await writer.WriteAttributeStringAsync(null, "FileToLoad", null, ge.datatoload.NewFileToLoad);
+									await writer.WriteEndElementAsync(); //end of event data
+
+									break;
+								case (EventType.Cutscene):
+									await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.Cutscene).ToString());
+									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
+									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
+
+									await writer.WriteStartElementAsync(null, "EventData", null); //Event Data
+									await writer.WriteAttributeStringAsync(null, "Newxpos", null, ge.datatoload.newx.ToString());
+									await writer.WriteAttributeStringAsync(null, "Newypos", null, ge.datatoload.newy.ToString());
+									await writer.WriteAttributeStringAsync(null, "MoveTime", null, ge.datatoload.MoveTime.ToString());
+									await writer.WriteAttributeStringAsync(null, "FileToLoad", null, ge.datatoload.NewFileToLoad);
+									await writer.WriteEndElementAsync(); //end of event data
+
+									break;
+								case (EventType.BGM):
+									await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.BGM).ToString());
+									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
+									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
+									break;
+							}
+							await writer.WriteEndElementAsync(); //end creation of event.
+						}
+
+
+						await writer.WriteEndElementAsync(); //GameEvents Tag End
+
 						Skiplayer:
 
 						await writer.WriteEndElementAsync();
@@ -915,108 +973,19 @@ namespace BixBite
 					gameeventlayers.Add(g);
 				}
 
-
-				await writer.WriteStartElementAsync(null, "GameEvents", null); //list of Level game events
-				
 				//there will always be a default collision event!
-				await writer.WriteStartElementAsync(null, "Event", null);
-				await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.Collision).ToString());
-				await writer.WriteAttributeStringAsync(null, "Group", null, "-1");
-				await writer.WriteAttributeStringAsync(null, "Function", null, "TileCollisionFound"); //this is the function/delegate name
-				await writer.WriteStartElementAsync(null, "EventData", null);
-				await writer.WriteStringAsync("Default Collision");
+				//await writer.WriteStartElementAsync(null, "Event", null);
+				//await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.Collision).ToString());
+				//await writer.WriteAttributeStringAsync(null, "Group", null, "-1");
+				//await writer.WriteAttributeStringAsync(null, "Function", null, "TileCollisionFound"); //this is the function/delegate name
+				//await writer.WriteStartElementAsync(null, "EventData", null);
+				//await writer.WriteStringAsync("Default Collision");
 				//await writer.WriteAttributeStringAsync(null, "Activiation", null, "[Button]");
 				//await writer.WriteStringAsync("Objects to load here");
-				await writer.WriteEndElementAsync();
-				await writer.WriteEndElementAsync();
+				//await writer.WriteEndElementAsync();
+				//await writer.WriteEndElementAsync();
+				
 
-				//loop through all the game events layers to AND thier internal game events.
-				foreach(SpriteLayer sl in gameeventlayers)
-				{
-					List<GameEvent> LGE = ((Tuple<int[,], List<GameEvent>>)sl.LayerObjects).Item2;
-					foreach(GameEvent ge in LGE)
-					{
-						await writer.WriteStartElementAsync(null, "Event", null); //create new event
-						await writer.WriteAttributeStringAsync(null, "Name", null, ge.EventName);
-						switch (ge.eventType)
-						{
-							//TODO YO ASSHOLE... MAKE A METHOD FOR THIS. FOR THE LOVE GOD ITS DISGUSTING...
-							case (EventType.None):
-								break;
-							case (EventType.Collision):
-								await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.Collision).ToString());
-								await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
-								await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
-								await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
-								await writer.WriteAttributeStringAsync(null, "Activation", null, "NONE");
-								break;
-							case (EventType.Trigger):
-								await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.Trigger).ToString());
-								await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
-								await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
-								await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
-								await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
-								break;
-							case (EventType.LevelTransition):
-								await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.LevelTransition).ToString());
-								await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
-								await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
-								await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
-								await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
-
-
-								await writer.WriteStartElementAsync(null, "EventData", null); //Event Data
-								await writer.WriteAttributeStringAsync(null, "Newxpos", null, ge.datatoload.newx.ToString());
-								await writer.WriteAttributeStringAsync(null, "Newypos", null, ge.datatoload.newy.ToString());
-								await writer.WriteAttributeStringAsync(null, "MoveTime", null, ge.datatoload.MoveTime.ToString());
-								await writer.WriteAttributeStringAsync(null, "FileToLoad", null, ge.datatoload.NewFileToLoad);
-								await writer.WriteEndElementAsync(); //end of event data
-
-								break;
-							case (EventType.DialougeScene):
-								await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.DialougeScene).ToString());
-								await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
-								await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
-								await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
-								await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
-
-								await writer.WriteStartElementAsync(null, "EventData", null); //Event Data
-								await writer.WriteAttributeStringAsync(null, "Newxpos", null, ge.datatoload.newx.ToString());
-								await writer.WriteAttributeStringAsync(null, "Newypos", null, ge.datatoload.newy.ToString());
-								await writer.WriteAttributeStringAsync(null, "MoveTime", null, ge.datatoload.MoveTime.ToString());
-								await writer.WriteAttributeStringAsync(null, "FileToLoad", null, ge.datatoload.NewFileToLoad);
-								await writer.WriteEndElementAsync(); //end of event data
-
-								break;
-							case (EventType.Cutscene):
-								await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.Cutscene).ToString());
-								await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
-								await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
-								await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
-								await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
-
-								await writer.WriteStartElementAsync(null, "EventData", null); //Event Data
-								await writer.WriteAttributeStringAsync(null, "Newxpos", null, ge.datatoload.newx.ToString());
-								await writer.WriteAttributeStringAsync(null, "Newypos", null, ge.datatoload.newy.ToString());
-								await writer.WriteAttributeStringAsync(null, "MoveTime", null, ge.datatoload.MoveTime.ToString());
-								await writer.WriteAttributeStringAsync(null, "FileToLoad", null, ge.datatoload.NewFileToLoad);
-								await writer.WriteEndElementAsync(); //end of event data
-
-								break;
-							case (EventType.BGM):
-								await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.BGM).ToString());
-								await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
-								await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
-								await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
-								await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
-								break;
-						}
-						await writer.WriteEndElementAsync(); //end creation of event.
-					}
-				}
-
-
-				await writer.WriteEndElementAsync();
 				await writer.WriteEndElementAsync();
 
 				await writer.FlushAsync();
