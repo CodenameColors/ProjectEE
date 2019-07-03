@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using BixBite;
 using BixBite.Characters;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace ProjectE_E.Components.Cuprite
 {
@@ -38,14 +40,19 @@ namespace ProjectE_E.Components.Cuprite
 		#region level1_ge_test_1.lvl
 
 		//Used for changing the map/level. given a new position
-		public static void LevelTestDele1(ref Map CurrentMap, String FileName, int newx, int newy, int movetime)
+		public static void LevelTestDele1(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, Player player ,Map CurrentMap, String FileName, int newx, int newy, int movetime)
 		{
 			//unload the map
-			CurrentMap.UnloadMap();
+			//CurrentMap.UnloadMap();
 			//get the level file!
 			Level NewLevel = Level.ImportLevel(FileName);
 			//Create New Map
-			CurrentMap = new Map() { level = NewLevel };
+			CurrentMap.level = NewLevel;
+
+			CurrentMap.LoadTileMaps(graphicsDevice, CurrentMap.level);
+			CurrentMap.LoadSprites(graphicsDevice, CurrentMap.level);
+			CurrentMap.GenerateLevel(CurrentMap.level, graphicsDevice, spriteBatch);
+			player.Position = new Vector2(0, 0);
 		}
 
 		#endregion

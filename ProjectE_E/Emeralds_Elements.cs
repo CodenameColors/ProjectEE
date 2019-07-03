@@ -144,19 +144,36 @@ namespace ProjectE_E
 			Player.Update(gameTime);
 
 			//this is collision detection
-			foreach (Tile tile in map.MapTiles)
+			//foreach (Tile tile in map.MapTiles)
+			for (int i = 0; i < map.MapTiles.Count; i++)
 			{
-				Player.Collision(tile.Rectangle, map.Width, map.Height, tile.EventGroup);
-				if (map.EventLUT.Count > 0 && tile.EventGroup > 0 && (int)Player.Position.X / 40 == tile.Rectangle.X / 40 && (int)Player.Position.Y / 40 == tile.Rectangle.Y / 40)
+				Player.Collision(map.MapTiles[i].Rectangle, map.Width, map.Height, map.MapTiles[i].EventGroup);
+				if (map.EventLUT.Count > 0 && map.MapTiles[i].EventGroup > 0 && (int)Player.Position.X / 40 == map.MapTiles[i].Rectangle.X / 40 && (int)Player.Position.Y / 40 == map.MapTiles[i].Rectangle.Y / 40)
 				{
-					var v = map.GetMapEvent(tile.EventGroup);
+					var v = map.GetMapEvent(map.MapTiles[i].EventGroup);
 					if (v != null)
 					{
-						//GameEvent g = map.GetMapEvent()
-						List<object> Prams = new List<object>();
+						GameEvent g = map.MapEvents[map.MapTiles[i].EventGroup];
+						List<object> Prams = new List<object>
+						{
+							this.GraphicsDevice,
+							this.spriteBatch,
+							Player,
+							map,
+							g.datatoload.NewFileToLoad,
+							(int)g.datatoload.newx,
+							(int)g.datatoload.newy,
+							(int)g.datatoload.MoveTime
+						};
 
-
-						v.Invoke(null, null);
+						map.level = null;
+						map.MapEvents.Clear();
+						map.ClearEventLUT();
+						map.MapTiles.Clear();
+						v.Invoke(null, Prams.ToArray());
+						
+						System.Console.WriteLine("M Change");
+						return;
 					}
 				}
 
