@@ -158,9 +158,6 @@ namespace ProjectE_E.Components
 
 					MapTiles.Add(new Tile(croppedTexture, new Rectangle(j*40, i*40, 40, 40), 0, 0));
 
-					//Tile tileTemp = new Tile(croppedTexture, r);
-					//tileTemp.Draw(spriteBatch);
-
 				}
 			}
 		}

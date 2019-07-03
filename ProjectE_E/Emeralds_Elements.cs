@@ -117,7 +117,7 @@ namespace ProjectE_E
 			Player.Load(this.Content);
 			// TODO: use this.Content to load your game content here
 
-			C_map.level = Level.ImportLevel("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\Levels\\LevelChangeTest.lvl");
+			C_map.level = Level.ImportLevel("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\Levels\\LevelChangeTestNew.lvl");
 
 		}
 
@@ -147,11 +147,17 @@ namespace ProjectE_E
 			foreach (Tile tile in map.MapTiles)
 			{
 				Player.Collision(tile.Rectangle, map.Width, map.Height, tile.EventGroup);
-				if(map.EventLUT.Count > 0 && tile.EventGroup > 0 && (int)Player.Position.X/40 == tile.Rectangle.X/40 && (int)Player.Position.Y / 40 == tile.Rectangle.Y / 40)
+				if (map.EventLUT.Count > 0 && tile.EventGroup > 0 && (int)Player.Position.X / 40 == tile.Rectangle.X / 40 && (int)Player.Position.Y / 40 == tile.Rectangle.Y / 40)
 				{
 					var v = map.GetMapEvent(tile.EventGroup);
 					if (v != null)
+					{
+						//GameEvent g = map.GetMapEvent()
+						List<object> Prams = new List<object>();
+
+
 						v.Invoke(null, null);
+					}
 				}
 
 			}
