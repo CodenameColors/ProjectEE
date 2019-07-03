@@ -19,7 +19,7 @@ namespace ProjectE_E.Components
 		private List<Tuple<Texture2D,int>> TileMaps = new List<Tuple<Texture2D,int>>();
 		private Dictionary<String, Texture2D> sprites = new Dictionary<string, Texture2D>();
 		public Level level = new Level();
-		private List<GameEvent> MapEvents;
+		public Dictionary<int, GameEvent> MapEvents= new Dictionary<int, GameEvent>();
 		public List<Tile> MapTiles = new List<Tile>();
 
 		//Look up table of this maps Gameevents
@@ -178,6 +178,12 @@ namespace ProjectE_E.Components
 
 		public void GenerateGameEvents(int[,] GELocations, List<GameEvent> gameEvents)
 		{
+
+			foreach(GameEvent g in gameEvents)
+			{
+				if(!MapEvents.ContainsKey((int)g.GetProperty("group")))
+					MapEvents.Add((int)g.GetProperty("group"),g);
+			}
 
 			List<Tile> GETiles = new List<Tile>();//MapTiles.Where(item => item.EventGroup != 0);
 			foreach (Tile t in MapTiles)

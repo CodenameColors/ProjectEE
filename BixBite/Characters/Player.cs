@@ -21,7 +21,8 @@ namespace BixBite.Characters
 
 		public Vector2 Position
 		{
-			get { return position; }
+			get { return position;  }
+			set { }
 		}
 
 		public Player()
