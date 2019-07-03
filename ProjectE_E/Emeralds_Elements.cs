@@ -77,7 +77,7 @@ namespace ProjectE_E
 
 		protected async void Load_async()
 		{
-			map.level = await map.GetLevelFromFile(MainLevelPath);
+			 map.level = await map.GetLevelFromFile(MainLevelPath);
 			
 		}
 
