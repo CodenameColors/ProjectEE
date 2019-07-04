@@ -80,6 +80,9 @@
     <Compile Include="Forms\GameEventsSettings.xaml.cs">
       <DependentUpon>GameEventsSettings.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Forms\NewMapChange.xaml.cs">
+      <DependentUpon>NewMapChange.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ResizeThumb.cs" />
     <Compile Include="Resources\ObservableStyleDictionary.cs" />
     <Compile Include="RotateThumb.cs" />
@@ -94,6 +97,10 @@
     <Page Include="Forms\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Forms\NewMapChange.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Forms\NewProject_Form.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -39,8 +39,8 @@ namespace ProjectE_E.Components
 		private int eventtype;
 		public int EventType
 		{
-			get { return eventgroup; }
-			set { eventgroup = value; }
+			get { return eventtype; }
+			set { eventtype = value; }
 		}
 
 		public Tile(Texture2D text, Rectangle r, int TileEventGroup, int EventType)

@@ -23,18 +23,31 @@ namespace AmethystEngine.Forms
 	{
 		List<int> Layernum = new List<int>();
 		Level CurrentLevel;
+		String ProjectPath = "";
+		Dictionary<String, String> ProjectLevels = new Dictionary<string, string>();
+
+		public int AddNewX = 0;
+		public int AddnewY = 0;
 
 		public GameEventsSettings()
 		{
 			InitializeComponent();
 		}
 
-		public GameEventsSettings(ref Level CurrentLevel, int TCindex)
+		public GameEventsSettings(ref Level CurrentLevel, String ProjectPath, int TCindex)
 		{
 			InitializeComponent();
 			GameEvent_TC.SelectedIndex = TCindex;
 			SetGameEventLayers(CurrentLevel);
 			
+			this.ProjectPath = ProjectPath;
+			//load all the levels for this project
+			foreach (String s in System.IO.Directory.GetFiles(ProjectPath.Replace(".gem", "_Game\\Content\\Levels")))
+			{
+				String LevelName = (s.Substring(s.LastIndexOfAny(new char[] { '/', '\\' }) + 1));
+				ProjectLevels.Add(s, LevelName);
+			}
+
 			this.CurrentLevel = CurrentLevel;
 			GameEventLayers_LB.SelectedIndex = 0;
 			if (TCindex == 0)
@@ -77,6 +90,7 @@ namespace AmethystEngine.Forms
 				GameEvents_LB.Items.Add(ge.EventName);
 		}
 
+		//load the Form the selected Gameevent data.
 		private void SetGameEventProperties(GameEvent curGameEvent)
 		{
 			EventName_TB.Text = curGameEvent.GetProperty("EventName").ToString();
@@ -93,7 +107,22 @@ namespace AmethystEngine.Forms
 				EventData_CC.Visibility = Visibility.Hidden;
 				return;
 			}
-			FileToLoad_CB.Text = curGameEvent.datatoload.NewFileToLoad;
+
+			//load the FileToLoad Combobox based on the event type.
+			FileToLoad_CB.Items.Clear(); FileToLoad_CB.Items.Add("None");
+			if(EventType_CB.SelectedIndex == 1)
+			{
+				foreach (String key in ProjectLevels.Keys)
+					FileToLoad_CB.Items.Add(ProjectLevels[key]);
+			}
+			//TODO: Add other types of gameevents triggering.
+
+			//is this a valid level for this project?
+			if (ProjectLevels.ContainsKey(curGameEvent.datatoload.NewFileToLoad))
+			{
+				int num1 = ProjectLevels.Keys.ToList().IndexOf(curGameEvent.datatoload.NewFileToLoad);
+				FileToLoad_CB.SelectedIndex = num1;
+			}
 			EventNewPosX_TB.Text = curGameEvent.datatoload.newx.ToString();
 			EventNewPosY_TB.Text = curGameEvent.datatoload.newy.ToString();
 			EventMoveTime_TB.Text = curGameEvent.datatoload.MoveTime.ToString();
@@ -156,7 +185,7 @@ namespace AmethystEngine.Forms
 				bLName &= Int32.TryParse(AddEventNewPosY_TB.Text, out newy);
 				bLName &= Int32.TryParse(AddEventMoveTime_TB.Text, out movetime);
 				AddEventData_CC.Visibility = Visibility.Visible;
-				ret &= (AddFileToLoad_TB_TB.Text == "" ? false : true);
+				ret &= (AddFileToLoad_CB.SelectedIndex  > 0 ? true : false);
 				ret &= (AddEventNewPosX_TB.Text == "" ? false : true);
 				ret &= (AddEventNewPosY_TB.Text == "" ? false : true);
 				ret &= (AddEventMoveTime_TB.Text == "" ? false : true);
@@ -199,7 +228,8 @@ namespace AmethystEngine.Forms
 					ge.datatoload.MoveTime = movetime;
 					ge.datatoload.newx = newx;
 					ge.datatoload.newy = newy;
-					ge.datatoload.NewFileToLoad= AddFileToLoad_TB_TB.Text;
+					if (AddEventType_CB.SelectedIndex == 1 && AddFileToLoad_CB.SelectedIndex > 0)
+						ge.datatoload.NewFileToLoad = ProjectLevels.Keys.ToList()[AddFileToLoad_CB.SelectedIndex - 1];
 				}
 
 				//add the event!
@@ -210,6 +240,7 @@ namespace AmethystEngine.Forms
 
 		private void AddEventType_CB_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
+			if (AddEventData_CC == null) return;
 			if (AddEventType_CB.SelectedIndex == 4 || AddEventType_CB.SelectedIndex == 5)
 			{
 				AddEventData_CC.Visibility = Visibility.Hidden;
@@ -222,8 +253,19 @@ namespace AmethystEngine.Forms
 			}
 			else
 			{
-				AddEventGroup_TB.IsEnabled = true;
 				AddEventData_CC.Visibility = Visibility.Visible;
+				AddEventGroup_TB.IsEnabled = true;
+				
+				//load the FileToLoad Combobox based on the event type.
+				AddFileToLoad_CB.Items.Clear(); AddFileToLoad_CB.Items.Add("None");
+				if (AddEventType_CB.SelectedIndex == 1)
+				{
+					foreach (String key in ProjectLevels.Keys)
+						AddFileToLoad_CB.Items.Add(ProjectLevels[key]);
+				}
+				//TODO: Add other types of gameevents triggering.
+
+
 			}
 		}
 
@@ -394,5 +436,49 @@ namespace AmethystEngine.Forms
 				}
 			}
 		}
+
+		private void RemoveGE_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			if (GameEvents_LB.SelectedIndex >= 0)
+			{
+				//removes the gameevent itself.
+				GameEvent gameE = ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].LayerObjects).Item2[GameEvents_LB.SelectedIndex];
+				int TileGoupNum = (int)gameE.GetProperty("group");
+				((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].LayerObjects).Item2.RemoveAt(GameEvents_LB.SelectedIndex);
+
+				
+
+				//remove EVERY int value in the game event tile array of this event.
+				for (int i = 0; i < ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].LayerObjects).Item1.GetLength(0); i++)
+				{
+					for (int j = 0; j < ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].LayerObjects).Item1.GetLength(1); j++)
+					{
+						if (((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].LayerObjects).Item1[i, j] == TileGoupNum)
+							((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].LayerObjects).Item1[i, j] = 0;
+					}
+				}
+			}
+		}
+
+		private void MapView_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			if (AddFileToLoad_CB.SelectedIndex <= 0 || FileToLoad_CB.SelectedIndex > 0)
+			{
+				Window f;
+				if (GameEvent_TC.SelectedIndex == 0)
+				{
+					f = new NewMapChange(ProjectLevels.Keys.ToList()[FileToLoad_CB.SelectedIndex - 1], this, false);
+					f.Show();
+				}
+				else
+				{
+					f = new NewMapChange(ProjectLevels.Keys.ToList()[AddFileToLoad_CB.SelectedIndex - 1], this, true);
+					f.Show();
+				}
+			}
+		}
+
+
+
 	}
 }

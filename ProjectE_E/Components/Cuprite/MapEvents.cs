@@ -42,8 +42,6 @@ namespace ProjectE_E.Components.Cuprite
 		//Used for changing the map/level. given a new position
 		public static void LevelTestDele1(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, Player player ,Map CurrentMap, String FileName, int newx, int newy, int movetime)
 		{
-			//unload the map
-			//CurrentMap.UnloadMap();
 			//get the level file!
 			Level NewLevel = Level.ImportLevel(FileName);
 			//Create New Map
