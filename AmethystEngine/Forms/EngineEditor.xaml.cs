@@ -2629,14 +2629,14 @@ namespace AmethystEngine.Forms
 		private void AddGameEvent_Click(object sender, RoutedEventArgs e)
 		{
 			if (CurrentLevel == null) return;
-			GameEventsSettings ff = new GameEventsSettings(ref CurrentLevel, 1);
+			GameEventsSettings ff = new GameEventsSettings(ref CurrentLevel, ProjectFilePath, 1);
 			ff.Show();
 		}
 
 		private void EditGameEvents_Click(object sender, RoutedEventArgs e)
 		{
 			if (CurrentLevel == null) return;
-			GameEventsSettings ff = new GameEventsSettings(ref CurrentLevel, 0);
+			GameEventsSettings ff = new GameEventsSettings(ref CurrentLevel, ProjectFilePath, 0);
 			ff.Show();
 		}
 

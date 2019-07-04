@@ -54,9 +54,10 @@
 						<ColumnDefinition Width="239*"/>
 						<ColumnDefinition Width="347*"/>
 					</Grid.ColumnDefinitions>
-					<ListBox Name="GameEvents_LB" Background="Transparent" Foreground="White" SelectionChanged="GameEvents_LB_SelectionChanged">
+					<ListBox Name="GameEvents_LB" Background="Transparent" Foreground="White" SelectionChanged="GameEvents_LB_SelectionChanged" Margin="0,0,0,31">
 
 					</ListBox>
+					<Button x:Name="RemoveGE_BTN" Content="Remove" VerticalContentAlignment="Center" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,10,6" Width="219" Click="RemoveGE_BTN_Click" />
 
 					<Label Content="Event Name:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,11,0,0" Width="132"/>
 					<TextBox x:Name="EventName_TB" Grid.Column="1" Width="246" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="91,12,0,0" KeyDown="EventName_TB_KeyDown"/>
@@ -82,6 +83,9 @@
 
 					<ContentControl Grid.Column="1" Name="EventData_CC">
 						<Grid>
+
+							<Button Content="MAP VIEW" Margin="268,228,10,146" Click="MapView_BTN_Click" />
+
 							<Label Content="Event Data:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,166,0,0" FontWeight="Bold"/>
 							<TextBox x:Name="EventNewPosX_TB" Width="70" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="193,227,0,0" KeyDown="EventNewPosX_TB_KeyDown" />
 							<Label Content="New Position of Player (x):" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,226,0,0" FontWeight="Thin"/>
@@ -89,8 +93,13 @@
 							<Label Content="New Position of Player (y):" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,257,0,0" FontWeight="Thin"/>
 							<TextBox x:Name="EventMoveTime_TB" Width="117" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="146,289,0,0" KeyDown="EventMoveTime_TB_KeyDown" />
 							<Label Content="Movement Time:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,288,0,0" FontWeight="Thin"/>
-							<ComboBox x:Name="FileToLoad_CB" Width="214" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="123,196,0,0" />
+							<ComboBox x:Name="FileToLoad_CB" Width="214" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="123,196,0,0" >
+								<ComboBoxItem IsSelected="True">None</ComboBoxItem>
+							</ComboBox>
 							<Label Content="File to Load:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50,195,0,0" FontWeight="Thin"/>
+
+							
+
 						</Grid>
 
 					</ContentControl>
@@ -105,7 +114,7 @@
 					<TextBox x:Name="AddEventName_TB" Grid.Column="1" Width="246" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="91,12,0,0"/>
 					<Label Content="Event Type:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,42,0,0" Width="132"/>
 					<ComboBox x:Name="AddEventType_CB" Grid.Column="1" Width="116" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="91,43,0,0" SelectionChanged="AddEventType_CB_SelectionChanged">
-						<ComboBoxItem Name="acbi1">None</ComboBoxItem>
+						<ComboBoxItem Name="acbi1" IsSelected="True">None</ComboBoxItem>
 						<ComboBoxItem Name="acbi2">Level Transistion</ComboBoxItem>
 						<ComboBoxItem Name="acbi3">Dialogue Scene Transistion</ComboBoxItem>
 						<ComboBoxItem Name="acbi4">Cutscene Transistion</ComboBoxItem>
@@ -121,7 +130,7 @@
 					<Label Content="Event Activation:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,135,0,0" Width="132"/>
 					<ComboBox x:Name="AddEventActivation_TB" Grid.Column="1" Width="195" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="142,135,0,0"/>
 
-					<ContentControl Grid.Column="1" Name="AddEventData_CC">
+					<ContentControl Grid.Column="1" Name="AddEventData_CC" >
 						<Grid HorizontalAlignment="Left" VerticalAlignment="Top">
 							<Label Content="Event Data:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,166,0,0" FontWeight="Bold"/>
 							<TextBox x:Name="AddEventNewPosX_TB" Width="70" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="193,227,0,0" />
@@ -130,9 +139,11 @@
 							<Label Content="New Position of Player (y):" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,257,0,0" FontWeight="Thin"/>
 							<TextBox x:Name="AddEventMoveTime_TB" Width="117" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="146,289,0,0" />
 							<Label Content="Movement Time:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,288,0,0" FontWeight="Thin"/>
-							<TextBox x:Name="AddFileToLoad_TB_TB" Width="214" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="123,196,0,0" />
+							<ComboBox x:Name="AddFileToLoad_CB" Width="214" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="123,196,0,0" />
 							<Label Content="File to Load:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50,195,0,0" FontWeight="Thin"/>
-							
+
+							<Button x:Name="MapView_BTN" Content="MAP VIEW" Margin="271,227,5,31" Click="MapView_BTN_Click" />
+
 						</Grid>
 
 					</ContentControl>

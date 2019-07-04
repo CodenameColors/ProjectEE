@@ -153,8 +153,10 @@ namespace ProjectE_E
 					var v = map.GetMapEvent(map.MapTiles[i].EventGroup);
 					if (v != null)
 					{
-						GameEvent g = map.MapEvents[map.MapTiles[i].EventGroup];
-						List<object> Prams = new List<object>
+						if (map.MapTiles[i].EventType == 1) // level transition
+						{
+							GameEvent g = map.MapEvents[map.MapTiles[i].EventGroup];
+							List<object> Prams = new List<object>
 						{
 							this.GraphicsDevice,
 							this.spriteBatch,
@@ -166,14 +168,17 @@ namespace ProjectE_E
 							(int)g.datatoload.MoveTime
 						};
 
-						map.level = null;
-						map.MapEvents.Clear();
-						map.ClearEventLUT();
-						map.MapTiles.Clear();
-						v.Invoke(null, Prams.ToArray());
-						
-						System.Console.WriteLine("M Change");
-						return;
+							map.level = null;
+							map.MapEvents.Clear();
+							map.ClearEventLUT();
+							map.MapTiles.Clear();
+							v.Invoke(null, Prams.ToArray());
+
+							System.Console.WriteLine("M Change");
+							return;
+						}
+
+
 					}
 				}
 
