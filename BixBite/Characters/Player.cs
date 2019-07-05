@@ -27,7 +27,7 @@ namespace BixBite.Characters
 
 		public Player()
 		{
-			position = new Vector2(0, 0);
+			position = new Vector2(100, 100);
 		}
 
 		public void Load(ContentManager Content)
@@ -46,6 +46,12 @@ namespace BixBite.Characters
 			//if (velocity.Y < 10)
 			//	velocity.Y += .4f;
 
+		}
+
+		public void SetPosition(int x, int y)
+		{
+			position.X = x;
+			position.Y = y;
 		}
 
 		private void Input(GameTime gameTime)

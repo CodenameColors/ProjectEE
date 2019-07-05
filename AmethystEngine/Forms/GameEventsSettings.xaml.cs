@@ -462,7 +462,7 @@ namespace AmethystEngine.Forms
 
 		private void MapView_BTN_Click(object sender, RoutedEventArgs e)
 		{
-			if (AddFileToLoad_CB.SelectedIndex <= 0 || FileToLoad_CB.SelectedIndex > 0)
+			if (AddFileToLoad_CB.SelectedIndex > 0 || FileToLoad_CB.SelectedIndex > 0)
 			{
 				Window f;
 				if (GameEvent_TC.SelectedIndex == 0)

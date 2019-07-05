@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using BixBite.Resources;
+using System.Windows.Controls;
 
 namespace BixBite
 {
@@ -94,6 +95,38 @@ namespace BixBite
 		public object GetProperty(String PName)
 		{
 			return Properties[PName];
+		}
+		#endregion
+
+		#region PropertiesCallBack
+		public void PropertyCallback(object sender, System.Windows.RoutedEventArgs e)
+		{
+			//theres two things that can call this. Textbox, Checkbox
+			if (sender is CheckBox)
+			{
+				String PName = ((CheckBox)sender).Tag.ToString();
+				if (GetProperty(PName) is bool)
+				{
+
+					if (PName == "isActive")
+					{
+						SetProperty(PName, ((CheckBox)sender).IsChecked);
+					}
+					else
+					{
+						Console.WriteLine("Others... Saved should be enabled= false...");
+					}
+				}
+			}
+			else if(sender is TextBox)
+			{
+				String PName = ((TextBox)sender).Tag.ToString();
+				if(GetProperty(PName) is String)
+				{
+					SetProperty(PName, ((TextBox)sender).Text);
+				}
+			}
+
 		}
 		#endregion
 

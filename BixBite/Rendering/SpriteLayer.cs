@@ -173,10 +173,11 @@ namespace BixBite.Rendering
 		/// <param name="newLayerObject">Desired object to add.</param>
 		public void AddToLayer(int xcell = 0, int ycell = 0, int tiledata = 0)
 		{
-			Console.WriteLine("tttt");
+			Console.WriteLine(String.Format("{0},{1}",xcell, ycell));
 			if (LayerObjects is Array && ((Array)LayerObjects).Rank == 2)
 			{
-				((Array)LayerObjects).SetValue(tiledata, xcell, ycell);
+				if(((Array)LayerObjects).GetLength(0) >= xcell && ((Array)LayerObjects).GetLength(1) >= ycell)
+					((Array)LayerObjects).SetValue(tiledata, xcell, ycell);
 			}
 			else Console.WriteLine("Invalid defined Layerobject type. Not a List of Tiles");
 			return;
@@ -240,7 +241,6 @@ namespace BixBite.Rendering
 		}
 
 		//TODO: Create the deletion methods for the other sprite layer types.
-
 		/// <summary>
 		/// Overwrites objects on the sprite layer. Changes thier data values.
 		/// </summary>

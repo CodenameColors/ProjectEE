@@ -548,7 +548,7 @@ namespace BixBite
 							await reader.ReadAsync(); await reader.ReadAsync();
 						}
 
-						while (reader.Name.Trim() != "Sprites") //ignore whitespace
+						while (reader.NodeType != XmlNodeType.Element) //ignore whitespace
 							await reader.ReadAsync();
 
 						//next up is the tilesets for the map.

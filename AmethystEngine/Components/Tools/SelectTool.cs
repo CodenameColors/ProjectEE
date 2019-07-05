@@ -64,7 +64,7 @@ namespace AmethystEngine.Components.Tools
 		{
 			foreach (ContentControl r in LSprites)
 			{
-				if (inBorder(backcanvas, r, x, y))
+				if (inContentControl(backcanvas, r, x, y))
 				{
 					if (Canvas.GetZIndex(r as System.Windows.UIElement) == zindex)
 						return r;
@@ -88,21 +88,43 @@ namespace AmethystEngine.Components.Tools
 			return null;
 		}
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="levelEditorCanvas">the main level editor canvas</param>
-		/// <param name="zindex">The Z index of the layer current selected/desired layer</param>
-		/// <param name="x">the x position of the mouse in relative origin to the canvas</param>
-		/// <param name="y">the y position of the mouse in relative origin to the canvas</param>
-		/// <returns></returns>
-		public static Rectangle FindTile(Canvas levelEditorCanvas, int zindex, int x, int y)
+		public static Border FindBorder(Canvas backcavas, List<Border> GEBorders, int zindex, int x, int y)
 		{
-
-
-
+			foreach (Border item in GEBorders)
+			{
+				if(inBorder(backcavas, item, x, y))
+				{ 
+					if(Canvas.GetZIndex(item) == zindex)
+						return item;
+				}
+			}
 			return null;
 		}
+
+		public static BixBite.GameEvent FindGameEvent(SpriteLayer SLayer, Border bor, int group)
+		{
+			//get the location of the border in CELL DIM
+			int celly = (int)Canvas.GetLeft(bor)/40;
+			int cellx = (int)Canvas.GetTop(bor)/40;
+			
+			//get the GEs
+			List<BixBite.GameEvent> SLGEvents = ((Tuple<int[,], List<BixBite.GameEvent>>)SLayer.LayerObjects).Item2;
+			int[,] GETileData = ((Tuple<int[,], List<BixBite.GameEvent>>)SLayer.LayerObjects).Item1;
+
+			int DesGroup = GETileData[cellx, celly];
+			if(group == DesGroup)
+			{
+				foreach(BixBite.GameEvent ge in SLGEvents)
+				{
+					if((int)ge.GetProperty("group") == group)
+					{
+						return ge;
+					}
+				}
+			}
+			return null;
+		}
+
 		
 		/// <summary>
 		/// Takes in a tile, and a mouse position. Determines if the mouse is within the tiles bounds.
@@ -122,7 +144,15 @@ namespace AmethystEngine.Components.Tools
 			return false;
 		}
 
-		public static bool inBorder(Canvas backcanvas, ContentControl bor, int x, int y)
+		/// <summary>
+		///	Determines if we are clicking in an already created content control/ Sprite object on the canvas
+		/// </summary>
+		/// <param name="backcanvas"></param>
+		/// <param name="bor"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <returns></returns>
+		public static bool inContentControl(Canvas backcanvas, ContentControl bor, int x, int y)
 		{
 			int left = (int)(Canvas.GetLeft(bor) * backcanvas.RenderTransform.Value.M11);
 			int right = left + (int)(bor.ActualWidth * backcanvas.RenderTransform.Value.M11);
@@ -135,5 +165,20 @@ namespace AmethystEngine.Components.Tools
 			}
 			return false;
 		}
+
+		public static bool inBorder(Canvas backcanvas, Border bor, int x, int y)
+		{
+			int left = (int)(Canvas.GetLeft(bor) * backcanvas.RenderTransform.Value.M11);
+			int right = left + (int)(bor.ActualWidth * backcanvas.RenderTransform.Value.M11);
+			int top = (int)(Canvas.GetTop(bor) * backcanvas.RenderTransform.Value.M11);
+			int bottom = top + (int)(bor.ActualHeight * backcanvas.RenderTransform.Value.M11);
+			if (x >= left && x <= right)
+			{
+				if (y >= top && y <= bottom)
+					return true;
+			}
+			return false;
+		}
+
 	}
 }

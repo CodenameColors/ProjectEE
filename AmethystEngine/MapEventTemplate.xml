@@ -1,16 +1,17 @@
 <EventTypeTemplates>
     <LevelTransition>
     //Used for changing the map/level. given a new position
-    public static void [NAMEHERE](ref Map CurrentMap, String FileName, int newx, int newy, int movetime)
+    public static void [NAMEHERE](GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, Player player ,Map CurrentMap, String FileName, int newx, int newy, int movetime)
     {
-        //unload the map
-        CurrentMap.UnloadMap();
-
         //get the level file!
         Level NewLevel = Level.ImportLevel(FileName);
-
         //Create New Map
-        CurrentMap = new Map(){ level = NewLevel };
+        CurrentMap.level = NewLevel;
+
+        CurrentMap.LoadTileMaps(graphicsDevice, CurrentMap.level);
+        CurrentMap.LoadSprites(graphicsDevice, CurrentMap.level);
+        CurrentMap.GenerateLevel(CurrentMap.level, graphicsDevice, spriteBatch);
+        player.SetPosition(newx, newy);
     }
     </LevelTransition>
     <DialogueSceneTransistion>

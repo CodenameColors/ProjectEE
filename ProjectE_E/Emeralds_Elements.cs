@@ -177,16 +177,14 @@ namespace ProjectE_E
 							System.Console.WriteLine("M Change");
 							return;
 						}
-
-
+						
 					}
 				}
-
 			}
 				if (map != null)
 			{
 				camera.Update(Player.Position, map.Width, map.Height);
-				if (Player.Position.Y > 400)
+				if (Player.Position.Y > 1000)
 				{
 					map.UnloadMap();
 					map = null;
@@ -204,6 +202,7 @@ namespace ProjectE_E
 					}
 					System.Console.WriteLine("T DOWN");
 				}
+				Player.SetPosition(0, 0);
 			}
 
 			if (Keyboard.GetState().IsKeyDown(Keys.M))
