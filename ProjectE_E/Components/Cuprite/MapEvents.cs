@@ -50,7 +50,7 @@ namespace ProjectE_E.Components.Cuprite
 			CurrentMap.LoadTileMaps(graphicsDevice, CurrentMap.level);
 			CurrentMap.LoadSprites(graphicsDevice, CurrentMap.level);
 			CurrentMap.GenerateLevel(CurrentMap.level, graphicsDevice, spriteBatch);
-			player.Position = new Vector2(0, 0);
+			player.SetPosition(newx, newy);
 		}
 
 		#endregion

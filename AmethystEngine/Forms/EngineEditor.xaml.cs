@@ -751,6 +751,12 @@ namespace AmethystEngine.Forms
 
 				if (CurrentTool == EditorTool.Brush)
 				{
+					//Are we allowed to paint?
+					if (Canvas_grid.Viewport.X > 0 || Canvas_grid.Viewport.Y > 0)
+						return; //we are out of the bounds negative wise (viewport)
+
+
+
 					if (SelectedTile_Canvas.Children.Count == 0) return;
 					Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid. always 40 becasue thats the base. 
 
@@ -866,6 +872,8 @@ namespace AmethystEngine.Forms
 			{
 				if (CurrentTool == EditorTool.Gameevent)
 				{
+					Border bor = SelectTool.FindBorder(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Border>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
+					if (bor != null) return; //the game event is already declared here!
 
 					List<GameEvent> layergameevents = ((Tuple<int[,], List<GameEvent>>)((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerObjects).Item2;
 					if (GameEventNum < 0) return;
@@ -908,9 +916,47 @@ namespace AmethystEngine.Forms
 				}
 				else if (CurrentTool == EditorTool.Select) //selected a game event square.
 				{
-					Console.WriteLine("GE - Selected");
+					//use the snapped grid cords to find the Border that we are clicking in.
+					Border bor = SelectTool.FindBorder(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Border>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
+					int DesGroup = 0;
+					GameEvent ge;
+					if (bor == null) return;
+					else if (Int32.TryParse(((TextBlock)bor.Child).Text, out DesGroup))
+						ge = SelectTool.FindGameEvent(CurrentLevel.Layers[curLayer], bor, DesGroup);
+					else return;
+					//if (ge == null) return; //Event found but on the wrong layer so ignore
 
-					
+					PropGrid PGrid = ((PropGrid)(FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)));
+					PGrid.ClearProperties();
+					int i = 0;
+					foreach (object o in ge.getProperties().Values)
+					{
+						if (o is String || o is int)
+						{
+							PGrid.AddProperty(ge.getProperties().Keys.ToList()[i], new TextBox() { IsEnabled = false }, o.ToString(), ge.PropertyCallback);
+						}
+						i++;
+					}
+
+					Console.WriteLine("GE - Selected");
+				}
+				else if (CurrentTool == EditorTool.Eraser)
+				{
+					//use the snapped grid cords to find the Border that we are clicking in.
+					Border bor = SelectTool.FindBorder(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Border>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
+					int DesGroup = 0;
+					GameEvent ge;
+					if (bor == null) return;
+					else if (Int32.TryParse(((TextBlock)bor.Child).Text, out DesGroup))
+						ge = SelectTool.FindGameEvent(CurrentLevel.Layers[curLayer], bor, DesGroup);
+					else return;
+
+					LevelEditor_Canvas.Children.Remove(bor); //deletes display wise
+
+					//Deletes data wise.
+					int cellx = (int)p.X / 40;
+					int celly = (int)p.Y / 40;
+					((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[curLayer].LayerObjects).Item1[celly, cellx] = 0;
 				}
 			}
 		}
@@ -1369,7 +1415,7 @@ namespace AmethystEngine.Forms
     private void LevelEditor_Canvas_MouseWheel(object sender, MouseWheelEventArgs e)
     {
       Console.WriteLine("scroollll");
-			if (ZoomLevel == .2) return; //do not allow this be 0 which in turn / by 0;
+			
 
       if (e.Delta > 0) //zoom in!
       {
@@ -1387,6 +1433,15 @@ namespace AmethystEngine.Forms
         Console.WriteLine(String.Format("W:{0},  H{1}", EditorGridWidth, EditorGridHeight));
         //TODO: resize selection rectangle
       }
+
+			if (ZoomLevel < .2)
+			{
+				ZoomLevel = .2;
+				Canvas_grid.Transform = new ScaleTransform(ZoomLevel, ZoomLevel);
+				LevelEditor_Canvas.RenderTransform = new ScaleTransform(ZoomLevel, ZoomLevel);
+				return;
+			} //do not allow this be 0 which in turn / by 0;
+
 			ZoomFactor_TB.Text = String.Format("({0})%  ({1}x{1})" , 100 * ZoomLevel, EditorGridWidth * ZoomLevel);
 			scaleFullMapEditor();
 		}
@@ -1442,8 +1497,8 @@ namespace AmethystEngine.Forms
 
 			Rectangle r = new Rectangle() { Width = 10, Height = 10, Fill = imgtilebrush };
 
-			int setX = (10 * ((int)p.X / EditorGridWidth)) + ((int)GridOffset.X);
-			int setY = (10 * ((int)p.Y / EditorGridHeight)) + ((int)GridOffset.Y);
+			int setX = (10 * (((int)p.X / EditorGridWidth)));
+			int setY = (10 * (((int)p.Y / EditorGridHeight)));
 
 			Canvas.SetLeft(r, setX); Canvas.SetTop(r, setY); Canvas.SetZIndex(r, zindex);
 			FullMapLEditor_Canvas.Children.Add(r);
@@ -2118,8 +2173,7 @@ namespace AmethystEngine.Forms
 			//((PropGrid)FullMapGrid_Control.Template.FindName("Properties_Grid", FullMapGrid_Control)).PropDictionary = CurrentLevel.getProperties();
 		}
 		#endregion
-
-
+		
 		#region "Content Library"
 		/// <summary>
 		/// When the import button is pressed in the content explorer section of the editor.
