@@ -99,6 +99,7 @@ namespace AmethystEngine.Forms
 
 		private Tuple<object, SceneObjectType> CurrentLevelEditorSceneObject;
     Point[] SelectionRectPoints = new Point[2];
+		Rectangle LESelectRect;
 		Point[] shiftpoints = new Point[3]; //0 = mouse down , 1 = mouse up , 2 on shifting "tick"
 		private List<Image> TileSets = new List<Image>();
 
@@ -124,7 +125,9 @@ namespace AmethystEngine.Forms
     public EngineEditor()
     {
       InitializeComponent();
-      LoadInitalVars();
+			
+
+			LoadInitalVars();
       //LevelEditorMain_Canvas.Background = new DrawingBrush();
     }
 
@@ -219,7 +222,8 @@ namespace AmethystEngine.Forms
     private void LoadInitalVars()
     {
       PreviewMouseMove += OnPreviewMouseMove;
-      EditorObjects_LB.ItemsSource = EditorObj_list;
+			LESelectRect = new Rectangle() { Tag = "Selection" }; LESelectRect.MouseUp += LevelEditor_BackCanvas_MouseLeftButtonUp;
+			EditorObjects_LB.ItemsSource = EditorObj_list;
       SearchResultList.ItemsSource = Titles;
     }
 
@@ -754,15 +758,15 @@ namespace AmethystEngine.Forms
 					//Are we allowed to paint?
 					if (Canvas_grid.Viewport.X > 0 || Canvas_grid.Viewport.Y > 0)
 						return; //we are out of the bounds negative wise (viewport)
-
-
+					if ((int)CurrentLevel.GetProperty("xCells") < p.X / 40 || (int)CurrentLevel.GetProperty("yCells") < p.Y / 40)
+						return;
 
 					if (SelectedTile_Canvas.Children.Count == 0) return;
 					Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid. always 40 becasue thats the base. 
 
 					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
 					if (rr != null)
-					{ Console.WriteLine(String.Format("Cell ({0},{1}) already is filled", (int)pos.X, (int)pos.Y)); return; }//check to see if the current tile exists. if so then don't add.
+						{ Console.WriteLine(String.Format("Cell ({0},{1}) already is filled", (int)pos.X, (int)pos.Y)); return; }//check to see if the current tile exists. if so then don't add.
 
 					Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, curLayer); //place the tile position wise
 					LevelEditor_Canvas.Children.Add(r); //actual place it on the canvas
@@ -777,17 +781,6 @@ namespace AmethystEngine.Forms
 					//find the tile
 					if (SceneExplorer_TreeView.SelectedValue is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Tile)
 					{
-						Rectangle r = new Rectangle() { Tag = "selection", Width = 40, Height = 40, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
-						Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
-						Canvas.SetLeft(r, (int)p.X); Canvas.SetTop(r, (int)p.Y); Canvas.SetZIndex(r, 100);
-
-						//don't add another selection rectangle on an existing selection rectangle
-						Rectangle sr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 100, (int)pos.X, (int)pos.Y);
-
-						if (sr != null) return;
-						selectTool.SelectedTiles.Add(rr);
-						LevelEditor_Canvas.Children.Add(r);
-
 						SelectionRectPoints[0] = new Point((int)e.GetPosition(LevelEditor_BackCanvas).X, (int)e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
 					}
 					else if(SceneExplorer_TreeView.SelectedValue is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.GameEvent)
@@ -1267,20 +1260,45 @@ namespace AmethystEngine.Forms
 				else if (e.LeftButton == MouseButtonState.Pressed && CurrentTool == EditorTool.Select)
 				{
 					Point pp = GetGridSnapCords(SelectionRectPoints[0]);
-
 					Point Snapped = RelativeGridSnap(p); //If we have then find the bottom right cords of that cell.
-					int wid = (int)GetGridSnapCords(p).X - (int)pp.X + 40;
-					int heigh = (int)GetGridSnapCords(p).Y - (int)pp.Y + 40;
+					int wid = (int)GetGridSnapCords(p).X - ((int)pp.X);
+					int heigh = (int)GetGridSnapCords(p).Y - ((int)pp.Y);
+
+					int[] CurrentPos = { (int)GetGridSnapCords(p).X, (int)GetGridSnapCords(p).Y};
+
+					if (wid >= 0 && heigh < 0) //Quadrant [+ -]
+					{
+						LESelectRect.Width = CurrentPos[0] - pp.X + 40;
+						LESelectRect.Height = pp.Y + 40 - CurrentPos[1];
+						Canvas.SetLeft(LESelectRect, pp.X); Canvas.SetTop(LESelectRect, CurrentPos[1]); Canvas.SetZIndex(LESelectRect, 100);
+					}
+					else if (wid < 0 && heigh >= 0) //Quadrant [- +]
+					{
+						LESelectRect.Width = pp.X - CurrentPos[0]; LESelectRect.Height = CurrentPos[1] - pp.Y + 40;
+						Canvas.SetLeft(LESelectRect, CurrentPos[0]); Canvas.SetTop(LESelectRect, pp.Y); Canvas.SetZIndex(LESelectRect, 100);
+					}
+					else if (wid >= 0 && heigh >= 0) //Quadrant [+ +]
+					{
+						LESelectRect.Width = CurrentPos[0] - pp.X + 40; LESelectRect.Height = CurrentPos[1] - pp.Y + 40;
+						Canvas.SetLeft(LESelectRect, pp.X); Canvas.SetTop(LESelectRect, pp.Y); Canvas.SetZIndex(LESelectRect, 100);
+					}
+					else //Quadrant [- -]
+					{
+						LESelectRect.Width = (wid * -1); LESelectRect.Height = (heigh *-1);
+						Canvas.SetLeft(LESelectRect, CurrentPos[0]); Canvas.SetTop(LESelectRect, CurrentPos[1]); Canvas.SetZIndex(LESelectRect, 100);
+					}
+
+
+
+					Console.WriteLine(String.Format("W:{0}, H{1}", wid, heigh));
 
 					//the drawing, and data manuplation will have to occur on LEFTMOUSEBUTTONUP
-					Rectangle r = new Rectangle() { Tag = "selection", Width = wid, Height = heigh, Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100)) };
-					r.MouseLeftButtonUp += LevelEditor_BackCanvas_MouseLeftButtonUp;
-					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, layertiles: LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(),
-																						 zindex: curLayer, x: (int)p.X, y: (int)p.Y);
-					Canvas.SetLeft(r, (int)pp.X); Canvas.SetTop(r, (int)pp.Y); Canvas.SetZIndex(r, 100);
-					Deselect();
+					LESelectRect.Fill = new SolidColorBrush(Color.FromArgb(100, 0, 20, 100));
+					LevelEditor_Canvas.Children.Remove(LESelectRect); LevelEditor_Canvas.Children.Add(LESelectRect);
+					//r.MouseLeftButtonUp += LevelEditor_BackCanvas_MouseLeftButtonUp;
+					//Deselect();
 
-					LevelEditor_Canvas.Children.Add(r);
+
 				}
 			}
 			else if (((SpriteLayer)(SceneExplorer_TreeView.SelectedValue)).layerType == LayerType.Sprite)
@@ -1535,6 +1553,8 @@ namespace AmethystEngine.Forms
 
 		private void Fill_Click(object sender, RoutedEventArgs e)
 		{
+			if (SelectedTile_Canvas.Children.Count == 0) return;
+
 			CurrentTool = EditorTool.Fill;
 			int relgridsize = (int)(40 * Math.Round(LevelEditor_Canvas.RenderTransform.Value.M11, 1));
 			int columns = (int)(RelativeGridSnap(SelectionRectPoints[1]).X - RelativeGridSnap(SelectionRectPoints[0]).X);
@@ -1548,6 +1568,9 @@ namespace AmethystEngine.Forms
 			{
 				for (int j = 0; j <= rows; j++)
 				{
+					if ((int)CurrentLevel.GetProperty("xCells")-1 <= i || (int)CurrentLevel.GetProperty("yCells")-1 <= j)
+						break;
+
 					Point p = new Point(begginning.X + (int)(40 * i), begginning.Y + (int)(40 * j));
 					int iii = GetTileZIndex(SceneExplorer_TreeView);
 					Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid.
@@ -1578,10 +1601,19 @@ namespace AmethystEngine.Forms
 				int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
 				if (curLayer - 1 < 0) return;
 
+				//ONLY move this data to a layer with the same Layer type
+				int deslayer = -1;
+				for (int i = curLayer - 1; i >= 0; i--)
+				{
+					if (CurrentLevel.Layers[curLayer].layerType == CurrentLevel.Layers[i].layerType)
+					{ deslayer = i; break; } // we found a matching layer
+				}
+				if (deslayer == -1) return; //no layer found
+
 				//from here all the prereqs are fulfilled so we can apply the up layer VISUALLY 
 				for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
 				{
-					Canvas.SetZIndex(selectTool.SelectedTiles[i], Canvas.GetZIndex(selectTool.SelectedTiles[i]) - 1);
+					Canvas.SetZIndex(selectTool.SelectedTiles[i], deslayer);
 				}
 
 				//Change the data for the level objects 
@@ -1601,7 +1633,7 @@ namespace AmethystEngine.Forms
 					{
 						absrow = ((int)begginning.Y + (relgridsize * j) + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight;
 						abscol = ((int)begginning.X + (relgridsize * i) + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth;
-						CurrentLevel.ChangeLayer(absrow, abscol, curLayer, curLayer - 1, LayerType.Tile);
+						CurrentLevel.ChangeLayer(absrow, abscol, curLayer, deslayer, LayerType.Tile);
 					}
 				}
 			}
@@ -1622,15 +1654,22 @@ namespace AmethystEngine.Forms
 			if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Tile)
 			{
 				if (selectTool.SelectedTiles.Count == 0) return;//Do we have a selected area?
-																												//is there a layer above the current to transfer the data to?
-																												//we need to get the current Sprite layer that is currently clicked.
 				int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
-				if (CurrentLevel.Layers.Count - 1 == curLayer) return;
+				if (CurrentLevel.Layers.Count - 1 == curLayer) return; //last layer.
+
+				//ONLY move this data to a layer with the same Layer type
+				int deslayer = -1;
+				for (int i = curLayer +1; i < CurrentLevel.Layers.Count; i++)
+				{
+					if (CurrentLevel.Layers[curLayer].layerType == CurrentLevel.Layers[i].layerType)
+						{ deslayer = i; break; } // we found a matching layer
+				}
+				if (deslayer == -1) return; //no layer found
 
 				//from here all the prereqs are fulfilled so we can apply the up layer VISUALLY 
 				for (int i = 0; i < selectTool.SelectedTiles.Count; i++)
 				{
-					Canvas.SetZIndex(selectTool.SelectedTiles[i], Canvas.GetZIndex(selectTool.SelectedTiles[i]) + 1);
+					Canvas.SetZIndex(selectTool.SelectedTiles[i], deslayer);
 				}
 
 				//Change the data for the level objects 
@@ -1650,7 +1689,7 @@ namespace AmethystEngine.Forms
 					{
 						absrow = ((int)begginning.Y + (relgridsize * j) + (int)Math.Abs(Canvas_grid.Viewport.Y)) / EditorGridHeight;
 						abscol = ((int)begginning.X + (relgridsize * i) + (int)Math.Abs(Canvas_grid.Viewport.X)) / EditorGridWidth;
-						CurrentLevel.ChangeLayer(absrow, abscol, curLayer, curLayer + 1, LayerType.Tile);
+						CurrentLevel.ChangeLayer(absrow, abscol, curLayer, deslayer, LayerType.Tile);
 					}
 				}
 			}

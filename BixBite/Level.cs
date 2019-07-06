@@ -215,7 +215,7 @@ namespace BixBite
 			{
 				//does this cell contain data?
 				int[,] tiledata = (int[,])Layers[FromLayer].LayerObjects;
-				if (tiledata[cellx, celly] == 0) return;
+				if (tiledata[cellx, celly] == -1) return; //no data to move.
 				else
 				{
 					SpriteLayer deslayer = Layers[DesLayer]; //get the desired layer
