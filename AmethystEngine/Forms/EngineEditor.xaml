@@ -239,13 +239,13 @@
 
 							<Label x:Name="TileSet_LBL" Grid.Row="0" Content="TileSet:" VerticalContentAlignment="Center" Foreground="White" Visibility="Hidden"/>
 							<ComboBox Grid.Row="0" x:Name="TileSetSelector_CB" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="50,5,5,5" SelectionChanged="TileSetSelector_CB_SelectionChanged" Visibility="Hidden" />
-							<ScrollViewer Grid.Row="1" x:Name="LevelEditorTIleMap_SV" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,5,5,7" IsEnabled="True" Background="Black" Visibility="Hidden">
+							<ScrollViewer Grid.Row="1" x:Name="LevelEditorTIleMap_SV" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Margin="7,5,5,7" IsEnabled="True" Background="Black" Visibility="Hidden" ScrollChanged="LevelEditorTIleMap_SV_ScrollChanged">
 								<Canvas x:Name="TileMap_Canvas" IsHitTestVisible="True" MouseWheel="LevelEditor_Canvas_MouseWheel" Width="512" Height="512" MouseLeftButtonDown="TileMap_Canvas_MouseLeftButtonDown" 
 										MouseMove="TileMap_Canvas_MouseMove" HorizontalAlignment="Left" VerticalAlignment="Top" >
 									<Canvas.Background>
 										<VisualBrush x:Name="LevelEditorTileMapCanvas_VB" Stretch="None" TileMode="Tile" Viewport="0,0,32,32" ViewportUnits="Absolute" >
 											<VisualBrush.Visual>
-												<Rectangle  Width="32" Height="32" Fill="Transparent" Stroke="White" StrokeThickness=".2" Visibility="Visible" />
+												<Rectangle x:Name="TileMapGrid_Rect" Width="32" Height="32" Fill="Transparent" Stroke="White" StrokeThickness=".2" Visibility="Visible" />
 											</VisualBrush.Visual>
 										</VisualBrush>
 									</Canvas.Background>
@@ -737,7 +737,8 @@
 			</TreeView>
 
 			<ListBox x:Name="SearchResultList" Grid.Column="1" HorizontalAlignment="Stretch" Margin="3,25,0,0" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
-               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" SelectionChanged="SearchResultList_SelectionChanged" ScrollViewer.VerticalScrollBarVisibility="Hidden" MouseDoubleClick="SearchResultList_MouseDoubleClick">
+               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" SelectionChanged="SearchResultList_SelectionChanged" ScrollViewer.VerticalScrollBarVisibility="Hidden" MouseDoubleClick="SearchResultList_MouseDoubleClick"
+							 ItemTemplate="{StaticResource CExplorer}">
 				<ListBox.ItemsPanel>
 					<ItemsPanelTemplate>
 						<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>

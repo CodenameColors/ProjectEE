@@ -28,25 +28,33 @@ namespace ProjectE_E.Components.Cuprite
 			Console.WriteLine(String.Format("Collision Activated {0}", "WIP"));
 		}
 
+		#endregion
+		#region LevelChangeTestNew.lvl
 
 		public static void TrigTestDele()
 		{
 			Console.WriteLine(String.Format("Activated Trigger Area {0}", "TrigTestDele"));
 		}
 
-		#endregion
-
-
-		#region level1_ge_test_1.lvl
-
 		//Used for changing the map/level. given a new position
-		public static void LevelTestDele1(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, Player player ,Map CurrentMap, String FileName, int newx, int newy, int movetime)
+		public static void LevelTestDele1(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, Player player, Map CurrentMap, String FileName, int newx, int newy, int movetime)
 		{
 			//get the level file!
 			Level NewLevel = Level.ImportLevel(FileName);
 			//Create New Map
 			CurrentMap.level = NewLevel;
-
+			CurrentMap.LoadTileMaps(graphicsDevice, CurrentMap.level);
+			CurrentMap.LoadSprites(graphicsDevice, CurrentMap.level);
+			CurrentMap.GenerateLevel(CurrentMap.level, graphicsDevice, spriteBatch);
+			player.SetPosition(newx, newy);
+		}
+		//Used for changing the map/level. given a new position
+		public static void BackToTestMapDele(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, Player player, Map CurrentMap, String FileName, int newx, int newy, int movetime)
+		{
+			//get the level file!
+			Level NewLevel = Level.ImportLevel(FileName);
+			//Create New Map
+			CurrentMap.level = NewLevel;
 			CurrentMap.LoadTileMaps(graphicsDevice, CurrentMap.level);
 			CurrentMap.LoadSprites(graphicsDevice, CurrentMap.level);
 			CurrentMap.GenerateLevel(CurrentMap.level, graphicsDevice, spriteBatch);

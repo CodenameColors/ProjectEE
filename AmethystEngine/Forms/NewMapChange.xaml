@@ -6,6 +6,31 @@
         xmlns:local="clr-namespace:AmethystEngine.Forms"
         mc:Ignorable="d"
         Title="NewMapChange" Height="720" Width="1080">
+	<Window.Resources>
+	<ResourceDictionary>
+
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="/AmethystEngine;component/Resources/DesignerItem.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+
+			<!-- The x:shared = false is IMPORTANT it allows me to use the control multiple times.  -->
+		<ContentControl x:Key="MoveableImages_Template"
+											x:Shared="False" 
+											Width="130"
+											Height="130"
+											Canvas.Top="150"
+											Canvas.Left="470"
+											Selector.IsSelected="False"
+											Style="{DynamicResource DesignerItemStyle}" >
+			<Rectangle x:Name="ResizeImage_rect" IsHitTestVisible="True" 
+										Stretch="Fill" >
+				<Rectangle.Fill>
+					<ImageBrush x:Name="ResizeImage_Image" ImageSource="/AmethystEngine;component/images/smol megumin.jpg" />
+				</Rectangle.Fill>
+			</Rectangle>
+		</ContentControl>
+		</ResourceDictionary>
+	</Window.Resources>
 	<Grid Background="Black">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="319*"/>
