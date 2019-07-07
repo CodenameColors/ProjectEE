@@ -71,7 +71,8 @@ namespace ProjectE_E.Components
 					var texture = Texture2D.FromStream(graphicsDevice, stream);
 					text = Texture2D.FromStream(graphicsDevice, stream);
 				}
-				sprites.Add(tuple.Item2.Replace("\\","/"), text);
+				if(!sprites.ContainsKey(tuple.Item2.Replace("\\", "/")))
+					sprites.Add(tuple.Item2.Replace("\\","/"), text);
 			}
 		}
 
@@ -249,14 +250,15 @@ namespace ProjectE_E.Components
 
 		public void FillDictLUT(List<GameEvent> gameEvents)
 		{
-			foreach(GameEvent ge in gameEvents)
+			ClearEventLUT();
+			foreach (GameEvent ge in gameEvents)
 			{
 				if (EventLUT.ContainsKey((int)ge.GetProperty("group"))) continue;
 				EventLUT.Add(
 					(int)ge.GetProperty("group"),
 					Type.GetType("ProjectE_E.Components.Cuprite.MapEvents").GetMethod(ge.GetProperty("DelegateEventName").ToString())
 					);
-			}		
+			}
 		}
 
 		public System.Reflection.MethodInfo GetMapEvent(int key)

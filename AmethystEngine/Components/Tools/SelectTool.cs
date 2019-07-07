@@ -136,9 +136,9 @@ namespace AmethystEngine.Components.Tools
 			int right = left + (int)(tile.ActualWidth * backcanvas.RenderTransform.Value.M11);
 			int top = (int)(Canvas.GetTop(tile) * backcanvas.RenderTransform.Value.M11);
 			int bottom = top + (int)(tile.ActualHeight * backcanvas.RenderTransform.Value.M11);
-			if (x >= left && x <= right)
+			if (x >= left && x < right)
 			{
-				if (y >= top && y <= bottom )
+				if (y >= top && y < bottom )
 					return true;
 			}
 			return false;
@@ -158,9 +158,9 @@ namespace AmethystEngine.Components.Tools
 			int right = left + (int)(bor.ActualWidth * backcanvas.RenderTransform.Value.M11);
 			int top = (int)(Canvas.GetTop(bor) * backcanvas.RenderTransform.Value.M11);
 			int bottom = top + (int)(bor.ActualHeight * backcanvas.RenderTransform.Value.M11);
-			if (x >= left && x <= right)
+			if (x >= left && x < right)
 			{
-				if (y >= top && y <= bottom)
+				if (y >= top && y < bottom)
 					return true;
 			}
 			return false;
@@ -172,9 +172,9 @@ namespace AmethystEngine.Components.Tools
 			int right = left + (int)(bor.ActualWidth * backcanvas.RenderTransform.Value.M11);
 			int top = (int)(Canvas.GetTop(bor) * backcanvas.RenderTransform.Value.M11);
 			int bottom = top + (int)(bor.ActualHeight * backcanvas.RenderTransform.Value.M11);
-			if (x >= left && x <= right)
+			if (x >= left && x < right)
 			{
-				if (y >= top && y <= bottom)
+				if (y >= top && y < bottom)
 					return true;
 			}
 			return false;
