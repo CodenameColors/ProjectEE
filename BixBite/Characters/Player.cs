@@ -93,9 +93,12 @@ namespace BixBite.Characters
 
 			if (rectangle.TouchTopOf(newRectangle))
 			{
-				rectangle.Y = newRectangle.Y - rectangle.Height;
-				velocity.Y = 0f;
+				//rectangle.Y = newRectangle.Y - rectangle.Height;
+				//velocity.Y = 0f;
 				hasJumped = false;
+
+				position.Y = newRectangle.Y - rectangle.Height - 2;
+
 			}
 			if (rectangle.TouchLeftOf(newRectangle))
 			{
@@ -107,7 +110,7 @@ namespace BixBite.Characters
 			}
 			if (rectangle.TouchBottomOf(newRectangle))
 			{
-				velocity.Y = 0;
+				position.Y = newRectangle.Y + rectangle.Height + 10;
 			}
 
 			//this is for checking the map. Don't allow out of bounds.
