@@ -44,7 +44,11 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Game1.cs" />
+    <Compile Include="Components\Camera.cs" />
+    <Compile Include="Components\Cuprite\MapEvents.cs" />
+    <Compile Include="Components\Map.cs" />
+    <Compile Include="Components\Tile.cs" />
+    <Compile Include="Emeralds_Elements.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

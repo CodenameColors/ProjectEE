@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
-
+using BixBite.Resources;
 
 namespace AmethystEngine.Components
 {
@@ -20,16 +20,25 @@ namespace AmethystEngine.Components
   {
     None,
     Folder,
-    File
+    File,
+		Sprite,
+		GameEvent
   };
 
 
   public class EditorObject
   {
-    public Uri Thumbnail { get; set; }
+
+
+		private ObservablePropertyDictionary _observableButtonStyles = null;
+
+		public Uri Thumbnail { get; set; }
     public String Name { get; set; }
     public int width { get; set; }
     public EObjectType EditObjType;
+
+		
+
 
     public EditorObject()
     {
@@ -52,6 +61,19 @@ namespace AmethystEngine.Components
       }
       width = 300;
     }
+
+		public void SetThumbnail(String desimg, bool rel = true)
+		{
+			if (rel)
+			{
+				Thumbnail = new Uri(desimg, UriKind.Relative);
+			}
+			else
+			{
+				Thumbnail = new Uri(desimg, UriKind.Absolute);
+			}
+			width = 300;
+		}
 
     public override string ToString()
     {
