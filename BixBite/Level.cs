@@ -287,8 +287,8 @@ namespace BixBite
 						TempLevel.Properties["bMainLevel"] = (reader.GetAttribute("MainLevel").ToLower() == "false" ? false : true);
 						TempLevel.Properties["xCells"] = Int32.Parse(reader.GetAttribute("Width")) / 40;
 						TempLevel.Properties["yCells"] = Int32.Parse(reader.GetAttribute("Height")) / 40;
-
-						while (reader.Name.Trim() != "TileSet") //ignore whitespace
+						reader.Read();
+						while (reader.NodeType != XmlNodeType.Element) //ignore whitespace
 							reader.Read();
 
 						//next up is the tilesets for the map.
@@ -304,7 +304,7 @@ namespace BixBite
 						}
 
 
-						while (reader.Name.Trim() != "Sprites" &&  reader.Name.Trim() != "Layers") //ignore whitespace
+						while (reader.NodeType != XmlNodeType.Element) //ignore whitespace
 							reader.Read();
 
 						//next up is the tilesets for the map.
@@ -315,6 +315,10 @@ namespace BixBite
 							TempLevel.sprites.Add(new Tuple<string, String>(Name, Location));
 							reader.Read(); reader.Read();
 						}
+
+						while (reader.NodeType != XmlNodeType.Element) //ignore whitespace
+							reader.Read();
+
 
 						//the next thing is the layers . LOOPS
 						while ((reader.NodeType == XmlNodeType.EndElement && reader.Name.Trim() != "Layers") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Layers")) //loop through all the TileSets
@@ -532,8 +536,8 @@ namespace BixBite
 						TempLevel.Properties["bMainLevel"] = (reader.GetAttribute("MainLevel").ToLower() == "false" ? false : true);
 						TempLevel.Properties["xCells"] = Int32.Parse(reader.GetAttribute("Width")) / 40;
 						TempLevel.Properties["yCells"] = Int32.Parse(reader.GetAttribute("Height")) / 40;
-
-						while (reader.Name.Trim() != "TileSet") //ignore whitespace
+						await reader.ReadAsync();
+						while (reader.NodeType != XmlNodeType.Element) //ignore whitespace
 							await reader.ReadAsync();
 
 						//next up is the tilesets for the map.
@@ -559,6 +563,9 @@ namespace BixBite
 							TempLevel.sprites.Add(new Tuple<string,String>(Name, Location));
 							await reader.ReadAsync(); await reader.ReadAsync();
 						}
+
+						while (reader.NodeType != XmlNodeType.Element) //ignore whitespace
+							await reader.ReadAsync();
 
 						//the next thing is the layers . LOOPS
 						while ((reader.NodeType == XmlNodeType.EndElement && reader.Name.Trim() != "Layers") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Layers")) //loop through all the TileSets
