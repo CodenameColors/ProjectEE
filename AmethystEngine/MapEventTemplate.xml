@@ -1,0 +1,47 @@
+<EventTypeTemplates>
+    <LevelTransition>
+    //Used for changing the map/level. given a new position
+    public static void [NAMEHERE](GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, Player player ,Map CurrentMap, String FileName, int newx, int newy, int movetime)
+    {
+        //get the level file!
+        Level NewLevel = Level.ImportLevel(FileName);
+        //Create New Map
+        CurrentMap.level = NewLevel;
+
+        CurrentMap.LoadTileMaps(graphicsDevice, CurrentMap.level);
+        CurrentMap.LoadSprites(graphicsDevice, CurrentMap.level);
+        CurrentMap.GenerateLevel(CurrentMap.level, graphicsDevice, spriteBatch);
+        player.SetPosition(newx, newy);
+    }
+    </LevelTransition>
+    <DialogueSceneTransistion>
+    public static void [NAMEHERE](String FileName, int newx, int newy, int movetime)
+    {
+        Console.WriteLine(String.Format("DialogueSceneTransistion Activated {0}", "WIP"));
+    }
+    </DialogueSceneTransistion>
+    <Cutscene>
+    public static void [NAMEHERE](String FileName, int newx, int newy, int movetime)
+    {
+        Console.WriteLine(String.Format("Cutscene Activated {0}", "WIP"));
+    }
+    </Cutscene>
+    <Trigger>
+    public static void [NAMEHERE]()
+    {
+        Console.WriteLine(String.Format("Activated Trigger Area {0}", "[NAMEHERE]"));
+    }
+    </Trigger>
+    <Collision>
+    public static void [NAMEHERE](ref Player player)
+    {
+        Console.WriteLine(String.Format("Collision Activated {0}", "WIP"));
+    }
+    </Collision>
+    <BGMTransition>
+    public static void [NAMEHERE](String FileName, int newx, int newy, int movetime)
+    {
+        Console.WriteLine(String.Format("BGMTransition Activated {0}", "WIP"));
+    }
+    </BGMTransition>
+</EventTypeTemplates>

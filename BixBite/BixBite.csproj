@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,21 +36,34 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BixBiteTypes.cs" />
     <Compile Include="Characters\Character.cs" />
     <Compile Include="Characters\Enemy.cs" />
     <Compile Include="Characters\NPC.cs" />
     <Compile Include="Characters\PartyMember.cs" />
     <Compile Include="Characters\Player.cs" />
+    <Compile Include="Effects\ImageEffect.cs" />
+    <Compile Include="GameEvent.cs" />
+    <Compile Include="Level.cs" />
+    <Compile Include="Resources\IProperties.cs" />
+    <Compile Include="Resources\ObservableDictionary.cs" />
+    <Compile Include="Resources\ObservablePropertyDictionary.cs" />
+    <Compile Include="Resources\ObservableSortedDictionary.cs" />
+    <Compile Include="SceneObject\GameObject.cs" />
     <Compile Include="SceneObject\Prop.cs" />
     <Compile Include="Rendering\GameImage.cs" />
     <Compile Include="Input\InputController.cs" />
@@ -58,6 +72,8 @@
     <Compile Include="Rendering\Sprite.cs" />
     <Compile Include="Rendering\SpriteLayer.cs" />
     <Compile Include="SceneObject\Spawner.cs" />
+    <Compile Include="SceneObject\Transistion.cs" />
+    <Compile Include="TileCollisionChecker.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
