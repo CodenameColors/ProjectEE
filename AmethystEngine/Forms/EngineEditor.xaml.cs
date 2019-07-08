@@ -769,7 +769,8 @@ namespace AmethystEngine.Forms
 					if (SelectedTile_Canvas.Children.Count == 0) return;
 					Rectangle r = new Rectangle() { Width = 40, Height = 40, Fill = imgtilebrush }; //create the tile that we wish to add to the grid. always 40 becasue thats the base. 
 
-					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
+					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 
+						curLayer, (int)pos.X, (int)pos.Y, (int)Canvas_grid.Viewport.X, (int)Canvas_grid.Viewport.Y);
 					if (rr != null)
 					{
 						//If Desired tile is the same as the painted tile. Do nothing
@@ -816,7 +817,8 @@ namespace AmethystEngine.Forms
 				else if (CurrentTool == EditorTool.Eraser)
 				{
 					//find the tile on the layer that is selected.
-					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
+					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 
+						curLayer, (int)pos.X, (int)pos.Y, (int)Canvas_grid.Viewport.X, (int)Canvas_grid.Viewport.Y);
 					if (rr == null) return; //if you click on a empty rect return
 																	//find the rect in the current layers displayed tiles
 					int i = LevelEditor_Canvas.Children.IndexOf(rr);
@@ -1098,7 +1100,8 @@ namespace AmethystEngine.Forms
 							{
 								//find the rectangle
 								Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(),
-									curLayer, (int)begginning.X + (relgridsize * i) + 1, (int)begginning.Y + (relgridsize * j) + 1);
+									curLayer, (int)begginning.X + (relgridsize * i) + 1, (int)begginning.Y + (relgridsize * j) + 1,
+									(int)Canvas_grid.Viewport.X, (int)Canvas_grid.Viewport.Y);
 								if (!selectTool.SelectedTiles.Contains(rr))
 								{
 									if (rr != null)
@@ -1879,7 +1882,8 @@ namespace AmethystEngine.Forms
 						break;
 					//find the tile on the layer that is selected.
 					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 
-						curLayer, (int)begginning.X + (i*40), (int)begginning.Y + (j * 40));
+						curLayer, (int)begginning.X + (i*40), (int)begginning.Y + (j * 40),
+						(int)Canvas_grid.Viewport.X, (int)Canvas_grid.Viewport.Y);
 					if (rr == null) continue; //if you click on a empty rect return
 																	//find the rect in the current layers displayed tiles
 					int k = LevelEditor_Canvas.Children.IndexOf(rr);
@@ -2735,10 +2739,12 @@ namespace AmethystEngine.Forms
     /// <returns>The direction in which they have moved.</returns>
     private BixBite.BixBiteTypes.CardinalDirection GetDCirectionalMove(Point p, int zIndex)
     {
-      int relgridsize = (((int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11)));
+			int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
+			int relgridsize = (((int)(40 * LevelEditor_Canvas.RenderTransform.Value.M11)));
       //use the current rectange that the user is in to get the (x,y) cords
       //compare these values to the current MOUSE POS
-      Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 0, (int)p.X, (int)p.Y);
+      Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), curLayer,
+				(int)p.X, (int)p.Y, (int)Canvas_grid.Viewport.X, (int)Canvas_grid.Viewport.Y);
       Point snappedpoints = RelativeGridSnap(shiftpoints[2]);
       if (rr != null)
           return BixBite.BixBiteTypes.CardinalDirection.None;
