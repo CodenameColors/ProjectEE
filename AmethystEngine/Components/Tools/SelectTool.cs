@@ -140,6 +140,7 @@ namespace AmethystEngine.Components.Tools
 			//the get left works off the viewport, not the canvas as a whole. So wee need to do the offset math IF veiwport > 0
 			left -= xoff; right -= xoff;
 			top -= yoff; bottom -= yoff;
+			x -= xoff; y -= yoff;
 
 			if (x >= left && x < right)
 			{
@@ -163,6 +164,13 @@ namespace AmethystEngine.Components.Tools
 			int right = left + (int)(bor.ActualWidth * backcanvas.RenderTransform.Value.M11);
 			int top = (int)(Canvas.GetTop(bor) * backcanvas.RenderTransform.Value.M11);
 			int bottom = top + (int)(bor.ActualHeight * backcanvas.RenderTransform.Value.M11);
+
+			//the get left works off the viewport, not the canvas as a whole. So wee need to do the offset math IF veiwport > 0
+			left -= xoff; right -= xoff;
+			top -= yoff; bottom -= yoff;
+			x -= xoff; y -= yoff;
+
+
 			if (x >= left && x < right)
 			{
 				if (y >= top && y < bottom)
@@ -177,6 +185,13 @@ namespace AmethystEngine.Components.Tools
 			int right = left + (int)(bor.ActualWidth * backcanvas.RenderTransform.Value.M11);
 			int top = (int)(Canvas.GetTop(bor) * backcanvas.RenderTransform.Value.M11);
 			int bottom = top + (int)(bor.ActualHeight * backcanvas.RenderTransform.Value.M11);
+
+			//the get left works off the viewport, not the canvas as a whole. So wee need to do the offset math IF veiwport > 0
+			left -= xoff; right -= xoff;
+			top -= yoff; bottom -= yoff;
+			x -= xoff; y -= yoff;
+
+
 			if (x >= left && x < right)
 			{
 				if (y >= top && y < bottom)

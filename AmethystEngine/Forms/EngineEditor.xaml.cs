@@ -891,7 +891,8 @@ namespace AmethystEngine.Forms
 			{
 				if (CurrentTool == EditorTool.Gameevent)
 				{
-					Border bor = SelectTool.FindBorder(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Border>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
+					Border bor = SelectTool.FindBorder(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Border>().ToList(),
+						curLayer, (int)pos.X, (int)pos.Y, (int)Canvas_grid.Viewport.X, (int)Canvas_grid.Viewport.Y);
 					if (bor != null) return; //the game event is already declared here!
 
 					List<GameEvent> layergameevents = ((Tuple<int[,], List<GameEvent>>)((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerObjects).Item2;
@@ -936,7 +937,8 @@ namespace AmethystEngine.Forms
 				else if (CurrentTool == EditorTool.Select) //selected a game event square.
 				{
 					//use the snapped grid cords to find the Border that we are clicking in.
-					Border bor = SelectTool.FindBorder(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Border>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
+					Border bor = SelectTool.FindBorder(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Border>().ToList(), 
+						curLayer, (int)pos.X, (int)pos.Y, (int)Canvas_grid.Viewport.X, (int)Canvas_grid.Viewport.Y);
 					int DesGroup = 0;
 					GameEvent ge;
 					if (bor == null) return;
@@ -962,7 +964,8 @@ namespace AmethystEngine.Forms
 				else if (CurrentTool == EditorTool.Eraser)
 				{
 					//use the snapped grid cords to find the Border that we are clicking in.
-					Border bor = SelectTool.FindBorder(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Border>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
+					Border bor = SelectTool.FindBorder(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Border>().ToList(),
+						curLayer, (int)pos.X, (int)pos.Y, (int)Canvas_grid.Viewport.X, (int)Canvas_grid.Viewport.Y);
 					int DesGroup = 0;
 					GameEvent ge;
 					if (bor == null) return;
@@ -1028,7 +1031,8 @@ namespace AmethystEngine.Forms
 			int curLayer = CurrentLevel.FindLayerindex(((SpriteLayer)SceneExplorer_TreeView.SelectedValue).LayerName);
 			List<Sprite> lsprites = (List<Sprite>)((SpriteLayer)SceneExplorer_TreeView.SelectedItem).LayerObjects;
 
-			ContentControl cc = SelectTool.FindSpriteControl(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<ContentControl>().ToList(), curLayer, (int)pos.X, (int)pos.Y);
+			ContentControl cc = SelectTool.FindSpriteControl(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<ContentControl>().ToList(), 
+				curLayer, (int)pos.X, (int)pos.Y, (int)Canvas_grid.Viewport.X, (int)Canvas_grid.Viewport.Y);
 			Sprite spr = SelectTool.FindSprite(lsprites, cc);
 
 			int i = 0;
