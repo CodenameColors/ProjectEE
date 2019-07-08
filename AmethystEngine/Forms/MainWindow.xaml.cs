@@ -90,20 +90,33 @@ namespace AmethystEngine.Forms
           }
           continue;
         }
-
-
-
+				
         String tline = "";
-        while ((tline = file.ReadLine()) != null)
-        {
-          System.Console.WriteLine(tline);
-          if (tline.Contains("ProjectName"))
-          {
-            tline = file.ReadLine();
-            recentprojs.Add(new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png", tline));
-            break;
-          }
-        }
+				EditorObject TempEO = new EditorObject();
+				while ((tline = file.ReadLine()) != null)
+				{
+					System.Console.WriteLine(tline);
+					if (tline.Contains("ProjectName"))
+					{
+						tline = file.ReadLine();
+						TempEO.Name = tline;
+						//recentprojs.Add(new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png", tline));
+					}
+					else if (tline.Contains("Thumbnail"))
+					{
+						tline = file.ReadLine();
+						if (tline.Contains(";"))
+							TempEO.SetThumbnail(tline);
+						else {
+							if (File.Exists(tline)) {
+								TempEO.SetThumbnail(tline, false);
+							}
+							else { TempEO.SetThumbnail("/AmethystEngine;component/images/Ame_icon_small.png", true); }
+						}
+							//recentprojs.Add(new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png", tline));
+					}
+				}
+				recentprojs.Add(TempEO);
       }
       RecentProj_LB.ItemsSource = recentprojs;
     }
@@ -146,8 +159,6 @@ namespace AmethystEngine.Forms
         return;
       }
 
-
-
       String path = ProjectPath_TB.Text;
       String pname = ProName_TB.Text;
 
@@ -161,22 +172,31 @@ namespace AmethystEngine.Forms
           StringBuilder sb = new StringBuilder();
           sb.AppendLine("-ProjectName:");
           sb.AppendLine(pname);
-          sb.AppendLine("-thumbnail:");
-          sb.AppendLine("[FILLINLATER]");
-          sb.AppendLine("-EditorLocation:");
-          sb.AppendLine("[FILLINLATER]");
+          sb.AppendLine("-Thumbnail:");
+          sb.AppendLine("/AmethystEngine;component/images/Ame_icon_small.png");
           sb.AppendLine("-GameLocation:");
           sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game\\" + "bin\\DesktopGL\\AnyCPU\\Debug\\Game1.exe");
           sb.AppendLine("-ConfigLocation:");
-          sb.AppendLine("[FILLINLATER]");
-          byte[] data = new UTF8Encoding(true).GetBytes(sb.ToString());
+          sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Config");
+					sb.AppendLine("-Levels:");
+					sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Levels");
+					sb.AppendLine("-MainLevel:");
+					sb.AppendLine("[FILLINLATER]");
+					sb.AppendLine("-Dialogue:");
+					sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Dialogue");
+					byte[] data = new UTF8Encoding(true).GetBytes(sb.ToString());
           f.Write(data, 0, data.Length);
         }
       }
 
       CreateGameFiles(path + "\\" + pname + "\\" + pname + "_Game" + "\\");
 
-      String pathString = System.Environment.CurrentDirectory + "\\rpj.txt";
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Images");
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Levels");
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Config");
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Dialogue");
+
+			String pathString = System.Environment.CurrentDirectory + "\\rpj.txt";
 
       if (!System.IO.File.Exists(pathString))
       {
@@ -187,8 +207,9 @@ namespace AmethystEngine.Forms
         System.IO.File.AppendAllText(pathString, String.Format("{0}{1}{2}", path + "\\" + pname + "\\", pname, ".gem\n"));
       }
       this.Hide();
-      EngineEditor ff = new EngineEditor(String.Format("{0}", path + "\\" + pname + "\\" + pname + "_Game\\"));
-      ff.Show();
+      EngineEditor ff = new EngineEditor(String.Format("{0}{1}{2}", path + "\\" + pname + "\\", pname, ".gem"), pname);
+
+			ff.Show();
     }
 
     private void ProPath_BTN_Click(object sender, RoutedEventArgs e)

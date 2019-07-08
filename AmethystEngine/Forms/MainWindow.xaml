@@ -6,21 +6,22 @@
         mc:Ignorable="d" Background="#FF0E0D0D"
         Title="AmethystEngine" Height="429.333" Width="500" Foreground="{x:Null}" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
 	<Window.Resources>
-		<DataTemplate x:Key="CExplorer">
+		<DataTemplate x:Key="CExplorer1">
 			<Border     Width="75"
-                            Margin="5"
-                            BorderThickness="1"
-                            BorderBrush="Transparent"
-                            VerticalAlignment="Top"
-                            >
+									Height="75"
+                  Margin="5"
+                  BorderThickness="1"
+                  BorderBrush="Transparent"
+                  VerticalAlignment="Top"
+                  >
 
 				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
 					<Image Height="50" Grid.Column="0" HorizontalAlignment="Center" Stretch="Fill" VerticalAlignment="Top" Width="50">
 						<Image.Source>
-							<ImageSource>/AmethystEngine;component/images/smol megumin.jpg</ImageSource>
+							<BitmapImage UriSource="{Binding Thumbnail}"/>
 						</Image.Source>
 					</Image>
-					<TextBlock Text="{Binding Name}" Foreground="White" HorizontalAlignment="Center" Width="50" Height="auto" TextWrapping="Wrap" FontSize="10"/>
+					<TextBlock Text="{Binding Name}" Foreground="White" HorizontalAlignment="Center" Height="auto" TextWrapping="Wrap" FontSize="10"/>
 				</StackPanel>
 			</Border>
 		</DataTemplate>
@@ -63,7 +64,7 @@
 
 		<!--This is where the project, content, and scene explorer reside-->
 		<ListBox x:Name="RecentProj_LB" HorizontalAlignment="Center" Height="222" Grid.Row="1" VerticalAlignment="Top" Width="480" Foreground="White" Background="Transparent" BorderBrush="#FF484848" Margin="10,35,10,0"
-						 ItemTemplate="{Binding CExplorer}" ItemsSource="{Binding recentprojs}">
+						 ItemTemplate="{StaticResource CExplorer1}" ItemsSource="{Binding recentprojs}">
 			<ListBox.ItemsPanel>
 				<ItemsPanelTemplate>
 					<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>

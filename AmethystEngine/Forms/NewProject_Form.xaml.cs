@@ -61,43 +61,52 @@ namespace AmethystEngine.Forms
 			String pname = ProjName_TB.Text;
 
 			if (path != "")
-			{
-				System.IO.Directory.CreateDirectory(path + "\\" + pname);
-				System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game");
-				System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Editor");
-				using (System.IO.FileStream f = System.IO.File.Create(path + "\\" + pname + "\\" + pname + ".gem"))
-				{
-					StringBuilder sb = new StringBuilder();
-					sb.AppendLine("-ProjectName:");
-					sb.AppendLine(pname);
-					sb.AppendLine("-thumbnail:");
+      {
+        System.IO.Directory.CreateDirectory(path + "\\" + pname);
+        System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game");
+        System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Editor");
+        using (System.IO.FileStream f = System.IO.File.Create(path + "\\" + pname + "\\" + pname + ".gem"))
+        {
+          StringBuilder sb = new StringBuilder();
+          sb.AppendLine("-ProjectName:");
+          sb.AppendLine(pname);
+          sb.AppendLine("-Thumbnail:");
+          sb.AppendLine("/AmethystEngine;component/images/Ame_icon_small.png");
+          sb.AppendLine("-GameLocation:");
+          sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game\\" + "bin\\DesktopGL\\AnyCPU\\Debug\\Game1.exe");
+          sb.AppendLine("-ConfigLocation:");
+          sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Config");
+					sb.AppendLine("-Levels:");
+					sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Levels");
+					sb.AppendLine("-MainLevel:");
 					sb.AppendLine("[FILLINLATER]");
-					sb.AppendLine("-EditorLocation:");
-					sb.AppendLine("[FILLINLATER]");
-					sb.AppendLine("-GameLocation:");
-					sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game\\" + "bin\\DesktopGL\\AnyCPU\\Debug\\Game1.exe");
-					sb.AppendLine("-ConfigLocation:");
-					sb.AppendLine("[FILLINLATER]");
+					sb.AppendLine("-Dialogue:");
+					sb.AppendLine(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Dialogue");
 					byte[] data = new UTF8Encoding(true).GetBytes(sb.ToString());
-					f.Write(data, 0, data.Length);
-				}
-			}
+          f.Write(data, 0, data.Length);
+        }
+      }
 
-			MainWindow.CreateGameFiles(path + "\\" + pname + "\\" + pname + "_Game" + "\\");
+      MainWindow.CreateGameFiles(path + "\\" + pname + "\\" + pname + "_Game" + "\\");
+
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Images");
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Levels");
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Config");
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Dialogue");
 
 			String pathString = System.Environment.CurrentDirectory + "\\rpj.txt";
 
-			if (!System.IO.File.Exists(pathString))
-			{
-				System.IO.File.AppendAllText(pathString, String.Format("{0}{1}{2}", path + "\\" + pname + "\\", pname, ".gem\n"));
-			}
-			else
-			{
-				System.IO.File.AppendAllText(pathString, String.Format("{0}{1}{2}", path + "\\" + pname + "\\", pname, ".gem\n"));
-			}
-			this.Close();
-			cureditor.Close();
-			EngineEditor ff = new EngineEditor(String.Format("{0}", path + "\\" + pname + "\\" + pname + "_Game\\"));
+      if (!System.IO.File.Exists(pathString))
+      {
+        System.IO.File.AppendAllText(pathString, String.Format("{0}{1}{2}", path + "\\" + pname + "\\", pname, ".gem\n"));
+      }
+      else
+      {
+        System.IO.File.AppendAllText(pathString, String.Format("{0}{1}{2}", path + "\\" + pname + "\\", pname, ".gem\n"));
+      }
+      this.Hide();
+      EngineEditor ff = new EngineEditor(String.Format("{0}{1}{2}", path + "\\" + pname + "\\", pname, ".gem"), pname);
+
 			ff.Show();
 
 		}
