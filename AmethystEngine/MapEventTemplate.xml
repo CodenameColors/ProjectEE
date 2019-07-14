@@ -8,6 +8,8 @@
         //Create New Map
         CurrentMap.level = NewLevel;
 
+        CurrentMap.ClearEventLUT(); //clear the dictionary LUT to make room for the new maps LUT vars.
+
         CurrentMap.LoadTileMaps(graphicsDevice, CurrentMap.level);
         CurrentMap.LoadSprites(graphicsDevice, CurrentMap.level);
         CurrentMap.GenerateLevel(CurrentMap.level, graphicsDevice, spriteBatch);

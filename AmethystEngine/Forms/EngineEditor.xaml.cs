@@ -1047,6 +1047,7 @@ namespace AmethystEngine.Forms
 				i++;
 			}
 
+
 		}
 
 		private void LevelEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
