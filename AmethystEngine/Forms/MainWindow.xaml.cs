@@ -52,7 +52,7 @@ namespace AmethystEngine.Forms
       }
 
       //read the file to a list 
-      rpjFileToList(ref TFiles, pathString);
+      RpjFileToList(ref TFiles, pathString);
 
       //each string in the list is a file. so we need to read that file.
       foreach (String tempFile in TFiles)
@@ -121,7 +121,7 @@ namespace AmethystEngine.Forms
       RecentProj_LB.ItemsSource = recentprojs;
     }
 
-    private void rpjFileToList(ref List<String> TFiles, String pathString)
+    private void RpjFileToList(ref List<String> TFiles, String pathString)
     {
       //read the file to a list 
       String tline = "";
@@ -214,7 +214,7 @@ namespace AmethystEngine.Forms
 
     private void ProPath_BTN_Click(object sender, RoutedEventArgs e)
     {
-      String path = EngineEditor.getFilePath("Create New Project");
+      String path = EngineEditor.GetFilePath("Create New Project");
 
       if (path == String.Empty || path == null)
       {
@@ -251,7 +251,7 @@ namespace AmethystEngine.Forms
       if (RecentProj_LB.SelectedIndex > -1)
       {
         //remove the directory.
-        removeProject(TFiles[RecentProj_LB.SelectedIndex].Substring(0, TFiles[RecentProj_LB.SelectedIndex].LastIndexOfAny(new char[] { '\\', '/' })));
+        RemoveProject(TFiles[RecentProj_LB.SelectedIndex].Substring(0, TFiles[RecentProj_LB.SelectedIndex].LastIndexOfAny(new char[] { '\\', '/' })));
 
         //drop the project from the file.
         TFiles.RemoveAt(RecentProj_LB.SelectedIndex);
@@ -276,7 +276,7 @@ namespace AmethystEngine.Forms
       }
     }
 
-    private void removeProject(String ProjectLoc)
+    private void RemoveProject(String ProjectLoc)
     {
       System.IO.Directory.Delete(ProjectLoc, true);
     }

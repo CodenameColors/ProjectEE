@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using BixBite;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -31,10 +30,12 @@ namespace AmethystEngine.Components.Tools
 				ProjectCollection pc = new ProjectCollection();
 
 				// THERE ARE A LOT OF PROPERTIES HERE, THESE MAP TO THE MSBUILD CLI PROPERTIES
-				Dictionary<string, string> globalProperty = new Dictionary<string, string>();
-				globalProperty.Add("Configuration", "Debug");
-				globalProperty.Add("Platform", "Any CPU");
-				globalProperty.Add("OutputPath", @"bin\DesktopGL\AnyCPU\Debug");
+				Dictionary<string, string> globalProperty = new Dictionary<string, string>
+				{
+					{ "Configuration", "Debug" },
+					{ "Platform", "Any CPU" },
+					{ "OutputPath", @"bin\DesktopGL\AnyCPU\Debug" }
+				};
 
 				BuildParameters bp = new BuildParameters(pc);
 				BuildRequestData buildRequest = new BuildRequestData(ProjFileName[0], globalProperty, "4.0", new string[] { "Build" }, null);
@@ -116,7 +117,7 @@ namespace AmethystEngine.Components.Tools
 
 		private static int GetFileWriteLocation(ref List<String> FileCodeLines, String RegionName, String MethodName)
 		{
-			if (!isMethodCreated(FileCodeLines, MethodName)) //Does this method exist?
+			if (!IsMethodCreated(FileCodeLines, MethodName)) //Does this method exist?
 			{
 				int num = GetEndOfRegion(ref FileCodeLines, RegionName);
 				if (num > 0) //Is the region created?
@@ -134,7 +135,7 @@ namespace AmethystEngine.Components.Tools
 			return -1;
 		}
 
-		private static bool isRegionCreated(String CodeFilePath, String RegionName)
+		private static bool IsRegionCreated(String CodeFilePath, String RegionName)
 		{
 			using (StreamReader sr = new StreamReader(CodeFilePath))
 			{
@@ -148,7 +149,7 @@ namespace AmethystEngine.Components.Tools
 			return false;
 		}
 		
-		private static bool isRegionCreated(List<String> CodeFileLines, String RegionName)
+		private static bool IsRegionCreated(List<String> CodeFileLines, String RegionName)
 		{
 			foreach (String s in CodeFileLines)
 			{
@@ -195,7 +196,7 @@ namespace AmethystEngine.Components.Tools
 
 		private static int GetEndOfRegion(ref List<String> CodeFileLines, String RegionName)
 		{
-			if (isRegionCreated(CodeFileLines, RegionName)) //does this region exist?
+			if (IsRegionCreated(CodeFileLines, RegionName)) //does this region exist?
 			{
 				for(int i = 0; i < CodeFileLines.Count; i++) //scan all lines for the beginning region
 				{
@@ -218,7 +219,7 @@ namespace AmethystEngine.Components.Tools
 			return -1;
 		}
 
-		private static bool isMethodCreated(String CodeFilePath, String Methodname)
+		private static bool IsMethodCreated(String CodeFilePath, String Methodname)
 		{
 			using (StreamReader sr = new StreamReader(CodeFilePath))
 			{
@@ -232,7 +233,7 @@ namespace AmethystEngine.Components.Tools
 				return false;
 		}
 
-		private static bool isMethodCreated(List<String> CodeFileLines, String Methodname)
+		private static bool IsMethodCreated(List<String> CodeFileLines, String Methodname)
 		{
 			foreach (String s in CodeFileLines)
 			{
