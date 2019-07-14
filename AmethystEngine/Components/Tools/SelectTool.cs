@@ -16,8 +16,6 @@ namespace AmethystEngine.Components.Tools
 	/// </summary>
 	public class SelectTool
 	{
-
-		SpriteLayer Currentlayer;
 		public List<Rectangle> SelectedTiles = new List<Rectangle>();
 
 		/// <summary>
@@ -44,7 +42,7 @@ namespace AmethystEngine.Components.Tools
 		{
 			foreach (Rectangle r in layertiles)
 			{
-				if (inTile(backcanvas, r, x, y, xoff, yoff))
+				if (InTile(backcanvas, r, x, y, xoff, yoff))
 				{
 					if (Canvas.GetZIndex(r as System.Windows.UIElement) == zindex)
 						return r;
@@ -64,7 +62,7 @@ namespace AmethystEngine.Components.Tools
 		{
 			foreach (ContentControl r in LSprites)
 			{
-				if (inContentControl(backcanvas, r, x, y, xoff, yoff))
+				if (InContentControl(backcanvas, r, x, y, xoff, yoff))
 				{
 					if (Canvas.GetZIndex(r as System.Windows.UIElement) == zindex)
 						return r;
@@ -92,7 +90,7 @@ namespace AmethystEngine.Components.Tools
 		{
 			foreach (Border item in GEBorders)
 			{
-				if(inBorder(backcavas, item, x, y, xoff, yoff))
+				if(InBorder(backcavas, item, x, y, xoff, yoff))
 				{ 
 					if(Canvas.GetZIndex(item) == zindex)
 						return item;
@@ -130,7 +128,7 @@ namespace AmethystEngine.Components.Tools
 		/// Takes in a tile, and a mouse position. Determines if the mouse is within the tiles bounds.
 		/// </summary>
 		/// <returns>true if the mouse location is within a given range</returns>
-		public static bool inTile(Canvas backcanvas, Rectangle tile, int x, int y, int xoff, int yoff)
+		public static bool InTile(Canvas backcanvas, Rectangle tile, int x, int y, int xoff, int yoff)
 		{
 			int left = (int)(Canvas.GetLeft(tile) * backcanvas.RenderTransform.Value.M11);
 			int right = left + (int)(tile.ActualWidth * backcanvas.RenderTransform.Value.M11);
@@ -158,7 +156,7 @@ namespace AmethystEngine.Components.Tools
 		/// <param name="x"></param>
 		/// <param name="y"></param>
 		/// <returns></returns>
-		public static bool inContentControl(Canvas backcanvas, ContentControl bor, int x, int y, int xoff, int yoff)
+		public static bool InContentControl(Canvas backcanvas, ContentControl bor, int x, int y, int xoff, int yoff)
 		{
 			int left = (int)(Canvas.GetLeft(bor) * backcanvas.RenderTransform.Value.M11);
 			int right = left + (int)(bor.ActualWidth * backcanvas.RenderTransform.Value.M11);
@@ -179,7 +177,7 @@ namespace AmethystEngine.Components.Tools
 			return false;
 		}
 
-		public static bool inBorder(Canvas backcanvas, Border bor, int x, int y, int xoff, int yoff)
+		public static bool InBorder(Canvas backcanvas, Border bor, int x, int y, int xoff, int yoff)
 		{
 			int left = (int)(Canvas.GetLeft(bor) * backcanvas.RenderTransform.Value.M11);
 			int right = left + (int)(bor.ActualWidth * backcanvas.RenderTransform.Value.M11);

@@ -25,6 +25,7 @@ namespace AmethystEngine.Forms
 		Level CurrentLevel;
 		String ProjectPath = "";
 		Dictionary<String, String> ProjectLevels = new Dictionary<string, string>();
+		Dictionary<String, GameEvent> ProjectGameEvents = new Dictionary<string, GameEvent>();
 
 		public int AddNewX = 0;
 		public int AddnewY = 0;
@@ -57,12 +58,35 @@ namespace AmethystEngine.Forms
 				GameEvents_LB.SelectedIndex = 0;
 				if (GameEvents_LB.Items.Count == 0) return; // there is no game events... 
 
+
+				FillProjectsGEDict();//find all the methods that the user has created!
+
 				//set the properties!
 				SetGameEventProperties(((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].LayerObjects).Item2[GameEvents_LB.SelectedIndex]);
 			}
 			else
 			{
 
+			}
+		}
+
+
+		private void FillProjectsGEDict()
+		{
+			foreach (String lev in ProjectLevels.Keys)
+			{
+				Level Tlev = Level.ImportLevel(lev); //create level
+				foreach (SpriteLayer sl in Tlev.Layers)
+				{
+					if(sl.layerType == LayerType.GameEvent)
+					{
+						foreach (GameEvent GE in ((Tuple<int[,], List<GameEvent>>)sl.LayerObjects).Item2)
+						{
+							if (!ProjectGameEvents.ContainsKey(GE.GetProperty("DelegateEventName").ToString()))
+								ProjectGameEvents.Add(GE.GetProperty("DelegateEventName").ToString(), GE);
+						}
+					}
+				}
 			}
 		}
 
@@ -147,6 +171,7 @@ namespace AmethystEngine.Forms
 
 		private bool CanCreateEvent()
 		{
+			GameEventLog_TB.Text = "";
 			bool ret = true;
 			bool bLName = true;
 			String s = "";
@@ -155,13 +180,15 @@ namespace AmethystEngine.Forms
 			ret &= (AddEventGroup_TB.Text == "" ? false : true);
 			ret &= (AddEventDelegateName_TB.Text == "" ? false : true); ;
 			ret &= (AddEventGroup_TB.Text == "" ? false : true); ;
-
+			
+			if (ProjectGameEvents.ContainsKey(AddEventDelegateName_TB.Text))
+			{
+				GameEventLog_TB.Text = "Delegate Name is already used in this project!"; return false;
+			}
 
 			//okay so all of those should be filled out to have a valid event!
 			bLName &= System.Text.RegularExpressions.Regex.IsMatch(AddEventName_TB.Text, @"^[A-Za-z][A-Za-z0-9]+");
 			bLName &= System.Text.RegularExpressions.Regex.IsMatch(AddEventDelegateName_TB.Text, @"^[A-Za-z][A-Za-z0-9]+");
-			int group, newx, newy, movetime = 0;
-
 
 			//What Event Type is this?
 			if (AddEventType_CB.SelectedIndex == 4 || AddEventType_CB.SelectedIndex == 5)
@@ -174,21 +201,23 @@ namespace AmethystEngine.Forms
 				}
 				else
 				{
-					Console.WriteLine("Invaild Data given to create game event");
+					GameEventLog_TB.Text = ("Invaild Data given to create game event");
 					return false; //not valid
 				}
 			}
 			else
 			{
-				bLName &= Int32.TryParse(AddEventGroup_TB.Text, out group);
-				bLName &= Int32.TryParse(AddEventNewPosX_TB.Text, out newx);
-				bLName &= Int32.TryParse(AddEventNewPosY_TB.Text, out newy);
-				bLName &= Int32.TryParse(AddEventMoveTime_TB.Text, out movetime);
+				int val;
+				bLName &= Int32.TryParse(AddEventGroup_TB.Text, out int group);
+				bLName &= Int32.TryParse(AddEventNewPosX_TB.Text, out int newx);
+				bLName &= Int32.TryParse(AddEventNewPosY_TB.Text, out int newy);
+				bLName &= Int32.TryParse(AddEventMoveTime_TB.Text, out int movetime);
 				AddEventData_CC.Visibility = Visibility.Visible;
 				ret &= (AddFileToLoad_CB.SelectedIndex  > 0 ? true : false);
-				ret &= (AddEventNewPosX_TB.Text == "" ? false : true);
-				ret &= (AddEventNewPosY_TB.Text == "" ? false : true);
-				ret &= (AddEventMoveTime_TB.Text == "" ? false : true);
+				//are the valid numbers  > 0
+				ret &= (newx >= 0 ? true : false);
+				ret &= (newy >= 0 ? true : false);
+				ret &= (0 >= 0 ? true : false);
 
 				if (ret && bLName)
 				{
@@ -196,7 +225,7 @@ namespace AmethystEngine.Forms
 				}
 				else
 				{
-					Console.WriteLine("Invaild Data given to create game event");
+					GameEventLog_TB.Text = ("Invaild Data given to create game event");
 					return false; //not valid
 				}
 
@@ -208,12 +237,11 @@ namespace AmethystEngine.Forms
 			if (CanCreateEvent())
 			{
 				bool bLName = true;
-				int group, newx, newy, movetime = 0;
-				bLName &= Int32.TryParse(AddEventGroup_TB.Text, out group);
+				bLName &= Int32.TryParse(AddEventGroup_TB.Text, out int group);
 				bLName &= group > 0; //-1 = collision, 0 is nothing. Only allow 1 -> n
-				bLName &= Int32.TryParse(AddEventNewPosX_TB.Text, out newx);
-				bLName &= Int32.TryParse(AddEventNewPosY_TB.Text, out newy);
-				bLName &= Int32.TryParse(AddEventMoveTime_TB.Text, out movetime);
+				bLName &= Int32.TryParse(AddEventNewPosX_TB.Text, out int newx);
+				bLName &= Int32.TryParse(AddEventNewPosY_TB.Text, out int newy);
+				bLName &= Int32.TryParse(AddEventMoveTime_TB.Text, out int movetime);
 
 				//create a new GameEvent
 				GameEvent ge = new GameEvent(AddEventName_TB.Text, (EventType)AddEventType_CB.SelectedIndex, group);
@@ -366,8 +394,7 @@ namespace AmethystEngine.Forms
 		{
 			if (e.Key == Key.Enter)
 			{
-				int num = 0;
-				if (Int32.TryParse(((TextBox)sender).Text, out num))
+				if (Int32.TryParse(((TextBox)sender).Text, out int num))
 				{
 					//change the property on this layer and event
 					GameEvent g = ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].
@@ -396,8 +423,7 @@ namespace AmethystEngine.Forms
 		{
 			if (e.Key == Key.Enter)
 			{
-				int num = 0;
-				if (Int32.TryParse(((TextBox)sender).Text, out num))
+				if (Int32.TryParse(((TextBox)sender).Text, out int num))
 				{
 					//change the property on this layer and event
 					GameEvent g = ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].
@@ -411,8 +437,7 @@ namespace AmethystEngine.Forms
 		{
 			if (e.Key == Key.Enter)
 			{
-				int num = 0;
-				if (Int32.TryParse(((TextBox)sender).Text, out num))
+				if (Int32.TryParse(((TextBox)sender).Text, out int num))
 				{
 					//change the property on this layer and event
 					GameEvent g = ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].
@@ -426,8 +451,7 @@ namespace AmethystEngine.Forms
 		{
 			if (e.Key == Key.Enter)
 			{
-				int num = 0;
-				if (Int32.TryParse(((TextBox)sender).Text, out num))
+				if (Int32.TryParse(((TextBox)sender).Text, out int num))
 				{
 					//change the property on this layer and event
 					GameEvent g = ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].
