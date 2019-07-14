@@ -3,12 +3,12 @@ test2
 -Thumbnail:
 C:\Users\amorales\Documents\createst\test2\test2_W_Game\Content\Images\smol megumin.jpg
 -GameLocation:
-C:\Users\amorales\Documents\createst\test2\test2_Game\bin\DesktopGL\AnyCPU\Debug\Game1.exe
+C:\Users\amorales\Documents\createst\test2\test2_W_Game\bin\DesktopGL\AnyCPU\Debug\Game1.exe
 -ConfigLocation:
-C:\Users\amorales\Documents\createst\test2\test2_Game\Content\Config
+C:\Users\amorales\Documents\createst\test2\test2_W_Game\Content\Config
 -Levels:
-C:\Users\amorales\Documents\createst\test2\test2_Game\Content\Levels
+C:\Users\amorales\Documents\createst\test2\test2_W_Game\Content\Levels
 -MainLevel:
-C:\Users\amorales\Documents\createst\test2\test2_W_Game\Content\Levels\level1_test.lvl
+C:\Users\amorales\Documents\createst\test2\test2_W_Game\Content\Levels\level1_ge_test_1_new.lvl
 -Dialogue:
-C:\Users\amorales\Documents\createst\test2\test2_Game\Content\Dialogue
+C:\Users\amorales\Documents\createst\test2\test2_W_Game\Content\Dialogue

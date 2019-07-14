@@ -100,6 +100,7 @@
 						<ColumnDefinition Width="Auto"/>
 						<ColumnDefinition Width="Auto"/>
 						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
 						<ColumnDefinition/>
 						<ColumnDefinition Width="Auto" MinWidth="44"/>
 						<ColumnDefinition Width="Auto" MinWidth="292"/>
@@ -116,25 +117,28 @@
 					<Menu DockPanel.Dock="Top" Grid.Column="1" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
 						<MenuItem Header="Selection" Click="LevelEditorSelection_Click"/>
 					</Menu>
-					<Menu DockPanel.Dock="Top" Grid.Column="2" Background="Transparent" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Left" Width="42" Height="18" Margin="0,4,0,3">
+					<Menu DockPanel.Dock="Top" Grid.Column="2" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Deselect" Click="LevelEditorDeselect_Click"/>
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="3" Background="Transparent" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Left" Width="42" Height="18" Margin="0,4,0,3">
 						<MenuItem Header="Eraser" Click="LevelEditorEraser_Click"/>
 					</Menu>
-					<Menu DockPanel.Dock="Top" Grid.Column="3" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
+					<Menu DockPanel.Dock="Top" Grid.Column="4" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
 						<MenuItem Header="Move" Click="LevelEditorMove_Click"/>
 					</Menu>
-					<Menu DockPanel.Dock="Top" Grid.Column="4" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
+					<Menu DockPanel.Dock="Top" Grid.Column="5" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
 						<MenuItem Header="Brush" Click="LevelEditorBrush_Click"/>
 					</Menu>
-					<Menu DockPanel.Dock="Top" Grid.Column="5" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
+					<Menu DockPanel.Dock="Top" Grid.Column="6" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
 						<MenuItem Header="Fill" Click="Fill_Click"/>
 					</Menu>
-					<Menu DockPanel.Dock="Top" Grid.Column="6" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
+					<Menu DockPanel.Dock="Top" Grid.Column="7" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
 						<MenuItem Header="Up Layer" Click="UpLaverLevelEditor_BTN_Click"/>
 					</Menu>
-					<Menu DockPanel.Dock="Top" Grid.Column="7" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
+					<Menu DockPanel.Dock="Top" Grid.Column="8" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
 						<MenuItem Header="Down Laver" Click="DownLaverLevelEditor_BTN_Click"/>
 					</Menu>
-					<Menu DockPanel.Dock="Top" Grid.Column="8" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
+					<Menu DockPanel.Dock="Top" Grid.Column="9" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
 						<MenuItem Header="Game Events" Foreground="White">
 							<MenuItem x:Name="NewGameEvent" Header="Add GameEvent" Foreground="Black" Click="AddGameEvent_Click"/>
 							<MenuItem x:Name="EditGameEvents" Header="Edit GameEvents" Foreground="Black" Click="EditGameEvents_Click"/>
@@ -144,7 +148,7 @@
 							<MenuItem Header="Select GameEvent" Foreground="Black" Click="LevelEditorSelection_Click"/>
 						</MenuItem>
 					</Menu>
-					<Menu DockPanel.Dock="Top" Grid.Column="9" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
+					<Menu DockPanel.Dock="Top" Grid.Column="10" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
 						<MenuItem Header="Test" Click="Test_Click"/>
 					</Menu>
 
@@ -184,7 +188,10 @@
 					<Menu DockPanel.Dock="Top" Grid.Column="1" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
 						<MenuItem Header="Selection" Click="LevelEditorSelection_Click"/>
 					</Menu>
-					<Menu DockPanel.Dock="Top" Grid.Column="2" Background="Transparent" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Left" Width="42" Height="18" Margin="0,4,0,3">
+					<Menu DockPanel.Dock="Top" Grid.Column="2" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Deselect" Click="LevelEditorDeselect_Click"/>
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="3" Background="Transparent" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Left" Width="42" Height="18" Margin="0,4,0,3">
 						<MenuItem Header="Delete" Click="LevelEditorEraser_Click"/>
 					</Menu>
 					<Menu DockPanel.Dock="Top" Grid.Column="4" Background="Transparent" Foreground="White" VerticalAlignment="Center"  Height="18" Margin="0,4,0,3">
@@ -206,6 +213,10 @@
 
 			<!--#endregion-->
 
+			<ControlTemplate x:Key="UIEditorObjects_Template">
+				
+			</ControlTemplate>
+			
 			<ControlTemplate x:Key="LevelEditorTileMap_Template">
 				<TabControl x:Name="LevelEditorLibary_TabControl" Background="#FF2B2B2B" SelectionChanged="LevelEditorLibary_TabControl_SelectionChanged">
 
@@ -269,7 +280,7 @@
 
 			<ControlTemplate x:Key="ContentLibaray_LB_Template">
 				<ListBox x:Name="EditorObjects_LB" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
-               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" ItemsSource="{Binding Titles}" ItemTemplate="{DynamicResource BigEdit}" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" ItemsSource="{Binding ContentLibaryObjList}" ItemTemplate="{DynamicResource BigEdit}" ScrollViewer.VerticalScrollBarVisibility="Hidden">
 					<ListBox.ItemsPanel>
 						<ItemsPanelTemplate>
 							<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>
@@ -278,6 +289,42 @@
 				</ListBox>
 			</ControlTemplate>
 
+			<ContentControl x:Key="UIEditorSceneExplorer">
+				
+			</ContentControl>
+			
+			<ControlTemplate x:Key="LevelEditorSceneExplorer_Template">
+				<TreeView x:Name="SceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,25,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
+								 SelectedItemChanged="SceneExplorer_TreeView_SelectedItemChanged">
+					<TreeView.Resources>
+						<HierarchicalDataTemplate DataType="{x:Type Bix:Level}" ItemsSource="{Binding Layers}">
+							<StackPanel Orientation="Horizontal">
+								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
+								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="20" MaxHeight="15" />
+								<TextBlock Text="{Binding LevelName}" Foreground="White" />
+							</StackPanel>
+						</HierarchicalDataTemplate>
+						<DataTemplate DataType="{x:Type BixRen:SpriteLayer}">
+							<StackPanel Orientation="Horizontal">
+								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
+								<TextBlock Text="{Binding LayerName}" Foreground="White" />
+							</StackPanel>
+						</DataTemplate>
+						<DataTemplate DataType="{x:Type BixRen:Sprite}">
+							<StackPanel Orientation="Horizontal">
+								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
+								<TextBlock Text="{Binding Name}" Foreground="White" />
+							</StackPanel>
+						</DataTemplate>
+					</TreeView.Resources>
+				</TreeView>
+			</ControlTemplate>
+			
+			
+			<ControlTemplate x:Key="UIEditorProperty_Template">
+				
+			</ControlTemplate>
+			
 			<ControlTemplate x:Key="LevelEditorProperty_Template">
 				<Grid VerticalAlignment="Stretch" Grid.Column="2" Margin="0,45,0,0" Background="#FF2B2B2B">
 					<Grid.RowDefinitions>
@@ -443,10 +490,13 @@
 											Canvas.Top="150"
 											Canvas.Left="470"
 											Selector.IsSelected="False"
+											Selector.Unselected="Sprite_OnUnselected"
+											MouseLeftButtonUp="Sprite_MouseLeftButtonUp"
 											Style="{DynamicResource DesignerItemStyle}" 
-											MouseLeftButtonDown="ContentControl_MouseLeftButtonDown" Selector.Unselected="DeselectedResizeRect" Selector.SelectionChanged="ContentControl_SelectionChanged">
+											MouseLeftButtonDown="ContentControl_MouseLeftButtonDown" Selector.SelectionChanged="ContentControl_SelectionChanged">
 				<Rectangle x:Name="ResizeImage_rect" IsHitTestVisible="True" 
-										Stretch="Fill" MouseLeftButtonDown="Rectangle_MouseLeftButtonDown" >
+										Stretch="Fill" MouseLeftButtonDown="Sprite_MouseLeftButtonDown" 
+									  >
 					<Rectangle.Fill>
 						<ImageBrush x:Name="ResizeImage_Image" ImageSource="/AmethystEngine;component/images/smol megumin.jpg" />
 					</Rectangle.Fill>
@@ -558,7 +608,7 @@
 				<TextBlock Text="+" Margin="0,0,1,2" VerticalAlignment="Center"/>
 			</Button>
 			<ContentControl x:Name="ContentLibrary_Control" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
-               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" Margin="0,46,0,-1" Template="{DynamicResource LevelEditorTileMap_Template}">
+               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" Margin="0,46,0,-1" Template="{DynamicResource UIEditorObjects_Template}">
 				<Expander Header="Expander" Height="100" Width="100">
 					<Grid Background="#FFE5E5E5"/>
 				</Expander>
@@ -568,7 +618,7 @@
 			<Label x:Name="label4" Content="Properties" Foreground="White" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
 
-			<ContentControl x:Name="FullMapGrid_Control" Template="{DynamicResource LevelEditorProperty_Template}" Grid.Column="2" Grid.ColumnSpan="2"/>
+			<ContentControl x:Name="ObjectProperties_Control" Template="{DynamicResource UIEditorProperty_Template}" Grid.Column="2" Grid.ColumnSpan="2"/>
 
 			<ContentControl x:Name="EditorToolBar_CC" Grid.Column="1" Height="25" VerticalAlignment="Top" Margin="10,4,123,0"
 											Template="{DynamicResource LevelEditorTileMapToolBar_Template}"/>
@@ -671,7 +721,7 @@
 				<TabItem Header="Cutscene Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 					<Grid Background="Black" />
 				</TabItem>
-				<TabItem Header="UI Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
+				<TabItem  IsSelected="True" Header="UI Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 					<Grid Background="Black" />
 				</TabItem>
 				<TabItem Header="Particle Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
@@ -711,30 +761,12 @@
 			<Button x:Name="SceneViewAdd_BTN" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="AUTO" Content="Add +" 
 							Foreground="White" Background="#FF4F4F4F" Height="26" BorderThickness="0" Margin="0,0,1,0" Click="SceneViewAdd_BTN_Click"/>
 
-			<TreeView x:Name="SceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,25,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
-								 SelectedItemChanged="SceneExplorer_TreeView_SelectedItemChanged">
-				<TreeView.Resources>
-					<HierarchicalDataTemplate DataType="{x:Type Bix:Level}" ItemsSource="{Binding Layers}">
-						<StackPanel Orientation="Horizontal">
-							<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
-							<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="20" MaxHeight="15" />
-							<TextBlock Text="{Binding LevelName}" Foreground="White" />
-						</StackPanel>
-					</HierarchicalDataTemplate>
-					<DataTemplate DataType="{x:Type BixRen:SpriteLayer}">
-						<StackPanel Orientation="Horizontal">
-							<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
-							<TextBlock Text="{Binding LayerName}" Foreground="White" />
-						</StackPanel>
-					</DataTemplate>
-					<DataTemplate DataType="{x:Type BixRen:Sprite}">
-						<StackPanel Orientation="Horizontal">
-							<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
-							<TextBlock Text="{Binding Name}" Foreground="White" />
-						</StackPanel>
-					</DataTemplate>
-				</TreeView.Resources>
-			</TreeView>
+			<ContentControl x:Name="SceneExplorer_control" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,0,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch"
+											 Template="{DynamicResource LevelEditorSceneExplorer_Template}">
+				
+			</ContentControl>
+			
+			
 
 			<ListBox x:Name="SearchResultList" Grid.Column="1" HorizontalAlignment="Stretch" Margin="3,25,0,0" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
                Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" SelectionChanged="SearchResultList_SelectionChanged" ScrollViewer.VerticalScrollBarVisibility="Hidden" MouseDoubleClick="SearchResultList_MouseDoubleClick"

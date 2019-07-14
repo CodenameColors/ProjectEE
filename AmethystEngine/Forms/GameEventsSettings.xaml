@@ -45,9 +45,10 @@
 		<!--Game event layers-->
 		<Label Grid.Row="1" Grid.Column="0" Content="Game Event Layers" Foreground="White" Margin="5" VerticalAlignment="Top" HorizontalContentAlignment="Center" />
 		<ListBox x:Name="GameEventLayers_LB" Grid.Row="1" Grid.Column="0" Margin="5,30,5,5" Background="Transparent" Foreground="White" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectionChanged="GameEventLayers_LB_SelectionChanged">
+
 		</ListBox>
 
-		<TabControl x:Name="GameEvent_TC" Grid.Row="1" Grid.Column="1" Margin="5">
+		<TabControl x:Name="GameEvent_TC" Grid.Row="1" Grid.Column="1" Margin="5,5,5,88">
 			<TabItem Header="Game Event Settings" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 				<Grid Background="Black" >
 					<Grid.ColumnDefinitions>
@@ -98,7 +99,7 @@
 							</ComboBox>
 							<Label Content="File to Load:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="50,195,0,0" FontWeight="Thin"/>
 
-							
+
 
 						</Grid>
 
@@ -147,12 +148,13 @@
 						</Grid>
 
 					</ContentControl>
-					<Button Content="Add Event" Margin="254,329,249,67" Click="CreateNewGameEvent_Click" />
+					<Button Content="Add Event" Click="CreateNewGameEvent_Click" RenderTransformOrigin="-0.687,1.359" Margin="273,303,220,10" />
 				</Grid>
 			</TabItem>
 		</TabControl>
 
 		<GridSplitter HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1" Width="3" Background="#FF484848" />
+		<TextBlock x:Name="GameEventLog_TB" Grid.Column="1" HorizontalAlignment="Left" Margin="10,400,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Height="60" Width="582" Background="White" Foreground="Black"/>
 	</Grid>
 </Window>
 

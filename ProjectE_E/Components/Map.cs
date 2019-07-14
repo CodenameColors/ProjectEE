@@ -39,9 +39,6 @@ namespace ProjectE_E.Components
 		public List<CollisionTiles> CollisionTiles;
 
 		public Map(){
-
-			mapwidth = 1000;
-			mapheight = 1000;
 		}
 
 		public void LoadTileMaps(GraphicsDevice graphicsDevice, Level currentLevel)
@@ -88,15 +85,23 @@ namespace ProjectE_E.Components
 
 		public void GenerateLevel(Level level, GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
 		{
-			foreach(SpriteLayer spriteLayer in level.Layers)
+			foreach (SpriteLayer spriteLayer in level.Layers)
 			{
 				if (spriteLayer.layerType == LayerType.Tile)
 					GenerateTileMap(((int[,])spriteLayer.LayerObjects), graphicsDevice, spriteBatch);
 				else if (spriteLayer.layerType == LayerType.Sprite)
 					GenerateSprites(((List<Sprite>)spriteLayer.LayerObjects), graphicsDevice, spriteBatch);
 				else if (spriteLayer.layerType == LayerType.GameEvent)
+				{
 					GenerateGameEvents(((Tuple<int[,], List<GameEvent>>)spriteLayer.LayerObjects).Item1, ((Tuple<int[,], List<GameEvent>>)spriteLayer.LayerObjects).Item2);
+					FillDictLUT(((System.Tuple<int[,], List<GameEvent>>)spriteLayer.LayerObjects).Item2);
+				}
 			}
+
+			mapwidth = 40 * (int)level.GetProperty("xCells");
+			mapheight = 40 * (int)level.GetProperty("yCells");
+
+
 		}
 
 		public void GenerateTileMap(int[,] map, GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
@@ -239,7 +244,7 @@ namespace ProjectE_E.Components
 		public async Task<Level> GetLevelFromFile(String FilePath)
 		{
 			Level l = await Level.ImportLevelAsync(FilePath);
-			level = l; 
+			level = l;
 			return l;
 		}
 
