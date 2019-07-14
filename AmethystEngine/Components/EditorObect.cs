@@ -29,12 +29,9 @@ namespace AmethystEngine.Components
   public class EditorObject
   {
 
-
-		private ObservablePropertyDictionary _observableButtonStyles = null;
-
 		public Uri Thumbnail { get; set; }
     public String Name { get; set; }
-    public int width { get; set; }
+    public int Width { get; set; }
     public EObjectType EditObjType;
 
 		
@@ -59,7 +56,7 @@ namespace AmethystEngine.Components
         Name = desName;
         EditObjType = eot;
       }
-      width = 300;
+      Width = 300;
     }
 
 		public void SetThumbnail(String desimg, bool rel = true)
@@ -72,7 +69,7 @@ namespace AmethystEngine.Components
 			{
 				Thumbnail = new Uri(desimg, UriKind.Absolute);
 			}
-			width = 300;
+			Width = 300;
 		}
 
     public override string ToString()
