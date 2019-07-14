@@ -268,8 +268,10 @@ namespace BixBite
 		{
 			Level TempLevel = new Level();
 
-			XmlReaderSettings settings = new XmlReaderSettings();
-			settings.Async = true;
+			XmlReaderSettings settings = new XmlReaderSettings
+			{
+				Async = true
+			};
 			//Create the Level object from the file
 			using (XmlReader reader = XmlReader.Create(filename, settings))
 			{

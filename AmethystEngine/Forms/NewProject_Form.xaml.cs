@@ -113,7 +113,7 @@ namespace AmethystEngine.Forms
 
 		private void Browse_BTN_Click(object sender, RoutedEventArgs e)
 		{
-			String path = EngineEditor.getFilePath("Create New Project");
+			String path = EngineEditor.GetFilePath("Create New Project");
 
 			if (path == String.Empty || path == null)
 			{
