@@ -41,6 +41,9 @@ namespace ProjectE_E.Components.Cuprite
 		{
 			//get the level file!
 			Level NewLevel = Level.ImportLevel(FileName);
+
+			CurrentMap.ClearEventLUT(); //clear the dictionary LUT to make room for the new maps LUT vars.
+
 			//Create New Map
 			CurrentMap.level = NewLevel;
 			CurrentMap.LoadTileMaps(graphicsDevice, CurrentMap.level);
@@ -53,6 +56,9 @@ namespace ProjectE_E.Components.Cuprite
 		{
 			//get the level file!
 			Level NewLevel = Level.ImportLevel(FileName);
+
+			CurrentMap.ClearEventLUT(); //clear the dictionary LUT to make room for the new maps LUT vars.
+
 			//Create New Map
 			CurrentMap.level = NewLevel;
 			CurrentMap.LoadTileMaps(graphicsDevice, CurrentMap.level);

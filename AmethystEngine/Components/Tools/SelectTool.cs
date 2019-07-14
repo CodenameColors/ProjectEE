@@ -60,11 +60,11 @@ namespace AmethystEngine.Components.Tools
 		/// <param name="x">the x position of the mouse in relative origin to the canvas</param>
 		/// <param name="y">the y position of the mouse in relative origin to the canvas</param>
 		/// <returns>Returns the rectangle that the mouse has clicked on. NULL if not found.</returns>
-		public static ContentControl FindSpriteControl(Canvas backcanvas, List<ContentControl> LSprites, int zindex, int x, int y)
+		public static ContentControl FindSpriteControl(Canvas backcanvas, List<ContentControl> LSprites, int zindex, int x, int y, int xoff, int yoff)
 		{
 			foreach (ContentControl r in LSprites)
 			{
-				if (inContentControl(backcanvas, r, x, y))
+				if (inContentControl(backcanvas, r, x, y, xoff, yoff))
 				{
 					if (Canvas.GetZIndex(r as System.Windows.UIElement) == zindex)
 						return r;
@@ -88,11 +88,11 @@ namespace AmethystEngine.Components.Tools
 			return null;
 		}
 
-		public static Border FindBorder(Canvas backcavas, List<Border> GEBorders, int zindex, int x, int y)
+		public static Border FindBorder(Canvas backcavas, List<Border> GEBorders, int zindex, int x, int y, int xoff, int yoff)
 		{
 			foreach (Border item in GEBorders)
 			{
-				if(inBorder(backcavas, item, x, y))
+				if(inBorder(backcavas, item, x, y, xoff, yoff))
 				{ 
 					if(Canvas.GetZIndex(item) == zindex)
 						return item;
@@ -158,7 +158,7 @@ namespace AmethystEngine.Components.Tools
 		/// <param name="x"></param>
 		/// <param name="y"></param>
 		/// <returns></returns>
-		public static bool inContentControl(Canvas backcanvas, ContentControl bor, int x, int y)
+		public static bool inContentControl(Canvas backcanvas, ContentControl bor, int x, int y, int xoff, int yoff)
 		{
 			int left = (int)(Canvas.GetLeft(bor) * backcanvas.RenderTransform.Value.M11);
 			int right = left + (int)(bor.ActualWidth * backcanvas.RenderTransform.Value.M11);
@@ -179,7 +179,7 @@ namespace AmethystEngine.Components.Tools
 			return false;
 		}
 
-		public static bool inBorder(Canvas backcanvas, Border bor, int x, int y)
+		public static bool inBorder(Canvas backcanvas, Border bor, int x, int y, int xoff, int yoff)
 		{
 			int left = (int)(Canvas.GetLeft(bor) * backcanvas.RenderTransform.Value.M11);
 			int right = left + (int)(bor.ActualWidth * backcanvas.RenderTransform.Value.M11);

@@ -107,7 +107,7 @@ namespace ProjectE_E
 
 			Load_async();
 
-			Thread.Sleep(System.TimeSpan.FromMilliseconds(50));
+			Thread.Sleep(System.TimeSpan.FromMilliseconds(100));
 
 			map.LoadTileMaps(this.GraphicsDevice, map.level);
 			map.LoadSprites(this.GraphicsDevice, map.level);
@@ -117,7 +117,7 @@ namespace ProjectE_E
 			Player.Load(this.Content);
 			// TODO: use this.Content to load your game content here
 
-			C_map.level = Level.ImportLevel("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\Levels\\LevelChangeTestNew.lvl");
+			//C_map.level = Level.ImportLevel("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\Levels\\LevelChangeTestNew.lvl");
 
 		}
 
@@ -181,38 +181,38 @@ namespace ProjectE_E
 					}
 				}
 			}
-				if (map != null)
+			if (map != null)
 			{
 				camera.Update(Player.Position, map.Width, map.Height);
-				if (Player.Position.Y > 1000)
-				{
-					map.UnloadMap();
-					map = null;
-				}
+				//if (Player.Position.Y > 1000)
+				//{
+				//	map.UnloadMap();
+				//	map = null;
+				//}
 			}
 			else
 			{
 				camera.Update(Player.Position, 0, 0);
 			}
 			//}
-			if (Keyboard.GetState().IsKeyDown(Keys.T)) {
-				foreach (SpriteLayer sl in map.level.Layers) {
-					if (sl.layerType == LayerType.GameEvent) {
-						map.FillDictLUT(((System.Tuple<int[,], List<GameEvent>>)sl.LayerObjects).Item2);
-					}
-					System.Console.WriteLine("T DOWN");
-				}
-				Player.SetPosition(0, 0);
-			}
+			//if (Keyboard.GetState().IsKeyDown(Keys.T)) {
+			//	foreach (SpriteLayer sl in map.level.Layers) {
+			//		if (sl.layerType == LayerType.GameEvent) {
+			//			map.FillDictLUT(((System.Tuple<int[,], List<GameEvent>>)sl.LayerObjects).Item2);
+			//		}
+			//		System.Console.WriteLine("T DOWN");
+			//	}
+			//	Player.SetPosition(0, 0);
+			//}
 
-			if (Keyboard.GetState().IsKeyDown(Keys.M))
-			{
-				map = C_map;
-				map.LoadTileMaps(this.GraphicsDevice, map.level);
-				map.LoadSprites(this.GraphicsDevice, map.level);
-				map.GenerateLevel(map.level, this.GraphicsDevice, spriteBatch);
-				System.Console.WriteLine("M DOWN");
-			}
+			//if (Keyboard.GetState().IsKeyDown(Keys.M))
+			//{
+			//	map = C_map;
+			//	map.LoadTileMaps(this.GraphicsDevice, map.level);
+			//	map.LoadSprites(this.GraphicsDevice, map.level);
+			//	map.GenerateLevel(map.level, this.GraphicsDevice, spriteBatch);
+			//	System.Console.WriteLine("M DOWN");
+			//}
 
 			base.Update(gameTime);
 		}
@@ -225,8 +225,8 @@ namespace ProjectE_E
 		{
 			GraphicsDevice.Clear(Color.Black);
 
-			//SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform
-			spriteBatch.Begin();
+			
+			spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform);
 			//spriteBatch.Draw(t2, new Vector2(0, 0));
 			if(map != null)
 				map.Draw(spriteBatch);
