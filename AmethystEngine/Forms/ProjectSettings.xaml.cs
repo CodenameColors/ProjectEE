@@ -102,10 +102,12 @@ namespace AmethystEngine.Forms
 
 		private void ChangeThumbnail_BTN_Click(object sender, RoutedEventArgs e)
 		{
-			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-			dlg.Title = "Choose New Thumbnail";
-			dlg.DefaultExt = "png file(*.png)|*.png"; //default file extension
-			dlg.Filter = "Image Files|*.png;*";
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+			{
+				Title = "Choose New Thumbnail",
+				DefaultExt = "png file(*.png)|*.png", //default file extension
+				Filter = "Image Files|*.png;*"
+			};
 
 			// Show save file dialog box
 			Nullable<bool> result = dlg.ShowDialog();
