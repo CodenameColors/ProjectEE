@@ -46,6 +46,14 @@ namespace AmethystEngine.Forms
 		Gameevent,
 	}
 
+	public enum NewUITool
+	{
+		NONE,
+		Textbox,
+		CheckBox,
+
+	}
+
 	public class LevelEditorProp
   {
     public String PropertyName { get; set; }
@@ -107,6 +115,10 @@ namespace AmethystEngine.Forms
 		#endregion
 		#endregion
 
+		#region UIEditorVars
+		NewUITool CurrentNewUI = NewUITool.NONE;
+		#endregion
+
 		TreeView SceneExplorer_TreeView = new TreeView();
 		ListBox EditorObjects_LB = new ListBox();
 
@@ -143,7 +155,7 @@ namespace AmethystEngine.Forms
 			TileMapTiles_Rect = (Rectangle)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB_Rect", ContentLibrary_Control);
 			TileMap_VB = (VisualBrush)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB", ContentLibrary_Control);
 			TileMapGrid_Rect = (Rectangle)ContentLibrary_Control.Template.FindName("TileMapGrid_Rect", ContentLibrary_Control);
-			SceneExplorer_TreeView = (TreeView)SceneExplorer_control.Template.FindName("SceneExplorer_TreeView", SceneExplorer_control);
+			SceneExplorer_TreeView = (TreeView)SceneExplorer_Control.Template.FindName("SceneExplorer_TreeView", SceneExplorer_Control);
 
 			OpenLevels = new ObservableCollection<Level>();
 
@@ -488,7 +500,9 @@ namespace AmethystEngine.Forms
       {
         ContentLibrary_Control.Template = (ControlTemplate)this.Resources["LevelEditorTileMap_Template"];
 				ObjectProperties_Control.Template = (ControlTemplate)this.Resources["LevelEditorProperty_Template"];
-				SceneExplorer_control.Template = (ControlTemplate)this.Resources["LevelEditorSceneExplorer_Template"];
+				SceneExplorer_Control.Template = (ControlTemplate)this.Resources["LevelEditorSceneExplorer_Template"];
+				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["LevelEditorTileMapToolBar_Template"];
+
 
 				UpdateLayout(); //update the templates to the ptrs won't be null! :D
 				//Find and set level editor controls!
@@ -501,14 +515,16 @@ namespace AmethystEngine.Forms
 				TileMapTiles_Rect = (Rectangle)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB_Rect", ContentLibrary_Control);
 				TileMap_VB = (VisualBrush)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB", ContentLibrary_Control);
 				TileMapGrid_Rect = (Rectangle)ContentLibrary_Control.Template.FindName("TileMapGrid_Rect", ContentLibrary_Control);
-				SceneExplorer_TreeView = (TreeView)SceneExplorer_control.Template.FindName("SceneExplorer_TreeView", SceneExplorer_control);
+				SceneExplorer_TreeView = (TreeView)SceneExplorer_Control.Template.FindName("SceneExplorer_TreeView", SceneExplorer_Control);
 
 			}
       else if(EditorWindows_TC.SelectedIndex == 4)
       {
 				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["UIEditorObjects_Template"];
 				ObjectProperties_Control.Template = (ControlTemplate)this.Resources["UIEditorProperty_Template"];
-				SceneExplorer_control.Template = (ControlTemplate)this.Resources["UIEditorSceneExplorer"];
+				if(SceneExplorer_Control != null)
+					SceneExplorer_Control.Template = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
+				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["UIEditorObjectExplorer_Template"];
 
 			}
     }
@@ -1395,7 +1411,7 @@ namespace AmethystEngine.Forms
       int MainCurCellsY = ((int)Math.Ceiling(LevelEditor_BackCanvas.ActualHeight / Canvas_grid.Viewport.Height));
 
 
-			FullMapLEditor_Canvas.Children.RemoveAt(0);
+			//FullMapLEditor_Canvas.Children.RemoveAt(0);
 
 			FullMapSelection_Rect = new Rectangle() { Width = MainCurCellsX * 10, Height = MainCurCellsY * 10, Stroke = Brushes.White, StrokeThickness = 1, Name = "SelectionRect" };
       Canvas.SetLeft(FullMapSelection_Rect, 0); Canvas.SetTop(FullMapSelection_Rect, 0);
@@ -2968,6 +2984,38 @@ namespace AmethystEngine.Forms
 
 		}
 		#endregion
+
+		private void UIEditoGameTB_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			CurrentNewUI = NewUITool.Textbox; 
+		}
+
+		private void UICanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+
+		}
+
+		private void UIEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+		{
+
+		}
+
+		private void UIEditor_BackCanvas_MouseMove(object sender, MouseEventArgs e)
+		{
+			Point p = Mouse.GetPosition(LevelEditor_BackCanvas);
+			String point = String.Format("({0}, {1}) OFF:({2}, {3})", (int)p.X, (int)p.Y, (int)Canvas_grid.Viewport.X, (int)Canvas_grid.Viewport.Y);
+			LevelEditorCords_TB.Text = point;
+
+			//which way is mouse moving?
+			MPos -= (Vector)e.GetPosition(LevelEditor_Canvas);
+			
+			//is the middle mouse button down?
+			if (e.MiddleButton == MouseButtonState.Pressed)
+			{
+				//LevelEditorPan();
+			}
+
+		}
 	}
 }
 

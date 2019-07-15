@@ -84,6 +84,49 @@
 			</DataTemplate>
 
 
+			<ControlTemplate x:Key="UIEditorObjectExplorer_Template">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition/>
+						<ColumnDefinition Width="Auto" MinWidth="44"/>
+						<ColumnDefinition Width="Auto" MinWidth="292"/>
+					</Grid.ColumnDefinitions>
+
+					<Menu DockPanel.Dock="Top" Grid.Column="0" Background="Transparent" Foreground="White" VerticalAlignment="Top" Margin="0,4,0,3" Height="18">
+						<MenuItem Header="UI" Foreground="White">
+							<MenuItem x:Name="NewLevel_MenuItem" Header="New UI" Foreground="Black"/>
+							<MenuItem Header="Open UI" Foreground="Black"/>
+							<MenuItem Header="Save UI" Foreground="Black"/>
+							<MenuItem Header="Save UI As" Foreground="Black"  />
+						</MenuItem>
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="1" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Draw" Click="LevelEditorSelection_Click"/>
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="2" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Selection" Click="LevelEditorSelection_Click"/>
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="3" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Deselect" Click="LevelEditorDeselect_Click"/>
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="4" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Move" Click="LevelEditorDeselect_Click"/>
+					</Menu>
+
+				</Grid>
+			</ControlTemplate>
+			
 
 			<!--<BixRes:ObservablePropertyDictionary x:Key="PropertyStyles"/>-->
 			<!--#region EdtiorToolbars-->
@@ -213,8 +256,20 @@
 
 			<!--#endregion-->
 
-			<ControlTemplate x:Key="UIEditorObjects_Template">
-				
+			<ControlTemplate x:Key="UIEditorObjects_Template" >
+				<Grid x:Name="LevelEditorTileMap_ToolBar_Grid" Background="#FF2B2B2B" VerticalAlignment="Stretch" Margin="5,4,10,8">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="75"/>
+						<RowDefinition Height="75"/>
+						<RowDefinition Height="75"/>
+						<RowDefinition Height="75"/>
+						<RowDefinition Height="75"/>
+						<RowDefinition Height="75"/>
+					</Grid.RowDefinitions>
+
+					<Button x:Name="UIEditoGameTB_BTN" Grid.Row="0" Content="Textbox" Click="UIEditoGameTB_BTN_Click"/>
+
+				</Grid>
 			</ControlTemplate>
 			
 			<ControlTemplate x:Key="LevelEditorTileMap_Template">
@@ -289,9 +344,9 @@
 				</ListBox>
 			</ControlTemplate>
 
-			<ContentControl x:Key="UIEditorSceneExplorer">
+			<ControlTemplate x:Key="UIEditorSceneExplorer_Template">
 				
-			</ContentControl>
+			</ControlTemplate>
 			
 			<ControlTemplate x:Key="LevelEditorSceneExplorer_Template">
 				<TreeView x:Name="SceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,25,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
@@ -621,7 +676,7 @@
 			<ContentControl x:Name="ObjectProperties_Control" Template="{DynamicResource UIEditorProperty_Template}" Grid.Column="2" Grid.ColumnSpan="2"/>
 
 			<ContentControl x:Name="EditorToolBar_CC" Grid.Column="1" Height="25" VerticalAlignment="Top" Margin="10,4,123,0"
-											Template="{DynamicResource LevelEditorTileMapToolBar_Template}"/>
+											Template="{DynamicResource UIEditorObjectExplorer_Template}"/>
 
 			<!--This is the main editor window-->
 
@@ -722,7 +777,19 @@
 					<Grid Background="Black" />
 				</TabItem>
 				<TabItem  IsSelected="True" Header="UI Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
-					<Grid Background="Black" />
+					<Grid Background="Black" >
+						<Canvas Grid.Row="0" x:Name="UIEditor_BackCanvas" IsHitTestVisible="True" Grid.Column="0" MouseLeftButtonDown="UICanvas_MouseLeftButtonDown" 
+										ClipToBounds="True" MouseLeftButtonUp="UIEditor_BackCanvas_MouseLeftButtonUp" MouseMove="UIEditor_BackCanvas_MouseMove">
+							<Canvas.Background>
+								<VisualBrush x:Name="UICanvas_grid" TileMode="Tile" Stretch="Uniform" Viewport="0,0,40,40" ViewportUnits="Absolute" >
+									<VisualBrush.Visual>
+										<Rectangle Width="40" Height="40" Fill="Black" Stroke="Gray" StrokeThickness=".4" />
+									</VisualBrush.Visual>
+								</VisualBrush>
+							</Canvas.Background>
+							<Canvas x:Name="UIEditor_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+						</Canvas>
+					</Grid>
 				</TabItem>
 				<TabItem Header="Particle Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 					<Grid Background="Black" />
@@ -761,7 +828,7 @@
 			<Button x:Name="SceneViewAdd_BTN" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="AUTO" Content="Add +" 
 							Foreground="White" Background="#FF4F4F4F" Height="26" BorderThickness="0" Margin="0,0,1,0" Click="SceneViewAdd_BTN_Click"/>
 
-			<ContentControl x:Name="SceneExplorer_control" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,0,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch"
+			<ContentControl x:Name="SceneExplorer_Control" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,0,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch"
 											 Template="{DynamicResource LevelEditorSceneExplorer_Template}">
 				
 			</ContentControl>
