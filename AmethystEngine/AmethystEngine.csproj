@@ -77,6 +77,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Components\Tools\Cuprite.cs" />
+    <Compile Include="DesignerItemDecorator.cs" />
     <Compile Include="Forms\GameEventsSettings.xaml.cs">
       <DependentUpon>GameEventsSettings.xaml</DependentUpon>
     </Compile>
@@ -84,6 +85,10 @@
       <DependentUpon>NewMapChange.xaml</DependentUpon>
     </Compile>
     <Compile Include="ResizeThumb.cs" />
+    <Compile Include="Resources\Adorners\ResizeRotateAdorner.cs" />
+    <Compile Include="Resources\Adorners\ResizeRotateChrome.cs" />
+    <Compile Include="Resources\Adorners\SizeAdorner.cs" />
+    <Compile Include="Resources\Adorners\SizeChrome.cs" />
     <Compile Include="Resources\ObservableStyleDictionary.cs" />
     <Compile Include="RotateThumb.cs" />
     <Page Include="Forms\EngineEditor.xaml">
@@ -143,7 +148,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Resources\ResizeRotateChrome.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Resources\RotateDecorator.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\SizeChrome.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

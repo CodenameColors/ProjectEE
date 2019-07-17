@@ -97,8 +97,10 @@ namespace AmethystEngine.Forms
 		int LEGridWidth = 40;
 		public double LEZoomLevel = 1;
 		public List<EditorObject> LESpriteObjectList = new List<EditorObject>();
+		private Sprite LESelectedSprite;
 		#endregion
 		#region LevelEditorUIPTRs
+		ContentControl LESelectedSpriteControl = new ContentControl();
 		Canvas MapLEditor_Canvas = new Canvas();
 		Canvas FullMapLEditor_Canvas = new Canvas();
 		VisualBrush FullMapLEditor_VB = new VisualBrush();
@@ -117,6 +119,7 @@ namespace AmethystEngine.Forms
 
 		#region UIEditorVars
 		NewUITool CurrentNewUI = NewUITool.NONE;
+		ContentControl SelectedUIControl;
 		#endregion
 
 		TreeView SceneExplorer_TreeView = new TreeView();
@@ -897,7 +900,7 @@ namespace AmethystEngine.Forms
 						Selector.AddUnselectedHandler(CC, Sprite_OnUnselected); //an event to call when we un select a sprite!
 						CC.MouseRightButtonDown += ContentControl_MouseLeftButtonDown;
 						var m = (CC.FindName("ResizeImage_rect"));
-						((Rectangle)CC.Content).Fill = new ImageBrush(img.Source) ;
+						((Rectangle)CC.Content).Fill = new ImageBrush(img.Source);
 						LevelEditor_Canvas.Children.Add(CC);
 
 						//add to minimap
@@ -1628,7 +1631,11 @@ namespace AmethystEngine.Forms
 			{
 				CurrentTool = EditorTool.Select;
 				Deselect();
+				if (SceneExplorer_TreeView.SelectedItem is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).layerType == LayerType.Sprite)
+					SetSpriteHitState(true);
 			}
+			if (SceneExplorer_TreeView.SelectedItem is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).layerType == LayerType.Sprite)
+				SetSpriteHitState(true);
 		}
 	
 		private void LevelEditorBrush_Click(object sender, RoutedEventArgs e)
@@ -2084,9 +2091,16 @@ namespace AmethystEngine.Forms
 
 					i++;
 				}
+
+				foreach (ContentControl cc in LevelEditor_Canvas.Children.OfType<ContentControl>().ToList())
+				{
+					cc.IsHitTestVisible = false;
+				}
+
 				LevelEditor_Canvas.Children.Clear();
 				FullMapLEditor_Canvas.Children.Clear();
 				RedrawLevel(CurrentLevel);
+				DeselectSprites();
 			}
 
 			if (e.NewValue is SpriteLayer)
@@ -2109,12 +2123,32 @@ namespace AmethystEngine.Forms
 					i++;
 				}
 
+				if (SL.layerType == LayerType.Sprite)
+					SetSpriteHitState(false);
+				else
+				{ SetSpriteHitState(false); DeselectSprites(); }
+
+
 				//ListBox LB = ((ListBox)(ObjectProperties_Control.Template.FindName("LEditProperty_LB", ObjectProperties_Control)));
 				//LB.ItemsSource = null;
 				//LB.ItemsSource = LEditorTS;
 			}
+		}
 
+		private void DeselectSprites(bool b = false)
+		{
+			foreach (ContentControl cc in LevelEditor_Canvas.Children.OfType<ContentControl>().ToList())
+			{
+				Selector.SetIsSelected(cc, b);
+			}
+		}
 
+		private void SetSpriteHitState(bool b)
+		{
+			foreach (ContentControl cc in LevelEditor_Canvas.Children.OfType<ContentControl>().ToList())
+			{
+				cc.IsHitTestVisible = b;
+			}
 		}
 
 		private void RedrawLevel(Level LevelToDraw)
@@ -2987,7 +3021,16 @@ namespace AmethystEngine.Forms
 
 		private void UIEditoGameTB_BTN_Click(object sender, RoutedEventArgs e)
 		{
-			CurrentNewUI = NewUITool.Textbox; 
+			CurrentNewUI = NewUITool.Textbox;
+			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+			CC.HorizontalAlignment = HorizontalAlignment.Center;
+			CC.VerticalAlignment = VerticalAlignment.Center;
+
+			//((Rectangle)CC.Content).Fill = new ImageBrush(img.Source);
+			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray });
+			((Grid)CC.Content).Children.Add(new TextBox() { Margin = new Thickness(2), IsHitTestVisible = false });
+
+			UIEditor_Canvas.Children.Add(CC);
 		}
 
 		private void UICanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -3015,6 +3058,101 @@ namespace AmethystEngine.Forms
 				//LevelEditorPan();
 			}
 
+		}
+
+		private void ContentControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			if (EditorWindows_TC.SelectedIndex == 0)
+			{
+				if (CurrentTool == EditorTool.Select)
+				{
+					if (LESelectedSpriteControl != null) Selector.SetIsSelected(LESelectedSpriteControl, false);
+					LESelectedSpriteControl = (ContentControl)sender;
+					Selector.SetIsSelected(LESelectedSpriteControl, true);
+
+					LESelectedSprite = SelectTool.FindSprite(((List<Sprite>)((SpriteLayer)SceneExplorer_TreeView.SelectedItem).LayerObjects), LESelectedSpriteControl);
+
+					Point point = new Point(Canvas.GetLeft(LESelectedSpriteControl), Canvas.GetTop(LESelectedSpriteControl));
+					Console.WriteLine(point.ToString());
+				}
+			}
+			else if(EditorWindows_TC.SelectedIndex == 4)
+			{
+				if (SelectedUIControl != null) Selector.SetIsSelected(SelectedUIControl, false);
+				SelectedUIControl = (ContentControl)sender;
+				Selector.SetIsSelected(SelectedUIControl, true);
+			}
+		}
+
+		private void ContentControl_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+		{
+			if (CurrentTool == EditorTool.Select)
+			{
+				Point point = new Point(Canvas.GetLeft((ContentControl)sender), Canvas.GetTop((ContentControl)sender));
+				LESelectedSprite.SetProperty("x", (int)point.X);
+				LESelectedSprite.SetProperty("y", (int)point.Y);
+				Console.WriteLine(point.ToString()+ "MUP");
+			}
+		}
+
+		private void ContentControl_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			if (CurrentTool == EditorTool.Select)
+			{
+				LESelectedSprite.SetProperty("width", (int)((ContentControl)sender).Width);
+				LESelectedSprite.SetProperty("height", (int)((ContentControl)sender).Height);
+				Console.WriteLine("SpriteSizeChanged");
+			}
+		}
+
+		private void NewUI_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+			CC.HorizontalAlignment = HorizontalAlignment.Center;
+			CC.VerticalAlignment = VerticalAlignment.Center;
+
+			//((Rectangle)CC.Content).Fill = new ImageBrush(img.Source);
+			((Grid)CC.Content).Children.Add(new Border() { BorderThickness=new Thickness(2), BorderBrush=Brushes.Gray});
+
+
+			UIEditor_Canvas.Children.Add(CC);
+		}
+
+		private void ContentControl_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			SelectedUIControl = (ContentControl)sender;
+		}
+
+		private void ContentControl_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+		{
+			ContextMenu cm = this.FindResource("EditMovableControls_Template") as ContextMenu;
+			//((MenuItem)cm.Items[0]).IsChecked = ((MenuItem)cm.Items[0]).IsChecked;
+			cm.PlacementTarget = sender as ContentControl;
+			cm.IsOpen = true;
+		}
+
+		private void EditMoveableControl_Click(object sender, RoutedEventArgs e)
+		{
+			((MenuItem)sender).IsChecked = !SelectedUIControl.IsHitTestVisible;
+			foreach (UIElement item in ((Grid)SelectedUIControl.Content).Children)
+			{
+				item.IsHitTestVisible = !item.IsHitTestVisible;
+			}
+		}
+
+		private void UIEditoGameIMG_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+			CC.HorizontalAlignment = HorizontalAlignment.Center;
+			CC.VerticalAlignment = VerticalAlignment.Center;
+
+			CC.Tag = "IMAGE";
+
+			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray });
+			((Grid)CC.Content).Children.Add(new Rectangle() { });
+			
+
+			UIEditor_Canvas.Children.Add(CC);
 		}
 	}
 }

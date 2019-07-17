@@ -54,6 +54,11 @@
 				<Setter Property="FontSize" Value="12" />
 			</Style>
 
+			<ContextMenu x:Key="EditMovableControls_Template">
+				<MenuItem x:Name="Edit_CM" IsChecked="False" Header="Edit" Click="EditMoveableControl_Click">
+				</MenuItem>
+			</ContextMenu>
+			
 			<ContextMenu x:Key="LevelContextMenu_Template">
 				<MenuItem Header="Add Tile Layer" Click="AddTileLayer_Click"/>
 				<MenuItem Header="Add Sprite Layer" Click="SpriteLayer_Click" />
@@ -105,7 +110,7 @@
 
 					<Menu DockPanel.Dock="Top" Grid.Column="0" Background="Transparent" Foreground="White" VerticalAlignment="Top" Margin="0,4,0,3" Height="18">
 						<MenuItem Header="UI" Foreground="White">
-							<MenuItem x:Name="NewLevel_MenuItem" Header="New UI" Foreground="Black"/>
+							<MenuItem x:Name="NewLevel_MenuItem" Header="New UI" Foreground="Black" Click="NewUI_BTN_Click"/>
 							<MenuItem Header="Open UI" Foreground="Black"/>
 							<MenuItem Header="Save UI" Foreground="Black"/>
 							<MenuItem Header="Save UI As" Foreground="Black"  />
@@ -268,6 +273,7 @@
 					</Grid.RowDefinitions>
 
 					<Button x:Name="UIEditoGameTB_BTN" Grid.Row="0" Content="Textbox" Click="UIEditoGameTB_BTN_Click"/>
+					<Button x:Name="UIEditoGameIMG_BTN" Grid.Row="1" Content="Image Box" Click="UIEditoGameIMG_BTN_Click"/>
 
 				</Grid>
 			</ControlTemplate>
@@ -349,7 +355,7 @@
 			</ControlTemplate>
 			
 			<ControlTemplate x:Key="LevelEditorSceneExplorer_Template">
-				<TreeView x:Name="SceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,25,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
+				<TreeView x:Name="SceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,0,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
 								 SelectedItemChanged="SceneExplorer_TreeView_SelectedItemChanged">
 					<TreeView.Resources>
 						<HierarchicalDataTemplate DataType="{x:Type Bix:Level}" ItemsSource="{Binding Layers}">
@@ -544,18 +550,37 @@
 											Height="130"
 											Canvas.Top="150"
 											Canvas.Left="470"
-											Selector.IsSelected="False"
+											SizeChanged="ContentControl_SizeChanged"
+											PreviewMouseLeftButtonDown="ContentControl_PreviewMouseLeftButtonDown"
+											PreviewMouseLeftButtonUp="ContentControl_PreviewMouseLeftButtonUp"
 											Selector.Unselected="Sprite_OnUnselected"
-											MouseLeftButtonUp="Sprite_MouseLeftButtonUp"
-											Style="{DynamicResource DesignerItemStyle}" 
-											MouseLeftButtonDown="ContentControl_MouseLeftButtonDown" Selector.SelectionChanged="ContentControl_SelectionChanged">
+											Style="{DynamicResource DesignerItemStyle}" >
 				<Rectangle x:Name="ResizeImage_rect" IsHitTestVisible="True" 
 										Stretch="Fill" MouseLeftButtonDown="Sprite_MouseLeftButtonDown" 
 									  >
-					<Rectangle.Fill>
+					<!--<Rectangle.Fill>
 						<ImageBrush x:Name="ResizeImage_Image" ImageSource="/AmethystEngine;component/images/smol megumin.jpg" />
-					</Rectangle.Fill>
+					</Rectangle.Fill>-->
 				</Rectangle>
+			</ContentControl>
+
+
+			<ContentControl x:Key="MoveableControls_Template"
+											x:Shared="False" 
+											Width="130"
+											Height="130"
+											Canvas.Top="150"
+											Canvas.Left="470"
+											SizeChanged="ContentControl_SizeChanged"
+											PreviewMouseRightButtonUp="ContentControl_PreviewMouseRightButtonUp"	
+											PreviewMouseLeftButtonDown="ContentControl_PreviewMouseLeftButtonDown"
+											PreviewMouseLeftButtonUp="ContentControl_PreviewMouseLeftButtonUp"
+											Selector.Unselected="Sprite_OnUnselected"
+											Style="{DynamicResource DesignerItemStyle}" PreviewMouseRightButtonDown="ContentControl_PreviewMouseRightButtonDown" >
+				<Grid x:Name="ResizeControl_Grid" IsHitTestVisible="True" 
+										MouseLeftButtonDown="Sprite_MouseLeftButtonDown" 
+									  >
+				</Grid>
 			</ContentControl>
 
 
@@ -828,7 +853,7 @@
 			<Button x:Name="SceneViewAdd_BTN" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="AUTO" Content="Add +" 
 							Foreground="White" Background="#FF4F4F4F" Height="26" BorderThickness="0" Margin="0,0,1,0" Click="SceneViewAdd_BTN_Click"/>
 
-			<ContentControl x:Name="SceneExplorer_Control" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,0,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch"
+			<ContentControl x:Name="SceneExplorer_Control" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,26,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch"
 											 Template="{DynamicResource LevelEditorSceneExplorer_Template}">
 				
 			</ContentControl>
