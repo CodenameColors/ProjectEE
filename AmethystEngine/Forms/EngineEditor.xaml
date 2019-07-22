@@ -7,6 +7,7 @@
         xmlns:local="clr-namespace:AmethystEngine" 
 				xmlns:Bix="clr-namespace:BixBite;assembly=BixBite"
 				xmlns:BixRen="clr-namespace:BixBite.Rendering;assembly=BixBite"
+				xmlns:BixUI="clr-namespace:BixBite.Rendering.UI;assembly=BixBite"
 				xmlns:BixRes="clr-namespace:BixBite.Resources;assembly=BixBite"
 				xmlns:src="clr-namespace:AmethystEngine.Resources"
 				xmlns:WpfToolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
@@ -113,7 +114,7 @@
 							<MenuItem x:Name="NewLevel_MenuItem" Header="New UI" Foreground="Black" Click="NewUI_BTN_Click"/>
 							<MenuItem Header="Open UI" Foreground="Black"/>
 							<MenuItem Header="Save UI" Foreground="Black"/>
-							<MenuItem Header="Save UI As" Foreground="Black"  />
+							<MenuItem Header="Save UI As" Foreground="Black" Click="SaveUIAs_Click"  />
 						</MenuItem>
 					</Menu>
 					<Menu DockPanel.Dock="Top" Grid.Column="1" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
@@ -351,11 +352,28 @@
 			</ControlTemplate>
 
 			<ControlTemplate x:Key="UIEditorSceneExplorer_Template">
-				
+				<TreeView x:Name="UISceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,0,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
+								 SelectedItemChanged="UISceneExplorer_TreeView_SelectedItemChanged" Loaded="UISceneExplorer_TreeView_Loaded">
+					<TreeView.Resources>
+						<HierarchicalDataTemplate DataType="{x:Type BixUI:GameUI}" ItemsSource="{Binding UIElements}">
+							<StackPanel Orientation="Horizontal">
+								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
+								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="20" MaxHeight="15" />
+								<TextBlock Text="{Binding UIName}" Foreground="White" />
+							</StackPanel>
+						</HierarchicalDataTemplate>
+						<DataTemplate DataType="{x:Type BixUI:GameTextBox}">
+							<StackPanel Orientation="Horizontal">
+								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
+								<TextBlock Text="{Binding TBName}" Foreground="White" />
+							</StackPanel>
+						</DataTemplate>
+					</TreeView.Resources>
+				</TreeView>
 			</ControlTemplate>
 			
 			<ControlTemplate x:Key="LevelEditorSceneExplorer_Template">
-				<TreeView x:Name="SceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,0,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
+				<TreeView x:Name="LESceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,0,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
 								 SelectedItemChanged="SceneExplorer_TreeView_SelectedItemChanged">
 					<TreeView.Resources>
 						<HierarchicalDataTemplate DataType="{x:Type Bix:Level}" ItemsSource="{Binding Layers}">
@@ -378,12 +396,14 @@
 							</StackPanel>
 						</DataTemplate>
 					</TreeView.Resources>
-				</TreeView>
+				</TreeView>	
 			</ControlTemplate>
 			
 			
 			<ControlTemplate x:Key="UIEditorProperty_Template">
-				
+				<pgrid:PropGrid x:Name="UIPropertyGrid" Margin="0,54,0,0">
+					
+				</pgrid:PropGrid>
 			</ControlTemplate>
 			
 			<ControlTemplate x:Key="LevelEditorProperty_Template">
@@ -576,7 +596,7 @@
 											PreviewMouseLeftButtonDown="ContentControl_PreviewMouseLeftButtonDown"
 											PreviewMouseLeftButtonUp="ContentControl_PreviewMouseLeftButtonUp"
 											Selector.Unselected="Sprite_OnUnselected"
-											Style="{DynamicResource DesignerItemStyle}" PreviewMouseRightButtonDown="ContentControl_PreviewMouseRightButtonDown" >
+											Style="{DynamicResource DesignerItemStyle}" PreviewMouseRightButtonDown="ContentControl_PreviewMouseRightButtonDown" PreviewMouseMove="ContentControl_PreviewMouseMove" >
 				<Grid x:Name="ResizeControl_Grid" IsHitTestVisible="True" 
 										MouseLeftButtonDown="Sprite_MouseLeftButtonDown" 
 									  >
@@ -854,7 +874,7 @@
 							Foreground="White" Background="#FF4F4F4F" Height="26" BorderThickness="0" Margin="0,0,1,0" Click="SceneViewAdd_BTN_Click"/>
 
 			<ContentControl x:Name="SceneExplorer_Control" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,26,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch"
-											 Template="{DynamicResource LevelEditorSceneExplorer_Template}">
+											 Template="{DynamicResource UIEditorSceneExplorer_Template}">
 				
 			</ContentControl>
 			

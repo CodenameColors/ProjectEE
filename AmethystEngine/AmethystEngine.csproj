@@ -202,5 +202,12 @@
     <Resource Include="images\winter.png" />
     <Resource Include="images\__pluse_and_minun___by_celsius_ice_rose.jpg" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\SmallTextBubble_Orange.png" />
+    <Resource Include="images\SmallTextBubble_Purple.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\emma_colors_oc.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

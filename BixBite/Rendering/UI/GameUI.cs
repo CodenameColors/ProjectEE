@@ -1,10 +1,13 @@
 ﻿using BixBite.Resources;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Xml;
 
 namespace BixBite.Rendering.UI
 {
@@ -12,16 +15,18 @@ namespace BixBite.Rendering.UI
 	{
 		public String UIName { get; set; }
 		protected ObservableDictionary<string, object> Properties { get; set; }
-		private List<GameUI> UIElements = new List<GameUI>();
+		public ObservableCollection<GameUI> UIElements { get; set; }
 
-		public GameUI(String UIName, int Width, int Height, String BackgroundPath = "")
+		public GameUI(String UIName, int Width, int Height, int Zindex, String BackgroundPath = "")
 		{
 			Properties = new ObservableDictionary<string, object>();
-
+			UIElements = new ObservableCollection<GameUI>();
 			this.UIName = UIName;
+			AddProperty("Name", UIName);
 			AddProperty("Width", Width);
 			AddProperty("Height", Height);
 			AddProperty("Background", BackgroundPath);
+			AddProperty("Zindex", Zindex);
 		}
 
 		#region Properties
@@ -63,13 +68,35 @@ namespace BixBite.Rendering.UI
 		#endregion
 
 		#region PropertiesCallBack
-		public void PropertyCallback(object sender, System.Windows.RoutedEventArgs e)
+		public virtual void PropertyCallback(object sender, System.Windows.RoutedEventArgs e)
 		{
-
+			Console.WriteLine("Main UI Callback");
 		}
+
+		public virtual void PropertyCallbackTB(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter)
+			{
+				//base.PropertyCallback(sender, e);
+				Console.WriteLine("GAMETB UI CALLBACK");
+				Console.WriteLine(((TextBox)sender).Tag.ToString());
+
+				String Property = ((TextBox)sender).Tag.ToString();
+				if (Properties.ContainsKey(Property))
+				{
+					SetProperty(Property, ((TextBox)sender).Text);
+					if (Property == "FontSize")
+					{
+						//((TextBox)sender).FontSize = Int32.Parse(((TextBox)sender).Text);
+					}
+				}
+			}
+		}
+
+
 		#endregion
 
-		public List<GameUI> GetUIelements()
+		public ObservableCollection<GameUI> GetUIelements()
 		{
 			return UIElements;
 		}
@@ -97,6 +124,50 @@ namespace BixBite.Rendering.UI
 			if (UIElements.Contains(gameUI)){
 				UIElements.Remove(gameUI);
 			}
+		}
+
+		public void ExportUI(String FilePath)
+		{
+			XmlWriterSettings settings = new XmlWriterSettings
+			{
+				Indent = true,
+				IndentChars = "  ",
+				NewLineChars = "\r\n",
+				NewLineHandling = NewLineHandling.Replace
+
+			};
+			//settings.Async = true;
+			//settings.NewLineHandling = NewLineHandling.Entitize;
+
+			using (XmlWriter writer = XmlWriter.Create(FilePath, settings))
+			{
+				//create the GameUI (Main)
+				writer.WriteStartElement(null, "GameUI", null);
+				//all the properties...
+				for(int i = 0; i < getProperties().Count; i++)
+				{
+					writer.WriteAttributeString(null, getProperties().Keys.ToList()[i].ToString(), null, getProperties().Values.ToList()[i].ToString());
+				}
+
+				//child UI
+				foreach (GameUI childUI in UIElements)
+				{
+					if(childUI is GameTextBox)
+					writer.WriteStartElement(null, "GameTextBox", null);
+					for (int i = 0; i < childUI.getProperties().Count; i++)
+					{
+						writer.WriteAttributeString(null, childUI.getProperties().Keys.ToList()[i].ToString(), null, childUI.getProperties().Values.ToList()[i].ToString());
+					}
+					writer.WriteEndElement();//end child UI
+				}
+
+				writer.WriteEndElement();//end base ui
+			}
+		}
+
+		public static GameUI ImportGameUI(String FileName)
+		{
+			throw new NotImplementedException();
 		}
 
 	}

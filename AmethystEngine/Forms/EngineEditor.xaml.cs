@@ -20,8 +20,8 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using BixBite.Resources;
 using PropertyGridEditor;
-
-
+using BixBite.Rendering.UI;
+using System.Threading;
 
 namespace AmethystEngine.Forms
 {
@@ -120,6 +120,10 @@ namespace AmethystEngine.Forms
 		#region UIEditorVars
 		NewUITool CurrentNewUI = NewUITool.NONE;
 		ContentControl SelectedUIControl;
+		//Dictionary<String, GameUI> OpenUIEdits = new Dictionary<string, GameUI>();
+		public ObservableCollection<GameUI> OpenUIEdits { get; set; }
+		GameUI CurrentOpenUI;
+		Dictionary<String, GameUI> CurrentUIDictionary = new Dictionary<String, GameUI>();
 		#endregion
 
 		TreeView SceneExplorer_TreeView = new TreeView();
@@ -158,10 +162,10 @@ namespace AmethystEngine.Forms
 			TileMapTiles_Rect = (Rectangle)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB_Rect", ContentLibrary_Control);
 			TileMap_VB = (VisualBrush)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB", ContentLibrary_Control);
 			TileMapGrid_Rect = (Rectangle)ContentLibrary_Control.Template.FindName("TileMapGrid_Rect", ContentLibrary_Control);
-			SceneExplorer_TreeView = (TreeView)SceneExplorer_Control.Template.FindName("SceneExplorer_TreeView", SceneExplorer_Control);
+			SceneExplorer_TreeView = (TreeView)SceneExplorer_Control.Template.FindName("LESceneExplorer_TreeView", SceneExplorer_Control);
 
 			OpenLevels = new ObservableCollection<Level>();
-
+			OpenUIEdits = new ObservableCollection<GameUI>();
 
 			//PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
 			//LB.AddProperty("LevelName", new TextBox(), "Level1");
@@ -518,19 +522,36 @@ namespace AmethystEngine.Forms
 				TileMapTiles_Rect = (Rectangle)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB_Rect", ContentLibrary_Control);
 				TileMap_VB = (VisualBrush)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB", ContentLibrary_Control);
 				TileMapGrid_Rect = (Rectangle)ContentLibrary_Control.Template.FindName("TileMapGrid_Rect", ContentLibrary_Control);
-				SceneExplorer_TreeView = (TreeView)SceneExplorer_Control.Template.FindName("SceneExplorer_TreeView", SceneExplorer_Control);
-
+				SceneExplorer_TreeView = (TreeView)SceneExplorer_Control.Template.FindName("LESceneExplorer_TreeView", SceneExplorer_Control);
+				SceneExplorer_TreeView.ItemsSource = OpenLevels;
+				SceneExplorer_TreeView.Items.Refresh();
+				SceneExplorer_TreeView.UpdateLayout();
 			}
       else if(EditorWindows_TC.SelectedIndex == 4)
       {
 				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["UIEditorObjects_Template"];
 				ObjectProperties_Control.Template = (ControlTemplate)this.Resources["UIEditorProperty_Template"];
-				if(SceneExplorer_Control != null)
-					SceneExplorer_Control.Template = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
 				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["UIEditorObjectExplorer_Template"];
+				if (SceneExplorer_Control != null)
+				{
+					ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
+					SceneExplorer_Control.Template = cc;
+					Console.WriteLine(SceneExplorer_Control.Template.ToString());
+					TreeView tv = (TreeView)cc.FindName("UISceneExplorer_TreeView", SceneExplorer_Control); //(TreeView)SceneExplorer_Control.Template.FindName("UISceneExplorer_TreeView", SceneExplorer_Control);
+					if (tv == null) return;
+					SceneExplorer_TreeView = tv;
+					SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
+				}
+				
 
 			}
     }
+
+		public void RUnthisthis()
+		{
+
+		}
+
     #endregion
 
     #region "File/Folder Viewer"
@@ -3023,14 +3044,36 @@ namespace AmethystEngine.Forms
 		{
 			CurrentNewUI = NewUITool.Textbox;
 			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+			CC.Tag = "TextBox";
 			CC.HorizontalAlignment = HorizontalAlignment.Center;
 			CC.VerticalAlignment = VerticalAlignment.Center;
 
-			//((Rectangle)CC.Content).Fill = new ImageBrush(img.Source);
-			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray });
-			((Grid)CC.Content).Children.Add(new TextBox() { Margin = new Thickness(2), IsHitTestVisible = false });
 
+			String TB = "/AmethystEngine;component/images/SmallTextBubble_Purple.png";
+			String TB1 = "/AmethystEngine;component/images/SmallTextBubble_Orange.png";
+			ImageBrush ib = new ImageBrush();
+			Image img = new Image();
+			img.Stretch = Stretch.Fill;
+			img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+			img.IsHitTestVisible = false;
+			((Grid)CC.Content).Children.Add(img);
+			//((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = ib});
+			((Grid)CC.Content).Children.Add(new TextBox() { Text = "Sameple Text", Margin = new Thickness(2),
+				BorderBrush = Brushes.Transparent ,IsHitTestVisible = false, Background = Brushes.Transparent,
+				VerticalContentAlignment = VerticalAlignment.Center, HorizontalContentAlignment = HorizontalAlignment.Center,
+				FontSize = 24, Foreground = Brushes.White
+			});
+
+			int i = 1; String name = "NewTextBox";
+			while (CurrentUIDictionary.ContainsKey(name))
+			{
+
+				name += i++;
+			}
+			CC.Name = name;
 			UIEditor_Canvas.Children.Add(CC);
+			CurrentUIDictionary.Add(name, new GameTextBox(name, 50, 50, 0, 0, 1));
+			CurrentOpenUI.AddUIElement(CurrentUIDictionary.Values.Last());
 		}
 
 		private void UICanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -3097,23 +3140,39 @@ namespace AmethystEngine.Forms
 
 		private void ContentControl_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
-			if (CurrentTool == EditorTool.Select)
+			if (EditorWindows_TC.SelectedIndex == 0)
 			{
-				LESelectedSprite.SetProperty("width", (int)((ContentControl)sender).Width);
-				LESelectedSprite.SetProperty("height", (int)((ContentControl)sender).Height);
-				Console.WriteLine("SpriteSizeChanged");
+				if (CurrentTool == EditorTool.Select)
+				{
+					LESelectedSprite.SetProperty("width", (int)((ContentControl)sender).Width);
+					LESelectedSprite.SetProperty("height", (int)((ContentControl)sender).Height);
+					Console.WriteLine("SpriteSizeChanged");
+				}
 			}
 		}
 
 		private void NewUI_BTN_Click(object sender, RoutedEventArgs e)
 		{
+			ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
+			TreeView tv = (TreeView)cc.FindName("UISceneExplorer_TreeView", SceneExplorer_Control);
+			if (tv != null)
+			{
+				SceneExplorer_TreeView = tv;
+				SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
+			}
 			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
 			CC.HorizontalAlignment = HorizontalAlignment.Center;
 			CC.VerticalAlignment = VerticalAlignment.Center;
 
 			//((Rectangle)CC.Content).Fill = new ImageBrush(img.Source);
 			((Grid)CC.Content).Children.Add(new Border() { BorderThickness=new Thickness(2), BorderBrush=Brushes.Gray});
+			CC.Tag = "Border";
+			
+			OpenUIEdits.Add(new GameUI("NewUITool", 50, 50, 1));
+			CurrentOpenUI = OpenUIEdits.Last();
+			CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
 
+			CC.Name = OpenUIEdits.Last().UIName;
 
 			UIEditor_Canvas.Children.Add(CC);
 		}
@@ -3121,7 +3180,38 @@ namespace AmethystEngine.Forms
 		private void ContentControl_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			SelectedUIControl = (ContentControl)sender;
+
+			int i = 0;
+			PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("UIPropertyGrid", ObjectProperties_Control)));
+			LB.ClearProperties();
+			foreach (object o in CurrentUIDictionary[SelectedUIControl.Name].getProperties().Values)
+			{
+				TextBox TB = new TextBox(); TB.KeyDown += UIPropertyCallback;
+
+				LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB , 
+					o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
+				i++;
+			}
+			
+
 		}
+
+		private void UIPropertyCallback(object sender, KeyEventArgs e)
+		{
+			if (Key.Enter == e.Key)
+			{
+				//base.PropertyCallback(sender, e);
+				Console.WriteLine("GAMETB UI CALLBACK");
+				Console.WriteLine(((TextBox)sender).Tag.ToString());
+
+				String Property = ((TextBox)sender).Tag.ToString();
+				if (Property == "FontSize")
+				{
+					((TextBox)((Grid)SelectedUIControl.Content).Children[1]).FontSize = Int32.Parse(((TextBox)sender).Text);
+				}
+			}
+		}
+
 
 		private void ContentControl_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
 		{
@@ -3148,11 +3238,64 @@ namespace AmethystEngine.Forms
 
 			CC.Tag = "IMAGE";
 
-			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray });
+
+			String TB = "/AmethystEngine;component/images/emma_colors_oc.png";
+			ImageBrush ib = new ImageBrush();
+			Image img = new Image();
+			img.Stretch = Stretch.Fill;
+			img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+			img.IsHitTestVisible = false;
+
 			((Grid)CC.Content).Children.Add(new Rectangle() { });
-			
+			((Grid)CC.Content).Children.Add(img);
 
 			UIEditor_Canvas.Children.Add(CC);
+		}
+
+		private void UISceneExplorer_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+
+		}
+
+		private void UISceneExplorer_TreeView_Loaded(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void ContentControl_PreviewMouseMove(object sender, MouseEventArgs e)
+		{
+			if(e.LeftButton == MouseButtonState.Pressed)
+			{
+				Console.WriteLine("Moved UI CC");
+			}
+		}
+
+		private void SaveUIAs_Click(object sender, RoutedEventArgs e)
+		{
+			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
+			{
+				Title = "New Level File",
+				FileName = "", //default file name
+				Filter = "txt files (*.lvl)|*.lvl|All files (*.*)|*.*",
+				FilterIndex = 2,
+				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Levels"),
+				RestoreDirectory = true
+			};
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+			Console.WriteLine(dlg.FileName);
+
+			CurrentOpenUI.ExportUI(dlg.FileName);
+
 		}
 	}
 }
