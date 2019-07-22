@@ -3291,7 +3291,7 @@ namespace AmethystEngine.Forms
 			{
 				
 				Console.WriteLine("Moved UI CC");
-				if (SelectedBaseUIControl != null && !(SelectedUI is GameTextBlock))
+				if (SelectedBaseUIControl != null && (SelectedUI is GameTextBlock))
 				{
 					Vector RelOrigin = new Vector((int)Canvas.GetLeft(SelectedBaseUIControl), (int)Canvas.GetTop(SelectedBaseUIControl));
 					Vector ControlPos = new Vector((int)Canvas.GetLeft(SelectedUIControl), (int)Canvas.GetTop(SelectedUIControl));
