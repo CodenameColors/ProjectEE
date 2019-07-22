@@ -60,9 +60,10 @@
     <Compile Include="GameEvent.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="Rendering\UI\GameIMG.cs" />
-    <Compile Include="Rendering\UI\GameTextBox.cs" />
+    <Compile Include="Rendering\UI\GameTextBlock.cs" />
     <Compile Include="Rendering\UI\GameUI.cs" />
     <Compile Include="Rendering\UI\GameSmartTextBox.cs" />
+    <Compile Include="Rendering\UI\UIComponent.cs" />
     <Compile Include="Resources\IProperties.cs" />
     <Compile Include="Resources\ObservableDictionary.cs" />
     <Compile Include="Resources\ObservablePropertyDictionary.cs" />

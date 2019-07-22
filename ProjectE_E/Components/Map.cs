@@ -64,8 +64,6 @@ namespace ProjectE_E.Components
 
 				using (var stream = new System.IO.FileStream(tuple.Item2, FileMode.Open))
 				{
-					//using (Bitmap img = (Bitmap)Bitmap.FromStream(stream))
-					var texture = Texture2D.FromStream(graphicsDevice, stream);
 					text = Texture2D.FromStream(graphicsDevice, stream);
 				}
 				if(!sprites.ContainsKey(tuple.Item2.Replace("\\", "/")))

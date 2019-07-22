@@ -152,7 +152,7 @@ namespace BixBite.Rendering.UI
 				//child UI
 				foreach (GameUI childUI in UIElements)
 				{
-					if(childUI is GameTextBox)
+					if(childUI is GameTextBlock)
 					writer.WriteStartElement(null, "GameTextBox", null);
 					for (int i = 0; i < childUI.getProperties().Count; i++)
 					{

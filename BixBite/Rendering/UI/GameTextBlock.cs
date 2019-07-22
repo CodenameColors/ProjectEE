@@ -10,12 +10,12 @@ using System.Windows.Input;
 
 namespace BixBite.Rendering.UI
 {
-	public class GameTextBox : GameUI, IProperties
+	public class GameTextBlock : GameUI, IProperties
 	{
 
 		public String TBName { get; set; } 
 
-		public GameTextBox(string UIName, int Width, int Height, int xoff, int yoff, int Zindex ,string BackgroundPath = "", String Text= "") 
+		public GameTextBlock(string UIName, int Width, int Height, int xoff, int yoff, int Zindex ,string BackgroundPath = "", String Text= "") 
 			: base(UIName, Width, Height, Zindex ,BackgroundPath)
 		{
 			TBName = UIName;

@@ -119,10 +119,11 @@ namespace AmethystEngine.Forms
 
 		#region UIEditorVars
 		NewUITool CurrentNewUI = NewUITool.NONE;
+		ContentControl SelectedBaseUIControl;
 		ContentControl SelectedUIControl;
 		//Dictionary<String, GameUI> OpenUIEdits = new Dictionary<string, GameUI>();
 		public ObservableCollection<GameUI> OpenUIEdits { get; set; }
-		GameUI CurrentOpenUI;
+		GameUI SelectedUI;
 		Dictionary<String, GameUI> CurrentUIDictionary = new Dictionary<String, GameUI>();
 		#endregion
 
@@ -3072,8 +3073,8 @@ namespace AmethystEngine.Forms
 			}
 			CC.Name = name;
 			UIEditor_Canvas.Children.Add(CC);
-			CurrentUIDictionary.Add(name, new GameTextBox(name, 50, 50, 0, 0, 1));
-			CurrentOpenUI.AddUIElement(CurrentUIDictionary.Values.Last());
+			CurrentUIDictionary.Add(name, new GameTextBlock(name, 50, 50, 0, 0, 1));
+			SelectedUI.AddUIElement(CurrentUIDictionary.Values.Last());
 		}
 
 		private void UICanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -3149,6 +3150,11 @@ namespace AmethystEngine.Forms
 					Console.WriteLine("SpriteSizeChanged");
 				}
 			}
+			else if(EditorWindows_TC.SelectedIndex == 4)
+			{
+				SelectedUI.SetProperty("Width", (int)((ContentControl)sender).Width);
+				SelectedUI.SetProperty("Height", (int)((ContentControl)sender).Height);
+			}
 		}
 
 		private void NewUI_BTN_Click(object sender, RoutedEventArgs e)
@@ -3169,7 +3175,7 @@ namespace AmethystEngine.Forms
 			CC.Tag = "Border";
 			
 			OpenUIEdits.Add(new GameUI("NewUITool", 50, 50, 1));
-			CurrentOpenUI = OpenUIEdits.Last();
+			SelectedUI = OpenUIEdits.Last();
 			CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
 
 			CC.Name = OpenUIEdits.Last().UIName;
@@ -3180,21 +3186,39 @@ namespace AmethystEngine.Forms
 		private void ContentControl_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			SelectedUIControl = (ContentControl)sender;
-
+			if (((ContentControl)sender).Tag.ToString() == "Border")
+				SelectedBaseUIControl = (ContentControl)sender;
+			SelectedUI = CurrentUIDictionary[((Control)sender).Name];
 			int i = 0;
 			PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("UIPropertyGrid", ObjectProperties_Control)));
 			LB.ClearProperties();
 			foreach (object o in CurrentUIDictionary[SelectedUIControl.Name].getProperties().Values)
 			{
-				TextBox TB = new TextBox(); TB.KeyDown += UIPropertyCallback;
-
-				LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB , 
-					o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
+				if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "Background")
+				{
+					DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
+					TB.SelectedColorChanged += customCP_SelectedColorChanged;
+					LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+						o.ToString());
+				}
+				else
+				{
+					TextBox TB = new TextBox(); TB.KeyDown += UIPropertyCallback;
+					LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+						o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
+				}
 				i++;
 			}
 			
 
 		}
+
+		void customCP_SelectedColorChanged(Color obj)
+		{
+			//canPreview.Background = new SolidColorBrush((Color)obj);
+			((TextBox)((Grid)SelectedUIControl.Content).Children[1]).Foreground = new SolidColorBrush((Color)obj);
+		}
+
 
 		private void UIPropertyCallback(object sender, KeyEventArgs e)
 		{
@@ -3254,7 +3278,6 @@ namespace AmethystEngine.Forms
 
 		private void UISceneExplorer_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
-
 		}
 
 		private void UISceneExplorer_TreeView_Loaded(object sender, RoutedEventArgs e)
@@ -3266,7 +3289,16 @@ namespace AmethystEngine.Forms
 		{
 			if(e.LeftButton == MouseButtonState.Pressed)
 			{
+				
 				Console.WriteLine("Moved UI CC");
+				if (SelectedBaseUIControl != null && !(SelectedUI is GameTextBlock))
+				{
+					Vector RelOrigin = new Vector((int)Canvas.GetLeft(SelectedBaseUIControl), (int)Canvas.GetTop(SelectedBaseUIControl));
+					Vector ControlPos = new Vector((int)Canvas.GetLeft(SelectedUIControl), (int)Canvas.GetTop(SelectedUIControl));
+					Vector Offset = ControlPos - RelOrigin;
+					SelectedUI.SetProperty("Xoffset", (int)Offset.X);
+					SelectedUI.SetProperty("YOffset", (int)Offset.Y);
+				}
 			}
 		}
 
@@ -3294,7 +3326,7 @@ namespace AmethystEngine.Forms
 			else return; //invalid name
 			Console.WriteLine(dlg.FileName);
 
-			CurrentOpenUI.ExportUI(dlg.FileName);
+			SelectedUI.ExportUI(dlg.FileName);
 
 		}
 	}
