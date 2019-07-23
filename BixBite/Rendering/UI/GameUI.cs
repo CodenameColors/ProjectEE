@@ -26,6 +26,7 @@ namespace BixBite.Rendering.UI
 			AddProperty("Width", Width);
 			AddProperty("Height", Height);
 			AddProperty("Background", BackgroundPath);
+			AddProperty("ShowBorder", true);
 			AddProperty("Zindex", Zindex);
 		}
 

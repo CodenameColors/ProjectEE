@@ -510,6 +510,24 @@
 				</Border>
 			</DataTemplate>
 
+			<DataTemplate x:Key="CBIMGItems">
+				<Border     
+                  Margin="5"
+                  BorderThickness="1"
+                  BorderBrush="Transparent"
+                  VerticalAlignment="Top"
+                  >
+
+					<StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+						<Image Height="50" Grid.Column="0" HorizontalAlignment="Center" Stretch="Fill" VerticalAlignment="Top" Width="50">
+							<Image.Source>
+								<BitmapImage UriSource="{Binding Thumbnail}"/>
+							</Image.Source>
+						</Image>
+						<TextBlock Text="{Binding Name}" Foreground="Black" HorizontalAlignment="Stretch" Height="auto" TextWrapping="Wrap" FontSize="10"/>
+					</StackPanel>
+				</Border>
+			</DataTemplate>
 
 			<DataTemplate x:Key="BigEdit">
 				<Border         Width="75" x:Name="EditorObject_Bor"

@@ -51,9 +51,9 @@
     <Reference Include="Microsoft.Build.Conversion.v4.0" />
     <Reference Include="Microsoft.Build.Engine" />
     <Reference Include="Microsoft.Build.Framework" />
-    <Reference Include="PropertyGridEditor, Version=1.1.0.3, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="PropertyGridEditor, Version=1.1.0.4, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Visual Studio 2019\Projects\MyWPFControls\PropertyGridEditor\bin\Debug\PropertyGridEditor.dll</HintPath>
+      <HintPath>Resources\PropertyGridEditor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

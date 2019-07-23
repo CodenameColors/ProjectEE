@@ -7,10 +7,13 @@ using System.Threading.Tasks;
 
 namespace BixBite.Rendering.UI
 {
-	class GameIMG : GameUI, IProperties
+	public class GameIMG : GameUI, IProperties
 	{
 		public GameIMG(string UIName, int Width, int Height, int Zindex, string BackgroundPath = "") : base(UIName, Width, Height, Zindex, BackgroundPath)
 		{
+			AddProperty("Xoffset", 0);
+			AddProperty("YOffset", 0);
+			AddProperty("Image", "");
 		}
 	}
 }
