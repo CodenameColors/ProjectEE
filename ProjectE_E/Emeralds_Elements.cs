@@ -239,6 +239,7 @@ namespace ProjectE_E
 			}
 			else
 			{
+				
 				camera.Update(Player.Position, 0, 0);
 			}
 			//}
