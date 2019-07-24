@@ -3103,7 +3103,13 @@ namespace AmethystEngine.Forms
 				LB.ClearProperties();
 				foreach (object o in CurrentUIDictionary[SelectedUIControl.Name].getProperties().Values)
 				{
-					if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "ShowBorder")
+					if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "Zindex")
+					{
+						TextBox TB = new TextBox(); TB.KeyDown += GameUI_ZIndex_Changed;
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+							o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
+					}
+					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "ShowBorder")
 					{
 						CheckBox CB = new CheckBox() { VerticalAlignment = VerticalAlignment.Center };
 						CB.Click += SetBorderVisibility;
@@ -3176,6 +3182,7 @@ namespace AmethystEngine.Forms
 		private void NewUI_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
+			
 			TreeView tv = (TreeView)cc.FindName("UISceneExplorer_TreeView", SceneExplorer_Control);
 			if (tv != null)
 			{
@@ -3187,7 +3194,8 @@ namespace AmethystEngine.Forms
 			CC.VerticalAlignment = VerticalAlignment.Center;
 			((Grid)CC.Content).Children.Add(new Border() { BorderThickness=new Thickness(2), BorderBrush=Brushes.Gray});
 			CC.Tag = "Border";
-			
+			Canvas.SetZIndex(CC, 0);
+
 			OpenUIEdits.Add(new GameUI("NewUITool", 50, 50, 1));
 			SelectedUI = OpenUIEdits.Last();
 			CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
@@ -3205,7 +3213,7 @@ namespace AmethystEngine.Forms
 			CC.Tag = "TEXTBOX";
 			CC.HorizontalAlignment = HorizontalAlignment.Center;
 			CC.VerticalAlignment = VerticalAlignment.Center;
-
+			Canvas.SetZIndex(CC, 1);
 
 			String TB = "/AmethystEngine;component/images/SmallTextBubble_Purple.png";
 			String TB1 = "/AmethystEngine;component/images/SmallTextBubble_Orange.png";
@@ -3245,6 +3253,7 @@ namespace AmethystEngine.Forms
 			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
 			CC.HorizontalAlignment = HorizontalAlignment.Center;
 			CC.VerticalAlignment = VerticalAlignment.Center;
+			Canvas.SetZIndex(CC, 1);
 
 			CC.Tag = "IMAGE";
 
@@ -3331,6 +3340,25 @@ namespace AmethystEngine.Forms
 				SelectedUI.SetProperty("Image", ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
 			}
 
+		}
+
+		private void GameUI_ZIndex_Changed(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter) {
+				if (((ContentControl)SelectedUIControl).Tag.ToString() == "Border")
+				{
+					return;
+				}
+				else
+				{
+					if (Int32.TryParse(((TextBox)sender).Text, out int val))
+					{
+						Canvas.SetZIndex((ContentControl)SelectedUIControl, val);
+						SelectedUI.SetProperty("Zindex", val);
+					}
+				}
+				
+			}
 		}
 
 
