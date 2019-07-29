@@ -3139,7 +3139,14 @@ namespace AmethystEngine.Forms
 					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "Background")
 					{
 						DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
-						TB.SelectedColorChanged += customCP_SelectedColorChanged;
+						TB.SelectedColorChanged += customCP_BackgroundColorChanged;
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+							o.ToString());
+					}
+					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "FontColor")
+					{
+						DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
+						TB.SelectedColorChanged += customCP_FontColorChanged;
 						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
 							o.ToString());
 					}
@@ -3200,7 +3207,7 @@ namespace AmethystEngine.Forms
 			ImageBrush ib = new ImageBrush();
 			Image img = new Image();
 			img.Stretch = Stretch.Fill;
-			img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+			//img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
 			img.IsHitTestVisible = false;
 			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false});
 			((Grid)CC.Content).Children.Add(img);
@@ -3225,7 +3232,7 @@ namespace AmethystEngine.Forms
 			CC.Name = name;
 			UIEditor_Canvas.Children.Add(CC);
 			CurrentUIDictionary.Add(name, new GameTextBlock(name, 50, 50, 0, 0, 1));
-			SelectedUI.AddUIElement(CurrentUIDictionary.Values.Last());
+			OpenUIEdits[0].AddUIElement(CurrentUIDictionary.Values.Last()); //TODO: use the selection Treeview
 		}
 
 		private void UIEditoGameIMG_BTN_Click(object sender, RoutedEventArgs e)
@@ -3256,21 +3263,24 @@ namespace AmethystEngine.Forms
 			CC.Name = name;
 			UIEditor_Canvas.Children.Add(CC);
 			CurrentUIDictionary.Add(name, new GameIMG(name, 50, 50, 1, 0, 0));
-			SelectedUI.AddUIElement(CurrentUIDictionary.Values.Last());
+			OpenUIEdits[0].AddUIElement(CurrentUIDictionary.Values.Last()); //TODO: use the selection Treeview
 		}
 
 		private void ContentControl_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			
 		}
-
-		void customCP_SelectedColorChanged(Color obj)
+		
+		void customCP_FontColorChanged(Color obj)
 		{
-			//canPreview.Background = new SolidColorBrush((Color)obj);
-			if(SelectedUIControl.Tag.ToString() == "TEXTBOX")
-				((TextBox)((Grid)SelectedUIControl.Content).Children[2]).Foreground = new SolidColorBrush((Color)obj);
-			if (SelectedUIControl.Tag.ToString() == "Border")
-				((Grid)SelectedUIControl.Content).Background = new SolidColorBrush(obj);
+			((TextBox)((Grid)SelectedUIControl.Content).Children[2]).Foreground = new SolidColorBrush(obj);
+			SelectedUI.SetProperty("FontColor", obj.ToString());
+		}
+
+		void customCP_BackgroundColorChanged(Color obj)
+		{
+			((Grid)SelectedUIControl.Content).Background = new SolidColorBrush(obj);
+			SelectedUI.SetProperty("Background", obj.ToString());
 		}
 
 		private void SetBorderVisibility(object sender, RoutedEventArgs e)
@@ -3311,13 +3321,18 @@ namespace AmethystEngine.Forms
 			if (SelectedUIControl.Tag.ToString() == "IMAGE")
 				((Image)((Grid)SelectedUIControl.Content).Children[2]).Source =
 					new BitmapImage(((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail);
-			Console.WriteLine(	((ComboBox)sender).SelectedIndex);
-			((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail = ((EditorObject)((ComboBox)sender).SelectedItem).Thumbnail;
-			((ComboBox)sender).SelectedIndex = ((ComboBox)sender).SelectedIndex;
 
 			if(SelectedUI is GameIMG)
 			{
 				SelectedUI.SetProperty("Image", ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+			}
+
+			if(SelectedUIControl.Tag.ToString() == "TEXTBOX")
+			{
+				((Image)((Grid)SelectedUIControl.Content).Children[1]).Source =
+					new BitmapImage(((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail);
+				SelectedUI.SetProperty("Image", ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+
 			}
 
 		}
@@ -3412,6 +3427,7 @@ namespace AmethystEngine.Forms
 
 			UIEditor_Canvas.Children.Add(CC);
 			SelectedUIControl = CC;
+			SelectedBaseUIControl = CC;
 		}
 
 		private void SaveUIAs_Click(object sender, RoutedEventArgs e)
@@ -3438,8 +3454,8 @@ namespace AmethystEngine.Forms
 			else return; //invalid name
 			Console.WriteLine(dlg.FileName);
 
-			SelectedUI.ExportUI(dlg.FileName);
-
+			OpenUIEdits[0].ExportUI(dlg.FileName);
+			
 		}
 
 		public List<String> GetAllProjectImages()
@@ -3486,7 +3502,7 @@ namespace AmethystEngine.Forms
 			}
 
 			DrawUIToScreen(UIEditor_Canvas, UIEditor_BackCanvas,OpenUIEdits.Last(), true);
-
+			
 		}
 
 
@@ -3503,7 +3519,7 @@ namespace AmethystEngine.Forms
 		{
 			//set the position and the size of the Base UI
 			ContentControl BaseUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
-			//{
+			
 			BaseUI.Width = Int32.Parse(gameUI.GetProperty("Width").ToString());
 			BaseUI.Height = Int32.Parse(gameUI.GetProperty("Height").ToString());
 			BaseUI.BorderBrush = (((bool)gameUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
@@ -3547,8 +3563,14 @@ namespace AmethystEngine.Forms
 					{
 						HorizontalAlignment = HorizontalAlignment.Stretch,
 						VerticalAlignment = VerticalAlignment.Stretch,
+						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("Background").ToString()),
+						IsHitTestVisible = false,
 					};
-					((Grid)CUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = (((bool)gameUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent) });
+					((Grid)CUI.Content).Children.Add(new Border()
+					{
+						BorderThickness = (((bool)childUI.GetProperty("ShowBorder")) ? new Thickness (2) : new Thickness(0)),
+						BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent)
+					});
 					CUI.Name = childUI.UIName;
 					Canvas.SetLeft(CUI, mid.X + Int32.Parse(childUI.GetProperty("Xoffset").ToString()));
 					Canvas.SetTop(CUI, mid.Y + Int32.Parse(childUI.GetProperty("YOffset").ToString()));
@@ -3559,36 +3581,37 @@ namespace AmethystEngine.Forms
 					if(childUI is GameTextBlock)
 					{
 						CUI.Tag = "TEXTBOX";
-
+						
 						String TB = "/AmethystEngine;component/images/SmallTextBubble_Purple.png";
 						String TB1 = "/AmethystEngine;component/images/SmallTextBubble_Orange.png";
-						ImageBrush ib = new ImageBrush();
 						Image img = new Image();
 						img.Stretch = Stretch.Fill;
-						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+						img.Source = new BitmapImage(new Uri(
+							(File.Exists(childUI.GetProperty("Image").ToString()) ? childUI.GetProperty("Image").ToString() : "" ), 
+							UriKind.RelativeOrAbsolute
+							));
 						img.IsHitTestVisible = false;
-						((Grid)CUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false });
+						//((Grid)CUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false });
 						((Grid)CUI.Content).Children.Add(img);
 						((Grid)CUI.Content).Children.Add(new TextBox()
 						{
 							Text = "Sameple Text",
-							//Margin = new Thickness(2),
-							//BorderBrush = Brushes.Transparent,
+							Margin = new Thickness(2),
+							BorderBrush = ((bool)childUI.GetProperty("ShowBorder") ? Brushes.Gray : Brushes.Transparent),
 							IsHitTestVisible = false,
-							//Background = Brushes.Transparent,
 							VerticalContentAlignment = VerticalAlignment.Center,
 							HorizontalContentAlignment = HorizontalAlignment.Center,
-							//FontSize = 24,
-							//Foreground = Brushes.White
+							FontSize = Int32.Parse(childUI.GetProperty("FontSize").ToString()),
+							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("FontColor").ToString()),
+							Background = Brushes.Transparent
 						});
 
 					}
 					else if(childUI is GameIMG)
 					{
 						CUI.Tag = "IMAGE";
-
-						String TB = "/AmethystEngine;component/images/emma_colors_oc.png";
-						ImageBrush ib = new ImageBrush();
+					
+						String TB = childUI.GetProperty("Image").ToString();
 						Image img = new Image();
 						img.Stretch = Stretch.Fill;
 						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
@@ -3613,6 +3636,7 @@ namespace AmethystEngine.Forms
 			SelectedUI = OpenUIEdits.Last();
 			CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
 			CurrentEditorCanvas.Children.Add(BaseUI);
+			SelectedBaseUIControl = BaseUI;
 		}
 
 

@@ -9,7 +9,7 @@ namespace BixBite.Rendering.UI
 {
 	public class GameIMG : GameUI, IProperties
 	{
-		public GameIMG(string UIName, int Width, int Height, int Zindex, int xoff, int yoff, String ImagePath = "", String BackgroundPath = "") : base(UIName, Width, Height, Zindex, BackgroundPath)
+		public GameIMG(string UIName, int Width, int Height, int Zindex, int xoff, int yoff, String ImagePath = "", String BackgroundPath = "#00000000") : base(UIName, Width, Height, Zindex, BackgroundPath)
 		{
 			AddProperty("Xoffset", xoff);
 			AddProperty("YOffset", yoff);

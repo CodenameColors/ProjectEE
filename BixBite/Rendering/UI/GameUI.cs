@@ -17,7 +17,7 @@ namespace BixBite.Rendering.UI
 		protected ObservableDictionary<string, object> Properties { get; set; }
 		public ObservableCollection<GameUI> UIElements { get; set; }
 
-		public GameUI(String UIName, int Width, int Height, int Zindex, String BackgroundPath = "")
+		public GameUI(String UIName, int Width, int Height, int Zindex, String BackgroundPath = "#00000000")
 		{
 			Properties = new ObservableDictionary<string, object>();
 			UIElements = new ObservableCollection<GameUI>();
@@ -209,6 +209,7 @@ namespace BixBite.Rendering.UI
 
 							GameTextBlock childUI = new GameTextBlock(Name, width, height, xoffset, yoffset, zindex, Background, ContentText);
 							childUI.SetProperty("ShowBorder", showBorder);
+							childUI.SetProperty("Image", reader.GetAttribute("Image"));
 							childUI.SetProperty("Font", reader.GetAttribute("Font"));
 							childUI.SetProperty("FontSize", Int32.Parse(reader.GetAttribute("FontSize")));
 							childUI.SetProperty("FontColor", reader.GetAttribute("FontColor"));
@@ -231,7 +232,7 @@ namespace BixBite.Rendering.UI
 							int xoffset = Int32.Parse(reader.GetAttribute("Xoffset"));
 							int yoffset = Int32.Parse(reader.GetAttribute("YOffset"));
 
-							GameIMG childUI = new GameIMG(Name, width, height, zindex, xoffset, yoffset, Image);
+							GameIMG childUI = new GameIMG(Name, width, height, zindex, xoffset, yoffset, Image, Background);
 							retGameUI.AddUIElement(childUI);
 						}
 						//Buttons WIP still

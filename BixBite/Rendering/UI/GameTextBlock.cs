@@ -15,7 +15,7 @@ namespace BixBite.Rendering.UI
 
 		public String TBName { get; set; } 
 
-		public GameTextBlock(string UIName, int Width, int Height, int xoff, int yoff, int Zindex ,string BackgroundPath = "", String Text= "") 
+		public GameTextBlock(string UIName, int Width, int Height, int xoff, int yoff, int Zindex ,string BackgroundPath = "#00000000", String Text= "") 
 			: base(UIName, Width, Height, Zindex ,BackgroundPath)
 		{
 			TBName = UIName;
@@ -28,6 +28,7 @@ namespace BixBite.Rendering.UI
 			AddProperty("FontStyle", "Normal");
 			AddProperty("TextSpeed", 1.0);
 			AddProperty("TextTime", 1.0);//number of seconds to "type" the text to the screen
+			AddProperty("Image", "");
 		}
 
 		public override void PropertyCallback(object sender, RoutedEventArgs e)
