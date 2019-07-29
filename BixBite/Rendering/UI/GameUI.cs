@@ -170,8 +170,89 @@ namespace BixBite.Rendering.UI
 
 		public static GameUI ImportGameUI(String FileName)
 		{
-			throw new NotImplementedException();
+			//Create our return GameUI
+			GameUI retGameUI = null;
+
+			XmlReaderSettings settings = new XmlReaderSettings
+			{
+				//Async = true
+			};
+			//read the UI File.
+			using (XmlReader reader  = XmlReader.Create(FileName, settings))
+			{
+				while (reader.Read())
+				{
+					//skip to a GameUI node
+					while (reader.Name != "GameUI")
+						reader.Read();
+
+					//by this time we should have found a Game UI node use this to create the ACUTAL object
+					retGameUI = new GameUI(reader.GetAttribute("Name"), Int32.Parse(reader.GetAttribute("Width")), 
+						Int32.Parse(reader.GetAttribute("Height")), Int32.Parse(reader.GetAttribute("Zindex")));
+
+					//After creating the Initial BASE object get all the child UI objects!
+					while(reader.NodeType != XmlNodeType.EndElement && reader.Name != " GameUI" && reader.Read())
+					{//There are MULTIPLE different types of UI
+						//Texblock
+						if(reader.Name == "GameTextBlock" && reader.NodeType == XmlNodeType.Element)
+						{
+							//get the attributes 
+							String Name = reader.GetAttribute("Name");
+							String Background = reader.GetAttribute("Background");
+							String ContentText = reader.GetAttribute("ContentText");
+							bool showBorder = (reader.GetAttribute("ShowBorder") == "True" ? true : false);
+							int width = Int32.Parse(reader.GetAttribute("Width"));
+							int height = Int32.Parse(reader.GetAttribute("Height"));
+							int zindex = Int32.Parse(reader.GetAttribute("Zindex"));
+							int xoffset = Int32.Parse(reader.GetAttribute("Xoffset"));
+							int yoffset = Int32.Parse(reader.GetAttribute("YOffset"));
+
+							GameTextBlock childUI = new GameTextBlock(Name, width, height, xoffset, yoffset, zindex, Background, ContentText);
+							childUI.SetProperty("ShowBorder", showBorder);
+							childUI.SetProperty("Font", reader.GetAttribute("Font"));
+							childUI.SetProperty("FontSize", Int32.Parse(reader.GetAttribute("FontSize")));
+							childUI.SetProperty("FontColor", reader.GetAttribute("FontColor"));
+							childUI.SetProperty("FontStyle", reader.GetAttribute("FontStyle"));
+							childUI.SetProperty("TextSpeed", Int32.Parse(reader.GetAttribute("TextSpeed")));
+							childUI.SetProperty("TextTime", Int32.Parse(reader.GetAttribute("TextTime")));
+							retGameUI.AddUIElement(childUI);
+						}
+						//Image Boxes
+						else if (reader.Name == "GameIMG" && reader.NodeType == XmlNodeType.Element)
+						{
+							//get the attributes 
+							String Name = reader.GetAttribute("Name");
+							String Background = reader.GetAttribute("Background");
+							String Image = reader.GetAttribute("Image");
+							bool showBorder = (reader.GetAttribute("ShowBorder") == "True" ? true : false);
+							int width = Int32.Parse(reader.GetAttribute("Width"));
+							int height = Int32.Parse(reader.GetAttribute("Height"));
+							int zindex = Int32.Parse(reader.GetAttribute("Zindex"));
+							int xoffset = Int32.Parse(reader.GetAttribute("Xoffset"));
+							int yoffset = Int32.Parse(reader.GetAttribute("YOffset"));
+
+							GameIMG childUI = new GameIMG(Name, width, height, zindex, xoffset, yoffset, Image);
+							retGameUI.AddUIElement(childUI);
+						}
+						//Buttons WIP still
+						else if (reader.Name == "GameButton" && reader.NodeType == XmlNodeType.Element)
+						{
+							//GameButton childUI = new GameButton()
+							retGameUI = null;
+						}
+					}
+				}
+			}
+			return retGameUI;
 		}
 
 	}
 }
+
+
+//AddProperty("Name", UIName);
+//AddProperty("Width", Width);
+//AddProperty("Height", Height);
+//AddProperty("Background", BackgroundPath);
+//AddProperty("ShowBorder", true);
+//AddProperty("Zindex", Zindex);

@@ -3048,7 +3048,11 @@ namespace AmethystEngine.Forms
 
 		private void UICanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-
+			//you clicked on nothing. so deselect UI CCs
+			foreach (ContentControl cc in UIEditor_Canvas.Children.OfType<ContentControl>().ToList())
+			{
+				Selector.SetIsSelected(cc, false);
+			}
 		}
 
 		private void UIEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -3163,6 +3167,7 @@ namespace AmethystEngine.Forms
 
 		private void ContentControl_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
+			if (SelectedUI == null) return;
 			if (EditorWindows_TC.SelectedIndex == 0)
 			{
 				if (CurrentTool == EditorTool.Select)
@@ -3179,32 +3184,7 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-		private void NewUI_BTN_Click(object sender, RoutedEventArgs e)
-		{
-			ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
-			
-			TreeView tv = (TreeView)cc.FindName("UISceneExplorer_TreeView", SceneExplorer_Control);
-			if (tv != null)
-			{
-				SceneExplorer_TreeView = tv;
-				SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
-			}
-			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
-			CC.HorizontalAlignment = HorizontalAlignment.Center;
-			CC.VerticalAlignment = VerticalAlignment.Center;
-			((Grid)CC.Content).Children.Add(new Border() { BorderThickness=new Thickness(2), BorderBrush=Brushes.Gray});
-			CC.Tag = "Border";
-			Canvas.SetZIndex(CC, 0);
-
-			OpenUIEdits.Add(new GameUI("NewUITool", 50, 50, 1));
-			SelectedUI = OpenUIEdits.Last();
-			CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
-
-			CC.Name = OpenUIEdits.Last().UIName;
-
-			UIEditor_Canvas.Children.Add(CC);
-			SelectedUIControl = CC;
-		}
+		
 
 		private void UIEditoGameTB_BTN_Click(object sender, RoutedEventArgs e)
 		{
@@ -3275,7 +3255,7 @@ namespace AmethystEngine.Forms
 			}
 			CC.Name = name;
 			UIEditor_Canvas.Children.Add(CC);
-			CurrentUIDictionary.Add(name, new GameIMG(name, 50, 50, 1));
+			CurrentUIDictionary.Add(name, new GameIMG(name, 50, 50, 1, 0, 0));
 			SelectedUI.AddUIElement(CurrentUIDictionary.Values.Last());
 		}
 
@@ -3407,6 +3387,33 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		private void NewUI_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
+
+			TreeView tv = (TreeView)cc.FindName("UISceneExplorer_TreeView", SceneExplorer_Control);
+			if (tv != null)
+			{
+				SceneExplorer_TreeView = tv;
+				SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
+			}
+			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+			CC.HorizontalAlignment = HorizontalAlignment.Center;
+			CC.VerticalAlignment = VerticalAlignment.Center;
+			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray });
+			CC.Tag = "Border";
+			Canvas.SetZIndex(CC, 0);
+
+			OpenUIEdits.Add(new GameUI("NewUITool", 50, 50, 1));
+			SelectedUI = OpenUIEdits.Last();
+			CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
+
+			CC.Name = OpenUIEdits.Last().UIName;
+
+			UIEditor_Canvas.Children.Add(CC);
+			SelectedUIControl = CC;
+		}
+
 		private void SaveUIAs_Click(object sender, RoutedEventArgs e)
 		{
 			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
@@ -3441,6 +3448,174 @@ namespace AmethystEngine.Forms
 			String InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Images");
 			return Directory.GetFiles(InitialDirectory).ToList();
 		}
+
+		private void OpenUIFile_UIE(object sender, RoutedEventArgs e)
+		{
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+			{
+				Title = "Open UI File",
+				FileName = "", //default file name
+				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\UI"),
+				Filter = "UI files (*.ui)|*.ui|All files (*.*)|*.*",
+				FilterIndex = 2,
+				RestoreDirectory = true
+			};
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+			Console.WriteLine(dlg.FileName);
+
+			GameUI g =  GameUI.ImportGameUI(dlg.FileName);
+			OpenUIEdits.Add(g);
+
+			ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
+
+			TreeView tv = (TreeView)cc.FindName("UISceneExplorer_TreeView", SceneExplorer_Control);
+			if (tv != null)
+			{
+				SceneExplorer_TreeView = tv;
+				SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
+			}
+
+			DrawUIToScreen(UIEditor_Canvas, UIEditor_BackCanvas,OpenUIEdits.Last(), true);
+
+		}
+
+
+		/// <summary>
+		/// method to draw a newly added/imported UI to the screen. Choose whether or not to breakdown the components for editing.
+		/// </summary>
+		/// <param name="CurrentEditorCanvas">Current Canvas that you will draw the UI too</param>
+		/// <param name="gameUI">The Custom created UI that you want to draw</param>
+		/// <param name="bcomps">TRUE = multiple ContentControls will be drawn, and allowed to be edited 
+		/// <para/>
+		/// FALSE = ONLY ONE Content control will be drawn. Base UI is editable in size, and position. Children are editable via properties
+		/// </param>
+		public void DrawUIToScreen(Canvas CurrentEditorCanvas, Canvas CurrentEditorCanvas_Back, GameUI gameUI, bool bcomps)
+		{
+			//set the position and the size of the Base UI
+			ContentControl BaseUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+			//{
+			BaseUI.Width = Int32.Parse(gameUI.GetProperty("Width").ToString());
+			BaseUI.Height = Int32.Parse(gameUI.GetProperty("Height").ToString());
+			BaseUI.BorderBrush = (((bool)gameUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+			BaseUI.BorderThickness = new Thickness(2);
+			BaseUI.Tag = "Border";
+			BaseUI.Name = gameUI.UIName;
+			//};
+			BaseUI.Content = new Grid()
+			{
+				HorizontalAlignment = HorizontalAlignment.Stretch,
+				VerticalAlignment = VerticalAlignment.Stretch,
+				
+			};
+			((Grid)BaseUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = (((bool)gameUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent) });
+
+			//get the middle!
+			Point mid = new Point(CurrentEditorCanvas_Back.ActualWidth / 2, CurrentEditorCanvas_Back.ActualHeight/2);
+			//get the true center point. Since origin is top left.
+			mid.X -= BaseUI.Width / 2; mid.Y -= BaseUI.Height / 2;
+			Canvas.SetLeft(BaseUI, mid.X); Canvas.SetTop(BaseUI, mid.Y);
+			
+
+
+			//which drawing type?
+			if (bcomps)
+			{
+				//create all the child UI elements as editable content controls
+				foreach(GameUI childUI in gameUI.UIElements)
+				{
+					#region DefaultProperties
+					//set the position and the size of the Base UI
+					ContentControl CUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+					CUI.Width = Int32.Parse(childUI.GetProperty("Width").ToString());
+					CUI.Height = Int32.Parse(childUI.GetProperty("Height").ToString());
+					CUI.BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+					CUI.BorderThickness = new Thickness(2);
+					CUI.Tag = "Border";
+					CUI.Name = childUI.UIName;
+
+					CUI.Content = new Grid()
+					{
+						HorizontalAlignment = HorizontalAlignment.Stretch,
+						VerticalAlignment = VerticalAlignment.Stretch,
+					};
+					((Grid)CUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = (((bool)gameUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent) });
+					CUI.Name = childUI.UIName;
+					Canvas.SetLeft(CUI, mid.X + Int32.Parse(childUI.GetProperty("Xoffset").ToString()));
+					Canvas.SetTop(CUI, mid.Y + Int32.Parse(childUI.GetProperty("YOffset").ToString()));
+					Canvas.SetZIndex(CUI, Int32.Parse(childUI.GetProperty("Zindex").ToString()));
+					CurrentEditorCanvas.Children.Add(CUI);
+					#endregion
+
+					if(childUI is GameTextBlock)
+					{
+						CUI.Tag = "TEXTBOX";
+
+						String TB = "/AmethystEngine;component/images/SmallTextBubble_Purple.png";
+						String TB1 = "/AmethystEngine;component/images/SmallTextBubble_Orange.png";
+						ImageBrush ib = new ImageBrush();
+						Image img = new Image();
+						img.Stretch = Stretch.Fill;
+						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+						img.IsHitTestVisible = false;
+						((Grid)CUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false });
+						((Grid)CUI.Content).Children.Add(img);
+						((Grid)CUI.Content).Children.Add(new TextBox()
+						{
+							Text = "Sameple Text",
+							//Margin = new Thickness(2),
+							//BorderBrush = Brushes.Transparent,
+							IsHitTestVisible = false,
+							//Background = Brushes.Transparent,
+							VerticalContentAlignment = VerticalAlignment.Center,
+							HorizontalContentAlignment = HorizontalAlignment.Center,
+							//FontSize = 24,
+							//Foreground = Brushes.White
+						});
+
+					}
+					else if(childUI is GameIMG)
+					{
+						CUI.Tag = "IMAGE";
+
+						String TB = "/AmethystEngine;component/images/emma_colors_oc.png";
+						ImageBrush ib = new ImageBrush();
+						Image img = new Image();
+						img.Stretch = Stretch.Fill;
+						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+						img.IsHitTestVisible = false;
+						((Grid)CUI.Content).Children.Add(new Rectangle() { });
+						((Grid)CUI.Content).Children.Add(img);
+
+
+					}
+					else if(childUI is GameButton)
+					{
+
+					}
+
+					CurrentUIDictionary.Add(childUI.UIName, childUI);
+				}
+			}
+			else //all as one
+			{
+
+			}
+			SelectedUI = OpenUIEdits.Last();
+			CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
+			CurrentEditorCanvas.Children.Add(BaseUI);
+		}
+
+
 
 
 	}

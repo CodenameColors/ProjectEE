@@ -112,22 +112,22 @@
 					<Menu DockPanel.Dock="Top" Grid.Column="0" Background="Transparent" Foreground="White" VerticalAlignment="Top" Margin="0,4,0,3" Height="18">
 						<MenuItem Header="UI" Foreground="White">
 							<MenuItem x:Name="NewLevel_MenuItem" Header="New UI" Foreground="Black" Click="NewUI_BTN_Click"/>
-							<MenuItem Header="Open UI" Foreground="Black"/>
+							<MenuItem Header="Open UI" Foreground="Black" Click="OpenUIFile_UIE"/>
 							<MenuItem Header="Save UI" Foreground="Black"/>
 							<MenuItem Header="Save UI As" Foreground="Black" Click="SaveUIAs_Click"  />
 						</MenuItem>
 					</Menu>
 					<Menu DockPanel.Dock="Top" Grid.Column="1" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
-						<MenuItem Header="Draw" Click="LevelEditorSelection_Click"/>
+						<MenuItem Header="Draw"/>
 					</Menu>
 					<Menu DockPanel.Dock="Top" Grid.Column="2" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
-						<MenuItem Header="Selection" Click="LevelEditorSelection_Click"/>
+						<MenuItem Header="Selection" />
 					</Menu>
 					<Menu DockPanel.Dock="Top" Grid.Column="3" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
-						<MenuItem Header="Deselect" Click="LevelEditorDeselect_Click"/>
+						<MenuItem Header="Deselect" />
 					</Menu>
 					<Menu DockPanel.Dock="Top" Grid.Column="4" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
-						<MenuItem Header="Move" Click="LevelEditorDeselect_Click"/>
+						<MenuItem Header="Move" />
 					</Menu>
 
 				</Grid>
