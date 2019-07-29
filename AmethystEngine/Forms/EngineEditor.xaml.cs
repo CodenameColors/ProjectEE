@@ -3413,6 +3413,7 @@ namespace AmethystEngine.Forms
 				SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
 			}
 			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+			
 			CC.HorizontalAlignment = HorizontalAlignment.Center;
 			CC.VerticalAlignment = VerticalAlignment.Center;
 			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray });
@@ -3501,7 +3502,7 @@ namespace AmethystEngine.Forms
 				SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
 			}
 
-			DrawUIToScreen(UIEditor_Canvas, UIEditor_BackCanvas,OpenUIEdits.Last(), true);
+			DrawUIToScreen(UIEditor_Canvas, UIEditor_BackCanvas,OpenUIEdits.Last(), false);
 			
 		}
 
@@ -3523,7 +3524,7 @@ namespace AmethystEngine.Forms
 			BaseUI.Width = Int32.Parse(gameUI.GetProperty("Width").ToString());
 			BaseUI.Height = Int32.Parse(gameUI.GetProperty("Height").ToString());
 			BaseUI.BorderBrush = (((bool)gameUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
-			BaseUI.BorderThickness = new Thickness(2);
+			BaseUI.BorderThickness = new Thickness(0);
 			BaseUI.Tag = "Border";
 			BaseUI.Name = gameUI.UIName;
 			//};
@@ -3540,14 +3541,14 @@ namespace AmethystEngine.Forms
 			//get the true center point. Since origin is top left.
 			mid.X -= BaseUI.Width / 2; mid.Y -= BaseUI.Height / 2;
 			Canvas.SetLeft(BaseUI, mid.X); Canvas.SetTop(BaseUI, mid.Y);
-			
+
 
 
 			//which drawing type?
 			if (bcomps)
 			{
 				//create all the child UI elements as editable content controls
-				foreach(GameUI childUI in gameUI.UIElements)
+				foreach (GameUI childUI in gameUI.UIElements)
 				{
 					#region DefaultProperties
 					//set the position and the size of the Base UI
@@ -3568,7 +3569,7 @@ namespace AmethystEngine.Forms
 					};
 					((Grid)CUI.Content).Children.Add(new Border()
 					{
-						BorderThickness = (((bool)childUI.GetProperty("ShowBorder")) ? new Thickness (2) : new Thickness(0)),
+						BorderThickness = (((bool)childUI.GetProperty("ShowBorder")) ? new Thickness(2) : new Thickness(0)),
 						BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent)
 					});
 					CUI.Name = childUI.UIName;
@@ -3578,16 +3579,16 @@ namespace AmethystEngine.Forms
 					CurrentEditorCanvas.Children.Add(CUI);
 					#endregion
 
-					if(childUI is GameTextBlock)
+					if (childUI is GameTextBlock)
 					{
 						CUI.Tag = "TEXTBOX";
-						
+
 						String TB = "/AmethystEngine;component/images/SmallTextBubble_Purple.png";
 						String TB1 = "/AmethystEngine;component/images/SmallTextBubble_Orange.png";
 						Image img = new Image();
 						img.Stretch = Stretch.Fill;
 						img.Source = new BitmapImage(new Uri(
-							(File.Exists(childUI.GetProperty("Image").ToString()) ? childUI.GetProperty("Image").ToString() : "" ), 
+							(File.Exists(childUI.GetProperty("Image").ToString()) ? childUI.GetProperty("Image").ToString() : ""),
 							UriKind.RelativeOrAbsolute
 							));
 						img.IsHitTestVisible = false;
@@ -3607,10 +3608,10 @@ namespace AmethystEngine.Forms
 						});
 
 					}
-					else if(childUI is GameIMG)
+					else if (childUI is GameIMG)
 					{
 						CUI.Tag = "IMAGE";
-					
+
 						String TB = childUI.GetProperty("Image").ToString();
 						Image img = new Image();
 						img.Stretch = Stretch.Fill;
@@ -3621,7 +3622,7 @@ namespace AmethystEngine.Forms
 
 
 					}
-					else if(childUI is GameButton)
+					else if (childUI is GameButton)
 					{
 
 					}
@@ -3631,7 +3632,98 @@ namespace AmethystEngine.Forms
 			}
 			else //all as one
 			{
+				//create all the child UI elements as editable content controls
+				foreach (GameUI childUI in gameUI.UIElements)
+				{
+					#region DefaultProperties
+					//set the position and the size of the Base UI
+					ContentControl CUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+					CUI.Width = Int32.Parse(childUI.GetProperty("Width").ToString());
+					CUI.Height = Int32.Parse(childUI.GetProperty("Height").ToString());
+					CUI.BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+					CUI.BorderThickness = new Thickness(0);
+					CUI.Tag = "Border";
+					CUI.Name = childUI.UIName;
 
+					CUI.Content = new Grid()
+					{
+						HorizontalAlignment = HorizontalAlignment.Stretch,
+						VerticalAlignment = VerticalAlignment.Stretch,
+						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("Background").ToString()),
+						IsHitTestVisible = false,
+					};
+					((Grid)CUI.Content).Children.Add(new Border()
+					{
+						BorderThickness = new Thickness(0),//(((bool)childUI.GetProperty("ShowBorder")) ? new Thickness(2) : new Thickness(0)),
+						BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent),
+						IsHitTestVisible = false
+					});
+					CUI.Name = childUI.UIName;
+					#endregion
+
+					if (childUI is GameTextBlock)
+					{
+						CUI.Tag = "TEXTBOX";
+						Image img = new Image() { IsHitTestVisible = false };
+						img.Stretch = Stretch.Fill;
+						img.Source = new BitmapImage(new Uri(
+							(File.Exists(childUI.GetProperty("Image").ToString()) ? childUI.GetProperty("Image").ToString() : ""),
+							UriKind.RelativeOrAbsolute
+							));
+						img.IsHitTestVisible = false;
+						//((Grid)CUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false });
+						((Grid)CUI.Content).Children.Add(img);
+						((Grid)CUI.Content).Children.Add(new TextBox()
+						{
+							Text = "Sameple Text",
+							Margin = new Thickness(2),
+							BorderThickness = new Thickness(0),
+							IsHitTestVisible = false,
+							VerticalContentAlignment = VerticalAlignment.Center,
+							HorizontalContentAlignment = HorizontalAlignment.Center,
+							FontSize = Int32.Parse(childUI.GetProperty("FontSize").ToString()),
+							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("FontColor").ToString()),
+							Background = Brushes.Transparent
+						});
+						CUI.Margin = new Thickness()
+						{
+							Left = Int32.Parse(childUI.GetProperty("Xoffset").ToString()),
+							Top = Int32.Parse(childUI.GetProperty("YOffset").ToString()),
+							//Bottom = BaseUI.Height - (Top + CUI.Height),
+							//Right = BaseUI.Width - (Left + CUI.Width)
+						};
+						CUI.IsHitTestVisible = false;
+						CUI.VerticalAlignment = VerticalAlignment.Top;
+						CUI.HorizontalAlignment = HorizontalAlignment.Left;
+						CUI.BorderThickness = new Thickness(0);
+						((Grid)BaseUI.Content).Children.Add(CUI);
+					}
+					else if (childUI is GameIMG)
+					{
+						CUI.Tag = "IMAGE";
+
+						String TB = childUI.GetProperty("Image").ToString();
+						Image img = new Image() { IsHitTestVisible = false };
+						img.Stretch = Stretch.Fill;
+						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+						img.IsHitTestVisible = false;
+						((Grid)CUI.Content).Children.Add(new Rectangle() { });
+						CUI.Margin = new Thickness()
+						{
+							Left = Int32.Parse(childUI.GetProperty("Xoffset").ToString()),
+							Top = Int32.Parse(childUI.GetProperty("YOffset").ToString()),
+						};
+						CUI.IsHitTestVisible = false;
+						CUI.VerticalAlignment = VerticalAlignment.Top;
+						CUI.HorizontalAlignment = HorizontalAlignment.Left;
+						((Grid)CUI.Content).Children.Add(img);
+						((Grid)BaseUI.Content).Children.Add(CUI);
+					}
+					else if (childUI is GameButton)
+					{
+
+					}
+				}
 			}
 			SelectedUI = OpenUIEdits.Last();
 			CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
