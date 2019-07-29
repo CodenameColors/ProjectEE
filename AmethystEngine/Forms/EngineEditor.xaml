@@ -834,7 +834,62 @@
 					<Grid Background="Black" />
 				</TabItem>
 				<TabItem Header="Dialogue Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
-					<Grid Background="Black" />
+					<Grid Background="Black" >
+
+						<Grid.RowDefinitions>
+							<RowDefinition Height="4*"/>
+							<RowDefinition Height=".5*"/>
+							<RowDefinition Height="4*"/>
+						</Grid.RowDefinitions>
+
+						<Grid x:Name="DialogueEditor_Grid" Grid.Row="0" Grid.RowSpan="1">
+							<Grid.RowDefinitions>
+								<RowDefinition Height="4*"/>
+								<RowDefinition Height="2*"/>
+							</Grid.RowDefinitions>
+							<Canvas Grid.Row="0" Grid.Column="0" x:Name="DialogueEditor_BackCanvas" IsHitTestVisible="True" ClipToBounds="True" >
+								<Canvas.Background>
+									<VisualBrush x:Name="DialogueEditor_VB" TileMode="Tile" Stretch="Uniform" Viewport="0,0,40,40" ViewportUnits="Absolute" >
+										<VisualBrush.Visual>
+											<Rectangle Width="40" Height="40" Fill="Black" Stroke="Gray" StrokeThickness=".4" />
+										</VisualBrush.Visual>
+									</VisualBrush>
+								</Canvas.Background>
+								<Canvas x:Name="DialogueEditore_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+							</Canvas>
+
+							<ScrollViewer Grid.Row="1">
+								<Canvas>
+									<Canvas.Background>
+										<VisualBrush TileMode="Tile" Stretch="Uniform" Viewport="0,0,20,20" ViewportUnits="Absolute" >
+											<VisualBrush.Visual>
+												<Rectangle Width="20" Height="20" Fill="#FF292929" Stroke="Gray" StrokeThickness=".4" />
+											</VisualBrush.Visual>
+										</VisualBrush>
+									</Canvas.Background>
+								</Canvas>
+							</ScrollViewer>
+
+						</Grid>
+
+						<Grid Name="DialogueNodeEditor_Grid" Grid.Row="2" Grid.RowSpan="1" Background="#FF212121">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="2*"/>
+								<ColumnDefinition Width="7*"/>
+							</Grid.ColumnDefinitions>
+							<Canvas Grid.Row="0" Grid.Column="1" x:Name="DialogueNode_BackCanvas" IsHitTestVisible="True" ClipToBounds="True" >
+								<Canvas.Background>
+									<VisualBrush x:Name="DialogueNode_VB" TileMode="Tile" Stretch="Uniform" Viewport="0,0,40,40" ViewportUnits="Absolute" >
+										<VisualBrush.Visual>
+											<Rectangle Width="40" Height="40" Fill="Black" Stroke="Gray" StrokeThickness=".4" />
+										</VisualBrush.Visual>
+									</VisualBrush>
+								</Canvas.Background>
+								<Canvas x:Name="DialogueNode_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+							</Canvas>
+						</Grid>
+						<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Background="#FF444444" ResizeDirection="Rows"/>
+					</Grid>
 				</TabItem>
 				<TabItem Header="Cutscene Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 					<Grid Background="Black" />

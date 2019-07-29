@@ -3532,7 +3532,6 @@ namespace AmethystEngine.Forms
 			{
 				HorizontalAlignment = HorizontalAlignment.Stretch,
 				VerticalAlignment = VerticalAlignment.Stretch,
-				
 			};
 			((Grid)BaseUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = (((bool)gameUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent) });
 
@@ -3541,8 +3540,6 @@ namespace AmethystEngine.Forms
 			//get the true center point. Since origin is top left.
 			mid.X -= BaseUI.Width / 2; mid.Y -= BaseUI.Height / 2;
 			Canvas.SetLeft(BaseUI, mid.X); Canvas.SetTop(BaseUI, mid.Y);
-
-
 
 			//which drawing type?
 			if (bcomps)
