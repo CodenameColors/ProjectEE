@@ -12,7 +12,7 @@
 				xmlns:src="clr-namespace:AmethystEngine.Resources"
 				xmlns:WpfToolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
 				xmlns:DiagramDesigner="clr-namespace:DiagramDesigner" x:Class="AmethystEngine.Forms.EngineEditor"
-				
+				xmlns:Tline="clr-namespace:TimelinePlayer;assembly=TimelinePlayer"
 				mc:Ignorable="d" Background="#FF0E0D0D"
         Title="AmethystEngine" Height="1000" Width="1600" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
 
@@ -858,7 +858,11 @@
 								<Canvas x:Name="DialogueEditore_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 							</Canvas>
 
-							<ScrollViewer Grid.Row="1">
+							<Tline:TimelinePlayer Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="Auto" Width="Auto">
+								
+							</Tline:TimelinePlayer>
+
+							<!--<ScrollViewer Grid.Row="1">
 								<Canvas>
 									<Canvas.Background>
 										<VisualBrush TileMode="Tile" Stretch="Uniform" Viewport="0,0,20,20" ViewportUnits="Absolute" >
@@ -868,7 +872,7 @@
 										</VisualBrush>
 									</Canvas.Background>
 								</Canvas>
-							</ScrollViewer>
+							</ScrollViewer>-->
 
 						</Grid>
 
