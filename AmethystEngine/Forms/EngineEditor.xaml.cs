@@ -20,8 +20,8 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using BixBite.Resources;
 using PropertyGridEditor;
-
-
+using BixBite.Rendering.UI;
+using System.Threading;
 
 namespace AmethystEngine.Forms
 {
@@ -44,6 +44,14 @@ namespace AmethystEngine.Forms
     Fill,
 		Image,
 		Gameevent,
+	}
+
+	public enum NewUITool
+	{
+		NONE,
+		Textbox,
+		CheckBox,
+
 	}
 
 	public class LevelEditorProp
@@ -89,8 +97,10 @@ namespace AmethystEngine.Forms
 		int LEGridWidth = 40;
 		public double LEZoomLevel = 1;
 		public List<EditorObject> LESpriteObjectList = new List<EditorObject>();
+		private Sprite LESelectedSprite;
 		#endregion
 		#region LevelEditorUIPTRs
+		ContentControl LESelectedSpriteControl = new ContentControl();
 		Canvas MapLEditor_Canvas = new Canvas();
 		Canvas FullMapLEditor_Canvas = new Canvas();
 		VisualBrush FullMapLEditor_VB = new VisualBrush();
@@ -107,6 +117,16 @@ namespace AmethystEngine.Forms
 		#endregion
 		#endregion
 
+		#region UIEditorVars
+		NewUITool CurrentNewUI = NewUITool.NONE;
+		ContentControl SelectedBaseUIControl;
+		ContentControl SelectedUIControl;
+		//Dictionary<String, GameUI> OpenUIEdits = new Dictionary<string, GameUI>();
+		public ObservableCollection<GameUI> OpenUIEdits { get; set; }
+		GameUI SelectedUI;
+		Dictionary<String, GameUI> CurrentUIDictionary = new Dictionary<String, GameUI>();
+		#endregion
+
 		TreeView SceneExplorer_TreeView = new TreeView();
 		ListBox EditorObjects_LB = new ListBox();
 
@@ -119,6 +139,7 @@ namespace AmethystEngine.Forms
 
     String ProjectFilePath = "";
 		String MainLevelPath = "";
+		String CurrentWorkingDirectory = "";
 
 		ObservablePropertyDictionary EditorObjectProperties = new ObservablePropertyDictionary();
 
@@ -143,10 +164,10 @@ namespace AmethystEngine.Forms
 			TileMapTiles_Rect = (Rectangle)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB_Rect", ContentLibrary_Control);
 			TileMap_VB = (VisualBrush)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB", ContentLibrary_Control);
 			TileMapGrid_Rect = (Rectangle)ContentLibrary_Control.Template.FindName("TileMapGrid_Rect", ContentLibrary_Control);
-			SceneExplorer_TreeView = (TreeView)SceneExplorer_control.Template.FindName("SceneExplorer_TreeView", SceneExplorer_control);
+			SceneExplorer_TreeView = (TreeView)SceneExplorer_Control.Template.FindName("LESceneExplorer_TreeView", SceneExplorer_Control);
 
 			OpenLevels = new ObservableCollection<Level>();
-
+			OpenUIEdits = new ObservableCollection<GameUI>();
 
 			//PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
 			//LB.AddProperty("LevelName", new TextBox(), "Level1");
@@ -172,6 +193,7 @@ namespace AmethystEngine.Forms
 			MainLevelPath = LevelPath;
 			LoadInitalVars();
 			LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\"));
+			CurrentWorkingDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\");
     }
 		
 		private void LoadMainLevel(String filepath)
@@ -455,7 +477,7 @@ namespace AmethystEngine.Forms
 		#region "Dynamic Template Binding"
 		private void Desc_CB_Click(object sender, RoutedEventArgs e)
 		{
-			if (EditorWindows_TC.SelectedIndex == 0) //we are in the level editor.
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level")) //we are in the level editor.
 			{
 				TabControl LELibary_TC = (TabControl)ContentLibrary_Control.Template.FindName("LevelEditorLibary_TabControl", ContentLibrary_Control);
 				if (LELibary_TC.SelectedIndex == 1) //sprite libary
@@ -482,13 +504,16 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-    private void EditorWindows_TC_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-      if (EditorWindows_TC.SelectedIndex == 0)
+		private void EditorWindows_TC_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header == null) { EditorWindows_TC.SelectedIndex = 4; return; }
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level"))
       {
         ContentLibrary_Control.Template = (ControlTemplate)this.Resources["LevelEditorTileMap_Template"];
 				ObjectProperties_Control.Template = (ControlTemplate)this.Resources["LevelEditorProperty_Template"];
-				SceneExplorer_control.Template = (ControlTemplate)this.Resources["LevelEditorSceneExplorer_Template"];
+				SceneExplorer_Control.Template = (ControlTemplate)this.Resources["LevelEditorSceneExplorer_Template"];
+				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["LevelEditorTileMapToolBar_Template"];
+
 
 				UpdateLayout(); //update the templates to the ptrs won't be null! :D
 				//Find and set level editor controls!
@@ -501,17 +526,40 @@ namespace AmethystEngine.Forms
 				TileMapTiles_Rect = (Rectangle)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB_Rect", ContentLibrary_Control);
 				TileMap_VB = (VisualBrush)ContentLibrary_Control.Template.FindName("LevelEditorTileMapCanvas_VB", ContentLibrary_Control);
 				TileMapGrid_Rect = (Rectangle)ContentLibrary_Control.Template.FindName("TileMapGrid_Rect", ContentLibrary_Control);
-				SceneExplorer_TreeView = (TreeView)SceneExplorer_control.Template.FindName("SceneExplorer_TreeView", SceneExplorer_control);
-
+				SceneExplorer_TreeView = (TreeView)SceneExplorer_Control.Template.FindName("LESceneExplorer_TreeView", SceneExplorer_Control);
+				SceneExplorer_TreeView.ItemsSource = OpenLevels;
+				SceneExplorer_TreeView.Items.Refresh();
+				SceneExplorer_TreeView.UpdateLayout();
 			}
-      else if(EditorWindows_TC.SelectedIndex == 4)
+			else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Dialogue"))
+			{
+				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["DialogueEditorObjects_Template"];
+			}
+      else if(((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
       {
 				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["UIEditorObjects_Template"];
 				ObjectProperties_Control.Template = (ControlTemplate)this.Resources["UIEditorProperty_Template"];
-				SceneExplorer_control.Template = (ControlTemplate)this.Resources["UIEditorSceneExplorer"];
+				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["UIEditorObjectExplorer_Template"];
+				if (SceneExplorer_Control != null)
+				{
+					ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
+					SceneExplorer_Control.Template = cc;
+					Console.WriteLine(SceneExplorer_Control.Template.ToString());
+					TreeView tv = (TreeView)cc.FindName("UISceneExplorer_TreeView", SceneExplorer_Control); //(TreeView)SceneExplorer_Control.Template.FindName("UISceneExplorer_TreeView", SceneExplorer_Control);
+					if (tv == null) return;
+					SceneExplorer_TreeView = tv;
+					SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
+				}
+				
 
 			}
     }
+
+		public void RUnthisthis()
+		{
+
+		}
+
     #endregion
 
     #region "File/Folder Viewer"
@@ -523,7 +571,8 @@ namespace AmethystEngine.Forms
       CurrentProjectTreeView = (TreeView)sender; ContentLibaryObjList.Clear();
 			if (CurrentProjectTreeView.Items.Count == 0) return; 
       ((TreeViewItem)(CurrentProjectTreeView.SelectedItem)).IsExpanded = true;
-      AmethystEngine.Components.EObjectType EType = EObjectType.File;
+			CurrentWorkingDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\" + ((TreeViewItem)(CurrentProjectTreeView.SelectedItem)).Header + "\\");
+			AmethystEngine.Components.EObjectType EType = EObjectType.File;
       foreach (TreeViewItem tvi in ((TreeViewItem)(CurrentProjectTreeView.SelectedItem)).Items)
       {
         bool brel = false;
@@ -614,7 +663,6 @@ namespace AmethystEngine.Forms
 			if (result == true)
 			{
 				importfilename = dlg.FileName;
-
 			}
 			else
 				return;
@@ -625,7 +673,7 @@ namespace AmethystEngine.Forms
 
 			//filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
 			int len = importstartlocation.Length - importstartlocation.LastIndexOfAny(new char[] { '/', '\\' });
-			destfilename = importendlocation + importstartlocation.Substring(
+			destfilename = CurrentWorkingDirectory + importstartlocation.Substring(
 				importstartlocation.LastIndexOfAny(new char[] { '\\', '/' }) + 1, len - 1);
 
 			//copy the file
@@ -670,7 +718,8 @@ namespace AmethystEngine.Forms
         case (EObjectType.File):
           return;
         case (EObjectType.Folder):
-          ((TreeViewItem)(((TreeViewItem)(ProjectContentExplorer.SelectedItem)).Items[((ListBox)sender).SelectedIndex])).IsSelected = true;
+					CurrentWorkingDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\"+ ((EditorObject)((ListBox)sender).SelectedItem).Name + "\\");
+					((TreeViewItem)(((TreeViewItem)(ProjectContentExplorer.SelectedItem)).Items[((ListBox)sender).SelectedIndex])).IsSelected = true;
           return;
       }
     }
@@ -881,7 +930,7 @@ namespace AmethystEngine.Forms
 						Selector.AddUnselectedHandler(CC, Sprite_OnUnselected); //an event to call when we un select a sprite!
 						CC.MouseRightButtonDown += ContentControl_MouseLeftButtonDown;
 						var m = (CC.FindName("ResizeImage_rect"));
-						((Rectangle)CC.Content).Fill = new ImageBrush(img.Source) ;
+						((Rectangle)CC.Content).Fill = new ImageBrush(img.Source);
 						LevelEditor_Canvas.Children.Add(CC);
 
 						//add to minimap
@@ -1395,7 +1444,7 @@ namespace AmethystEngine.Forms
       int MainCurCellsY = ((int)Math.Ceiling(LevelEditor_BackCanvas.ActualHeight / Canvas_grid.Viewport.Height));
 
 
-			FullMapLEditor_Canvas.Children.RemoveAt(0);
+			//FullMapLEditor_Canvas.Children.RemoveAt(0);
 
 			FullMapSelection_Rect = new Rectangle() { Width = MainCurCellsX * 10, Height = MainCurCellsY * 10, Stroke = Brushes.White, StrokeThickness = 1, Name = "SelectionRect" };
       Canvas.SetLeft(FullMapSelection_Rect, 0); Canvas.SetTop(FullMapSelection_Rect, 0);
@@ -1612,7 +1661,11 @@ namespace AmethystEngine.Forms
 			{
 				CurrentTool = EditorTool.Select;
 				Deselect();
+				if (SceneExplorer_TreeView.SelectedItem is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).layerType == LayerType.Sprite)
+					SetSpriteHitState(true);
 			}
+			if (SceneExplorer_TreeView.SelectedItem is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).layerType == LayerType.Sprite)
+				SetSpriteHitState(true);
 		}
 	
 		private void LevelEditorBrush_Click(object sender, RoutedEventArgs e)
@@ -2068,9 +2121,16 @@ namespace AmethystEngine.Forms
 
 					i++;
 				}
+
+				foreach (ContentControl cc in LevelEditor_Canvas.Children.OfType<ContentControl>().ToList())
+				{
+					cc.IsHitTestVisible = false;
+				}
+
 				LevelEditor_Canvas.Children.Clear();
 				FullMapLEditor_Canvas.Children.Clear();
 				RedrawLevel(CurrentLevel);
+				DeselectSprites();
 			}
 
 			if (e.NewValue is SpriteLayer)
@@ -2093,12 +2153,32 @@ namespace AmethystEngine.Forms
 					i++;
 				}
 
+				if (SL.layerType == LayerType.Sprite)
+					SetSpriteHitState(false);
+				else
+				{ SetSpriteHitState(false); DeselectSprites(); }
+
+
 				//ListBox LB = ((ListBox)(ObjectProperties_Control.Template.FindName("LEditProperty_LB", ObjectProperties_Control)));
 				//LB.ItemsSource = null;
 				//LB.ItemsSource = LEditorTS;
 			}
+		}
 
+		private void DeselectSprites(bool b = false)
+		{
+			foreach (ContentControl cc in LevelEditor_Canvas.Children.OfType<ContentControl>().ToList())
+			{
+				Selector.SetIsSelected(cc, b);
+			}
+		}
 
+		private void SetSpriteHitState(bool b)
+		{
+			foreach (ContentControl cc in LevelEditor_Canvas.Children.OfType<ContentControl>().ToList())
+			{
+				cc.IsHitTestVisible = b;
+			}
 		}
 
 		private void RedrawLevel(Level LevelToDraw)
@@ -2273,7 +2353,7 @@ namespace AmethystEngine.Forms
 
 		public void ImportLevel(String filename)
 		{
-			if (EditorWindows_TC.SelectedIndex == 0)
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level"))
 			{
 				CurrentLevel = ((Level.ImportLevel(filename)));
 				OpenLevels.Add(CurrentLevel);
@@ -2494,7 +2574,7 @@ namespace AmethystEngine.Forms
 			string filename = "";
 
 			//level editor
-			if (EditorWindows_TC.SelectedIndex == 0)
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level"))
 			{
 				//get the LevelEditor content Libary tab control
 				TabControl LELibary_TC = (TabControl)ContentLibrary_Control.Template.FindName("LevelEditorLibary_TabControl", ContentLibrary_Control);
@@ -2764,7 +2844,7 @@ namespace AmethystEngine.Forms
 		private void SceneViewAdd_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			//what editor are we currently in?
-			if (EditorWindows_TC.SelectedIndex == 0)  //Level Editor
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level"))  //Level Editor
 			{
 				if (SceneExplorer_TreeView.HasItems) //there is no current Level we are editing.
 				{
@@ -2968,6 +3048,694 @@ namespace AmethystEngine.Forms
 
 		}
 		#endregion
+
+		
+
+		private void UICanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			//you clicked on nothing. so deselect UI CCs
+			foreach (ContentControl cc in UIEditor_Canvas.Children.OfType<ContentControl>().ToList())
+			{
+				Selector.SetIsSelected(cc, false);
+			}
+		}
+
+		private void UIEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+		{
+
+		}
+
+		private void UIEditor_BackCanvas_MouseMove(object sender, MouseEventArgs e)
+		{
+			Point p = Mouse.GetPosition(LevelEditor_BackCanvas);
+			String point = String.Format("({0}, {1}) OFF:({2}, {3})", (int)p.X, (int)p.Y, (int)Canvas_grid.Viewport.X, (int)Canvas_grid.Viewport.Y);
+			LevelEditorCords_TB.Text = point;
+
+			//which way is mouse moving?
+			MPos -= (Vector)e.GetPosition(LevelEditor_Canvas);
+			
+			//is the middle mouse button down?
+			if (e.MiddleButton == MouseButtonState.Pressed)
+			{
+				//LevelEditorPan();
+			}
+
+		}
+
+		private void ContentControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level"))
+			{
+				if (CurrentTool == EditorTool.Select)
+				{
+					if (LESelectedSpriteControl != null) Selector.SetIsSelected(LESelectedSpriteControl, false);
+					LESelectedSpriteControl = (ContentControl)sender;
+					Selector.SetIsSelected(LESelectedSpriteControl, true);
+
+					LESelectedSprite = SelectTool.FindSprite(((List<Sprite>)((SpriteLayer)SceneExplorer_TreeView.SelectedItem).LayerObjects), LESelectedSpriteControl);
+
+					Point point = new Point(Canvas.GetLeft(LESelectedSpriteControl), Canvas.GetTop(LESelectedSpriteControl));
+					Console.WriteLine(point.ToString());
+				}
+			}
+			else if(((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
+			{
+				if (SelectedUIControl != null) Selector.SetIsSelected(SelectedUIControl, false);
+				SelectedUIControl = (ContentControl)sender;
+				Selector.SetIsSelected(SelectedUIControl, true);
+
+				if (SelectedUIControl.Tag.ToString() == "Border")
+					SelectedBaseUIControl = (ContentControl)sender;
+				SelectedUI = CurrentUIDictionary[((Control)sender).Name];
+				int i = 0;
+				PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("UIPropertyGrid", ObjectProperties_Control)));
+				LB.ClearProperties();
+				foreach (object o in CurrentUIDictionary[SelectedUIControl.Name].getProperties().Values)
+				{
+					if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "Zindex")
+					{
+						TextBox TB = new TextBox(); TB.KeyDown += GameUI_ZIndex_Changed;
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+							o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
+					}
+					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "ShowBorder")
+					{
+						CheckBox CB = new CheckBox() { VerticalAlignment = VerticalAlignment.Center };
+						CB.Click += SetBorderVisibility;
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i],
+							CB,
+							o);
+					}
+					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "Image")
+					{
+						ComboBox CB = new ComboBox() { Height=50, ItemTemplate = (DataTemplate)this.Resources["CBIMGItems"] };
+						CB.SelectionChanged += GameImage_SelectionChanged;
+						List<EditorObject> ComboItems = new List<EditorObject>();
+						foreach(String filepath in GetAllProjectImages())
+						{
+							ComboItems.Add(new EditorObject(filepath, filepath.Substring(filepath.LastIndexOfAny(new char[] { '\\', '/' })), false));
+						}
+						CB.ItemsSource = ComboItems;
+
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], 
+							CB,
+							new List<String>());
+					}
+					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "Background")
+					{
+						DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
+						TB.SelectedColorChanged += customCP_BackgroundColorChanged;
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+							o.ToString());
+					}
+					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "FontColor")
+					{
+						DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
+						TB.SelectedColorChanged += customCP_FontColorChanged;
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+							o.ToString());
+					}
+					else
+					{
+						TextBox TB = new TextBox(); TB.KeyDown += UIPropertyCallback;
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+							o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
+					}
+					i++;
+				}
+			}
+		}
+
+		private void ContentControl_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+		{
+			if (CurrentTool == EditorTool.Select)
+			{
+				Point point = new Point(Canvas.GetLeft((ContentControl)sender), Canvas.GetTop((ContentControl)sender));
+				LESelectedSprite.SetProperty("x", (int)point.X);
+				LESelectedSprite.SetProperty("y", (int)point.Y);
+				Console.WriteLine(point.ToString()+ "MUP");
+			}
+		}
+
+		private void ContentControl_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			if (SelectedUI == null) return;
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level"))
+			{
+				if (CurrentTool == EditorTool.Select)
+				{
+					LESelectedSprite.SetProperty("width", (int)((ContentControl)sender).Width);
+					LESelectedSprite.SetProperty("height", (int)((ContentControl)sender).Height);
+					Console.WriteLine("SpriteSizeChanged");
+				}
+			}
+			else if(((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
+			{
+				SelectedUI.SetProperty("Width", (int)((ContentControl)sender).Width);
+				SelectedUI.SetProperty("Height", (int)((ContentControl)sender).Height);
+			}
+		}
+
+		
+
+		private void UIEditoGameTB_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			CurrentNewUI = NewUITool.Textbox;
+			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+			CC.Tag = "TEXTBOX";
+			CC.HorizontalAlignment = HorizontalAlignment.Center;
+			CC.VerticalAlignment = VerticalAlignment.Center;
+			Canvas.SetZIndex(CC, 1);
+
+			String TB = "/AmethystEngine;component/images/SmallTextBubble_Purple.png";
+			String TB1 = "/AmethystEngine;component/images/SmallTextBubble_Orange.png";
+			ImageBrush ib = new ImageBrush();
+			Image img = new Image();
+			img.Stretch = Stretch.Fill;
+			//img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+			img.IsHitTestVisible = false;
+			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false});
+			((Grid)CC.Content).Children.Add(img);
+			((Grid)CC.Content).Children.Add(new TextBox()
+			{
+				Text = "Sameple Text",
+				Margin = new Thickness(2),
+				BorderBrush = Brushes.Transparent,
+				IsHitTestVisible = false,
+				Background = Brushes.Transparent,
+				VerticalContentAlignment = VerticalAlignment.Center,
+				HorizontalContentAlignment = HorizontalAlignment.Center,
+				FontSize = 24,
+				Foreground = Brushes.White
+			});
+
+			int i = 1; String name = "NewTextBox";
+			while (CurrentUIDictionary.ContainsKey(name))
+			{
+				name += i++;
+			}
+			CC.Name = name;
+			UIEditor_Canvas.Children.Add(CC);
+			CurrentUIDictionary.Add(name, new GameTextBlock(name, 50, 50, 0, 0, 1));
+			OpenUIEdits[0].AddUIElement(CurrentUIDictionary.Values.Last()); //TODO: use the selection Treeview
+		}
+
+		private void UIEditoGameIMG_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+			CC.HorizontalAlignment = HorizontalAlignment.Center;
+			CC.VerticalAlignment = VerticalAlignment.Center;
+			Canvas.SetZIndex(CC, 1);
+
+			CC.Tag = "IMAGE";
+
+
+			String TB = "/AmethystEngine;component/images/emma_colors_oc.png";
+			ImageBrush ib = new ImageBrush();
+			Image img = new Image();
+			img.Stretch = Stretch.Fill;
+			img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+			img.IsHitTestVisible = false;
+			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, IsHitTestVisible = false });
+			((Grid)CC.Content).Children.Add(new Rectangle() { });
+			((Grid)CC.Content).Children.Add(img);
+
+			int i = 1; String name = "NewImgBox";
+			while (CurrentUIDictionary.ContainsKey(name))
+			{
+				name += i++;
+			}
+			CC.Name = name;
+			UIEditor_Canvas.Children.Add(CC);
+			CurrentUIDictionary.Add(name, new GameIMG(name, 50, 50, 1, 0, 0));
+			OpenUIEdits[0].AddUIElement(CurrentUIDictionary.Values.Last()); //TODO: use the selection Treeview
+		}
+
+		private void ContentControl_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			
+		}
+		
+		void customCP_FontColorChanged(Color obj)
+		{
+			((TextBox)((Grid)SelectedUIControl.Content).Children[2]).Foreground = new SolidColorBrush(obj);
+			SelectedUI.SetProperty("FontColor", obj.ToString());
+		}
+
+		void customCP_BackgroundColorChanged(Color obj)
+		{
+			((Grid)SelectedUIControl.Content).Background = new SolidColorBrush(obj);
+			SelectedUI.SetProperty("Background", obj.ToString());
+		}
+
+		private void SetBorderVisibility(object sender, RoutedEventArgs e)
+		{
+			String Property = ((CheckBox)sender).Tag.ToString();
+			if (Property == "ShowBorder")
+			{
+				Console.WriteLine("Change BorderDisplay");
+				if (((CheckBox)sender).IsChecked == false) //T->F
+					((Border)((Grid)SelectedUIControl.Content).Children[0]).Visibility = Visibility.Hidden;
+				//((TextBox)((Grid)SelectedUIControl.Content).Children[1]).FontSize = Int32.Parse(((TextBox)sender).Text);
+				else
+					((Border)((Grid)SelectedUIControl.Content).Children[0]).Visibility = Visibility.Visible;
+
+				SelectedUI.SetProperty("ShowBorder", !((bool)SelectedUI.GetProperty("ShowBorder")));
+			}
+		}
+
+		private void UIPropertyCallback(object sender, KeyEventArgs e)
+		{
+			if (Key.Enter == e.Key)
+			{
+				//base.PropertyCallback(sender, e);
+				Console.WriteLine("GAMETB UI CALLBACK");
+				Console.WriteLine(((TextBox)sender).Tag.ToString());
+
+				String Property = ((TextBox)sender).Tag.ToString();
+				if (Property == "FontSize")
+				{
+					((TextBox)((Grid)SelectedUIControl.Content).Children[2]).FontSize = Int32.Parse(((TextBox)sender).Text);
+				}
+			}
+		}
+
+
+		private void GameImage_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (SelectedUIControl.Tag.ToString() == "IMAGE")
+				((Image)((Grid)SelectedUIControl.Content).Children[2]).Source =
+					new BitmapImage(((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail);
+
+			if(SelectedUI is GameIMG)
+			{
+				SelectedUI.SetProperty("Image", ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+			}
+
+			if(SelectedUIControl.Tag.ToString() == "TEXTBOX")
+			{
+				((Image)((Grid)SelectedUIControl.Content).Children[1]).Source =
+					new BitmapImage(((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail);
+				SelectedUI.SetProperty("Image", ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+
+			}
+
+		}
+
+		private void GameUI_ZIndex_Changed(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter) {
+				if (((ContentControl)SelectedUIControl).Tag.ToString() == "Border")
+				{
+					return;
+				}
+				else
+				{
+					if (Int32.TryParse(((TextBox)sender).Text, out int val))
+					{
+						Canvas.SetZIndex((ContentControl)SelectedUIControl, val);
+						SelectedUI.SetProperty("Zindex", val);
+					}
+				}
+				
+			}
+		}
+
+
+		private void ContentControl_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+		{
+			ContextMenu cm = this.FindResource("EditMovableControls_Template") as ContextMenu;
+			//((MenuItem)cm.Items[0]).IsChecked = ((MenuItem)cm.Items[0]).IsChecked;
+			cm.PlacementTarget = sender as ContentControl;
+			cm.IsOpen = true;
+		}
+
+		private void EditMoveableControl_Click(object sender, RoutedEventArgs e)
+		{
+			((MenuItem)sender).IsChecked = !SelectedUIControl.IsHitTestVisible;
+			foreach (UIElement item in ((Grid)SelectedUIControl.Content).Children)
+			{
+				item.IsHitTestVisible = !item.IsHitTestVisible;
+			}
+		}
+
+		
+
+		private void UISceneExplorer_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+		}
+
+		private void UISceneExplorer_TreeView_Loaded(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void ContentControl_PreviewMouseMove(object sender, MouseEventArgs e)
+		{
+			if(e.LeftButton == MouseButtonState.Pressed)
+			{
+				
+				Console.WriteLine("Moved UI CC");
+				if (SelectedBaseUIControl != null && (SelectedUI is GameTextBlock || SelectedUI is GameIMG))
+				{
+					Vector RelOrigin = new Vector((int)Canvas.GetLeft(SelectedBaseUIControl), (int)Canvas.GetTop(SelectedBaseUIControl));
+					Vector ControlPos = new Vector((int)Canvas.GetLeft(SelectedUIControl), (int)Canvas.GetTop(SelectedUIControl));
+					Vector Offset = ControlPos - RelOrigin;
+					SelectedUI.SetProperty("Xoffset", (int)Offset.X);
+					SelectedUI.SetProperty("YOffset", (int)Offset.Y);
+				}
+			}
+		}
+
+		private void NewUI_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
+
+			TreeView tv = (TreeView)cc.FindName("UISceneExplorer_TreeView", SceneExplorer_Control);
+			if (tv != null)
+			{
+				SceneExplorer_TreeView = tv;
+				SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
+			}
+			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+			
+			CC.HorizontalAlignment = HorizontalAlignment.Center;
+			CC.VerticalAlignment = VerticalAlignment.Center;
+			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray });
+			CC.Tag = "Border";
+			Canvas.SetZIndex(CC, 0);
+
+			OpenUIEdits.Add(new GameUI("NewUITool", 50, 50, 1));
+			SelectedUI = OpenUIEdits.Last();
+			CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
+
+			CC.Name = OpenUIEdits.Last().UIName;
+
+			UIEditor_Canvas.Children.Add(CC);
+			SelectedUIControl = CC;
+			SelectedBaseUIControl = CC;
+		}
+
+		private void SaveUIAs_Click(object sender, RoutedEventArgs e)
+		{
+			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
+			{
+				Title = "New Level File",
+				FileName = "", //default file name
+				Filter = "txt files (*.lvl)|*.lvl|All files (*.*)|*.*",
+				FilterIndex = 2,
+				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\UI"),
+				RestoreDirectory = true
+			};
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+			Console.WriteLine(dlg.FileName);
+
+			OpenUIEdits[0].ExportUI(dlg.FileName);
+			
+		}
+
+		public List<String> GetAllProjectImages()
+		{
+			//get the images location
+			String InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Images");
+			return Directory.GetFiles(InitialDirectory).ToList();
+		}
+
+		private void OpenUIFile_UIE(object sender, RoutedEventArgs e)
+		{
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+			{
+				Title = "Open UI File",
+				FileName = "", //default file name
+				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\UI"),
+				Filter = "UI files (*.ui)|*.ui|All files (*.*)|*.*",
+				FilterIndex = 2,
+				RestoreDirectory = true
+			};
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+			Console.WriteLine(dlg.FileName);
+
+			GameUI g =  GameUI.ImportGameUI(dlg.FileName);
+			OpenUIEdits.Add(g);
+
+			ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
+
+			TreeView tv = (TreeView)cc.FindName("UISceneExplorer_TreeView", SceneExplorer_Control);
+			if (tv != null)
+			{
+				SceneExplorer_TreeView = tv;
+				SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
+			}
+
+			DrawUIToScreen(UIEditor_Canvas, UIEditor_BackCanvas,OpenUIEdits.Last(), false);
+			
+		}
+
+
+		/// <summary>
+		/// method to draw a newly added/imported UI to the screen. Choose whether or not to breakdown the components for editing.
+		/// </summary>
+		/// <param name="CurrentEditorCanvas">Current Canvas that you will draw the UI too</param>
+		/// <param name="gameUI">The Custom created UI that you want to draw</param>
+		/// <param name="bcomps">TRUE = multiple ContentControls will be drawn, and allowed to be edited 
+		/// <para/>
+		/// FALSE = ONLY ONE Content control will be drawn. Base UI is editable in size, and position. Children are editable via properties
+		/// </param>
+		public void DrawUIToScreen(Canvas CurrentEditorCanvas, Canvas CurrentEditorCanvas_Back, GameUI gameUI, bool bcomps)
+		{
+			//set the position and the size of the Base UI
+			ContentControl BaseUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+			
+			BaseUI.Width = Int32.Parse(gameUI.GetProperty("Width").ToString());
+			BaseUI.Height = Int32.Parse(gameUI.GetProperty("Height").ToString());
+			BaseUI.BorderBrush = (((bool)gameUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+			BaseUI.BorderThickness = new Thickness(0);
+			BaseUI.Tag = "Border";
+			BaseUI.Name = gameUI.UIName;
+			//};
+			BaseUI.Content = new Grid()
+			{
+				HorizontalAlignment = HorizontalAlignment.Stretch,
+				VerticalAlignment = VerticalAlignment.Stretch,
+			};
+			((Grid)BaseUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = (((bool)gameUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent) });
+
+			//get the middle!
+			Point mid = new Point(CurrentEditorCanvas_Back.ActualWidth / 2, CurrentEditorCanvas_Back.ActualHeight/2);
+			//get the true center point. Since origin is top left.
+			mid.X -= BaseUI.Width / 2; mid.Y -= BaseUI.Height / 2;
+			Canvas.SetLeft(BaseUI, mid.X); Canvas.SetTop(BaseUI, mid.Y);
+
+			//which drawing type?
+			if (bcomps)
+			{
+				//create all the child UI elements as editable content controls
+				foreach (GameUI childUI in gameUI.UIElements)
+				{
+					#region DefaultProperties
+					//set the position and the size of the Base UI
+					ContentControl CUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+					CUI.Width = Int32.Parse(childUI.GetProperty("Width").ToString());
+					CUI.Height = Int32.Parse(childUI.GetProperty("Height").ToString());
+					CUI.BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+					CUI.BorderThickness = new Thickness(2);
+					CUI.Tag = "Border";
+					CUI.Name = childUI.UIName;
+
+					CUI.Content = new Grid()
+					{
+						HorizontalAlignment = HorizontalAlignment.Stretch,
+						VerticalAlignment = VerticalAlignment.Stretch,
+						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("Background").ToString()),
+						IsHitTestVisible = false,
+					};
+					((Grid)CUI.Content).Children.Add(new Border()
+					{
+						BorderThickness = (((bool)childUI.GetProperty("ShowBorder")) ? new Thickness(2) : new Thickness(0)),
+						BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent)
+					});
+					CUI.Name = childUI.UIName;
+					Canvas.SetLeft(CUI, mid.X + Int32.Parse(childUI.GetProperty("Xoffset").ToString()));
+					Canvas.SetTop(CUI, mid.Y + Int32.Parse(childUI.GetProperty("YOffset").ToString()));
+					Canvas.SetZIndex(CUI, Int32.Parse(childUI.GetProperty("Zindex").ToString()));
+					CurrentEditorCanvas.Children.Add(CUI);
+					#endregion
+
+					if (childUI is GameTextBlock)
+					{
+						CUI.Tag = "TEXTBOX";
+
+						String TB = "/AmethystEngine;component/images/SmallTextBubble_Purple.png";
+						String TB1 = "/AmethystEngine;component/images/SmallTextBubble_Orange.png";
+						Image img = new Image();
+						img.Stretch = Stretch.Fill;
+						img.Source = new BitmapImage(new Uri(
+							(File.Exists(childUI.GetProperty("Image").ToString()) ? childUI.GetProperty("Image").ToString() : ""),
+							UriKind.RelativeOrAbsolute
+							));
+						img.IsHitTestVisible = false;
+						//((Grid)CUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false });
+						((Grid)CUI.Content).Children.Add(img);
+						((Grid)CUI.Content).Children.Add(new TextBox()
+						{
+							Text = "Sameple Text",
+							Margin = new Thickness(2),
+							BorderBrush = ((bool)childUI.GetProperty("ShowBorder") ? Brushes.Gray : Brushes.Transparent),
+							IsHitTestVisible = false,
+							VerticalContentAlignment = VerticalAlignment.Center,
+							HorizontalContentAlignment = HorizontalAlignment.Center,
+							FontSize = Int32.Parse(childUI.GetProperty("FontSize").ToString()),
+							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("FontColor").ToString()),
+							Background = Brushes.Transparent
+						});
+
+					}
+					else if (childUI is GameIMG)
+					{
+						CUI.Tag = "IMAGE";
+
+						String TB = childUI.GetProperty("Image").ToString();
+						Image img = new Image();
+						img.Stretch = Stretch.Fill;
+						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+						img.IsHitTestVisible = false;
+						((Grid)CUI.Content).Children.Add(new Rectangle() { });
+						((Grid)CUI.Content).Children.Add(img);
+
+
+					}
+					else if (childUI is GameButton)
+					{
+
+					}
+
+					CurrentUIDictionary.Add(childUI.UIName, childUI);
+				}
+			}
+			else //all as one
+			{
+				//create all the child UI elements as editable content controls
+				foreach (GameUI childUI in gameUI.UIElements)
+				{
+					#region DefaultProperties
+					//set the position and the size of the Base UI
+					ContentControl CUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+					CUI.Width = Int32.Parse(childUI.GetProperty("Width").ToString());
+					CUI.Height = Int32.Parse(childUI.GetProperty("Height").ToString());
+					CUI.BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+					CUI.BorderThickness = new Thickness(0);
+					CUI.Tag = "Border";
+					CUI.Name = childUI.UIName;
+
+					CUI.Content = new Grid()
+					{
+						HorizontalAlignment = HorizontalAlignment.Stretch,
+						VerticalAlignment = VerticalAlignment.Stretch,
+						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("Background").ToString()),
+						IsHitTestVisible = false,
+					};
+					((Grid)CUI.Content).Children.Add(new Border()
+					{
+						BorderThickness = new Thickness(0),//(((bool)childUI.GetProperty("ShowBorder")) ? new Thickness(2) : new Thickness(0)),
+						BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent),
+						IsHitTestVisible = false
+					});
+					CUI.Name = childUI.UIName;
+					#endregion
+
+					if (childUI is GameTextBlock)
+					{
+						CUI.Tag = "TEXTBOX";
+						Image img = new Image() { IsHitTestVisible = false };
+						img.Stretch = Stretch.Fill;
+						img.Source = new BitmapImage(new Uri(
+							(File.Exists(childUI.GetProperty("Image").ToString()) ? childUI.GetProperty("Image").ToString() : ""),
+							UriKind.RelativeOrAbsolute
+							));
+						img.IsHitTestVisible = false;
+						//((Grid)CUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false });
+						((Grid)CUI.Content).Children.Add(img);
+						((Grid)CUI.Content).Children.Add(new TextBox()
+						{
+							Text = "Sameple Text",
+							Margin = new Thickness(2),
+							BorderThickness = new Thickness(0),
+							IsHitTestVisible = false,
+							VerticalContentAlignment = VerticalAlignment.Center,
+							HorizontalContentAlignment = HorizontalAlignment.Center,
+							FontSize = Int32.Parse(childUI.GetProperty("FontSize").ToString()),
+							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("FontColor").ToString()),
+							Background = Brushes.Transparent
+						});
+						CUI.Margin = new Thickness()
+						{
+							Left = Int32.Parse(childUI.GetProperty("Xoffset").ToString()),
+							Top = Int32.Parse(childUI.GetProperty("YOffset").ToString()),
+							//Bottom = BaseUI.Height - (Top + CUI.Height),
+							//Right = BaseUI.Width - (Left + CUI.Width)
+						};
+						CUI.IsHitTestVisible = false;
+						CUI.VerticalAlignment = VerticalAlignment.Top;
+						CUI.HorizontalAlignment = HorizontalAlignment.Left;
+						CUI.BorderThickness = new Thickness(0);
+						((Grid)BaseUI.Content).Children.Add(CUI);
+					}
+					else if (childUI is GameIMG)
+					{
+						CUI.Tag = "IMAGE";
+
+						String TB = childUI.GetProperty("Image").ToString();
+						Image img = new Image() { IsHitTestVisible = false };
+						img.Stretch = Stretch.Fill;
+						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+						img.IsHitTestVisible = false;
+						((Grid)CUI.Content).Children.Add(new Rectangle() { });
+						CUI.Margin = new Thickness()
+						{
+							Left = Int32.Parse(childUI.GetProperty("Xoffset").ToString()),
+							Top = Int32.Parse(childUI.GetProperty("YOffset").ToString()),
+						};
+						CUI.IsHitTestVisible = false;
+						CUI.VerticalAlignment = VerticalAlignment.Top;
+						CUI.HorizontalAlignment = HorizontalAlignment.Left;
+						((Grid)CUI.Content).Children.Add(img);
+						((Grid)BaseUI.Content).Children.Add(CUI);
+					}
+					else if (childUI is GameButton)
+					{
+
+					}
+				}
+			}
+			SelectedUI = OpenUIEdits.Last();
+			CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
+			CurrentEditorCanvas.Children.Add(BaseUI);
+			SelectedBaseUIControl = BaseUI;
+		}
+
+
+
+
 	}
 }
 
