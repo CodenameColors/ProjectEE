@@ -6,7 +6,16 @@ using System.Threading.Tasks;
 
 namespace BixBite.Characters
 {
-	class Character
+	public class Character
 	{
+		//Every Character has a name
+		public String Name { get; set; }
+
+		//every character has Dialogue Sprites
+		List<String> DialogueSprites = new List<string>();
+
+		//Every character will have Animations (WIP)
+		
+
 	}
 }
