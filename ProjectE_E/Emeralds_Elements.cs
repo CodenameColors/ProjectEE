@@ -8,6 +8,8 @@ using ProjectE_E.Components;
 using System.Collections.Generic;
 using System.Threading;
 using System.IO;
+using BixBite.Rendering.UI;
+using System;
 
 namespace ProjectE_E
 {
@@ -23,8 +25,9 @@ namespace ProjectE_E
 		Map C_map; //for map change testing
 		Player Player;
 		Camera camera;
-
+		private List<UIComponent> _uiComponents;
 		string MainLevelPath = "";
+		private Color _backgroundColour;
 
 		public Emeralds_Elements()
 		{
@@ -71,6 +74,7 @@ namespace ProjectE_E
 			map = new Map();
 			C_map = new Map();
 			Player = new Player();
+			this.IsMouseVisible = true;
 			base.Initialize();
 		}
 
@@ -98,14 +102,14 @@ namespace ProjectE_E
 			Tile.Content = this.Content;
 
 			camera = new Camera(GraphicsDevice.Viewport);
-
-			//load the assets.
-			//this.Content.Load<Texture2D>("Images/Tile1");
 			
+		//load the assets.
+		//this.Content.Load<Texture2D>("Images/Tile1");
 
-			//Tile.Content = this.Content;
 
-			Load_async();
+		//Tile.Content = this.Content;
+
+		Load_async();
 
 			Thread.Sleep(System.TimeSpan.FromMilliseconds(100));
 
@@ -115,11 +119,54 @@ namespace ProjectE_E
 			
 
 			Player.Load(this.Content);
+
+
+
+
+			//UI TESTING STARTS HEREE
+			var randomButton = new GameButton(Content.Load<Texture2D>("Images/Button"), Content.Load<SpriteFont>("Fonts/File"))
+			{
+				Position = new Vector2(350, 800),
+				Text = "Random",
+			};
+
+			randomButton.Click += RandomButton_Click;
+
+			var quitButton = new GameButton(Content.Load<Texture2D>("Images/Button"), Content.Load<SpriteFont>("Fonts/File"))
+			{
+				Position = new Vector2(350, 850),
+				Text = "Quit",
+			};
+
+			quitButton.Click += QuitButton_Click;
+
+			_uiComponents = new List<UIComponent>()
+			{
+				randomButton,
+				quitButton,
+			};
+
+			
+
 			// TODO: use this.Content to load your game content here
 
 			//C_map.level = Level.ImportLevel("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\Levels\\LevelChangeTestNew.lvl");
 
 		}
+
+		private void QuitButton_Click(object sender, System.EventArgs e)
+		{
+			Exit();
+		}
+
+		private void RandomButton_Click(object sender, System.EventArgs e)
+		{
+			var random = new Random();
+
+			_backgroundColour = new Color(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255));
+		}
+
+
 
 		/// <summary>
 		/// UnloadContent will be called once per game and is the place to unload
@@ -192,6 +239,7 @@ namespace ProjectE_E
 			}
 			else
 			{
+				
 				camera.Update(Player.Position, 0, 0);
 			}
 			//}
@@ -214,6 +262,11 @@ namespace ProjectE_E
 			//	System.Console.WriteLine("M DOWN");
 			//}
 
+			foreach (UIComponent ui in _uiComponents)
+			{
+				ui.Update(gameTime);
+			}
+
 			base.Update(gameTime);
 		}
 
@@ -223,14 +276,21 @@ namespace ProjectE_E
       /// <param name="gameTime">Provides a snapshot of timing values.</param>
 		protected override void Draw(GameTime gameTime)
 		{
-			GraphicsDevice.Clear(Color.Black);
+			GraphicsDevice.Clear(_backgroundColour);
 
-			
+
+
 			spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform);
 			//spriteBatch.Draw(t2, new Vector2(0, 0));
 			if(map != null)
 				map.Draw(spriteBatch);
 			Player.Draw(spriteBatch);
+
+			foreach (UIComponent ui in _uiComponents)
+			{
+				ui.Draw(gameTime, spriteBatch);
+			}
+
 			spriteBatch.End();
 			base.Draw(gameTime);
 		}
