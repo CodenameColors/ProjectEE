@@ -477,7 +477,7 @@ namespace AmethystEngine.Forms
 		#region "Dynamic Template Binding"
 		private void Desc_CB_Click(object sender, RoutedEventArgs e)
 		{
-			if (EditorWindows_TC.SelectedIndex == 0) //we are in the level editor.
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level")) //we are in the level editor.
 			{
 				TabControl LELibary_TC = (TabControl)ContentLibrary_Control.Template.FindName("LevelEditorLibary_TabControl", ContentLibrary_Control);
 				if (LELibary_TC.SelectedIndex == 1) //sprite libary
@@ -504,9 +504,10 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-    private void EditorWindows_TC_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-      if (EditorWindows_TC.SelectedIndex == 0)
+		private void EditorWindows_TC_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header == null) { EditorWindows_TC.SelectedIndex = 4; return; }
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level"))
       {
         ContentLibrary_Control.Template = (ControlTemplate)this.Resources["LevelEditorTileMap_Template"];
 				ObjectProperties_Control.Template = (ControlTemplate)this.Resources["LevelEditorProperty_Template"];
@@ -530,7 +531,11 @@ namespace AmethystEngine.Forms
 				SceneExplorer_TreeView.Items.Refresh();
 				SceneExplorer_TreeView.UpdateLayout();
 			}
-      else if(EditorWindows_TC.SelectedIndex == 4)
+			else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Dialogue"))
+			{
+				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["DialogueEditorObjects_Template"];
+			}
+      else if(((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
       {
 				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["UIEditorObjects_Template"];
 				ObjectProperties_Control.Template = (ControlTemplate)this.Resources["UIEditorProperty_Template"];
@@ -2348,7 +2353,7 @@ namespace AmethystEngine.Forms
 
 		public void ImportLevel(String filename)
 		{
-			if (EditorWindows_TC.SelectedIndex == 0)
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level"))
 			{
 				CurrentLevel = ((Level.ImportLevel(filename)));
 				OpenLevels.Add(CurrentLevel);
@@ -2569,7 +2574,7 @@ namespace AmethystEngine.Forms
 			string filename = "";
 
 			//level editor
-			if (EditorWindows_TC.SelectedIndex == 0)
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level"))
 			{
 				//get the LevelEditor content Libary tab control
 				TabControl LELibary_TC = (TabControl)ContentLibrary_Control.Template.FindName("LevelEditorLibary_TabControl", ContentLibrary_Control);
@@ -2839,7 +2844,7 @@ namespace AmethystEngine.Forms
 		private void SceneViewAdd_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			//what editor are we currently in?
-			if (EditorWindows_TC.SelectedIndex == 0)  //Level Editor
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level"))  //Level Editor
 			{
 				if (SceneExplorer_TreeView.HasItems) //there is no current Level we are editing.
 				{
@@ -3079,7 +3084,7 @@ namespace AmethystEngine.Forms
 
 		private void ContentControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			if (EditorWindows_TC.SelectedIndex == 0)
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level"))
 			{
 				if (CurrentTool == EditorTool.Select)
 				{
@@ -3093,7 +3098,7 @@ namespace AmethystEngine.Forms
 					Console.WriteLine(point.ToString());
 				}
 			}
-			else if(EditorWindows_TC.SelectedIndex == 4)
+			else if(((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
 			{
 				if (SelectedUIControl != null) Selector.SetIsSelected(SelectedUIControl, false);
 				SelectedUIControl = (ContentControl)sender;
@@ -3175,7 +3180,7 @@ namespace AmethystEngine.Forms
 		private void ContentControl_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			if (SelectedUI == null) return;
-			if (EditorWindows_TC.SelectedIndex == 0)
+			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level"))
 			{
 				if (CurrentTool == EditorTool.Select)
 				{
@@ -3184,7 +3189,7 @@ namespace AmethystEngine.Forms
 					Console.WriteLine("SpriteSizeChanged");
 				}
 			}
-			else if(EditorWindows_TC.SelectedIndex == 4)
+			else if(((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
 			{
 				SelectedUI.SetProperty("Width", (int)((ContentControl)sender).Width);
 				SelectedUI.SetProperty("Height", (int)((ContentControl)sender).Height);

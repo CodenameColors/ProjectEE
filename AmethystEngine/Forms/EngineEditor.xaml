@@ -59,7 +59,7 @@
 				<MenuItem x:Name="Edit_CM" IsChecked="False" Header="Edit" Click="EditMoveableControl_Click">
 				</MenuItem>
 			</ContextMenu>
-			
+
 			<ContextMenu x:Key="LevelContextMenu_Template">
 				<MenuItem Header="Add Tile Layer" Click="AddTileLayer_Click"/>
 				<MenuItem Header="Add Sprite Layer" Click="SpriteLayer_Click" />
@@ -132,7 +132,7 @@
 
 				</Grid>
 			</ControlTemplate>
-			
+
 
 			<!--<BixRes:ObservablePropertyDictionary x:Key="PropertyStyles"/>-->
 			<!--#region EdtiorToolbars-->
@@ -262,6 +262,38 @@
 
 			<!--#endregion-->
 
+			<ControlTemplate x:Key="DialogueEditorObjects_Template">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="30"/>
+						<RowDefinition Height="*"/>
+					</Grid.RowDefinitions>
+
+					<TextBlock Text="Add A Character" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,7,0,7"/>
+					<Button Content="+" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="106,5,0,5" Height="20" VerticalContentAlignment="Top" Width="20" RenderTransformOrigin="1.5,0.5"/>
+
+					<TreeView Grid.Row="1" Background="#FF383838">
+						<TreeView.Resources>
+							<HierarchicalDataTemplate DataType="{x:Type BixUI:GameUI}" ItemsSource="{Binding UIElements}">
+								<StackPanel Orientation="Horizontal">
+									<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
+									<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="20" MaxHeight="15" />
+									<TextBlock Text="{Binding UIName}" Foreground="White" />
+								</StackPanel>
+							</HierarchicalDataTemplate>
+							<DataTemplate DataType="{x:Type BixUI:GameTextBlock}">
+								<StackPanel Orientation="Horizontal">
+									<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
+									<TextBlock Text="{Binding TBName}" Foreground="White" />
+								</StackPanel>
+							</DataTemplate>
+						</TreeView.Resources>
+
+					</TreeView>
+				</Grid>
+			</ControlTemplate>
+
+
 			<ControlTemplate x:Key="UIEditorObjects_Template" >
 				<Grid x:Name="LevelEditorTileMap_ToolBar_Grid" Background="#FF2B2B2B" VerticalAlignment="Stretch" Margin="5,4,10,8">
 					<Grid.RowDefinitions>
@@ -278,7 +310,7 @@
 					<Button x:Name="UIEditoGameBTN_BTN" Grid.Row="2" Content="Button"/>
 				</Grid>
 			</ControlTemplate>
-			
+
 			<ControlTemplate x:Key="LevelEditorTileMap_Template">
 				<TabControl x:Name="LevelEditorLibary_TabControl" Background="#FF2B2B2B" SelectionChanged="LevelEditorLibary_TabControl_SelectionChanged">
 
@@ -371,7 +403,7 @@
 					</TreeView.Resources>
 				</TreeView>
 			</ControlTemplate>
-			
+
 			<ControlTemplate x:Key="LevelEditorSceneExplorer_Template">
 				<TreeView x:Name="LESceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,0,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
 								 SelectedItemChanged="SceneExplorer_TreeView_SelectedItemChanged">
@@ -396,16 +428,16 @@
 							</StackPanel>
 						</DataTemplate>
 					</TreeView.Resources>
-				</TreeView>	
+				</TreeView>
 			</ControlTemplate>
-			
-			
+
+
 			<ControlTemplate x:Key="UIEditorProperty_Template">
 				<pgrid:PropGrid x:Name="UIPropertyGrid" Margin="0,54,0,0">
-					
+
 				</pgrid:PropGrid>
 			</ControlTemplate>
-			
+
 			<ControlTemplate x:Key="LevelEditorProperty_Template">
 				<Grid VerticalAlignment="Stretch" Grid.Column="2" Margin="0,45,0,0" Background="#FF2B2B2B">
 					<Grid.RowDefinitions>
@@ -435,17 +467,21 @@
 					<!--<pgrid:PropGrid x:Name="Properties_Grid" Grid.Row="1">
 						
 					</pgrid:PropGrid>-->
-					
+
 					<!--<Label Content="Properties:" VerticalAlignment="Top" HorizontalAlignment="Stretch" Grid.Row="1" Foreground="White"/>-->
 					<!--<ListView HorizontalAlignment="Stretch" Margin="0,4,0,0" Grid.Row="1" VerticalAlignment="Stretch" x:Name="LEditProperty_LB"
 									ItemsSource="{Binding Source={StaticResource PropertyStyles}}" Background="Transparent" IsSynchronizedWithCurrentItem="True">
 						<ListView.ItemContainerStyle>
 							<Style TargetType="{x:Type ListViewItem}">
 								<Style.Resources>
-									--><!--Foreground for Selected ListViewItem--><!--
+									-->
+					<!--Foreground for Selected ListViewItem-->
+					<!--
 									<SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" 
                                  Color="Black"/>
-									--><!--Background for Selected ListViewItem--><!--
+									-->
+					<!--Background for Selected ListViewItem-->
+					<!--
 									<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
                                  Color="Transparent"/>
 								</Style.Resources>
@@ -453,7 +489,9 @@
 						</ListView.ItemContainerStyle>
 						<ListView.View>
 
-							--><!--<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>--><!--
+							-->
+					<!--<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>-->
+					<!--
 
 							<GridView ColumnHeaderContainerStyle="{StaticResource LeditorLV_Style}" >
 								<GridViewColumn Header="Property" DisplayMemberBinding="{Binding Key}">
@@ -465,7 +503,7 @@
 							</GridView>
 						</ListView.View>
 					</ListView>-->
-					
+
 					<GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
 				</Grid>
 			</ControlTemplate>
@@ -726,7 +764,7 @@
 				<TextBlock Text="+" Margin="0,0,1,2" VerticalAlignment="Center"/>
 			</Button>
 			<ContentControl x:Name="ContentLibrary_Control" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
-               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" Margin="0,46,0,-1" Template="{DynamicResource UIEditorObjects_Template}">
+               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" Margin="0,46,0,-1" Template="{DynamicResource DialogueEditorObjects_Template}">
 				<Expander Header="Expander" Height="100" Width="100">
 					<Grid Background="#FFE5E5E5"/>
 				</Expander>
@@ -859,7 +897,7 @@
 							</Canvas>
 
 							<Tline:TimelinePlayer Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="Auto" Width="Auto">
-								
+
 							</Tline:TimelinePlayer>
 
 							<!--<ScrollViewer Grid.Row="1">
@@ -952,10 +990,10 @@
 
 			<ContentControl x:Name="SceneExplorer_Control" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,26,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch"
 											 Template="{DynamicResource UIEditorSceneExplorer_Template}">
-				
+
 			</ContentControl>
-			
-			
+
+
 
 			<ListBox x:Name="SearchResultList" Grid.Column="1" HorizontalAlignment="Stretch" Margin="3,25,0,0" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
                Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" SelectionChanged="SearchResultList_SelectionChanged" ScrollViewer.VerticalScrollBarVisibility="Hidden" MouseDoubleClick="SearchResultList_MouseDoubleClick"
