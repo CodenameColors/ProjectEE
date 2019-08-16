@@ -89,6 +89,48 @@
 				</ComboBox>
 			</DataTemplate>
 
+			<ControlTemplate x:Key="DialogueEditorObjectExplorer_Template">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition/>
+						<ColumnDefinition Width="Auto" MinWidth="44"/>
+						<ColumnDefinition Width="Auto" MinWidth="292"/>
+					</Grid.ColumnDefinitions>
+
+					<Menu DockPanel.Dock="Top" Grid.Column="0" Background="Transparent" Foreground="White" VerticalAlignment="Top" Margin="0,4,0,3" Height="18">
+						<MenuItem Header="Dialogue Scene" Foreground="White">
+							<MenuItem x:Name="NewLevel_MenuItem" Header="New Dialogue Scene" Foreground="Black"/>
+							<MenuItem Header="Open Dialogue Scene" Foreground="Black"/>
+							<MenuItem Header="Save Dialogue Scene" Foreground="Black"/>
+							<MenuItem Header="Save Dialogue Scene As" Foreground="Black"   />
+						</MenuItem>
+					</Menu>
+					<!--<Menu DockPanel.Dock="Top" Grid.Column="1" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Draw"/>
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="2" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Selection" />
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="3" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Deselect" />
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="4" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Move" />
+					</Menu>-->
+
+				</Grid>
+			</ControlTemplate>
 
 			<ControlTemplate x:Key="UIEditorObjectExplorer_Template">
 				<Grid>

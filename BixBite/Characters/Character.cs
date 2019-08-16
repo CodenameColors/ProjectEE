@@ -1,8 +1,11 @@
-﻿using System;
+﻿using BixBite.Rendering;
+using BixBite.Rendering.UI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+//using TimelinePlayer.Components;
 
 namespace BixBite.Characters
 {
@@ -12,10 +15,9 @@ namespace BixBite.Characters
 		public String Name { get; set; }
 
 		//every character has Dialogue Sprites
-		List<String> DialogueSprites = new List<string>();
+		public List<Sprite> DialogueSprites = new List<Sprite>();
 
-		//Every character will have Animations (WIP)
-		
+		//every character has list of animations.
 
 	}
 }

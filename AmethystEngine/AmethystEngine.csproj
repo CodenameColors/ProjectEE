@@ -69,7 +69,8 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="TimelinePlayer">
+    <Reference Include="TimelinePlayer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\TimelinePlayer.dll</HintPath>
     </Reference>
     <Reference Include="UIAutomationProvider" />

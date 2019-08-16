@@ -534,6 +534,18 @@ namespace AmethystEngine.Forms
 			else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Dialogue"))
 			{
 				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["DialogueEditorObjects_Template"];
+				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["DialogueEditorObjectExplorer_Template"];
+				//if (SceneExplorer_Control != null)
+				//{
+				//	ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
+				//	SceneExplorer_Control.Template = cc;
+				//	Console.WriteLine(SceneExplorer_Control.Template.ToString());
+				//	TreeView tv = (TreeView)cc.FindName("UISceneExplorer_TreeView", SceneExplorer_Control); //(TreeView)SceneExplorer_Control.Template.FindName("UISceneExplorer_TreeView", SceneExplorer_Control);
+				//	if (tv == null) return;
+				//	SceneExplorer_TreeView = tv;
+				//	SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
+				//}
+
 			}
       else if(((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
       {

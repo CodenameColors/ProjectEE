@@ -70,6 +70,8 @@
     <Compile Include="Resources\ObservableDictionary.cs" />
     <Compile Include="Resources\ObservablePropertyDictionary.cs" />
     <Compile Include="Resources\ObservableSortedDictionary.cs" />
+    <Compile Include="Resources\TimeBlock.cs" />
+    <Compile Include="Resources\Timeline.cs" />
     <Compile Include="SceneObject\GameObject.cs" />
     <Compile Include="SceneObject\Prop.cs" />
     <Compile Include="Rendering\GameImage.cs" />
