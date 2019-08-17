@@ -47,6 +47,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="TimelinePlayer">
+      <HintPath>..\AmethystEngine\Resources\TimelinePlayer.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -70,8 +73,6 @@
     <Compile Include="Resources\ObservableDictionary.cs" />
     <Compile Include="Resources\ObservablePropertyDictionary.cs" />
     <Compile Include="Resources\ObservableSortedDictionary.cs" />
-    <Compile Include="Resources\TimeBlock.cs" />
-    <Compile Include="Resources\Timeline.cs" />
     <Compile Include="SceneObject\GameObject.cs" />
     <Compile Include="SceneObject\Prop.cs" />
     <Compile Include="Rendering\GameImage.cs" />

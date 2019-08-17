@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using BixBite.Resources;
-//using TimelinePlayer.Components;
+using TimelinePlayer.Components;
 
 namespace BixBite
 {
@@ -65,6 +65,10 @@ namespace BixBite
 			if (TrackData.ContainsKey(CharName))
 			{
 				TrackData[CharName] = TimeBlockLL;
+			}
+			else
+			{
+				TrackData.Add(CharName, TimeBlockLL);
 			}
 		}
 

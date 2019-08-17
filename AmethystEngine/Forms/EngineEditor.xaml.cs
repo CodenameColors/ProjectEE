@@ -22,6 +22,8 @@ using BixBite.Resources;
 using PropertyGridEditor;
 using BixBite.Rendering.UI;
 using System.Threading;
+using TimelinePlayer.Components;
+using BixBite.Characters;
 
 namespace AmethystEngine.Forms
 {
@@ -125,6 +127,20 @@ namespace AmethystEngine.Forms
 		public ObservableCollection<GameUI> OpenUIEdits { get; set; }
 		GameUI SelectedUI;
 		Dictionary<String, GameUI> CurrentUIDictionary = new Dictionary<String, GameUI>();
+		#endregion
+
+		#region DialogueEditor
+
+		#region Pointers
+		ObservableCollection<DialogueScene> ActiveDialogueScenes = new ObservableCollection<DialogueScene>();
+		DialogueScene CurActiveDialogueScene;
+		TreeView Dialogue_CE_Tree;
+		#endregion
+
+		#region Vars
+
+		#endregion
+
 		#endregion
 
 		TreeView SceneExplorer_TreeView = new TreeView();
@@ -533,6 +549,8 @@ namespace AmethystEngine.Forms
 			}
 			else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Dialogue"))
 			{
+				Dialogue_CE_Tree = (TreeView)ContentLibrary_Control.Template.FindName("DialogueEditor_CE_TV", ContentLibrary_Control);
+				
 				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["DialogueEditorObjects_Template"];
 				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["DialogueEditorObjectExplorer_Template"];
 				//if (SceneExplorer_Control != null)
@@ -3745,9 +3763,49 @@ namespace AmethystEngine.Forms
 			SelectedBaseUIControl = BaseUI;
 		}
 
+		private void NewDialogueScene_MenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			AllDialogueEditor_Grid.Visibility = Visibility.Visible;
+			DialogueEditor_Timeline.HookFunction1 = DialogueHook;
 
+			CurActiveDialogueScene = new DialogueScene("Dialogue1");
+			ActiveDialogueScenes.Add(CurActiveDialogueScene);
 
+			//DialogueEditor_Timeline.ItemsSource = new List<String>();
 
+		}
+
+		public void AddCharacterHook()
+		{
+
+		}
+
+		public void DialogueHook()
+		{
+			Console.WriteLine("Hook Activated");
+			CurActiveDialogueScene.SetTrack(CurActiveDialogueScene.Characters[0].Name, DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL);
+		}
+
+		private void DialogueEditorTesting_BTN(object sender, RoutedEventArgs e)
+		{
+			object t =  DialogueEditor_Timeline.GetTimelines()[0];
+			Timeline tt = (Timeline)t;
+		}
+
+		private void AddCharacterToScene(object sender, RoutedEventArgs e)
+		{
+
+			Dialogue_CE_Tree.ItemsSource = CurActiveDialogueScene.Characters;
+
+			CurActiveDialogueScene.Characters.Add(new Character() { Name = "Antonio" });
+			DialogueEditor_Timeline.AddTimeline("Antonio");
+		}
+
+		private void TestingAddingCharacterpictersdia(object sender, RoutedEventArgs e)
+		{
+			Sprite s = new Sprite("new sprite", "/AmethystEngine;component/images/Ame_icon_small.png",0 , 0, 400, 400);
+			CurActiveDialogueScene.Characters[0].DialogueSprites.Add(s);
+		}
 	}
 }
 

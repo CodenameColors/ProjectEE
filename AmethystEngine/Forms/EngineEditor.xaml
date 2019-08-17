@@ -11,6 +11,7 @@
 				xmlns:BixRes="clr-namespace:BixBite.Resources;assembly=BixBite"
 				xmlns:src="clr-namespace:AmethystEngine.Resources"
 				xmlns:WpfToolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
+				xmlns:BixChar="clr-namespace:BixBite.Characters;assembly=BixBite"
 				xmlns:DiagramDesigner="clr-namespace:DiagramDesigner" x:Class="AmethystEngine.Forms.EngineEditor"
 				xmlns:Tline="clr-namespace:TimelinePlayer;assembly=TimelinePlayer"
 				mc:Ignorable="d" Background="#FF0E0D0D"
@@ -110,24 +111,24 @@
 
 					<Menu DockPanel.Dock="Top" Grid.Column="0" Background="Transparent" Foreground="White" VerticalAlignment="Top" Margin="0,4,0,3" Height="18">
 						<MenuItem Header="Dialogue Scene" Foreground="White">
-							<MenuItem x:Name="NewLevel_MenuItem" Header="New Dialogue Scene" Foreground="Black"/>
+							<MenuItem x:Name="NewDialogueScene_MenuItem" Header="New Dialogue Scene" Foreground="Black" Click="NewDialogueScene_MenuItem_Click"/>
 							<MenuItem Header="Open Dialogue Scene" Foreground="Black"/>
 							<MenuItem Header="Save Dialogue Scene" Foreground="Black"/>
 							<MenuItem Header="Save Dialogue Scene As" Foreground="Black"   />
 						</MenuItem>
 					</Menu>
-					<!--<Menu DockPanel.Dock="Top" Grid.Column="1" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
-						<MenuItem Header="Draw"/>
+					<Menu DockPanel.Dock="Top" Grid.Column="1" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Test" Click="DialogueEditorTesting_BTN"/>
 					</Menu>
 					<Menu DockPanel.Dock="Top" Grid.Column="2" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
-						<MenuItem Header="Selection" />
+						<MenuItem Header="Test1" Click="TestingAddingCharacterpictersdia"/>
 					</Menu>
 					<Menu DockPanel.Dock="Top" Grid.Column="3" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
 						<MenuItem Header="Deselect" />
 					</Menu>
 					<Menu DockPanel.Dock="Top" Grid.Column="4" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
 						<MenuItem Header="Move" />
-					</Menu>-->
+					</Menu>
 
 				</Grid>
 			</ControlTemplate>
@@ -312,21 +313,20 @@
 					</Grid.RowDefinitions>
 
 					<TextBlock Text="Add A Character" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,7,0,7"/>
-					<Button Content="+" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="106,5,0,5" Height="20" VerticalContentAlignment="Top" Width="20" RenderTransformOrigin="1.5,0.5"/>
+					<Button Content="+" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="106,5,0,5" Height="20" VerticalContentAlignment="Top" Width="20" RenderTransformOrigin="1.5,0.5" Click="AddCharacterToScene"/>
 
-					<TreeView Grid.Row="1" Background="#FF383838">
+					<TreeView x:Name="DialogueEditor_CE_TV" Grid.Row="1" Background="#FF383838">
 						<TreeView.Resources>
-							<HierarchicalDataTemplate DataType="{x:Type BixUI:GameUI}" ItemsSource="{Binding UIElements}">
+							<HierarchicalDataTemplate DataType="{x:Type BixChar:Character}" ItemsSource="{Binding DialogueSprites}">
 								<StackPanel Orientation="Horizontal">
-									<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
-									<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="20" MaxHeight="15" />
-									<TextBlock Text="{Binding UIName}" Foreground="White" />
+									<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50" />
+									<TextBlock Text="{Binding Name}" Foreground="White" />
 								</StackPanel>
 							</HierarchicalDataTemplate>
-							<DataTemplate DataType="{x:Type BixUI:GameTextBlock}">
+							<DataTemplate DataType="{x:Type BixRen:Sprite}">
 								<StackPanel Orientation="Horizontal">
-									<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
-									<TextBlock Text="{Binding TBName}" Foreground="White" />
+									<Image Margin="0,0,5,0" Source="{Binding ImgPathLocation}" Width="50" Height="50"  />
+									<TextBlock Text="{Binding Name}" Foreground="White" />
 								</StackPanel>
 							</DataTemplate>
 						</TreeView.Resources>
@@ -826,7 +826,7 @@
 
 			<GridSplitter x:Name="gridSplitter" Grid.Column="1" HorizontalAlignment="Left"  VerticalAlignment="Stretch" Width="3"  Background="#FF868686" />
 			<GridSplitter x:Name="gridSplitter1" Grid.Column="2" HorizontalAlignment="Left"  VerticalAlignment="Stretch" Width="3"  Background="#FF868686"/>
-			<TabControl x:Name="EditorWindows_TC" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White" Margin="10,30,5,6" BorderBrush="#FF3C3C3C" SelectionChanged="EditorWindows_TC_SelectionChanged">
+			<TabControl x:Name="EditorWindows_TC" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Black" Margin="10,30,5,6" BorderBrush="#FF3C3C3C" SelectionChanged="EditorWindows_TC_SelectionChanged">
 				<!--LEVEL EDITOR STARTS HERE-->
 				<TabItem Header="Level Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 					<Grid Background="#FF3C3C3C">
@@ -914,7 +914,7 @@
 					<Grid Background="Black" />
 				</TabItem>
 				<TabItem Header="Dialogue Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
-					<Grid Background="Black" >
+					<Grid x:Name="AllDialogueEditor_Grid" Background="Black" Visibility="Hidden" >
 
 						<Grid.RowDefinitions>
 							<RowDefinition Height="4*"/>
@@ -938,7 +938,7 @@
 								<Canvas x:Name="DialogueEditore_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 							</Canvas>
 
-							<Tline:TimelinePlayer Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="Auto" Width="Auto">
+							<Tline:TimelinePlayer x:Name="DialogueEditor_Timeline" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="Auto" Width="Auto">
 
 							</Tline:TimelinePlayer>
 

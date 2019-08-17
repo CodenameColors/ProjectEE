@@ -12,7 +12,7 @@ namespace BixBite.Rendering
 {
 	public class Sprite : IProperties
 	{
-		public String ImgPathLocation;
+		public String ImgPathLocation { get; set; }
 		public String Name { get; set; }
 		//public int Width, Height;
 		//public int xpos, ypos;
