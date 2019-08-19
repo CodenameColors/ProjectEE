@@ -124,7 +124,7 @@
 						<MenuItem Header="Test1" Click="TestingAddingCharacterpictersdia"/>
 					</Menu>
 					<Menu DockPanel.Dock="Top" Grid.Column="3" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
-						<MenuItem Header="Deselect" />
+						<MenuItem Header="Test 2" Click="Test2Dia_Click" />
 					</Menu>
 					<Menu DockPanel.Dock="Top" Grid.Column="4" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
 						<MenuItem Header="Move" />
@@ -938,7 +938,7 @@
 								<Canvas x:Name="DialogueEditore_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 							</Canvas>
 
-							<Tline:TimelinePlayer x:Name="DialogueEditor_Timeline" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="Auto" Width="Auto">
+							<Tline:TimelinePlayer x:Name="DialogueEditor_Timeline" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="Auto" Width="Auto" PreviewMouseLeftButtonDown="DialogueEditor_Timeline_PreviewMouseLeftButtonDown" >
 
 							</Tline:TimelinePlayer>
 

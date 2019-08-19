@@ -1,0 +1,94 @@
+﻿<Window x:Class="AmethystEngine.Forms.AddCharacterForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AmethystEngine.Forms"
+        mc:Ignorable="d"
+				Background="#FF0E0D0D"
+        Title="Add Character to Dialogue Scene" Height="450" Width="800" AllowsTransparency="True" WindowStyle="None">
+
+	<Window.Resources>
+
+		<DataTemplate x:Key="CExplorer">
+			<Border     Width="75"
+                  Margin="5"
+                  BorderThickness="1"
+                  BorderBrush="Transparent"
+                  VerticalAlignment="Top"
+                  >
+
+				<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+					<Image Height="50" Grid.Column="0" HorizontalAlignment="Center" Stretch="Fill" VerticalAlignment="Top" Width="50">
+						<Image.Source>
+							<BitmapImage UriSource="{Binding Thumbnail}"/>
+						</Image.Source>
+					</Image>
+					<TextBlock Text="{Binding Name}" Foreground="White" HorizontalAlignment="Center" Width="50" Height="auto" TextWrapping="Wrap" FontSize="10"/>
+				</StackPanel>
+			</Border>
+		</DataTemplate>
+
+	</Window.Resources>
+
+	<Grid x:Name="MainGrid">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="30"/>
+			<RowDefinition Height="30"/>
+			<RowDefinition Height="0" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="30"/>
+		</Grid.RowDefinitions>
+
+		<Grid Grid.Row="0" Background="#FF484848" MouseLeftButtonDown="LBind_DragMove">
+			<Grid>
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+				</Grid.ColumnDefinitions>
+				<Image Height="30" HorizontalAlignment="Left" Margin="3,0,0,0" x:Name="AmeIcon_im" Stretch="None" VerticalAlignment="Top" Width="30"  OpacityMask="Black" Source="/AmethystEngine;component/images/Ame_icon_small.png" />
+				<Label Content="Amethyst Engine"  Padding="40,7,0,0" Foreground="White" Grid.Column="0"/>
+
+				<Label x:Name="ProjectName_LBL" Content="Add a Character to the Dialogue Scene" Foreground="White" Grid.Column="7" HorizontalAlignment="Center"/>
+			</Grid>
+		</Grid>
+
+
+		<TextBlock Grid.Row="1" Text="Import Entire Folder?" Foreground="White" Margin="318,6,0,8" HorizontalAlignment="Left" Width="119"/>
+		<CheckBox Grid.Row="1" x:Name="bImportFolder_CB" Margin="443,8,0,6" HorizontalAlignment="Left" Width="17" Click="BImportFolder_CB_Click"/>
+		<TextBlock Grid.Row="1" Text="Character's Name:" Foreground="White" Margin="10,6,0,8" VerticalAlignment="Center" HorizontalAlignment="Left" Height="16" Width="96"/>
+		<TextBox Grid.Row="1" x:Name="CharacterName_TB"  Background="#FF383838" Foreground="White" BorderBrush="Transparent" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="111,6,0,6" Width="183" Height="18" KeyDown="CharacterName_TB_KeyDown"/>
+
+		<!--Folder importing-->
+		<TextBlock Grid.Row="2" Text="Character's Folder Location:" Foreground="White" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+		<TextBox x:Name="CharacterFolderLocation_TB" Grid.Row="2"  Background="#FF383838" Foreground="White" BorderBrush="Transparent" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="160,0,0,0" Width="260"/>
+		<Button x:Name="GetCharacterFolderLoc_BTN" Grid.Row="2" Content="Browse"  Background="#FF383838" Foreground="White" Width="46" Height="26" BorderBrush="Transparent" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="424,2,0,2" Click="GetCharacterFolderLoc_BTN_Click"/>
+
+		<TextBlock Grid.Row="3" Text="Character Sprites:" Foreground="White" Margin="5" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+		<Button x:Name="AddSpriteToCharacter_BTN" Grid.Row="3" Content="Add Sprite" Margin="110,5,0,0" BorderBrush="Transparent" Background="#FF383838" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Click="AddSpriteToCharacter_BTN_Click"/>
+		<ListBox x:Name="CharacterSprites_LB" Grid.Row="3" HorizontalAlignment="Stretch" Margin="5,30,5,5" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
+               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0"  ScrollViewer.VerticalScrollBarVisibility="Hidden" 
+							 ItemTemplate="{StaticResource CExplorer}">
+			<ListBox.ItemsPanel>
+				<ItemsPanelTemplate>
+					<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>
+				</ItemsPanelTemplate>
+			</ListBox.ItemsPanel>
+		</ListBox>
+
+		<!--confirm button-->
+		<Button x:Name="Confirm_BTN" Grid.Row="4" Content=" CONFIRM" Background="#FF383838" Foreground="White" BorderBrush="Transparent" Margin="5" Click="Confirm_BTN_Click" />
+
+	</Grid>
+</Window>

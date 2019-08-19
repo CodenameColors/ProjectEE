@@ -3775,9 +3775,10 @@ namespace AmethystEngine.Forms
 
 		}
 
-		public void AddCharacterHook()
+		public void AddCharacterHook(Character c)
 		{
-
+			CurActiveDialogueScene.Characters.Add(c);
+			DialogueEditor_Timeline.AddTimeline(c.Name);
 		}
 
 		public void DialogueHook()
@@ -3797,8 +3798,15 @@ namespace AmethystEngine.Forms
 
 			Dialogue_CE_Tree.ItemsSource = CurActiveDialogueScene.Characters;
 
-			CurActiveDialogueScene.Characters.Add(new Character() { Name = "Antonio" });
-			DialogueEditor_Timeline.AddTimeline("Antonio");
+			//CurActiveDialogueScene.Characters.Add(new Character() { Name = "Antonio" });
+			
+			Character c = new Character();
+			Window w = new AddCharacterForm() { AddToScene = AddCharacterHook};
+			w.Show();
+
+			//CurActiveDialogueScene.Characters.Add(c);
+			//DialogueEditor_Timeline.AddTimeline(c.Name);
+
 		}
 
 		private void TestingAddingCharacterpictersdia(object sender, RoutedEventArgs e)
@@ -3806,6 +3814,34 @@ namespace AmethystEngine.Forms
 			Sprite s = new Sprite("new sprite", "/AmethystEngine;component/images/Ame_icon_small.png",0 , 0, 400, 400);
 			CurActiveDialogueScene.Characters[0].DialogueSprites.Add(s);
 		}
+
+		private void Test2Dia_Click(object sender, RoutedEventArgs e)
+		{
+			DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL.First.Value.TrackSpritePath = "/AmethystEngine;component/images/Ame_icon_small.png";
+			DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL.First.Value.Trackname = "DefaultImage";
+			DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL.First.Value.CurrentDialogue = "Yo my dude!";
+		}
+
+		private void DialogueEditor_Timeline_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			Console.WriteLine("Clicked on Timeline");
+
+			if (sender is TimeBlock)
+			{
+				TimeBlock tb = (TimeBlock)sender;
+				PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
+
+			}
+			else if (sender is Timeline)
+			{
+				Timeline tl = (Timeline)sender;
+				PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
+			}
+			else Console.WriteLine("Unsupported type"); 
+
+		}
+
+
 	}
 }
 
