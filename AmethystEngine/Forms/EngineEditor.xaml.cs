@@ -550,7 +550,7 @@ namespace AmethystEngine.Forms
 			else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Dialogue"))
 			{
 				Dialogue_CE_Tree = (TreeView)ContentLibrary_Control.Template.FindName("DialogueEditor_CE_TV", ContentLibrary_Control);
-				
+				ObjectProperties_Control.Template = (ControlTemplate)this.Resources["DialogueEditorProperty_Template"];
 				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["DialogueEditorObjects_Template"];
 				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["DialogueEditorObjectExplorer_Template"];
 				//if (SceneExplorer_Control != null)
@@ -3078,9 +3078,7 @@ namespace AmethystEngine.Forms
 
 		}
 		#endregion
-
 		
-
 		private void UICanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			//you clicked on nothing. so deselect UI CCs
@@ -3194,6 +3192,12 @@ namespace AmethystEngine.Forms
 					i++;
 				}
 			}
+			else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Dialogue"))
+			{
+				//if (SelectedUIControl != null) Selector.SetIsSelected(((ContentControl)sender), false);
+				SelectedUIControl = (ContentControl)sender;
+				Selector.SetIsSelected(SelectedUIControl, true);
+			}
 		}
 
 		private void ContentControl_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -3225,9 +3229,7 @@ namespace AmethystEngine.Forms
 				SelectedUI.SetProperty("Height", (int)((ContentControl)sender).Height);
 			}
 		}
-
 		
-
 		private void UIEditoGameTB_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentNewUI = NewUITool.Textbox;
@@ -3349,8 +3351,7 @@ namespace AmethystEngine.Forms
 				}
 			}
 		}
-
-
+		
 		private void GameImage_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			if (SelectedUIControl.Tag.ToString() == "IMAGE")
@@ -3391,7 +3392,6 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-
 		private void ContentControl_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
 		{
 			ContextMenu cm = this.FindResource("EditMovableControls_Template") as ContextMenu;
@@ -3409,8 +3409,6 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-		
-
 		private void UISceneExplorer_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 		}
@@ -3422,17 +3420,24 @@ namespace AmethystEngine.Forms
 
 		private void ContentControl_PreviewMouseMove(object sender, MouseEventArgs e)
 		{
-			if(e.LeftButton == MouseButtonState.Pressed)
+			if (e.LeftButton == MouseButtonState.Pressed)
 			{
-				
+
 				Console.WriteLine("Moved UI CC");
-				if (SelectedBaseUIControl != null && (SelectedUI is GameTextBlock || SelectedUI is GameIMG))
+				if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
 				{
-					Vector RelOrigin = new Vector((int)Canvas.GetLeft(SelectedBaseUIControl), (int)Canvas.GetTop(SelectedBaseUIControl));
-					Vector ControlPos = new Vector((int)Canvas.GetLeft(SelectedUIControl), (int)Canvas.GetTop(SelectedUIControl));
-					Vector Offset = ControlPos - RelOrigin;
-					SelectedUI.SetProperty("Xoffset", (int)Offset.X);
-					SelectedUI.SetProperty("YOffset", (int)Offset.Y);
+					if (SelectedBaseUIControl != null && (SelectedUI is GameTextBlock || SelectedUI is GameIMG))
+					{
+						Vector RelOrigin = new Vector((int)Canvas.GetLeft(SelectedBaseUIControl), (int)Canvas.GetTop(SelectedBaseUIControl));
+						Vector ControlPos = new Vector((int)Canvas.GetLeft(SelectedUIControl), (int)Canvas.GetTop(SelectedUIControl));
+						Vector Offset = ControlPos - RelOrigin;
+						SelectedUI.SetProperty("Xoffset", (int)Offset.X);
+						SelectedUI.SetProperty("YOffset", (int)Offset.Y);
+					}
+				}
+				else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Dialogue"))
+				{
+
 				}
 			}
 		}
@@ -3763,10 +3768,15 @@ namespace AmethystEngine.Forms
 			SelectedBaseUIControl = BaseUI;
 		}
 
+
+
+
+
 		private void NewDialogueScene_MenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			AllDialogueEditor_Grid.Visibility = Visibility.Visible;
-			DialogueEditor_Timeline.HookFunction1 = DialogueHook;
+			DialogueEditor_Timeline.TimeBlockSync = DialogueHook;
+			DialogueEditor_Timeline.SelectionChanged_Hook = ShowTimelineSelectedProperties;
 
 			CurActiveDialogueScene = new DialogueScene("Dialogue1");
 			ActiveDialogueScenes.Add(CurActiveDialogueScene);
@@ -3775,10 +3785,130 @@ namespace AmethystEngine.Forms
 
 		}
 
+		public void ShowTimelineSelectedProperties(object sender)
+		{
+			PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control)));
+			LB.ClearProperties();
+			if (sender is null) return;
+			else if(sender is TimeBlock)
+			{
+				LB.AddProperty("Type", new TextBox() { IsEnabled =false}, "Time Block");
+				LB.AddProperty("Start Time", new TextBox() { }, ((TimeBlock)sender).StartTime.ToString(), SetStartTime);
+				LB.AddProperty("End Time", new TextBox() { }, ((TimeBlock)sender).EndTime.ToString(), SetEndTime);
+				LB.AddProperty("Duration", new TextBox() { }, ((TimeBlock)sender).Duration.ToString(), SetDurationTime);
+
+				ComboBox CB = new ComboBox() { Height = 50, ItemTemplate = (DataTemplate)this.Resources["CBIMGItems"] };
+				CB.SelectionChanged += SetSpriteImagePath_Dia;
+				List<EditorObject> ComboItems = new List<EditorObject>();
+				foreach (Sprite filepath in CurActiveDialogueScene.Characters[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)sender).TimelineParent)].DialogueSprites)
+				{
+					ComboItems.Add(new EditorObject(filepath.ImgPathLocation, filepath.ImgPathLocation.Substring(filepath.ImgPathLocation.LastIndexOfAny(new char[] { '\\', '/' })), false));
+				}
+				CB.ItemsSource = ComboItems;
+
+				LB.AddProperty("Sprite Image", CB ,new List<String>());
+				LB.AddProperty("Dialogue Text", new TextBox() { }, ((TimeBlock)sender).CurrentDialogue.ToString(), SetDialogueText);
+
+			}
+			else if(sender is Timeline)
+			{
+				
+			}
+		}
+
+		public void SetStartTime(object sender, EventArgs e)
+		{
+			((TimeBlock)DialogueEditor_Timeline.SelectedControl).StartTime = double.Parse(((TextBox)sender).Text);
+		}
+
+		public void SetEndTime(object sender, EventArgs e)
+		{
+			((TimeBlock)DialogueEditor_Timeline.SelectedControl).EndTime = double.Parse(((TextBox)sender).Text);
+		}
+
+		public void SetDurationTime(object sender, EventArgs e)
+		{
+			((TimeBlock)DialogueEditor_Timeline.SelectedControl).Duration = double.Parse(((TextBox)sender).Text);
+		}
+
+		public void SetDialogueText(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter)
+			{
+				((TimeBlock)DialogueEditor_Timeline.SelectedControl).CurrentDialogue = ((TextBox)sender).Text;
+			}
+		}
+
+		public void SetSpriteImagePath_Dia(object sender, EventArgs e)
+		{
+			if (DialogueEditor_Timeline.SelectedControl is null) return;
+			else if (DialogueEditor_Timeline.SelectedControl is TimeBlock)
+			{
+				((TimeBlock)DialogueEditor_Timeline.SelectedControl).TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+				((TimeBlock)DialogueEditor_Timeline.SelectedControl).Trackname = (((EditorObject)((ComboBox)sender).SelectedValue).Name);
+			}
+			else if (DialogueEditor_Timeline.SelectedControl is Timeline)
+			{
+
+			}
+		}
+
+
+
 		public void AddCharacterHook(Character c)
 		{
 			CurActiveDialogueScene.Characters.Add(c);
 			DialogueEditor_Timeline.AddTimeline(c.Name);
+
+			//add moveable scaleable sprite control.
+			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+			CC.HorizontalAlignment = HorizontalAlignment.Center;
+			CC.VerticalAlignment = VerticalAlignment.Center;
+			Canvas.SetZIndex(CC, 1);
+
+			CC.Tag = "IMAGE";
+
+
+			String TB = "/AmethystEngine;component/images/emma_colors_oc.png";
+			ImageBrush ib = new ImageBrush();
+			Image img = new Image();
+			img.Stretch = Stretch.Fill;
+			img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+			img.IsHitTestVisible = false;
+			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, IsHitTestVisible = false });
+			((Grid)CC.Content).Children.Add(new Rectangle() { });
+			((Grid)CC.Content).Children.Add(img);
+
+			DialogueEditore_Canvas.Children.Add(CC);
+
+
+			//add GameUI control.
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+			{
+				Title = "Open UI File",
+				FileName = "", //default file name
+				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\UI"),
+				Filter = "UI files (*.ui)|*.ui|All files (*.*)|*.*",
+				FilterIndex = 2,
+				RestoreDirectory = true
+			};
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+			Console.WriteLine(dlg.FileName);
+
+			GameUI g = GameUI.ImportGameUI(dlg.FileName);
+			OpenUIEdits.Add(g);
+			DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false);
+
 		}
 
 		public void DialogueHook()
@@ -3820,6 +3950,7 @@ namespace AmethystEngine.Forms
 			DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL.First.Value.TrackSpritePath = "/AmethystEngine;component/images/Ame_icon_small.png";
 			DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL.First.Value.Trackname = "DefaultImage";
 			DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL.First.Value.CurrentDialogue = "Yo my dude!";
+			
 		}
 
 		private void DialogueEditor_Timeline_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
