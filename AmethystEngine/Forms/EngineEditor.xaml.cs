@@ -3780,6 +3780,7 @@ namespace AmethystEngine.Forms
 
 			CurActiveDialogueScene = new DialogueScene("Dialogue1");
 			ActiveDialogueScenes.Add(CurActiveDialogueScene);
+			DialogueEditor_Timeline.ActiveTBblocks.CollectionChanged += ActiveTBblocks_CollectionChanged;
 
 			//DialogueEditor_Timeline.ItemsSource = new List<String>();
 
@@ -3880,7 +3881,11 @@ namespace AmethystEngine.Forms
 			((Grid)CC.Content).Children.Add(img);
 
 			DialogueEditore_Canvas.Children.Add(CC);
+			CurActiveDialogueScene.CharacterSprites.Add(
+				new Sprite(img.Source.ToString(), img.Source.ToString(), 0, 0, (int)img.ActualWidth, (int)ActualHeight));
 
+
+				))
 
 			//add GameUI control.
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
@@ -3908,7 +3913,7 @@ namespace AmethystEngine.Forms
 			GameUI g = GameUI.ImportGameUI(dlg.FileName);
 			OpenUIEdits.Add(g);
 			DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false);
-
+			CurActiveDialogueScene.DialogueBoxes.Add(OpenUIEdits.Last());
 		}
 
 		public void DialogueHook()
@@ -3929,7 +3934,7 @@ namespace AmethystEngine.Forms
 			Dialogue_CE_Tree.ItemsSource = CurActiveDialogueScene.Characters;
 
 			//CurActiveDialogueScene.Characters.Add(new Character() { Name = "Antonio" });
-			
+
 			Character c = new Character();
 			Window w = new AddCharacterForm() { AddToScene = AddCharacterHook};
 			w.Show();
@@ -3938,6 +3943,21 @@ namespace AmethystEngine.Forms
 			//DialogueEditor_Timeline.AddTimeline(c.Name);
 
 		}
+
+
+		private void ActiveTBblocks_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+			{
+				Console.WriteLine("Added Active Time Block");
+			}
+			else
+			{
+				Console.WriteLine("Removed Active Time block");
+			}
+		}
+
+
 
 		private void TestingAddingCharacterpictersdia(object sender, RoutedEventArgs e)
 		{
