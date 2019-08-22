@@ -3882,10 +3882,8 @@ namespace AmethystEngine.Forms
 
 			DialogueEditore_Canvas.Children.Add(CC);
 			CurActiveDialogueScene.CharacterSprites.Add(
-				new Sprite(img.Source.ToString(), img.Source.ToString(), 0, 0, (int)img.ActualWidth, (int)ActualHeight));
-
-
-				))
+				new Sprite(img.Source.ToString(), img.Source.ToString(), 0, 0, (int)img.ActualWidth, (int)ActualHeight)
+				);
 
 			//add GameUI control.
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
