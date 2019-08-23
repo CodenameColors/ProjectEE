@@ -135,6 +135,7 @@ namespace AmethystEngine.Forms
 		ObservableCollection<DialogueScene> ActiveDialogueScenes = new ObservableCollection<DialogueScene>();
 		DialogueScene CurActiveDialogueScene;
 		TreeView Dialogue_CE_Tree;
+		List<Tuple<ContentControl, ContentControl>> CurSceneCharacterDisplays = new List<Tuple<ContentControl, ContentControl>>();
 		#endregion
 
 		#region Vars
@@ -3912,6 +3913,10 @@ namespace AmethystEngine.Forms
 			OpenUIEdits.Add(g);
 			DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false);
 			CurActiveDialogueScene.DialogueBoxes.Add(OpenUIEdits.Last());
+
+			//create the pointers to the content controls. which is what displays my images to the screen
+			CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
+
 		}
 
 		public void DialogueHook()
@@ -3948,6 +3953,8 @@ namespace AmethystEngine.Forms
 			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
 			{
 				Console.WriteLine("Added Active Time Block");
+				((Image)((Grid)CurSceneCharacterDisplays[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)].Item1.Content).Children[2]).Source = 
+					new BitmapImage(new Uri(((TimeBlock)e.NewItems[0]).TrackSpritePath, UriKind.Absolute));
 			}
 			else
 			{
@@ -3955,7 +3962,10 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		public void ChangeSpriteIMG(ContentControl CC, String newimg)
+		{
 
+		}
 
 		private void TestingAddingCharacterpictersdia(object sender, RoutedEventArgs e)
 		{

@@ -26,7 +26,7 @@ namespace BixBite
 		public ObservableCollection<Character> Characters = new ObservableCollection<Character>();
 
 		//The displaying of the current character sprite
-		public List<Sprite> CharacterSprites;
+		public List<Sprite> CharacterSprites = new List<Sprite>();
 
 		//each scene will also contain multiple different GameUI (Dialogue Boxes)
 		public List<GameUI> DialogueBoxes = new List<GameUI>();

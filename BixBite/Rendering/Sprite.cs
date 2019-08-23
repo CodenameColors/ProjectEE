@@ -12,17 +12,77 @@ namespace BixBite.Rendering
 {
 	public class Sprite : IProperties
 	{
-		public String ImgPathLocation { get; set; }
+
+		public delegate void ChangePathLocation(String newpath);
+		ChangePathLocation OnChangePathLocation = null;
+
+		public String ImgPathLocation
+		{
+			get { return imgpathlocation; }
+			set
+			{
+				imgpathlocation = value;
+				if (OnChangePathLocation != null)
+					OnChangePathLocation(value);
+			}
+		}
+		private String imgpathlocation = "";
 		public String Name { get; set; }
 		//public int Width, Height;
 		//public int xpos, ypos;
+
+
+		public double X
+		{
+			get
+			{
+				return (double)GetProperty("x");
+			}
+			set
+			{
+				SetProperty("x", value);
+			}
+		}
+		public double Y
+		{
+			get
+			{
+				return (double)GetProperty("y");
+			}
+			set
+			{
+				SetProperty("y", value);
+			}
+		}
+		public double Width
+		{
+			get
+			{
+				return (double)GetProperty("width");
+			}
+			set
+			{
+				SetProperty("width", value);
+			}
+		}
+		public double Height
+		{
+			get
+			{
+				return (double)GetProperty("height");
+			}
+			set
+			{
+				SetProperty("height", value);
+			}
+		}
 
 		ObservableDictionary<String, object> Properties { get; set; }
 
 		public Sprite(String Name, String imgLoc, int x, int y, int w, int h)
 		{
 			this.Name = Name;
-			this.ImgPathLocation = imgLoc;
+			this.imgpathlocation = imgLoc;
 
 			Properties = new ObservableDictionary<string, object>();
 			AddProperty("Name", Name);
