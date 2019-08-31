@@ -27,7 +27,7 @@ namespace BixBite.Rendering
 		public String LayerName { get; set; }
 		public LayerType layerType = LayerType.None;
 
-		private ObservableDictionary<String, object> Properties = new ObservableDictionary<string, object>();
+		private ObservableCollection<String, object> Properties = new ObservableCollection<string, object>();
 		public object LayerObjects = new object(); //contains the objects for this layer. 
 		ImageEffect layereffect = new ImageEffect(); //and image effect that will effect THE WHOLE layer. So windDistort for example.
 		public Level ParentLevel;
@@ -42,7 +42,7 @@ namespace BixBite.Rendering
 			DefineLayerDataType(layerType = desltype); //set the objectdata datatype
 			ParentLevel = Parent;
 
-			Properties = new ObservableDictionary<string, object>();
+			Properties = new ObservableCollection<string, object>();
 			AddProperty("LayerName", "");
 			AddProperty("#LayerObjects", 0);
 			AddProperty("LayerType", "");
@@ -52,7 +52,7 @@ namespace BixBite.Rendering
 		#region Properties
 		public void UpdateProperties(Dictionary<String, object> newdict)
 		{
-			Properties = new ObservableDictionary<string, object>(newdict);
+			Properties = new ObservableCollection<string, object>(newdict);
 		}
 
 		public void ClearProperties()
@@ -66,12 +66,12 @@ namespace BixBite.Rendering
 		}
 
 
-		public ObservableDictionary<string, object> getProperties()
+		public ObservableCollection<string, object> getProperties()
 		{
 			return Properties;
 		}
 
-		public void setProperties(ObservableDictionary<string, object> newprops)
+		public void setProperties(ObservableCollection<string, object> newprops)
 		{
 			Properties = newprops;
 		}

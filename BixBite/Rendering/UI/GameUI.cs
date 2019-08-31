@@ -14,12 +14,12 @@ namespace BixBite.Rendering.UI
 	public class GameUI : IProperties
 	{
 		public String UIName { get; set; }
-		protected ObservableDictionary<string, object> Properties { get; set; }
+		protected ObservableCollection<string, object> Properties { get; set; }
 		public ObservableCollection<GameUI> UIElements { get; set; }
 
 		public GameUI(String UIName, int Width, int Height, int Zindex, String BackgroundPath = "#00000000")
 		{
-			Properties = new ObservableDictionary<string, object>();
+			Properties = new ObservableCollection<string, object>();
 			UIElements = new ObservableCollection<GameUI>();
 			this.UIName = UIName;
 			AddProperty("Name", UIName);
@@ -33,7 +33,7 @@ namespace BixBite.Rendering.UI
 		#region Properties
 		public void UpdateProperties(Dictionary<String, object> newdict)
 		{
-			Properties = new ObservableDictionary<string, object>(newdict);
+			Properties = new ObservableCollection<string, object>(newdict);
 		}
 
 		public void ClearProperties()
@@ -47,12 +47,12 @@ namespace BixBite.Rendering.UI
 		}
 
 
-		public ObservableDictionary<string, object> getProperties()
+		public ObservableCollection<string, object> getProperties()
 		{
 			return Properties;
 		}
 
-		public void setProperties(ObservableDictionary<string, object> newprops)
+		public void setProperties(ObservableCollection<string, object> newprops)
 		{
 			Properties = newprops;
 		}

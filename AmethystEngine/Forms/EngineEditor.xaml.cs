@@ -3079,7 +3079,11 @@ namespace AmethystEngine.Forms
 
 		}
 		#endregion
-		
+
+
+		#region UI
+
+
 		private void UICanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			//you clicked on nothing. so deselect UI CCs
@@ -3102,7 +3106,7 @@ namespace AmethystEngine.Forms
 
 			//which way is mouse moving?
 			MPos -= (Vector)e.GetPosition(LevelEditor_Canvas);
-			
+
 			//is the middle mouse button down?
 			if (e.MiddleButton == MouseButtonState.Pressed)
 			{
@@ -3127,7 +3131,7 @@ namespace AmethystEngine.Forms
 					Console.WriteLine(point.ToString());
 				}
 			}
-			else if(((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
+			else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
 			{
 				if (SelectedUIControl != null) Selector.SetIsSelected(SelectedUIControl, false);
 				SelectedUIControl = (ContentControl)sender;
@@ -3157,16 +3161,16 @@ namespace AmethystEngine.Forms
 					}
 					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "Image")
 					{
-						ComboBox CB = new ComboBox() { Height=50, ItemTemplate = (DataTemplate)this.Resources["CBIMGItems"] };
+						ComboBox CB = new ComboBox() { Height = 50, ItemTemplate = (DataTemplate)this.Resources["CBIMGItems"] };
 						CB.SelectionChanged += GameImage_SelectionChanged;
 						List<EditorObject> ComboItems = new List<EditorObject>();
-						foreach(String filepath in GetAllProjectImages())
+						foreach (String filepath in GetAllProjectImages())
 						{
 							ComboItems.Add(new EditorObject(filepath, filepath.Substring(filepath.LastIndexOfAny(new char[] { '\\', '/' })), false));
 						}
 						CB.ItemsSource = ComboItems;
 
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], 
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i],
 							CB,
 							new List<String>());
 					}
@@ -3208,7 +3212,7 @@ namespace AmethystEngine.Forms
 				Point point = new Point(Canvas.GetLeft((ContentControl)sender), Canvas.GetTop((ContentControl)sender));
 				LESelectedSprite.SetProperty("x", (int)point.X);
 				LESelectedSprite.SetProperty("y", (int)point.Y);
-				Console.WriteLine(point.ToString()+ "MUP");
+				Console.WriteLine(point.ToString() + "MUP");
 			}
 		}
 
@@ -3224,13 +3228,13 @@ namespace AmethystEngine.Forms
 					Console.WriteLine("SpriteSizeChanged");
 				}
 			}
-			else if(((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
+			else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
 			{
 				SelectedUI.SetProperty("Width", (int)((ContentControl)sender).Width);
 				SelectedUI.SetProperty("Height", (int)((ContentControl)sender).Height);
 			}
 		}
-		
+
 		private void UIEditoGameTB_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentNewUI = NewUITool.Textbox;
@@ -3247,9 +3251,22 @@ namespace AmethystEngine.Forms
 			img.Stretch = Stretch.Fill;
 			//img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
 			img.IsHitTestVisible = false;
-			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false});
-			((Grid)CC.Content).Children.Add(img);
-			((Grid)CC.Content).Children.Add(new TextBox()
+			((Grid)CC.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+			((Grid)CC.Content).RowDefinitions.Add(new RowDefinition() { });
+			((Grid)CC.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+
+			((Grid)CC.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+			((Grid)CC.Content).ColumnDefinitions.Add(new ColumnDefinition() { });
+			((Grid)CC.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+
+			((Grid)CC.Content).ShowGridLines = true;
+
+			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false });
+			Grid.SetColumnSpan(((Grid)CC.Content).Children[((Grid)CC.Content).Children.Count - 1], 3);
+			Grid.SetRowSpan(((Grid)CC.Content).Children[((Grid)CC.Content).Children.Count - 1], 3);
+
+			InitimagesTBGrid((Grid)CC.Content);
+		 ((Grid)CC.Content).Children.Add(new TextBox()
 			{
 				Text = "Sameple Text",
 				Margin = new Thickness(2),
@@ -3261,6 +3278,9 @@ namespace AmethystEngine.Forms
 				FontSize = 24,
 				Foreground = Brushes.White
 			});
+			Grid.SetRow(((Grid)CC.Content).Children[((Grid)CC.Content).Children.Count - 1], 1);
+			Grid.SetColumn(((Grid)CC.Content).Children[((Grid)CC.Content).Children.Count - 1], 1);
+
 
 			int i = 1; String name = "NewTextBox";
 			while (CurrentUIDictionary.ContainsKey(name))
@@ -3285,14 +3305,14 @@ namespace AmethystEngine.Forms
 
 			String TB = "/AmethystEngine;component/images/emma_colors_oc.png";
 			ImageBrush ib = new ImageBrush();
-			Image img = new Image();
+			Image img = new Image() { IsHitTestVisible = false };
 			img.Stretch = Stretch.Fill;
 			img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
 			img.IsHitTestVisible = false;
 			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, IsHitTestVisible = false });
 			((Grid)CC.Content).Children.Add(new Rectangle() { });
 			((Grid)CC.Content).Children.Add(img);
-
+			
 			int i = 1; String name = "NewImgBox";
 			while (CurrentUIDictionary.ContainsKey(name))
 			{
@@ -3303,12 +3323,25 @@ namespace AmethystEngine.Forms
 			CurrentUIDictionary.Add(name, new GameIMG(name, 50, 50, 1, 0, 0));
 			OpenUIEdits[0].AddUIElement(CurrentUIDictionary.Values.Last()); //TODO: use the selection Treeview
 		}
+		
+		public void InitimagesTBGrid(Grid g)
+		{
+			for(int i = 0; i < g.RowDefinitions.Count; i++)
+			{
+				for(int j = 0; j < g.ColumnDefinitions.Count; j++)
+				{
+					Image img = new Image() { IsHitTestVisible = false, Stretch = Stretch.Fill };
+					Grid.SetRow(img, i); Grid.SetColumn(img, j);
+					g.Children.Add(img);
+				}
+			}
+		}
 
 		private void ContentControl_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			
+
 		}
-		
+
 		void customCP_FontColorChanged(Color obj)
 		{
 			((TextBox)((Grid)SelectedUIControl.Content).Children[2]).Foreground = new SolidColorBrush(obj);
@@ -3348,35 +3381,81 @@ namespace AmethystEngine.Forms
 				String Property = ((TextBox)sender).Tag.ToString();
 				if (Property == "FontSize")
 				{
-					((TextBox)((Grid)SelectedUIControl.Content).Children[2]).FontSize = Int32.Parse(((TextBox)sender).Text);
+					((TextBox)((Grid)SelectedUIControl.Content).Children[((Grid)SelectedUIControl.Content).Children.Count-1]).FontSize =
+						Int32.Parse(((TextBox)sender).Text);
 				}
 			}
 		}
-		
+
 		private void GameImage_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			if (SelectedUIControl.Tag.ToString() == "IMAGE")
 				((Image)((Grid)SelectedUIControl.Content).Children[2]).Source =
 					new BitmapImage(((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail);
 
-			if(SelectedUI is GameIMG)
+			if (SelectedUI is GameIMG)
 			{
 				SelectedUI.SetProperty("Image", ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
 			}
 
-			if(SelectedUIControl.Tag.ToString() == "TEXTBOX")
+			if (SelectedUIControl.Tag.ToString() == "TEXTBOX")
 			{
-				((Image)((Grid)SelectedUIControl.Content).Children[1]).Source =
-					new BitmapImage(((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail);
-				SelectedUI.SetProperty("Image", ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+				//((Image)((Grid)SelectedUIControl.Content).Children[1]).Source =
+				//	new BitmapImage(((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail);
+				//SelectedUI.SetProperty("Image", ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
 
+				SetTBBackgroundImage(((Grid)SelectedUIControl.Content), ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsoluteUri);
+			}
+		}
+
+		/// <summary>
+		/// This method is here to set the background 
+		/// </summary>
+		/// <param name="g"></param>
+		/// <param name="IMGPath"></param>
+		private void SetTBBackgroundImage(Grid g, String IMGPath)
+		{
+			foreach (UIElement uie in g.Children)
+			{
+				if (!(uie is Image)) continue;
+
+				int vert = Grid.GetRow(uie);
+				int hori = Grid.GetColumn(uie);
+				double width = 0; double height = 0;
+				double x = 0; double y = 0;
+
+				BitmapImage bmp = new BitmapImage(new Uri(IMGPath));
+
+				if (vert != 1) { height = 90;  }
+				else
+				{
+					height = bmp.Height-180; y = 90;
+				}
+				if (vert == 2) y = bmp.Height - 90;
+
+				if (hori != 1) { width = 90; }
+				else
+				{
+					width = bmp.Width - 180; x = 90;
+				}
+				if (hori == 2) x = bmp.Width - 90;
+
+				var crop = new CroppedBitmap(bmp, new Int32Rect((int)x, (int)y, (int)width, (int)height));
+				// using BitmapImage version to prove its created successfully
+				Image image2 = new Image
+				{
+					Source = crop //cropped
+				};
+
+				((Image)uie).Source = crop;
 			}
 
 		}
 
 		private void GameUI_ZIndex_Changed(object sender, KeyEventArgs e)
 		{
-			if (e.Key == Key.Enter) {
+			if (e.Key == Key.Enter)
+			{
 				if (((ContentControl)SelectedUIControl).Tag.ToString() == "Border")
 				{
 					return;
@@ -3389,7 +3468,7 @@ namespace AmethystEngine.Forms
 						SelectedUI.SetProperty("Zindex", val);
 					}
 				}
-				
+
 			}
 		}
 
@@ -3454,7 +3533,7 @@ namespace AmethystEngine.Forms
 				SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
 			}
 			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
-			
+
 			CC.HorizontalAlignment = HorizontalAlignment.Center;
 			CC.VerticalAlignment = VerticalAlignment.Center;
 			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray });
@@ -3497,7 +3576,7 @@ namespace AmethystEngine.Forms
 			Console.WriteLine(dlg.FileName);
 
 			OpenUIEdits[0].ExportUI(dlg.FileName);
-			
+
 		}
 
 		public List<String> GetAllProjectImages()
@@ -3531,7 +3610,7 @@ namespace AmethystEngine.Forms
 			else return; //invalid name
 			Console.WriteLine(dlg.FileName);
 
-			GameUI g =  GameUI.ImportGameUI(dlg.FileName);
+			GameUI g = GameUI.ImportGameUI(dlg.FileName);
 			OpenUIEdits.Add(g);
 
 			ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
@@ -3543,9 +3622,12 @@ namespace AmethystEngine.Forms
 				SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
 			}
 
-			DrawUIToScreen(UIEditor_Canvas, UIEditor_BackCanvas,OpenUIEdits.Last(), false);
-			
+			DrawUIToScreen(UIEditor_Canvas, UIEditor_BackCanvas, OpenUIEdits.Last(), false);
+
 		}
+
+
+		#endregion
 
 
 		/// <summary>
@@ -3768,10 +3850,6 @@ namespace AmethystEngine.Forms
 			CurrentEditorCanvas.Children.Add(BaseUI);
 			SelectedBaseUIControl = BaseUI;
 		}
-
-
-
-
 
 		private void NewDialogueScene_MenuItem_Click(object sender, RoutedEventArgs e)
 		{

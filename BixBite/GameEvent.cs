@@ -41,11 +41,11 @@ namespace BixBite
 		public  EventData datatoload = new EventData(); ///this is the data that will load on an activation of this event.
 		//private bool isActive = true; //this determines where or not this event should be checked for.
 
-		ObservableDictionary<string, object> Properties { get; set; }
+		ObservableCollection<string, object> Properties { get; set; }
 
 		public GameEvent(String Name, EventType eventType, int group)
 		{
-			Properties = new ObservableDictionary<string, object>();
+			Properties = new ObservableCollection<string, object>();
 			this.EventName = Name;
 			this.eventType = eventType;
 			AddProperty("EventName", Name);
@@ -63,7 +63,7 @@ namespace BixBite
 		#region Properties
 		public void UpdateProperties(Dictionary<String, object> newdict)
 		{
-			Properties = new ObservableDictionary<string, object>(newdict);
+			Properties = new ObservableCollection<string, object>(newdict);
 		}
 
 		public void ClearProperties()
@@ -77,12 +77,12 @@ namespace BixBite
 		}
 
 
-		public ObservableDictionary<string, object> getProperties()
+		public ObservableCollection<string, object> getProperties()
 		{
 			return Properties;
 		}
 
-		public void setProperties(ObservableDictionary<string, object> newprops)
+		public void setProperties(ObservableCollection<string, object> newprops)
 		{
 			Properties = newprops;
 		}

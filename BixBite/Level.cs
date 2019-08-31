@@ -23,7 +23,7 @@ namespace BixBite
 		public ObservableCollection<SpriteLayer> Layers { get; set; }
 
 
-		ObservableDictionary<string, object> Properties
+		ObservableCollection<string, object> Properties
 		{
 			get; set;
 		}
@@ -42,7 +42,7 @@ namespace BixBite
 		//private Dictionary<string, System.Reflection.MethodInfo> EventsLUT = new Dictionary<string, System.Reflection.MethodInfo>();
 		public Level()
 		{
-			Properties = new ObservableDictionary<string, object>();
+			Properties = new ObservableCollection<string, object>();
 			Layers = new ObservableCollection<SpriteLayer>();
 			Properties.Add("LevelName", "");
 			Properties.Add("bMainLevel", false);
@@ -55,7 +55,7 @@ namespace BixBite
 		public Level(String desname, bool MainLevel = false)
 		{
 			LevelName = desname;
-			Properties = new ObservableDictionary<string, object>();
+			Properties = new ObservableCollection<string, object>();
 			Properties.Add("LevelName", desname);
 			Properties.Add("bMainLevel", MainLevel);
 			Properties.Add("xCells", 0);
@@ -68,7 +68,7 @@ namespace BixBite
 		#region Properties
 		public void UpdateProperties(Dictionary<String, object> newdict)
 		{
-			Properties = new ObservableDictionary<string, object>(newdict);
+			Properties = new ObservableCollection<string, object>(newdict);
 		}
 
 		public void ClearProperties()
@@ -82,12 +82,12 @@ namespace BixBite
 		}
 
 
-		public ObservableDictionary<string, object> getProperties()
+		public ObservableCollection<string, object> getProperties()
 		{
 			return Properties;
 		}
 
-		public void setProperties(ObservableDictionary<string, object> newprops)
+		public void setProperties(ObservableCollection<string, object> newprops)
 		{
 			Properties = newprops;
 		}

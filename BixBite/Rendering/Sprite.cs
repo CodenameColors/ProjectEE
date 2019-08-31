@@ -77,14 +77,14 @@ namespace BixBite.Rendering
 			}
 		}
 
-		ObservableDictionary<String, object> Properties { get; set; }
+		ObservableCollection<String, object> Properties { get; set; }
 
 		public Sprite(String Name, String imgLoc, int x, int y, int w, int h)
 		{
 			this.Name = Name;
 			this.imgpathlocation = imgLoc;
 
-			Properties = new ObservableDictionary<string, object>();
+			Properties = new ObservableCollection<string, object>();
 			AddProperty("Name", Name);
 			AddProperty("x", x);
 			AddProperty("y", y);
@@ -97,7 +97,7 @@ namespace BixBite.Rendering
 		#region Properties
 		public void UpdateProperties(Dictionary<String, object> newdict)
 		{
-			Properties = new ObservableDictionary<string, object>(newdict);
+			Properties = new ObservableCollection<string, object>(newdict);
 		}
 
 		public void ClearProperties()
@@ -111,12 +111,12 @@ namespace BixBite.Rendering
 		}
 
 
-		public ObservableDictionary<string, object> getProperties()
+		public ObservableCollection<string, object> getProperties()
 		{
 			return Properties;
 		}
 
-		public void setProperties(ObservableDictionary<string, object> newprops)
+		public void setProperties(ObservableCollection<string, object> newprops)
 		{
 			Properties = newprops;
 		}

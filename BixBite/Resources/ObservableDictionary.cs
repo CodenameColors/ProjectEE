@@ -38,7 +38,7 @@ using System.Runtime.InteropServices;
 namespace BixBite.Resources
 {
     [Serializable]
-    public class ObservableDictionary<TKey, TValue> :
+    public class ObservableCollection<TKey, TValue> :
         IDictionary<TKey, TValue>,
         ICollection<KeyValuePair<TKey, TValue>>,
         IEnumerable<KeyValuePair<TKey, TValue>>,
@@ -54,12 +54,12 @@ namespace BixBite.Resources
 
         #region public
 
-        public ObservableDictionary()
+        public ObservableCollection()
         {
             _keyedEntryCollection = new KeyedDictionaryEntryCollection<TKey>();
         }
 
-        public ObservableDictionary(IDictionary<TKey, TValue> dictionary)
+        public ObservableCollection(IDictionary<TKey, TValue> dictionary)
         {
             _keyedEntryCollection = new KeyedDictionaryEntryCollection<TKey>();
 
@@ -67,12 +67,12 @@ namespace BixBite.Resources
                 DoAddEntry((TKey)entry.Key, (TValue)entry.Value);
         }
 
-        public ObservableDictionary(IEqualityComparer<TKey> comparer)
+        public ObservableCollection(IEqualityComparer<TKey> comparer)
         {
             _keyedEntryCollection = new KeyedDictionaryEntryCollection<TKey>(comparer);
         }
 
-        public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
+        public ObservableCollection(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
         {
             _keyedEntryCollection = new KeyedDictionaryEntryCollection<TKey>(comparer);
 
@@ -84,7 +84,7 @@ namespace BixBite.Resources
 
         #region protected
 
-        protected ObservableDictionary(SerializationInfo info, StreamingContext context)
+        protected ObservableCollection(SerializationInfo info, StreamingContext context)
         {
             _siInfo = info;
         }
@@ -666,7 +666,7 @@ namespace BixBite.Resources
         {
             #region constructors
 
-            internal Enumerator(ObservableDictionary<TKey, TValue> dictionary, bool isDictionaryEntryEnumerator)
+            internal Enumerator(ObservableCollection<TKey, TValue> dictionary, bool isDictionaryEntryEnumerator)
             {
                 _dictionary = dictionary;
                 _version = dictionary._version;
@@ -799,7 +799,7 @@ namespace BixBite.Resources
 
             #region fields
 
-            private ObservableDictionary<TKey, TValue> _dictionary;
+            private ObservableCollection<TKey, TValue> _dictionary;
             private int _version;
             private int _index;
             private KeyValuePair<TKey, TValue> _current;

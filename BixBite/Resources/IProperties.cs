@@ -1,13 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace BixBite.Resources
 {
 	interface IProperties
 	{
+		/// <summary>
+		/// This structure contains all the property data.
+		/// </summary>
+		ObservableCollection<Tuple<string, object, Control>> Properties { get; set; }
+
 		/// <summary>
 		/// Use this to MANUALLY set the properties dictionary
 		/// </summary>
@@ -27,8 +34,8 @@ namespace BixBite.Resources
 
 		object GetProperty(String Pname);
 
-		ObservableDictionary<String, object> getProperties();
+		ObservableCollection<Tuple<String, object, Control>> getProperties();
 
-		void setProperties(ObservableDictionary<String, object> newprops);
+		void setProperties(ObservableCollection<Tuple<String, object, Control>> newprops);
 	}
 }
