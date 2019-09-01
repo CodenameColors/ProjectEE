@@ -40,9 +40,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BixBite">
-      <HintPath>..\BixBite\bin\Debug\BixBite.dll</HintPath>
-    </Reference>
     <Reference Include="CustomColorPicker, Version=1.0.7142.29111, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\CustomColorPicker.dll</HintPath>
@@ -222,6 +219,15 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images\emma_colors_oc.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BixBite\BixBite.csproj">
+      <Project>{d50deef5-20be-4a57-b0f8-6cb460f71d82}</Project>
+      <Name>BixBite</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using BixBite.Resources;
 using System.Windows.Controls;
+using System.Collections.ObjectModel;
 
 namespace BixBite
 {
@@ -36,11 +37,139 @@ namespace BixBite
 		//these varibles determine the cell of the gameeven trigger as well as the grouping.
 		//public int xpos, ypos, width, height, group = 0; ///This is the area of activation :: 0 is top left ; 1 is bottom right
 		//public String ActivationButton, , DelegateEventName = String.Empty;
-		public String EventName;
 		public EventType eventType = new EventType();
-		public  EventData datatoload = new EventData(); ///this is the data that will load on an activation of this event.
+		public EventData datatoload = new EventData(); ///this is the data that will load on an activation of this event.
 		//private bool isActive = true; //this determines where or not this event should be checked for.
 
+		//Allows easy accesss to the properties collection.
+		#region Properties
+
+		#region EventName
+		public String EventName
+		{
+			get
+			{
+				if (Properties.ContainsKey("EventName"))
+				{
+					return Properties["EventName"].ToString();
+				}
+				throw new NullReferenceException(); //doesn't exist
+			}
+			set
+			{
+				if (Properties.ContainsKey("EventName"))
+				{
+					Properties["EventName"] = value;
+				}
+				else
+				{
+					Properties.Add("EventName", value);
+				}
+			}
+		}
+		#endregion
+
+		#region Group
+		public int Group
+		{
+			get
+			{
+				if (Properties.ContainsKey("group"))
+				{
+					return (int)Properties["group"];
+				}
+				throw new NullReferenceException(); //doesn't exist
+			}
+			set
+			{
+				if (Properties.ContainsKey("group"))
+				{
+					Properties["group"] = value;
+				}
+				else
+				{
+					Properties.Add("group", value);
+				}
+			}
+		}
+		#endregion
+
+		#region IsActive
+		public bool IsActive
+		{
+			get
+			{
+				if (Properties.ContainsKey("isActive"))
+				{
+					return (bool)Properties["isActive"];
+				}
+				throw new NullReferenceException(); //doesn't exist
+			}
+			set
+			{
+				if (Properties.ContainsKey("isActive"))
+				{
+					Properties["isActive"] = value;
+				}
+				else
+				{
+					Properties.Add("isActive", value);
+				}
+			}
+		}
+		#endregion
+
+		#region ActivationButton
+		public String ActivationButton
+		{
+			get
+			{
+				if (Properties.ContainsKey("ActivationButton"))
+				{
+					return Properties["ActivationButton"].ToString();
+				}
+				throw new NullReferenceException(); //doesn't exist
+			}
+			set
+			{
+				if (Properties.ContainsKey("ActivationButton"))
+				{
+					Properties["ActivationButton"] = value;
+				}
+				else
+				{
+					Properties.Add("ActivationButton", value);
+				}
+			}
+		}
+		#endregion
+
+		#region ActivationButton
+		public String DelegateEventName
+		{
+			get
+			{
+				if (Properties.ContainsKey("DelegateEventName"))
+				{
+					return Properties["DelegateEventName"].ToString();
+				}
+				throw new NullReferenceException(); //doesn't exist
+			}
+			set
+			{
+				if (Properties.ContainsKey("DelegateEventName"))
+				{
+					Properties["DelegateEventName"] = value;
+				}
+				else
+				{
+					Properties.Add("DelegateEventName", value);
+				}
+			}
+		}
+		#endregion
+
+		#endregion
 		ObservableCollection<string, object> Properties { get; set; }
 
 		public GameEvent(String Name, EventType eventType, int group)
@@ -61,9 +190,11 @@ namespace BixBite
 		}
 
 		#region Properties
-		public void UpdateProperties(Dictionary<String, object> newdict)
+
+		#region IPropertiesImplementation
+		public void SetNewProperties(ObservableCollection<string, object> NewProperties)
 		{
-			Properties = new ObservableCollection<string, object>(newdict);
+			Properties = NewProperties;
 		}
 
 		public void ClearProperties()
@@ -71,61 +202,97 @@ namespace BixBite
 			Properties.Clear();
 		}
 
-		public void AddProperty(string Pname, object data)
+		public void SetNewProperty(string Key, object Property)
 		{
-			Properties.Add(Pname, data);
+			if (!Properties.ContainsKey(Key))
+				Properties.[Key] = Property;
+			else throw new PropertyNotFoundException(Key);
+
 		}
 
+		public void AddProperty(string Key, object data)
+		{
+			if (!Properties.ContainsKey(Key))
+				Properties.Add(Key, data);
+		}
 
-		public ObservableCollection<string, object> getProperties()
+		public object GetProperty(String Key)
+		{
+			if (Properties.ContainsKey(Key))
+				return Properties[Key];
+			else throw new PropertyNotFoundException();
+		}
+		public ObservableCollection<String, object> GetProperties()
 		{
 			return Properties;
 		}
+		#endregion
 
-		public void setProperties(ObservableCollection<string, object> newprops)
-		{
-			Properties = newprops;
-		}
+		//public void UpdateProperties(Dictionary<String, object> newdict)
+		//{
+		//	Properties = new ObservableCollection<string, object>(newdict);
+		//}
 
-		public void SetProperty(string PName, object data)
-		{
-			Properties[PName] = data;
-		}
+		//public void ClearProperties()
+		//{
+		//	Properties.Clear();
+		//}
 
-		public object GetProperty(String PName)
-		{
-			return Properties[PName];
-		}
+		//public void AddProperty(string Pname, object data)
+		//{
+		//	Properties.Add(Pname, data);
+		//}
+
+
+		//public ObservableCollection<string, object> getProperties()
+		//{
+		//	return Properties;
+		//}
+
+		//public void setProperties(ObservableCollection<string, object> newprops)
+		//{
+		//	Properties = newprops;
+		//}
+
+		//public void SetProperty(string PName, object data)
+		//{
+		//	Properties[PName] = data;
+		//}
+
+		//public object GetProperty(String PName)
+		//{
+		//	return Properties[PName];
+		//}
 		#endregion
 
 		#region PropertiesCallBack
 		public void PropertyCallback(object sender, System.Windows.RoutedEventArgs e)
 		{
-			//theres two things that can call this. Textbox, Checkbox
-			if (sender is CheckBox)
-			{
-				String PName = ((CheckBox)sender).Tag.ToString();
-				if (GetProperty(PName) is bool)
-				{
+			////theres two things that can call this. Textbox, Checkbox
+			//if (sender is CheckBox)
+			//{
+			//	String PName = ((CheckBox)sender).Tag.ToString();
+			//	if (GetProperty(PName) is bool)
+			//	{
 
-					if (PName == "isActive")
-					{
-						SetProperty(PName, ((CheckBox)sender).IsChecked);
-					}
-					else
-					{
-						Console.WriteLine("Others... Saved should be enabled= false...");
-					}
-				}
-			}
-			else if(sender is TextBox)
-			{
-				String PName = ((TextBox)sender).Tag.ToString();
-				if(GetProperty(PName) is String)
-				{
-					SetProperty(PName, ((TextBox)sender).Text);
-				}
-			}
+			//		if (PName == "isActive")
+			//		{
+			//			SetProperty(PName, ((CheckBox)sender).IsChecked);
+			//		}
+			//		else
+			//		{
+			//			Console.WriteLine("Others... Saved should be enabled= false...");
+			//		}
+			//	}
+			//}
+			//else if(sender is TextBox)
+			//{
+			//	String PName = ((TextBox)sender).Tag.ToString();
+			//	if(GetProperty(PName) is String)
+			//	{
+			//		SetProperty(PName, ((TextBox)sender).Text);
+			//	}
+			//}
 
 		}
 		#endregion
@@ -182,6 +349,6 @@ namespace BixBite
 			}
 		}
 
-		
+
 	}
 }
