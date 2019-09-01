@@ -1,62 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BixBite.Resources
 {
-	/// <summary>
-	/// This interface is here to interface with my property grid control.
-	/// It holds the property name, property data.
-	/// IT WILL not hold the control reference, as then that will need to go in the data files... which is wrong.
-	/// </summary>
 	interface IProperties
 	{
-
 		/// <summary>
-		/// This method will SET the new properties.(ALL)
+		/// Use this to MANUALLY set the properties dictionary
 		/// </summary>
-		/// <param name="NewProperties"></param>
-		void SetNewProperties(ObservableCollection<Tuple<String, object>> NewProperties);
+		void UpdateProperties(Dictionary<String, object> newdict);
 
 		/// <summary>
-		/// Clears the current properties for the object.
+		/// Uses this to clear all the properties in the dictionary
 		/// </summary>
 		void ClearProperties();
 
 		/// <summary>
-		/// Searches for the given Key in the collection. If it found it will replace it
+		/// Use this to add a property to the dictionary
 		/// </summary>
-		/// <param name="Key">Property Name</param>
-		/// <param name="Property">Property Data.</param>
-		void SetNewProperty(String Key, Tuple<String, object> Property);
+		void AddProperty(String Pname, object data);
 
-		/// <summary>
-		/// Adds a new Property to the collection.
-		/// </summary>
-		/// <param name="Key">name of Property</param>
-		/// <param name="data">Data of the property</param>
-		void AddProperty(String Key, object data);
+		void SetProperty(String PName, object data);
 
-		/// <summary>
-		/// Gets the property data
-		/// </summary>
-		/// <returns>the property data as an object.</returns>
-		object GetPropertyData();
+		object GetProperty(String Pname);
 
-		/// <summary>
-		/// Returns the Tuple data for the property
-		/// </summary>
-		/// <returns>Returns the Tuple of the property</returns>
-		Tuple<String, object> GetProperty();
+		ObservableDictionary<String, object> getProperties();
 
-		/// <summary>
-		/// Returns the whole property Collection
-		/// </summary>
-		/// <returns></returns>
-		ObservableCollection<Tuple<String, object>> GetProperties();
-		
+		void setProperties(ObservableDictionary<String, object> newprops);
 	}
 }
