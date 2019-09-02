@@ -69,6 +69,7 @@
     <Compile Include="Rendering\UI\GameUI.cs" />
     <Compile Include="Rendering\UI\GameSmartTextBox.cs" />
     <Compile Include="Rendering\UI\UIComponent.cs" />
+    <Compile Include="Resources\EE_Exceptions.cs" />
     <Compile Include="Resources\IProperties.cs" />
     <Compile Include="Resources\ObservableDictionary.cs" />
     <Compile Include="Resources\ObservablePropertyDictionary.cs" />

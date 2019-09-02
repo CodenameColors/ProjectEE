@@ -34,6 +34,9 @@ namespace BixBite
 
 	public class GameEvent : IProperties
 	{
+		public delegate void PGridSync_Hook(String Key, object Property, System.Collections.Specialized.NotifyCollectionChangedAction action);
+		public PGridSync_Hook PGridSync = null;
+
 		//these varibles determine the cell of the gameeven trigger as well as the grouping.
 		//public int xpos, ypos, width, height, group = 0; ///This is the area of activation :: 0 is top left ; 1 is bottom right
 		//public String ActivationButton, , DelegateEventName = String.Empty;
@@ -49,21 +52,21 @@ namespace BixBite
 		{
 			get
 			{
-				if (Properties.ContainsKey("EventName"))
+				if (Properties.Any(m => m.Item1 == "EventName"))
 				{
-					return Properties["EventName"].ToString();
+					return GetPropertyData("EventName").ToString();
 				}
 				throw new NullReferenceException(); //doesn't exist
 			}
 			set
 			{
-				if (Properties.ContainsKey("EventName"))
+				if (Properties.Any(m => m.Item1 == "EventName"))
 				{
-					Properties["EventName"] = value;
+					SetProperty("EventName", value);
 				}
 				else
 				{
-					Properties.Add("EventName", value);
+					AddProperty("EventName", value);
 				}
 			}
 		}
@@ -74,21 +77,21 @@ namespace BixBite
 		{
 			get
 			{
-				if (Properties.ContainsKey("group"))
+				if (Properties.Any(m => m.Item1 == "group"))
 				{
-					return (int)Properties["group"];
+					return (int)GetPropertyData("group");
 				}
 				throw new NullReferenceException(); //doesn't exist
 			}
 			set
 			{
-				if (Properties.ContainsKey("group"))
+				if (Properties.Any(m => m.Item1 == "group"))
 				{
-					Properties["group"] = value;
+					SetProperty("group", value);
 				}
 				else
 				{
-					Properties.Add("group", value);
+					AddProperty("group", value);
 				}
 			}
 		}
@@ -99,21 +102,21 @@ namespace BixBite
 		{
 			get
 			{
-				if (Properties.ContainsKey("isActive"))
+				if (Properties.Any(m => m.Item1 == "isActive"))
 				{
-					return (bool)Properties["isActive"];
+					return (bool)GetPropertyData("isActive");
 				}
 				throw new NullReferenceException(); //doesn't exist
 			}
 			set
 			{
-				if (Properties.ContainsKey("isActive"))
+				if (Properties.Any(m => m.Item1 == "isActive"))
 				{
-					Properties["isActive"] = value;
+					SetProperty("isActive", value);
 				}
 				else
 				{
-					Properties.Add("isActive", value);
+					AddProperty("isActive", value);
 				}
 			}
 		}
@@ -124,21 +127,21 @@ namespace BixBite
 		{
 			get
 			{
-				if (Properties.ContainsKey("ActivationButton"))
+				if (Properties.Any(m => m.Item1 == "ActivationButton"))
 				{
-					return Properties["ActivationButton"].ToString();
+					return GetPropertyData("ActivationButton").ToString();
 				}
 				throw new NullReferenceException(); //doesn't exist
 			}
 			set
 			{
-				if (Properties.ContainsKey("ActivationButton"))
+				if (Properties.Any(m => m.Item1 == "ActivationButton"))
 				{
-					Properties["ActivationButton"] = value;
+					SetProperty("ActivationButton",value);
 				}
 				else
 				{
-					Properties.Add("ActivationButton", value);
+					AddProperty("ActivationButton", value);
 				}
 			}
 		}
@@ -149,32 +152,36 @@ namespace BixBite
 		{
 			get
 			{
-				if (Properties.ContainsKey("DelegateEventName"))
+				if (Properties.Any(m => m.Item1 == "DelegateEventName"))
 				{
-					return Properties["DelegateEventName"].ToString();
+					GetPropertyData("DelegateEventName");
 				}
 				throw new NullReferenceException(); //doesn't exist
 			}
 			set
 			{
-				if (Properties.ContainsKey("DelegateEventName"))
+				if (Properties.Any(m => m.Item1 == "DelegateEventName"))
 				{
-					Properties["DelegateEventName"] = value;
+					SetProperty("DelegateEventName", value);
 				}
 				else
 				{
-					Properties.Add("DelegateEventName", value);
+					AddProperty("DelegateEventName", value);
 				}
 			}
 		}
 		#endregion
 
 		#endregion
-		ObservableCollection<string, object> Properties { get; set; }
+		/// <summary>
+		/// Holds the properties and data for this object. It needs to be a tuple to allow on change callback
+		/// </summary>
+		ObservableCollection<Tuple<string, object>> Properties { get; set; }
 
 		public GameEvent(String Name, EventType eventType, int group)
 		{
-			Properties = new ObservableCollection<string, object>();
+			Properties = new ObservableCollection<Tuple<string, object>>();
+			Properties.CollectionChanged += Properties_Changed;
 			this.EventName = Name;
 			this.eventType = eventType;
 			AddProperty("EventName", Name);
@@ -192,7 +199,7 @@ namespace BixBite
 		#region Properties
 
 		#region IPropertiesImplementation
-		public void SetNewProperties(ObservableCollection<string, object> NewProperties)
+		public void SetNewProperties(ObservableCollection<Tuple<string, object>> NewProperties)
 		{
 			Properties = NewProperties;
 		}
@@ -202,115 +209,102 @@ namespace BixBite
 			Properties.Clear();
 		}
 
-		public void SetNewProperty(string Key, object Property)
+		public void SetProperty(string Key, object Property)
 		{
-			if (!Properties.ContainsKey(Key))
-				Properties.[Key] = Property;
+			if (!Properties.Any(m => m.Item1 == Key))
+				Properties[GetPropertyIndex(Key)] = new Tuple<string, object>(Key, Property);
 			else throw new PropertyNotFoundException(Key);
 
 		}
 
 		public void AddProperty(string Key, object data)
 		{
-			if (!Properties.ContainsKey(Key))
-				Properties.Add(Key, data);
+			if (!Properties.Any(m => m.Item1 == Key))
+				Properties.Add(new Tuple<String, object>(Key, data));
 		}
 
-		public object GetProperty(String Key)
+		public Tuple<String, object> GetProperty(String Key)
 		{
-			if (Properties.ContainsKey(Key))
-				return Properties[Key];
+			if (Properties.Any(m => m.Item1 == Key))
+				return Properties.Single(m => m.Item1 == Key);
 			else throw new PropertyNotFoundException();
 		}
-		public ObservableCollection<String, object> GetProperties()
+
+		public object GetPropertyData(string Key)
+		{
+			int i = GetPropertyIndex(Key);
+			if (-1 == i) throw new PropertyNotFoundException(Key);
+			return Properties[i].Item2;
+		}
+
+		public ObservableCollection<Tuple<String, object>> GetProperties()
 		{
 			return Properties;
 		}
+
 		#endregion
 
-		//public void UpdateProperties(Dictionary<String, object> newdict)
-		//{
-		//	Properties = new ObservableCollection<string, object>(newdict);
-		//}
-
-		//public void ClearProperties()
-		//{
-		//	Properties.Clear();
-		//}
-
-		//public void AddProperty(string Pname, object data)
-		//{
-		//	Properties.Add(Pname, data);
-		//}
-
-
-		//public ObservableCollection<string, object> getProperties()
-		//{
-		//	return Properties;
-		//}
-
-		//public void setProperties(ObservableCollection<string, object> newprops)
-		//{
-		//	Properties = newprops;
-		//}
-
-		//public void SetProperty(string PName, object data)
-		//{
-		//	Properties[PName] = data;
-		//}
-
-		//public object GetProperty(String PName)
-		//{
-		//	return Properties[PName];
-		//}
+		#region Helper
+		public int GetPropertyIndex(String Key)
+		{
+			int i = 0;
+			foreach(Tuple<String, object> tuple in Properties)
+			{
+				if (tuple.Item1 == Key)
+					return i;
+				i++;
+			}
+			return -1;
+		}
 		#endregion
 
 		#region PropertiesCallBack
-		public void PropertyCallback(object sender, System.Windows.RoutedEventArgs e)
+		private void Properties_Changed(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
-			////theres two things that can call this. Textbox, Checkbox
-			//if (sender is CheckBox)
-			//{
-			//	String PName = ((CheckBox)sender).Tag.ToString();
-			//	if (GetProperty(PName) is bool)
-			//	{
-
-			//		if (PName == "isActive")
-			//		{
-			//			SetProperty(PName, ((CheckBox)sender).IsChecked);
-			//		}
-			//		else
-			//		{
-			//			Console.WriteLine("Others... Saved should be enabled= false...");
-			//		}
-			//	}
-			//}
-			//else if(sender is TextBox)
-			//{
-			//	String PName = ((TextBox)sender).Tag.ToString();
-			//	if(GetProperty(PName) is String)
-			//	{
-			//		SetProperty(PName, ((TextBox)sender).Text);
-			//	}
-			//}
-
+			if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+			{
+				if(PGridSync != null)
+				{
+					foreach(Tuple<String, object> tuple in e.NewItems)
+					{
+						PGridSync(tuple.Item1, tuple.Item2, System.Collections.Specialized.NotifyCollectionChangedAction.Add);
+					}
+				}
+			}
+			else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+			{
+				if (PGridSync != null)
+				{
+					foreach (Tuple<String, object> tuple in e.NewItems)
+					{
+						PGridSync(tuple.Item1, tuple.Item2, System.Collections.Specialized.NotifyCollectionChangedAction.Remove);
+					}
+				}
+			}
+			else if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+			{
+				if (PGridSync != null)
+				{
+					foreach (Tuple<String, object> tuple in e.NewItems)
+					{
+						PGridSync(tuple.Item1, tuple.Item2, System.Collections.Specialized.NotifyCollectionChangedAction.Replace);
+					}
+				}
+			}
+			else if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+			{
+				if (PGridSync != null)
+				{
+					foreach (Tuple<String, object> tuple in e.NewItems)
+					{
+						PGridSync(tuple.Item1, tuple.Item2, System.Collections.Specialized.NotifyCollectionChangedAction.Reset);
+					}
+				}
+			}
 		}
+
 		#endregion
-
-		public void ChangeGroup(int newgroup)
-		{
-			SetProperty("group", newgroup);
-		}
-
-		public bool GetActiveState()
-		{
-			return (bool)GetProperty("isActive");
-		}
-
-		public void SetActiveState(bool activestate)
-		{
-			SetProperty("isActive", activestate);
-		}
+		#endregion
 
 		public void AddEventData(EventData ed, String newDeleName, String ButtonName)
 		{

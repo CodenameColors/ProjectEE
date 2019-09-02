@@ -14,7 +14,7 @@ namespace BixBite.Resources
 		/// This method will SET the new properties.(ALL)
 		/// </summary>
 		/// <param name="NewProperties"></param>
-		void SetNewProperties(ObservableCollection<String, object> NewProperties);
+		void SetNewProperties(ObservableCollection<Tuple<String, object>> NewProperties);
 
 		/// <summary>
 		/// Clears the current properties for the object.
@@ -26,7 +26,7 @@ namespace BixBite.Resources
 		/// </summary>
 		/// <param name="Key">Property Name</param>
 		/// <param name="Property">Property Data.</param>
-		void SetNewProperty(String Key, object Property);
+		void SetProperty(String Key, object Property);
 
 		/// <summary>
 		/// Adds a new Property to the collection.
@@ -45,13 +45,22 @@ namespace BixBite.Resources
 		/// Returns the Tuple data for the property
 		/// </summary>
 		/// <returns>Returns the Tuple of the property</returns>
-		Tuple<String, object> GetProperty();
+		Tuple<String, object> GetProperty(String Key);
 
 		/// <summary>
 		/// Returns the whole property Collection
 		/// </summary>
 		/// <returns></returns>
 		ObservableCollection<Tuple<String, object>> GetProperties();
-		
+
+		/// <summary>
+		/// Returns the index that this key is found at.
+		/// Helper function because tuple
+		/// </summary>
+		/// <param name="Key"></param>
+		/// <returns></returns>
+		int GetPropertyIndex(String Key);
+
+
 	}
 }
