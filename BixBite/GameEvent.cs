@@ -173,6 +173,7 @@ namespace BixBite
 		#endregion
 
 		#endregion
+
 		/// <summary>
 		/// Holds the properties and data for this object. It needs to be a tuple to allow on change callback
 		/// </summary>
@@ -211,7 +212,7 @@ namespace BixBite
 
 		public void SetProperty(string Key, object Property)
 		{
-			if (!Properties.Any(m => m.Item1 == Key))
+			if (Properties.Any(m => m.Item1 == Key))
 				Properties[GetPropertyIndex(Key)] = new Tuple<string, object>(Key, Property);
 			else throw new PropertyNotFoundException(Key);
 
@@ -259,6 +260,36 @@ namespace BixBite
 		#endregion
 
 		#region PropertiesCallBack
+		public void PropertyCallback(object sender, System.Windows.RoutedEventArgs e)
+		{
+			//theres two things that can call this. Textbox, Checkbox
+			if (sender is CheckBox)
+			{
+				String PName = ((CheckBox)sender).Tag.ToString();
+				if (GetPropertyData(PName) is bool)
+				{
+
+					if (PName == "isActive")
+					{
+						SetProperty(PName, ((CheckBox)sender).IsChecked);
+					}
+					else
+					{
+						Console.WriteLine("Others... Saved should be enabled= false...");
+					}
+				}
+			}
+			else if (sender is TextBox)
+			{
+				String PName = ((TextBox)sender).Tag.ToString();
+				if (GetPropertyData(PName) is String)
+				{
+					SetProperty(PName, ((TextBox)sender).Text);
+				}
+			}
+
+		}
+
 		private void Properties_Changed(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
 			if(e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)

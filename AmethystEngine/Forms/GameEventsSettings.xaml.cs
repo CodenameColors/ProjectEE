@@ -467,7 +467,7 @@ namespace AmethystEngine.Forms
 			{
 				//removes the gameevent itself.
 				GameEvent gameE = ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].LayerObjects).Item2[GameEvents_LB.SelectedIndex];
-				int TileGoupNum = (int)gameE.GetProperty("group");
+				int TileGoupNum = (int)gameE.GetPropertyData("group");
 				((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].LayerObjects).Item2.RemoveAt(GameEvents_LB.SelectedIndex);
 
 				

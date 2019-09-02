@@ -9,6 +9,7 @@ using BixBite.Resources;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows;
+using System.Collections.ObjectModel;
 
 namespace BixBite.Rendering
 {
@@ -23,11 +24,15 @@ namespace BixBite.Rendering
 
 	public class SpriteLayer : IProperties
 	{
+
+		public delegate void PGridSync_Hook(String Key, object Property, System.Collections.Specialized.NotifyCollectionChangedAction action);
+		public PGridSync_Hook PGridSync = null;
+
 		//instance variables
 		public String LayerName { get; set; }
 		public LayerType layerType = LayerType.None;
 
-		private ObservableCollection<String, object> Properties = new ObservableCollection<string, object>();
+		private ObservableCollection<Tuple<String, object>> Properties = new ObservableCollection<Tuple<string, object>>();
 		public object LayerObjects = new object(); //contains the objects for this layer. 
 		ImageEffect layereffect = new ImageEffect(); //and image effect that will effect THE WHOLE layer. So windDistort for example.
 		public Level ParentLevel;
@@ -42,17 +47,20 @@ namespace BixBite.Rendering
 			DefineLayerDataType(layerType = desltype); //set the objectdata datatype
 			ParentLevel = Parent;
 
-			Properties = new ObservableCollection<string, object>();
+			Properties = new ObservableCollection<Tuple<string, object>>();
+			Properties.CollectionChanged += Properties_Changed;
 			AddProperty("LayerName", "");
 			AddProperty("#LayerObjects", 0);
 			AddProperty("LayerType", "");
 
 		}
-		
+
 		#region Properties
-		public void UpdateProperties(Dictionary<String, object> newdict)
+
+		#region IPropertiesImplementation
+		public void SetNewProperties(ObservableCollection<Tuple<string, object>> NewProperties)
 		{
-			Properties = new ObservableCollection<string, object>(newdict);
+			Properties = NewProperties;
 		}
 
 		public void ClearProperties()
@@ -60,33 +68,102 @@ namespace BixBite.Rendering
 			Properties.Clear();
 		}
 
-		public void AddProperty(string Pname, object data)
+		public void SetProperty(string Key, object Property)
 		{
-			Properties.Add(Pname, data);
+			if (!Properties.Any(m => m.Item1 == Key))
+				Properties[GetPropertyIndex(Key)] = new Tuple<string, object>(Key, Property);
+			else throw new PropertyNotFoundException(Key);
+
 		}
 
+		public void AddProperty(string Key, object data)
+		{
+			if (!Properties.Any(m => m.Item1 == Key))
+				Properties.Add(new Tuple<String, object>(Key, data));
+		}
 
-		public ObservableCollection<string, object> getProperties()
+		public Tuple<String, object> GetProperty(String Key)
+		{
+			if (Properties.Any(m => m.Item1 == Key))
+				return Properties.Single(m => m.Item1 == Key);
+			else throw new PropertyNotFoundException();
+		}
+
+		public object GetPropertyData(string Key)
+		{
+			int i = GetPropertyIndex(Key);
+			if (-1 == i) throw new PropertyNotFoundException(Key);
+			return Properties[i].Item2;
+		}
+
+		public ObservableCollection<Tuple<String, object>> GetProperties()
 		{
 			return Properties;
 		}
 
-		public void setProperties(ObservableCollection<string, object> newprops)
-		{
-			Properties = newprops;
-		}
+		#endregion
 
-		public void SetProperty(string PName, object data)
+		#region Helper
+		public int GetPropertyIndex(String Key)
 		{
-			Properties[PName] = data;
-		}
-
-		public object GetProperty(String PName)
-		{
-			return Properties[PName];
+			int i = 0;
+			foreach (Tuple<String, object> tuple in Properties)
+			{
+				if (tuple.Item1 == Key)
+					return i;
+				i++;
+			}
+			return -1;
 		}
 		#endregion
 
+		#region PropertiesCallBack
+		private void Properties_Changed(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+			{
+				if (PGridSync != null)
+				{
+					foreach (Tuple<String, object> tuple in e.NewItems)
+					{
+						PGridSync(tuple.Item1, tuple.Item2, System.Collections.Specialized.NotifyCollectionChangedAction.Add);
+					}
+				}
+			}
+			else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+			{
+				if (PGridSync != null)
+				{
+					foreach (Tuple<String, object> tuple in e.NewItems)
+					{
+						PGridSync(tuple.Item1, tuple.Item2, System.Collections.Specialized.NotifyCollectionChangedAction.Remove);
+					}
+				}
+			}
+			else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+			{
+				if (PGridSync != null)
+				{
+					foreach (Tuple<String, object> tuple in e.NewItems)
+					{
+						PGridSync(tuple.Item1, tuple.Item2, System.Collections.Specialized.NotifyCollectionChangedAction.Replace);
+					}
+				}
+			}
+			else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+			{
+				if (PGridSync != null)
+				{
+					foreach (Tuple<String, object> tuple in e.NewItems)
+					{
+						PGridSync(tuple.Item1, tuple.Item2, System.Collections.Specialized.NotifyCollectionChangedAction.Reset);
+					}
+				}
+			}
+		}
+
+		#endregion
+		#endregion
 
 		#region PropertyCallbacks
 
@@ -95,7 +172,7 @@ namespace BixBite.Rendering
 			if (e.Key == Key.Enter)
 			{
 				String PName = ((TextBox)sender).Tag.ToString();
-				if (GetProperty(PName) is String)
+				if (GetPropertyData(PName) is String)
 				{
 					SetProperty(PName, ((TextBox)sender).Text);
 				}
@@ -106,7 +183,7 @@ namespace BixBite.Rendering
 		public void PropertyCheckBoxCallback(object sender, RoutedEventArgs e)
 		{
 			String PName = ((CheckBox)sender).Tag.ToString();
-			if (GetProperty(PName) is bool)
+			if (GetPropertyData(PName) is bool)
 			{
 
 				if (PName == "bMainLevel")
@@ -207,7 +284,7 @@ namespace BixBite.Rendering
 				else Console.WriteLine("incorrect layer type!");
 				return;
 			}
-			SetProperty("#LayerObjects", (int)(GetProperty("#LayerObjects")));
+			SetProperty("#LayerObjects", (int)(GetPropertyData("#LayerObjects")));
 		}
 
 		public void AddToLayer(int groupnum, int xcell, int ycell, GameEvent g )

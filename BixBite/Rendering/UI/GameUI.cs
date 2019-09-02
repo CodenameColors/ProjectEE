@@ -13,13 +13,16 @@ namespace BixBite.Rendering.UI
 {
 	public class GameUI : IProperties
 	{
+		public delegate void PGridSync_Hook(String Key, object Property, System.Collections.Specialized.NotifyCollectionChangedAction action);
+		public PGridSync_Hook PGridSync = null;
+
 		public String UIName { get; set; }
-		protected ObservableCollection<string, object> Properties { get; set; }
+		protected ObservableCollection<Tuple<string, object>> Properties { get; set; }
 		public ObservableCollection<GameUI> UIElements { get; set; }
 
 		public GameUI(String UIName, int Width, int Height, int Zindex, String BackgroundPath = "#00000000")
 		{
-			Properties = new ObservableCollection<string, object>();
+			Properties = new ObservableCollection<Tuple<string, object>>();
 			UIElements = new ObservableCollection<GameUI>();
 			this.UIName = UIName;
 			AddProperty("Name", UIName);
@@ -31,9 +34,11 @@ namespace BixBite.Rendering.UI
 		}
 
 		#region Properties
-		public void UpdateProperties(Dictionary<String, object> newdict)
+
+		#region IPropertiesImplementation
+		public void SetNewProperties(ObservableCollection<Tuple<string, object>> NewProperties)
 		{
-			Properties = new ObservableCollection<string, object>(newdict);
+			Properties = NewProperties;
 		}
 
 		public void ClearProperties()
@@ -41,31 +46,101 @@ namespace BixBite.Rendering.UI
 			Properties.Clear();
 		}
 
-		public void AddProperty(string Pname, object data)
+		public void SetProperty(string Key, object Property)
 		{
-			Properties.Add(Pname, data);
+			if (Properties.Any(m => m.Item1 == Key))
+				Properties[GetPropertyIndex(Key)] = new Tuple<string, object>(Key, Property);
+			else throw new PropertyNotFoundException(Key);
+
 		}
 
+		public void AddProperty(string Key, object data)
+		{
+			if (!Properties.Any(m => m.Item1 == Key))
+				Properties.Add(new Tuple<String, object>(Key, data));
+		}
 
-		public ObservableCollection<string, object> getProperties()
+		public Tuple<String, object> GetProperty(String Key)
+		{
+			if (Properties.Any(m => m.Item1 == Key))
+				return Properties.Single(m => m.Item1 == Key);
+			else throw new PropertyNotFoundException();
+		}
+
+		public object GetPropertyData(string Key)
+		{
+			int i = GetPropertyIndex(Key);
+			if (-1 == i) throw new PropertyNotFoundException(Key);
+			return Properties[i].Item2;
+		}
+
+		public ObservableCollection<Tuple<String, object>> GetProperties()
 		{
 			return Properties;
 		}
 
-		public void setProperties(ObservableCollection<string, object> newprops)
+		#endregion
+
+		#region Helper
+		public int GetPropertyIndex(String Key)
 		{
-			Properties = newprops;
+			int i = 0;
+			foreach (Tuple<String, object> tuple in Properties)
+			{
+				if (tuple.Item1 == Key)
+					return i;
+				i++;
+			}
+			return -1;
+		}
+		#endregion
+
+		#region PropertiesCallBack
+		private void Properties_Changed(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+			{
+				if (PGridSync != null)
+				{
+					foreach (Tuple<String, object> tuple in e.NewItems)
+					{
+						PGridSync(tuple.Item1, tuple.Item2, System.Collections.Specialized.NotifyCollectionChangedAction.Add);
+					}
+				}
+			}
+			else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+			{
+				if (PGridSync != null)
+				{
+					foreach (Tuple<String, object> tuple in e.NewItems)
+					{
+						PGridSync(tuple.Item1, tuple.Item2, System.Collections.Specialized.NotifyCollectionChangedAction.Remove);
+					}
+				}
+			}
+			else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+			{
+				if (PGridSync != null)
+				{
+					foreach (Tuple<String, object> tuple in e.NewItems)
+					{
+						PGridSync(tuple.Item1, tuple.Item2, System.Collections.Specialized.NotifyCollectionChangedAction.Replace);
+					}
+				}
+			}
+			else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+			{
+				if (PGridSync != null)
+				{
+					foreach (Tuple<String, object> tuple in e.NewItems)
+					{
+						PGridSync(tuple.Item1, tuple.Item2, System.Collections.Specialized.NotifyCollectionChangedAction.Reset);
+					}
+				}
+			}
 		}
 
-		public void SetProperty(string PName, object data)
-		{
-			Properties[PName] = data;
-		}
-
-		public object GetProperty(String PName)
-		{
-			return Properties[PName];
-		}
+		#endregion
 		#endregion
 
 		#region PropertiesCallBack
@@ -83,7 +158,7 @@ namespace BixBite.Rendering.UI
 				Console.WriteLine(((TextBox)sender).Tag.ToString());
 
 				String Property = ((TextBox)sender).Tag.ToString();
-				if (Properties.ContainsKey(Property))
+				if (Properties.Any(m => m.Item1 == Property))
 				{
 					SetProperty(Property, ((TextBox)sender).Text);
 					if (Property == "FontSize")
@@ -145,9 +220,9 @@ namespace BixBite.Rendering.UI
 				//create the GameUI (Main)
 				writer.WriteStartElement(null, "GameUI", null);
 				//all the properties...
-				for(int i = 0; i < getProperties().Count; i++)
+				for(int i = 0; i < GetProperties().Count; i++)
 				{
-					writer.WriteAttributeString(null, getProperties().Keys.ToList()[i].ToString(), null, getProperties().Values.ToList()[i].ToString());
+					writer.WriteAttributeString(null, GetProperties().Select(M => M.Item1).ToList()[i].ToString(), null, GetProperties().Select(m=>m.Item2).ToList()[i].ToString());
 				}
 
 				//child UI
@@ -157,9 +232,9 @@ namespace BixBite.Rendering.UI
 						writer.WriteStartElement(null, "GameTextBlock", null);
 					if (childUI is GameIMG)
 						writer.WriteStartElement(null, "GameIMG", null);
-					for (int i = 0; i < childUI.getProperties().Count; i++)
+					for (int i = 0; i < childUI.GetProperties().Count; i++)
 					{
-						writer.WriteAttributeString(null, childUI.getProperties().Keys.ToList()[i].ToString(), null, childUI.getProperties().Values.ToList()[i].ToString());
+						writer.WriteAttributeString(null, childUI.GetProperties().Select(m => m.Item1).ToList()[i].ToString(), null, childUI.GetProperties().Select(m => m.Item2).ToList()[i].ToString());
 					}
 					writer.WriteEndElement();//end child UI
 				}

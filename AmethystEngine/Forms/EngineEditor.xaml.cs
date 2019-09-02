@@ -846,7 +846,7 @@ namespace AmethystEngine.Forms
 					//Are we allowed to paint?
 					if (Canvas_grid.Viewport.X > 0 || Canvas_grid.Viewport.Y > 0)
 						return; //we are out of the bounds negative wise (viewport)
-					if ((int)CurrentLevel.GetProperty("xCells") < p.X / 40 || (int)CurrentLevel.GetProperty("yCells") < p.Y / 40)
+					if ((int)CurrentLevel.GetPropertyData("xCells") < p.X / 40 || (int)CurrentLevel.GetPropertyData("yCells") < p.Y / 40)
 						return;
 
 					if (SelectedTile_Canvas.Children.Count == 0) return;
@@ -994,10 +994,10 @@ namespace AmethystEngine.Forms
 						Width = 40,
 						Height = 40,
 						FontSize = 18,
-						Text = ((int)layergameevents[GameEventNum].GetProperty("group") == -1 ? "" : layergameevents[GameEventNum].GetProperty("group").ToString()),
+						Text = ((int)layergameevents[GameEventNum].GetPropertyData("group") == -1 ? "" : layergameevents[GameEventNum].GetProperty("group").ToString()),
 						Tag = layergameevents[GameEventNum].GetProperty("group").ToString(),
 						Foreground = new SolidColorBrush(Colors.Black),
-						Background = ((int)layergameevents[GameEventNum].GetProperty("group") == -1 ? new SolidColorBrush(Color.FromArgb(100, 255, 0, 0)) : new SolidColorBrush(Color.FromArgb(100, 100, 100, 100))),
+						Background = ((int)layergameevents[GameEventNum].GetPropertyData("group") == -1 ? new SolidColorBrush(Color.FromArgb(100, 255, 0, 0)) : new SolidColorBrush(Color.FromArgb(100, 100, 100, 100))),
 					};
 					Border b = new Border() { Width = 40, Height = 40 };
 					b.Child = tb;
@@ -1008,7 +1008,7 @@ namespace AmethystEngine.Forms
 					//create event data for the game event.
 					
 					
-					CurrentLevel.Layers[curLayer].AddToLayer((int)layergameevents[GameEventNum].GetProperty("group"), (int)p.Y/40, (int)p.X/40, null);
+					CurrentLevel.Layers[curLayer].AddToLayer((int)layergameevents[GameEventNum].GetPropertyData("group"), (int)p.Y/40, (int)p.X/40, null);
 					EventData ed = new EventData()
 					{
 						newx = 0,
@@ -1037,11 +1037,11 @@ namespace AmethystEngine.Forms
 					PropGrid PGrid = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
 					PGrid.ClearProperties();
 					int i = 0;
-					foreach (object o in ge.getProperties().Values)
+					foreach (object o in ge.GetProperties().Select(m=>m.Item1))
 					{
 						if (o is String || o is int)
 						{
-							PGrid.AddProperty(ge.getProperties().Keys.ToList()[i], new TextBox() { IsEnabled = false }, o.ToString(), ge.PropertyCallback);
+							PGrid.AddProperty(ge.GetProperties().Select(m=>m.Item2).ToList()[i].ToString(), new TextBox() { IsEnabled = false }, o.ToString(), ge.PropertyCallback);
 						}
 						i++;
 					}
@@ -1127,11 +1127,11 @@ namespace AmethystEngine.Forms
 			int i = 0;
 			PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
 			LB.ClearProperties();
-			foreach (object o in spr.getProperties().Values)
+			foreach (object o in spr.GetProperties().Select(m=>m.Item2))
 			{
 				if (o is String || o is int)
 				{
-					LB.AddProperty(spr.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), spr.PropertyTBCallback);
+					LB.AddProperty(spr.GetProperties().Select(m=>m.Item1).ToList()[i], new TextBox(), o.ToString(), spr.PropertyTBCallback);
 				}
 				i++;
 			}
@@ -1616,8 +1616,8 @@ namespace AmethystEngine.Forms
     {
 			Level TempLevel = CurrentLevel;
 			if (TempLevel == null) return; //TODO: Remove after i make force select work on tree view.
-			FullMapLEditor_Canvas.Width = (int)TempLevel.GetProperty("xCells") * 10;
-      FullMapLEditor_Canvas.Height = (int)TempLevel.GetProperty("yCells") * 10;
+			FullMapLEditor_Canvas.Width = (int)TempLevel.GetPropertyData("xCells") * 10;
+      FullMapLEditor_Canvas.Height = (int)TempLevel.GetPropertyData("yCells") * 10;
 
       FullMapLEditor_VB.Viewport = new Rect(0, 0, 10, 10);
 			
@@ -1676,7 +1676,7 @@ namespace AmethystEngine.Forms
 		private void FullMapEditorFill(Sprite spr, ImageBrush i, int zindex)
 		{
 			Rectangle r = new Rectangle() { Width = 10, Height = 10, Fill = i };
-			Canvas.SetLeft(r, (int)spr.GetProperty("x") / 4); Canvas.SetTop(r, (int)spr.GetProperty("y") / 4); Canvas.SetZIndex(r, zindex); // divide 4 because scaling.
+			Canvas.SetLeft(r, (int)spr.GetPropertyData("x") / 4); Canvas.SetTop(r, (int)spr.GetPropertyData("y") / 4); Canvas.SetZIndex(r, zindex); // divide 4 because scaling.
 			FullMapLEditor_Canvas.Children.Add(r);
 		}
 
@@ -1721,7 +1721,7 @@ namespace AmethystEngine.Forms
 			{
 				for (int j = 0; j < rows; j++)
 				{
-					if ((int)CurrentLevel.GetProperty("xCells")-1 <= i || (int)CurrentLevel.GetProperty("yCells")-1 <= j)
+					if ((int)CurrentLevel.GetPropertyData("xCells")-1 <= i || (int)CurrentLevel.GetPropertyData("yCells")-1 <= j)
 						break;
 
 					Point p = new Point(begginning.X + (int)(40 * i), begginning.Y + (int)(40 * j));
@@ -1999,7 +1999,7 @@ namespace AmethystEngine.Forms
 			{
 				for (int j = 0; j < rows; j++)
 				{
-					if ((int)CurrentLevel.GetProperty("xCells") - 1 <= i || (int)CurrentLevel.GetProperty("yCells") - 1 <= j)
+					if ((int)CurrentLevel.GetPropertyData("xCells") - 1 <= i || (int)CurrentLevel.GetPropertyData("yCells") - 1 <= j)
 						break;
 					//find the tile on the layer that is selected.
 					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 
@@ -2139,15 +2139,15 @@ namespace AmethystEngine.Forms
 				int i = 0;
 				PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
 				LB.ClearProperties();
-				foreach (object o in ((Level)e.NewValue).getProperties().Values)
+				foreach (object o in ((Level)e.NewValue).GetProperties().Select(m => m.Item2))
 				{
 					if (o is String || o is int)
 					{
-						LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), ((Level)e.NewValue).PropertyTBCallback);
+						LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new TextBox(), o.ToString(), ((Level)e.NewValue).PropertyTBCallback);
 					}
 					else if (o is bool)
 					{
-						LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, ((Level)e.NewValue).PropertyCheckBoxCallback);
+						LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new CheckBox(), (bool)o, ((Level)e.NewValue).PropertyCheckBoxCallback);
 					}
 
 					i++;
@@ -2170,15 +2170,15 @@ namespace AmethystEngine.Forms
 				PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
 				SpriteLayer SL = (SpriteLayer)e.NewValue;
 				LB.ClearProperties();
-				foreach (object o in SL.getProperties().Values)
+				foreach (object o in SL.GetProperties().Select(m=>m.Item2))
 				{
 					if (o is String || o is int)
 					{
-						LB.AddProperty(SL.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), SL.PropertyTBCallback);
+						LB.AddProperty(SL.GetProperties().Select(m=>m.Item1).ToList()[i], new TextBox(), o.ToString(), SL.PropertyTBCallback);
 					}
 					else if (o is bool)
 					{
-						LB.AddProperty(SL.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, SL.PropertyCheckBoxCallback);
+						LB.AddProperty(SL.GetProperties().Select(m=>m.Item1).ToList()[i], new CheckBox(), (bool)o, SL.PropertyCheckBoxCallback);
 					}
 
 					i++;
@@ -2328,13 +2328,13 @@ namespace AmethystEngine.Forms
 						{
 							Source = bitmap
 						};
-						Rectangle r = new Rectangle() { Width = (int)sprite.GetProperty("width"), Height = (int)sprite.GetProperty("height"), Fill = new ImageBrush(img.Source) };//Make a rectange the size of the image
+						Rectangle r = new Rectangle() { Width = (int)sprite.GetPropertyData("width"), Height = (int)sprite.GetPropertyData("height"), Fill = new ImageBrush(img.Source) };//Make a rectange the size of the image
 
 						ContentControl CC = ((ContentControl)this.TryFindResource("MoveableImages_Template"));
-						CC.Width = (int)sprite.GetProperty("width");
-						CC.Height = (int)sprite.GetProperty("height");
+						CC.Width = (int)sprite.GetPropertyData("width");
+						CC.Height = (int)sprite.GetPropertyData("height");
 
-						Canvas.SetLeft(CC, (int)sprite.GetProperty("x")); Canvas.SetTop(CC, (int)sprite.GetProperty("y")); Canvas.SetZIndex(CC, Zindex);
+						Canvas.SetLeft(CC, (int)sprite.GetPropertyData("x")); Canvas.SetTop(CC, (int)sprite.GetPropertyData("y")); Canvas.SetZIndex(CC, Zindex);
 						Selector.SetIsSelected(CC, false);
 						CC.MouseRightButtonDown += ContentControl_MouseLeftButtonDown;
 						((Rectangle)CC.Content).Fill = new ImageBrush(img.Source);
@@ -2446,15 +2446,15 @@ namespace AmethystEngine.Forms
 
 				int i = 0;
 				PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
-				foreach (object o in CurrentLevel.getProperties().Values)
+				foreach (object o in CurrentLevel.GetProperties().Select(m => m.Item2))
 				{
 					if (o is String || o is int)
 					{
-						LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
+						LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
 					}
 					else if (o is bool)
 					{
-						LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
+						LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
 					}
 
 					i++;
@@ -2511,15 +2511,15 @@ namespace AmethystEngine.Forms
 
 			int i = 0;
 			PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
-			foreach (object o in CurrentLevel.getProperties().Values)
+			foreach (object o in CurrentLevel.GetProperties().Select(m => m.Item2))
 			{
 				if (o is String || o is int)
 				{
-					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
+					LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
 				}
 				else if (o is bool)
 				{
-					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
+					LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
 				}
 
 				i++;
@@ -2570,15 +2570,15 @@ namespace AmethystEngine.Forms
 
 			int i = 0;
 			PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
-			foreach (object o in CurrentLevel.getProperties().Values)
+			foreach (object o in CurrentLevel.GetProperties().Select(m => m.Item2))
 			{
 				if (o is String || o is int)
 				{
-					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
+					LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
 				}
 				else if (o is bool)
 				{
-					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
+					LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
 				}
 
 				i++;
@@ -2774,7 +2774,7 @@ namespace AmethystEngine.Forms
 		{
 			Level TempLevel = ((Level)SceneExplorer_TreeView.SelectedValue);
 			TempLevel.AddLayer("new tile", LayerType.Tile);
-			TempLevel.Layers.Last().DefineLayerDataType(LayerType.Tile, (int)TempLevel.GetProperty("xCells"), (int)TempLevel.GetProperty("yCells"));
+			TempLevel.Layers.Last().DefineLayerDataType(LayerType.Tile, (int)TempLevel.GetPropertyData("xCells"), (int)TempLevel.GetPropertyData("yCells"));
 		}
 		private void SpriteLayer_Click(object sender, RoutedEventArgs e)
 		{
@@ -2786,7 +2786,7 @@ namespace AmethystEngine.Forms
 		{
 			Level TempLevel = ((Level)SceneExplorer_TreeView.SelectedValue);
 			TempLevel.AddLayer("new GOL", LayerType.GameEvent);
-			TempLevel.Layers.Last().DefineLayerDataType(LayerType.GameEvent, (int)TempLevel.GetProperty("xCells"), (int)TempLevel.GetProperty("yCells"));
+			TempLevel.Layers.Last().DefineLayerDataType(LayerType.GameEvent, (int)TempLevel.GetPropertyData("xCells"), (int)TempLevel.GetPropertyData("yCells"));
 
 
 		}
@@ -3143,23 +3143,23 @@ namespace AmethystEngine.Forms
 				int i = 0;
 				PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("UIPropertyGrid", ObjectProperties_Control)));
 				LB.ClearProperties();
-				foreach (object o in CurrentUIDictionary[SelectedUIControl.Name].getProperties().Values)
+				foreach (object o in CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item2))
 				{
-					if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "Zindex")
+					if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "Zindex")
 					{
 						TextBox TB = new TextBox(); TB.KeyDown += GameUI_ZIndex_Changed;
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB,
 							o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
 					}
-					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "ShowBorder")
+					else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "ShowBorder")
 					{
 						CheckBox CB = new CheckBox() { VerticalAlignment = VerticalAlignment.Center };
 						CB.Click += SetBorderVisibility;
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i],
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
 							CB,
 							o);
 					}
-					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "Image")
+					else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "Image")
 					{
 						ComboBox CB = new ComboBox() { Height = 50, ItemTemplate = (DataTemplate)this.Resources["CBIMGItems"] };
 						CB.SelectionChanged += GameImage_SelectionChanged;
@@ -3170,28 +3170,28 @@ namespace AmethystEngine.Forms
 						}
 						CB.ItemsSource = ComboItems;
 
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i],
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
 							CB,
 							new List<String>());
 					}
-					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "Background")
+					else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "Background")
 					{
 						DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
 						TB.SelectedColorChanged += customCP_BackgroundColorChanged;
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB,
 							o.ToString());
 					}
-					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "FontColor")
+					else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "FontColor")
 					{
 						DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
 						TB.SelectedColorChanged += customCP_FontColorChanged;
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB,
 							o.ToString());
 					}
 					else
 					{
 						TextBox TB = new TextBox(); TB.KeyDown += UIPropertyCallback;
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB,
 							o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
 					}
 					i++;
@@ -3366,7 +3366,7 @@ namespace AmethystEngine.Forms
 				else
 					((Border)((Grid)SelectedUIControl.Content).Children[0]).Visibility = Visibility.Visible;
 
-				SelectedUI.SetProperty("ShowBorder", !((bool)SelectedUI.GetProperty("ShowBorder")));
+				SelectedUI.SetProperty("ShowBorder", !((bool)SelectedUI.GetPropertyData("ShowBorder")));
 			}
 		}
 
@@ -3646,7 +3646,7 @@ namespace AmethystEngine.Forms
 			
 			BaseUI.Width = Int32.Parse(gameUI.GetProperty("Width").ToString());
 			BaseUI.Height = Int32.Parse(gameUI.GetProperty("Height").ToString());
-			BaseUI.BorderBrush = (((bool)gameUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+			BaseUI.BorderBrush = (((bool)gameUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
 			BaseUI.BorderThickness = new Thickness(0);
 			BaseUI.Tag = "Border";
 			BaseUI.Name = gameUI.UIName;
@@ -3656,7 +3656,7 @@ namespace AmethystEngine.Forms
 				HorizontalAlignment = HorizontalAlignment.Stretch,
 				VerticalAlignment = VerticalAlignment.Stretch,
 			};
-			((Grid)BaseUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = (((bool)gameUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent) });
+			((Grid)BaseUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = (((bool)gameUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent) });
 
 			//get the middle!
 			Point mid = new Point(CurrentEditorCanvas_Back.ActualWidth / 2, CurrentEditorCanvas_Back.ActualHeight/2);
@@ -3675,7 +3675,7 @@ namespace AmethystEngine.Forms
 					ContentControl CUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
 					CUI.Width = Int32.Parse(childUI.GetProperty("Width").ToString());
 					CUI.Height = Int32.Parse(childUI.GetProperty("Height").ToString());
-					CUI.BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+					CUI.BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
 					CUI.BorderThickness = new Thickness(2);
 					CUI.Tag = "Border";
 					CUI.Name = childUI.UIName;
@@ -3689,8 +3689,8 @@ namespace AmethystEngine.Forms
 					};
 					((Grid)CUI.Content).Children.Add(new Border()
 					{
-						BorderThickness = (((bool)childUI.GetProperty("ShowBorder")) ? new Thickness(2) : new Thickness(0)),
-						BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent)
+						BorderThickness = (((bool)childUI.GetPropertyData("ShowBorder")) ? new Thickness(2) : new Thickness(0)),
+						BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent)
 					});
 					CUI.Name = childUI.UIName;
 					Canvas.SetLeft(CUI, mid.X + Int32.Parse(childUI.GetProperty("Xoffset").ToString()));
@@ -3718,7 +3718,7 @@ namespace AmethystEngine.Forms
 						{
 							Text = "Sameple Text",
 							Margin = new Thickness(2),
-							BorderBrush = ((bool)childUI.GetProperty("ShowBorder") ? Brushes.Gray : Brushes.Transparent),
+							BorderBrush = ((bool)childUI.GetPropertyData("ShowBorder") ? Brushes.Gray : Brushes.Transparent),
 							IsHitTestVisible = false,
 							VerticalContentAlignment = VerticalAlignment.Center,
 							HorizontalContentAlignment = HorizontalAlignment.Center,
@@ -3760,7 +3760,7 @@ namespace AmethystEngine.Forms
 					ContentControl CUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
 					CUI.Width = Int32.Parse(childUI.GetProperty("Width").ToString());
 					CUI.Height = Int32.Parse(childUI.GetProperty("Height").ToString());
-					CUI.BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+					CUI.BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
 					CUI.BorderThickness = new Thickness(0);
 					CUI.Tag = "Border";
 					CUI.Name = childUI.UIName;
@@ -3775,7 +3775,7 @@ namespace AmethystEngine.Forms
 					((Grid)CUI.Content).Children.Add(new Border()
 					{
 						BorderThickness = new Thickness(0),//(((bool)childUI.GetProperty("ShowBorder")) ? new Thickness(2) : new Thickness(0)),
-						BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent),
+						BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent),
 						IsHitTestVisible = false
 					});
 					CUI.Name = childUI.UIName;
