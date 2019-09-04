@@ -136,10 +136,11 @@ namespace AmethystEngine.Forms
 		DialogueScene CurActiveDialogueScene;
 		TreeView Dialogue_CE_Tree;
 		List<Tuple<ContentControl, ContentControl>> CurSceneCharacterDisplays = new List<Tuple<ContentControl, ContentControl>>();
+		CollapsedPropertyGrid.CollapsedPropertyGrid CPGrid = new CollapsedPropertyGrid.CollapsedPropertyGrid();
 		#endregion
 
 		#region Vars
-
+		ObservableCollection<object> PropertyBags { get; set; }
 		#endregion
 
 		#endregion
@@ -171,7 +172,8 @@ namespace AmethystEngine.Forms
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-      //Find and set level editor controls!
+			PropertyBags = new ObservableCollection<object>();
+			//Find and set level editor controls!
       FullMapLEditor_Canvas = (Canvas)ObjectProperties_Control.Template.FindName("LevelEditor_Canvas", ObjectProperties_Control);
       FullMapLEditor_VB = (VisualBrush)ObjectProperties_Control.Template.FindName("FullLeditorGrid_VB", ObjectProperties_Control);
 			
@@ -554,6 +556,8 @@ namespace AmethystEngine.Forms
 				ObjectProperties_Control.Template = (ControlTemplate)this.Resources["DialogueEditorProperty_Template"];
 				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["DialogueEditorObjects_Template"];
 				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["DialogueEditorObjectExplorer_Template"];
+				if (((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control))).ItemsSource == null)
+					((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control))).ItemsSource = PropertyBags;
 				//if (SceneExplorer_Control != null)
 				//{
 				//	ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
@@ -3644,8 +3648,8 @@ namespace AmethystEngine.Forms
 			//set the position and the size of the Base UI
 			ContentControl BaseUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
 			
-			BaseUI.Width = Int32.Parse(gameUI.GetProperty("Width").ToString());
-			BaseUI.Height = Int32.Parse(gameUI.GetProperty("Height").ToString());
+			BaseUI.Width = Int32.Parse(gameUI.GetPropertyData("Width").ToString());
+			BaseUI.Height = Int32.Parse(gameUI.GetPropertyData("Height").ToString());
 			BaseUI.BorderBrush = (((bool)gameUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
 			BaseUI.BorderThickness = new Thickness(0);
 			BaseUI.Tag = "Border";
@@ -3758,8 +3762,8 @@ namespace AmethystEngine.Forms
 					#region DefaultProperties
 					//set the position and the size of the Base UI
 					ContentControl CUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
-					CUI.Width = Int32.Parse(childUI.GetProperty("Width").ToString());
-					CUI.Height = Int32.Parse(childUI.GetProperty("Height").ToString());
+					CUI.Width = Int32.Parse(childUI.GetPropertyData("Width").ToString());
+					CUI.Height = Int32.Parse(childUI.GetPropertyData("Height").ToString());
 					CUI.BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
 					CUI.BorderThickness = new Thickness(0);
 					CUI.Tag = "Border";
@@ -3769,7 +3773,7 @@ namespace AmethystEngine.Forms
 					{
 						HorizontalAlignment = HorizontalAlignment.Stretch,
 						VerticalAlignment = VerticalAlignment.Stretch,
-						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("Background").ToString()),
+						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("Background").ToString()),
 						IsHitTestVisible = false,
 					};
 					((Grid)CUI.Content).Children.Add(new Border()
@@ -3801,14 +3805,14 @@ namespace AmethystEngine.Forms
 							IsHitTestVisible = false,
 							VerticalContentAlignment = VerticalAlignment.Center,
 							HorizontalContentAlignment = HorizontalAlignment.Center,
-							FontSize = Int32.Parse(childUI.GetProperty("FontSize").ToString()),
-							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("FontColor").ToString()),
+							FontSize = Int32.Parse(childUI.GetPropertyData("FontSize").ToString()),
+							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("FontColor").ToString()),
 							Background = Brushes.Transparent
 						});
 						CUI.Margin = new Thickness()
 						{
-							Left = Int32.Parse(childUI.GetProperty("Xoffset").ToString()),
-							Top = Int32.Parse(childUI.GetProperty("YOffset").ToString()),
+							Left = Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()),
+							Top = Int32.Parse(childUI.GetPropertyData("YOffset").ToString()),
 							//Bottom = BaseUI.Height - (Top + CUI.Height),
 							//Right = BaseUI.Width - (Left + CUI.Width)
 						};
@@ -3830,8 +3834,8 @@ namespace AmethystEngine.Forms
 						((Grid)CUI.Content).Children.Add(new Rectangle() { });
 						CUI.Margin = new Thickness()
 						{
-							Left = Int32.Parse(childUI.GetProperty("Xoffset").ToString()),
-							Top = Int32.Parse(childUI.GetProperty("YOffset").ToString()),
+							Left = Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()),
+							Top = Int32.Parse(childUI.GetPropertyData("YOffset").ToString()),
 						};
 						CUI.IsHitTestVisible = false;
 						CUI.VerticalAlignment = VerticalAlignment.Top;
@@ -3867,15 +3871,46 @@ namespace AmethystEngine.Forms
 
 		public void ShowTimelineSelectedProperties(object sender)
 		{
-			PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control)));
-			LB.ClearProperties();
+			//CollapsedPropertyGrid.CollapsedPropertyGrid LB = ((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control)));
+			
+			CollapsedPropertyGrid.CollapsedPropertyGrid LB = ((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control)));
+			PropertyBag PBag = new PropertyBag();
 			if (sender is null) return;
 			else if(sender is TimeBlock)
 			{
-				LB.AddProperty("Type", new TextBox() { IsEnabled =false}, "Time Block");
-				LB.AddProperty("Start Time", new TextBox() { }, ((TimeBlock)sender).StartTime.ToString(), SetStartTime);
-				LB.AddProperty("End Time", new TextBox() { }, ((TimeBlock)sender).EndTime.ToString(), SetEndTime);
-				LB.AddProperty("Duration", new TextBox() { }, ((TimeBlock)sender).Duration.ToString(), SetDurationTime);
+				TimeBlock TimeB = sender as TimeBlock;
+
+				if (PropertyBags.Count > 0)
+				{
+					if (!(((PropertyBag)PropertyBags[0]).Properties.Any(m => m.Item2 == "Time Block")))
+					{ //if something else is displayed don't clear it
+						PropertyBags.Clear(); //clear the current property displayed
+						PropertyBags.Add(PBag);
+					}
+					else
+					{
+						PBag = (PropertyBag)PropertyBags[0];
+						///PBag.Properties.Clear();
+
+						PBag.Properties[0] = (new Tuple<string, object, Control>("Type", "Time Block", new TextBox() { IsEnabled = false }));
+						PBag.Properties[1] = (new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), new TextBox()));
+						PBag.Properties[2] = (new Tuple<string, object, Control>("End Time", TimeB.EndTime.ToString(), new TextBox()));
+						PBag.Properties[3] = (new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), new TextBox()));
+
+						return;
+					}
+				}
+				else PropertyBags.Add(PBag);
+
+
+				PBag.Properties.Add(new Tuple<string, object, Control>("Type", "Time Block", new TextBox() { IsEnabled = false }));
+				PBag.Properties.Add(new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), new TextBox()));
+				PBag.Properties.Add(new Tuple<string, object, Control>("End Time", TimeB.EndTime.ToString(), new TextBox()));
+				PBag.Properties.Add(new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), new TextBox()));
+				//LB.AddProperty("Type", new TextBox() { IsEnabled =false}, "Time Block");
+				//LB.AddProperty("Start Time", new TextBox() { }, ((TimeBlock)sender).StartTime.ToString(), SetStartTime);
+				//LB.AddProperty("End Time", new TextBox() { }, ((TimeBlock)sender).EndTime.ToString(), SetEndTime);
+				//LB.AddProperty("Duration", new TextBox() { }, ((TimeBlock)sender).Duration.ToString(), SetDurationTime);
 
 				ComboBox CB = new ComboBox() { Height = 50, ItemTemplate = (DataTemplate)this.Resources["CBIMGItems"] };
 				CB.SelectionChanged += SetSpriteImagePath_Dia;
@@ -3886,9 +3921,14 @@ namespace AmethystEngine.Forms
 				}
 				CB.ItemsSource = ComboItems;
 
-				LB.AddProperty("Sprite Image", CB ,new List<String>());
-				LB.AddProperty("Dialogue Text", new TextBox() { }, ((TimeBlock)sender).CurrentDialogue.ToString(), SetDialogueText);
+				PBag.Properties.Add(new Tuple<string, object, Control>("Sprite Image", new List<String>(), CB));
+				TextBox tb = new TextBox(); tb.KeyDown += SetDialogueText;
+				PBag.Properties.Add(new Tuple<string, object, Control>("Dialogue Text", TimeB.CurrentDialogue.ToString(), tb));
+				//LB.AddProperty("Sprite Image", CB ,new List<String>());
+				//LB.AddProperty("Dialogue Text", new TextBox() { }, ((TimeBlock)sender).CurrentDialogue.ToString(), SetDialogueText);
 
+				//if (!PropertyBags.Contains(PBag))
+				
 			}
 			else if(sender is Timeline)
 			{

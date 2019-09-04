@@ -40,6 +40,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CollapsedPropertyGrid">
+      <HintPath>Resources\CollapsedPropertyGrid.dll</HintPath>
+    </Reference>
     <Reference Include="CustomColorPicker, Version=1.0.7142.29111, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\CustomColorPicker.dll</HintPath>
@@ -81,6 +84,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Components\PropertyBag.cs" />
     <Compile Include="Components\Tools\Cuprite.cs" />
     <Compile Include="DesignerItemDecorator.cs" />
     <Compile Include="Forms\AddCharacterForm.xaml.cs">

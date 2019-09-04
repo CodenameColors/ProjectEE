@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 				xmlns:pgrid ="clr-namespace:PropertyGridEditor;assembly=PropertyGridEditor"
+				xmlns:cpgrid="clr-namespace:CollapsedPropertyGrid;assembly=CollapsedPropertyGrid"
         xmlns:local="clr-namespace:AmethystEngine" 
 				xmlns:Bix="clr-namespace:BixBite;assembly=BixBite"
 				xmlns:BixRen="clr-namespace:BixBite.Rendering;assembly=BixBite"
@@ -474,9 +475,7 @@
 			</ControlTemplate>
 
 			<ControlTemplate x:Key="DialogueEditorProperty_Template">
-				<pgrid:PropGrid x:Name="DialoguePropertyGrid" Margin="0,54,0,0">
-
-				</pgrid:PropGrid>
+				<cpgrid:CollapsedPropertyGrid x:Name="DialoguePropertyGrid" Margin="0,54,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  BorderBrush="#FF828790" Background="#FF383838"/>
 			</ControlTemplate>
 
 
@@ -821,7 +820,7 @@
 			<ContentControl x:Name="ObjectProperties_Control" Template="{DynamicResource DialogueEditorProperty_Template}" Grid.Column="2" Grid.ColumnSpan="2"/>
 
 			<ContentControl x:Name="EditorToolBar_CC" Grid.Column="1" Height="25" VerticalAlignment="Top" Margin="10,4,123,0"
-											Template="{DynamicResource UIEditorObjectExplorer_Template}"/>
+											Template="{DynamicResource DialogueEditorObjectExplorer_Template}"/>
 
 			<!--This is the main editor window-->
 

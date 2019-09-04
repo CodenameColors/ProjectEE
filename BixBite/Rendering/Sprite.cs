@@ -150,11 +150,12 @@ namespace BixBite.Rendering
 
 		public Sprite(String Name, String imgLoc, int x, int y, int w, int h)
 		{
+			Properties = new ObservableCollection<Tuple<string, object>>();
+			Properties.CollectionChanged += Properties_Changed;
+
 			this.Name = Name;
 			this.imgpathlocation = imgLoc;
 
-			Properties = new ObservableCollection<Tuple<string, object>>();
-			Properties.CollectionChanged += Properties_Changed;
 			AddProperty("Name", Name);
 			AddProperty("x", x);
 			AddProperty("y", y);
