@@ -12,9 +12,10 @@ namespace AmethystEngine.Components
 	{
 		public String Name { get; set; }
 		public ObservableCollection<Tuple<String, object, Control>> Properties { get; set; }
-
-		public PropertyBag()
+		public object Parent { get; set; }
+		public PropertyBag(object parent)
 		{
+			Parent = parent;
 			Properties = new ObservableCollection<Tuple<string, object, Control>>();
 		}
 

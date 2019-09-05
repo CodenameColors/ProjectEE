@@ -3874,15 +3874,15 @@ namespace AmethystEngine.Forms
 			//CollapsedPropertyGrid.CollapsedPropertyGrid LB = ((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control)));
 			
 			CollapsedPropertyGrid.CollapsedPropertyGrid LB = ((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control)));
-			PropertyBag PBag = new PropertyBag();
 			if (sender is null) return;
 			else if(sender is TimeBlock)
 			{
+				PropertyBag PBag = new PropertyBag(sender);
 				TimeBlock TimeB = sender as TimeBlock;
 
 				if (PropertyBags.Count > 0)
 				{
-					if (!(((PropertyBag)PropertyBags[0]).Properties.Any(m => m.Item2 == "Time Block")))
+					if (sender != ((PropertyBag)PropertyBags[0]).Parent)
 					{ //if something else is displayed don't clear it
 						PropertyBags.Clear(); //clear the current property displayed
 						PropertyBags.Add(PBag);
@@ -3907,10 +3907,6 @@ namespace AmethystEngine.Forms
 				PBag.Properties.Add(new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), new TextBox()));
 				PBag.Properties.Add(new Tuple<string, object, Control>("End Time", TimeB.EndTime.ToString(), new TextBox()));
 				PBag.Properties.Add(new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), new TextBox()));
-				//LB.AddProperty("Type", new TextBox() { IsEnabled =false}, "Time Block");
-				//LB.AddProperty("Start Time", new TextBox() { }, ((TimeBlock)sender).StartTime.ToString(), SetStartTime);
-				//LB.AddProperty("End Time", new TextBox() { }, ((TimeBlock)sender).EndTime.ToString(), SetEndTime);
-				//LB.AddProperty("Duration", new TextBox() { }, ((TimeBlock)sender).Duration.ToString(), SetDurationTime);
 
 				ComboBox CB = new ComboBox() { Height = 50, ItemTemplate = (DataTemplate)this.Resources["CBIMGItems"] };
 				CB.SelectionChanged += SetSpriteImagePath_Dia;
@@ -3924,11 +3920,22 @@ namespace AmethystEngine.Forms
 				PBag.Properties.Add(new Tuple<string, object, Control>("Sprite Image", new List<String>(), CB));
 				TextBox tb = new TextBox(); tb.KeyDown += SetDialogueText;
 				PBag.Properties.Add(new Tuple<string, object, Control>("Dialogue Text", TimeB.CurrentDialogue.ToString(), tb));
-				//LB.AddProperty("Sprite Image", CB ,new List<String>());
-				//LB.AddProperty("Dialogue Text", new TextBox() { }, ((TimeBlock)sender).CurrentDialogue.ToString(), SetDialogueText);
 
-				//if (!PropertyBags.Contains(PBag))
-				
+
+
+				ComboBox CB1 = new ComboBox() { Height = 50 };
+				CB1.SelectionChanged += SetLinkedTBName;
+				List<String> ComboItems1 = new List<String>();
+				foreach (GameUI Gameui in CurActiveDialogueScene.DialogueBoxes[DialogueEditor_Timeline.GetTimelinePosition(TimeB.TimelineParent)].UIElements)
+				{
+					if(Gameui is GameTextBlock)
+					{
+						ComboItems1.Add(Gameui.UIName);
+					}
+				}
+				CB1.ItemsSource = ComboItems1;
+				PBag.Properties.Add(new Tuple<string, object, Control>("Linked TextBox", new List<String>(), CB1));
+
 			}
 			else if(sender is Timeline)
 			{
@@ -3973,7 +3980,19 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		public void SetLinkedTBName(object sender, EventArgs e)
+		{
+			if(DialogueEditor_Timeline.SelectedControl is Timeline)
+			{
 
+			}
+			else if (DialogueEditor_Timeline.SelectedControl is TimeBlock)
+			{
+				((TimeBlock)DialogueEditor_Timeline.SelectedControl).LinkedTextBoxName = ((ComboBox)sender).SelectedItem.ToString();
+				//
+				//((TimeBlock)sender).
+			}
+		}
 
 		public void AddCharacterHook(Character c)
 		{
@@ -4070,9 +4089,35 @@ namespace AmethystEngine.Forms
 		{
 			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
 			{
+				//changing the Image on the screen Sprite dialogue
 				Console.WriteLine("Added Active Time Block");
 				((Image)((Grid)CurSceneCharacterDisplays[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)].Item1.Content).Children[2]).Source = 
 					new BitmapImage(new Uri(((TimeBlock)e.NewItems[0]).TrackSpritePath, UriKind.Absolute));
+				//here we change the dialogue text itself
+				GameUI gtb = CurActiveDialogueScene.DialogueBoxes[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)].UIElements.Single(m => m.UIName == ((TimeBlock)e.NewItems[0]).LinkedTextBoxName);
+				gtb.SetProperty("ContentText", ((TimeBlock)e.NewItems[0]).CurrentDialogue);
+
+				UIElementCollection uie = ((Grid)CurSceneCharacterDisplays[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)].Item2.Content).Children;
+				ContentControl CC = null;
+				foreach(UIElement ccc in uie)
+				{
+					if (ccc is Border) continue;
+					if(((ContentControl)ccc).Name == ((TimeBlock)e.NewItems[0]).LinkedTextBoxName)
+					{
+						CC = ((ContentControl)ccc);
+					}
+				}
+				if (CC == null) return;
+				Grid g = (Grid)CC.Content;
+				foreach(UIElement c in g.Children)
+				{
+					if(c is TextBox)
+					{
+						((TextBox)c).Text = gtb.GetPropertyData("ContentText").ToString();
+					}
+				}
+					//gtb.GetProperty("CurrentDialogue").ToString();
+
 			}
 			else
 			{
