@@ -552,12 +552,14 @@ namespace AmethystEngine.Forms
 			}
 			else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Dialogue"))
 			{
-				Dialogue_CE_Tree = (TreeView)ContentLibrary_Control.Template.FindName("DialogueEditor_CE_TV", ContentLibrary_Control);
 				ObjectProperties_Control.Template = (ControlTemplate)this.Resources["DialogueEditorProperty_Template"];
 				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["DialogueEditorObjects_Template"];
 				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["DialogueEditorObjectExplorer_Template"];
+				UpdateLayout();
 				if (((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control))).ItemsSource == null)
 					((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control))).ItemsSource = PropertyBags;
+
+				Dialogue_CE_Tree = (TreeView)ContentLibrary_Control.Template.FindName("DialogueEditor_CE_TV", ContentLibrary_Control);
 				//if (SceneExplorer_Control != null)
 				//{
 				//	ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
@@ -3404,21 +3406,22 @@ namespace AmethystEngine.Forms
 
 			if (SelectedUIControl.Tag.ToString() == "TEXTBOX")
 			{
-				//((Image)((Grid)SelectedUIControl.Content).Children[1]).Source =
-				//	new BitmapImage(((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail);
-				//SelectedUI.SetProperty("Image", ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
-
-				SetTBBackgroundImage(((Grid)SelectedUIControl.Content), ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsoluteUri);
+				//this sets it display wise
+				SetTBBackgroundImage(((Grid)SelectedUIControl.Content), ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+				SelectedUI.SetProperty("Image", ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+				//this sets it data wise.
 			}
 		}
 
 		/// <summary>
-		/// This method is here to set the background 
+		/// This method is here to set the background. In order to allow stretching this method using framing logic.
+		/// Or "Margins" for the image.
 		/// </summary>
 		/// <param name="g"></param>
 		/// <param name="IMGPath"></param>
 		private void SetTBBackgroundImage(Grid g, String IMGPath)
 		{
+			if (!File.Exists(IMGPath)) return;
 			foreach (UIElement uie in g.Children)
 			{
 				if (!(uie is Image)) continue;
@@ -3626,7 +3629,7 @@ namespace AmethystEngine.Forms
 				SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
 			}
 
-			DrawUIToScreen(UIEditor_Canvas, UIEditor_BackCanvas, OpenUIEdits.Last(), false);
+			DrawUIToScreen(UIEditor_Canvas, UIEditor_BackCanvas, OpenUIEdits.Last(), true);
 
 		}
 
@@ -3677,8 +3680,8 @@ namespace AmethystEngine.Forms
 					#region DefaultProperties
 					//set the position and the size of the Base UI
 					ContentControl CUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
-					CUI.Width = Int32.Parse(childUI.GetProperty("Width").ToString());
-					CUI.Height = Int32.Parse(childUI.GetProperty("Height").ToString());
+					CUI.Width = Int32.Parse(childUI.GetPropertyData("Width").ToString());
+					CUI.Height = Int32.Parse(childUI.GetPropertyData("Height").ToString());
 					CUI.BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
 					CUI.BorderThickness = new Thickness(2);
 					CUI.Tag = "Border";
@@ -3688,7 +3691,7 @@ namespace AmethystEngine.Forms
 					{
 						HorizontalAlignment = HorizontalAlignment.Stretch,
 						VerticalAlignment = VerticalAlignment.Stretch,
-						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("Background").ToString()),
+						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("Background").ToString()),
 						IsHitTestVisible = false,
 					};
 					((Grid)CUI.Content).Children.Add(new Border()
@@ -3697,46 +3700,48 @@ namespace AmethystEngine.Forms
 						BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent)
 					});
 					CUI.Name = childUI.UIName;
-					Canvas.SetLeft(CUI, mid.X + Int32.Parse(childUI.GetProperty("Xoffset").ToString()));
-					Canvas.SetTop(CUI, mid.Y + Int32.Parse(childUI.GetProperty("YOffset").ToString()));
-					Canvas.SetZIndex(CUI, Int32.Parse(childUI.GetProperty("Zindex").ToString()));
+					Canvas.SetLeft(CUI, mid.X + Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()));
+					Canvas.SetTop(CUI, mid.Y + Int32.Parse(childUI.GetPropertyData("YOffset").ToString()));
+					Canvas.SetZIndex(CUI, Int32.Parse(childUI.GetPropertyData("Zindex").ToString()));
 					CurrentEditorCanvas.Children.Add(CUI);
 					#endregion
 
 					if (childUI is GameTextBlock)
 					{
 						CUI.Tag = "TEXTBOX";
+						//My Game textboxes can have background images. so we need implement my frame logic.
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
 
-						String TB = "/AmethystEngine;component/images/SmallTextBubble_Purple.png";
-						String TB1 = "/AmethystEngine;component/images/SmallTextBubble_Orange.png";
-						Image img = new Image();
-						img.Stretch = Stretch.Fill;
-						img.Source = new BitmapImage(new Uri(
-							(File.Exists(childUI.GetProperty("Image").ToString()) ? childUI.GetProperty("Image").ToString() : ""),
-							UriKind.RelativeOrAbsolute
-							));
-						img.IsHitTestVisible = false;
-						//((Grid)CUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false });
-						((Grid)CUI.Content).Children.Add(img);
-						((Grid)CUI.Content).Children.Add(new TextBox()
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						((Grid)CUI.Content).ShowGridLines = true;
+						InitimagesTBGrid(((Grid)CUI.Content));
+						SetTBBackgroundImage(((Grid)CUI.Content), childUI.GetPropertyData("Image").ToString());
+						//
+						TextBox tb = new TextBox()
 						{
-							Text = "Sameple Text",
+							Text = childUI.GetPropertyData("ContentText").ToString(),
 							Margin = new Thickness(2),
-							BorderBrush = ((bool)childUI.GetPropertyData("ShowBorder") ? Brushes.Gray : Brushes.Transparent),
+							BorderThickness = new Thickness(0),
 							IsHitTestVisible = false,
 							VerticalContentAlignment = VerticalAlignment.Center,
 							HorizontalContentAlignment = HorizontalAlignment.Center,
-							FontSize = Int32.Parse(childUI.GetProperty("FontSize").ToString()),
-							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("FontColor").ToString()),
+							FontSize = Int32.Parse(childUI.GetPropertyData("FontSize").ToString()),
+							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("FontColor").ToString()),
 							Background = Brushes.Transparent
-						});
+						};
+						Grid.SetColumn(tb, 1); Grid.SetRow(tb, 1);
+						((Grid)CUI.Content).Children.Add(tb);
 
 					}
 					else if (childUI is GameIMG)
 					{
 						CUI.Tag = "IMAGE";
 
-						String TB = childUI.GetProperty("Image").ToString();
+						String TB = childUI.GetPropertyData("Image").ToString();
 						Image img = new Image();
 						img.Stretch = Stretch.Fill;
 						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
@@ -3753,6 +3758,8 @@ namespace AmethystEngine.Forms
 
 					CurrentUIDictionary.Add(childUI.UIName, childUI);
 				}
+				CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
+				
 			}
 			else //all as one
 			{
@@ -3788,18 +3795,20 @@ namespace AmethystEngine.Forms
 					if (childUI is GameTextBlock)
 					{
 						CUI.Tag = "TEXTBOX";
-						Image img = new Image() { IsHitTestVisible = false };
-						img.Stretch = Stretch.Fill;
-						img.Source = new BitmapImage(new Uri(
-							(File.Exists(childUI.GetProperty("Image").ToString()) ? childUI.GetProperty("Image").ToString() : ""),
-							UriKind.RelativeOrAbsolute
-							));
-						img.IsHitTestVisible = false;
-						//((Grid)CUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false });
-						((Grid)CUI.Content).Children.Add(img);
-						((Grid)CUI.Content).Children.Add(new TextBox()
+						//My Game textboxes can have background images. so we need implement my frame logic.
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						InitimagesTBGrid(((Grid)CUI.Content));
+						SetTBBackgroundImage(((Grid)CUI.Content), childUI.GetPropertyData("Image").ToString());
+						//
+						TextBox tb = new TextBox()
 						{
-							Text = "Sameple Text",
+							Text = childUI.GetPropertyData("ContentText").ToString(),
 							Margin = new Thickness(2),
 							BorderThickness = new Thickness(0),
 							IsHitTestVisible = false,
@@ -3808,7 +3817,9 @@ namespace AmethystEngine.Forms
 							FontSize = Int32.Parse(childUI.GetPropertyData("FontSize").ToString()),
 							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("FontColor").ToString()),
 							Background = Brushes.Transparent
-						});
+						};
+						Grid.SetColumn(tb, 1); Grid.SetRow(tb, 1);
+						((Grid)CUI.Content).Children.Add(tb);
 						CUI.Margin = new Thickness()
 						{
 							Left = Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()),
@@ -3826,7 +3837,7 @@ namespace AmethystEngine.Forms
 					{
 						CUI.Tag = "IMAGE";
 
-						String TB = childUI.GetProperty("Image").ToString();
+						String TB = childUI.GetPropertyData("Image").ToString();
 						Image img = new Image() { IsHitTestVisible = false };
 						img.Stretch = Stretch.Fill;
 						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
@@ -3849,10 +3860,9 @@ namespace AmethystEngine.Forms
 					}
 				}
 			}
-			SelectedUI = OpenUIEdits.Last();
-			CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
-			CurrentEditorCanvas.Children.Add(BaseUI);
 			SelectedBaseUIControl = BaseUI;
+			SelectedUI = OpenUIEdits.Last();
+			CurrentEditorCanvas.Children.Add(BaseUI);
 		}
 
 		private void NewDialogueScene_MenuItem_Click(object sender, RoutedEventArgs e)
@@ -4089,6 +4099,7 @@ namespace AmethystEngine.Forms
 		{
 			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
 			{
+				if (e.NewItems == null && !File.Exists(((TimeBlock)e.NewItems[0]).TrackSpritePath)) return;
 				//changing the Image on the screen Sprite dialogue
 				Console.WriteLine("Added Active Time Block");
 				((Image)((Grid)CurSceneCharacterDisplays[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)].Item1.Content).Children[2]).Source = 
@@ -4101,7 +4112,7 @@ namespace AmethystEngine.Forms
 				ContentControl CC = null;
 				foreach(UIElement ccc in uie)
 				{
-					if (ccc is Border) continue;
+					if (!(ccc is TextBlock)) continue;
 					if(((ContentControl)ccc).Name == ((TimeBlock)e.NewItems[0]).LinkedTextBoxName)
 					{
 						CC = ((ContentControl)ccc);
@@ -4141,7 +4152,6 @@ namespace AmethystEngine.Forms
 			DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL.First.Value.TrackSpritePath = "/AmethystEngine;component/images/Ame_icon_small.png";
 			DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL.First.Value.Trackname = "DefaultImage";
 			DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL.First.Value.CurrentDialogue = "Yo my dude!";
-			
 		}
 
 		private void DialogueEditor_Timeline_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

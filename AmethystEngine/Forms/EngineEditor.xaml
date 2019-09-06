@@ -16,7 +16,7 @@
 				xmlns:DiagramDesigner="clr-namespace:DiagramDesigner" x:Class="AmethystEngine.Forms.EngineEditor"
 				xmlns:Tline="clr-namespace:TimelinePlayer;assembly=TimelinePlayer"
 				mc:Ignorable="d" Background="#FF0E0D0D"
-        Title="AmethystEngine" Height="1000" Width="1600" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
+        Title="AmethystEngine" Height="800" Width="1200" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
 
 
 	<Window.Resources>
