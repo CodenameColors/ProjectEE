@@ -360,7 +360,7 @@ namespace BixBite
 						Console.WriteLine(reader.AttributeCount);
 
 						//set properties
-						TempLevel.SetProperty("Name",reader.GetAttribute("Name"));
+						TempLevel.SetProperty("LevelName",reader.GetAttribute("Name"));
 						TempLevel.LevelName = reader.GetAttribute("Name");
 						TempLevel.SetProperty("bMainLevel" ,(reader.GetAttribute("MainLevel").ToLower() == "false" ? false : true));
 						TempLevel.SetProperty("xCells", Int32.Parse(reader.GetAttribute("Width")) / 40);
@@ -925,10 +925,10 @@ namespace BixBite
 							await writer.WriteStartElementAsync(null, "Sprite", null);
 							await writer.WriteAttributeStringAsync(null, "Name", null, sprite.Name);
 							await writer.WriteAttributeStringAsync(null, "Location", null, sprite.ImgPathLocation);
-							await writer.WriteAttributeStringAsync(null, "Width", null, sprite.GetProperty("width").ToString());
-							await writer.WriteAttributeStringAsync(null, "Height", null, sprite.GetProperty("height").ToString());
-							await writer.WriteAttributeStringAsync(null, "x", null, sprite.GetProperty("x").ToString());
-							await writer.WriteAttributeStringAsync(null, "y", null, sprite.GetProperty("y").ToString());
+							await writer.WriteAttributeStringAsync(null, "Width", null, sprite.GetPropertyData("width").ToString());
+							await writer.WriteAttributeStringAsync(null, "Height", null, sprite.GetPropertyData("height").ToString());
+							await writer.WriteAttributeStringAsync(null, "x", null, sprite.GetPropertyData("x").ToString());
+							await writer.WriteAttributeStringAsync(null, "y", null, sprite.GetPropertyData("y").ToString());
 							await writer.WriteEndElementAsync();
 						}
 
@@ -969,24 +969,24 @@ namespace BixBite
 									break;
 								case (EventType.Collision):
 									await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.Collision).ToString());
-									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
-									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
-									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetPropertyData("group").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetPropertyData("isActive").ToString());
+									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetPropertyData("DelegateEventName").ToString()); //this is the function/delegate name
 									await writer.WriteAttributeStringAsync(null, "Activation", null, "NONE");
 									break;
 								case (EventType.Trigger):
 									await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.Trigger).ToString());
-									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
-									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
-									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
-									await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
+									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetPropertyData("group").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetPropertyData("isActive").ToString());
+									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetPropertyData("DelegateEventName").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetPropertyData("ActivationButton").ToString()); //button needed to activate our delegate
 									break;
 								case (EventType.LevelTransition):
 									await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.LevelTransition).ToString());
-									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
-									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
-									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
-									await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
+									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetPropertyData("group").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetPropertyData("isActive").ToString());
+									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetPropertyData("DelegateEventName").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetPropertyData("ActivationButton").ToString()); //button needed to activate our delegate
 
 
 									await writer.WriteStartElementAsync(null, "EventData", null); //Event Data
@@ -999,10 +999,10 @@ namespace BixBite
 									break;
 								case (EventType.DialougeScene):
 									await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.DialougeScene).ToString());
-									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
-									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
-									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
-									await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
+									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetPropertyData("group").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetPropertyData("isActive").ToString());
+									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetPropertyData("DelegateEventName").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetPropertyData("ActivationButton").ToString()); //button needed to activate our delegate
 
 									await writer.WriteStartElementAsync(null, "EventData", null); //Event Data
 									await writer.WriteAttributeStringAsync(null, "Newxpos", null, ge.datatoload.newx.ToString());
@@ -1014,10 +1014,10 @@ namespace BixBite
 									break;
 								case (EventType.Cutscene):
 									await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.Cutscene).ToString());
-									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
-									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
-									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
-									await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
+									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetPropertyData("group").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetPropertyData("isActive").ToString());
+									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetPropertyData("DelegateEventName").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetPropertyData("ActivationButton").ToString()); //button needed to activate our delegate
 
 									await writer.WriteStartElementAsync(null, "EventData", null); //Event Data
 									await writer.WriteAttributeStringAsync(null, "Newxpos", null, ge.datatoload.newx.ToString());
@@ -1029,10 +1029,10 @@ namespace BixBite
 									break;
 								case (EventType.BGM):
 									await writer.WriteAttributeStringAsync(null, "Type", null, ((int)EventType.BGM).ToString());
-									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetProperty("group").ToString()); //this is the function/delegate name
-									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetProperty("isActive").ToString());
-									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetProperty("DelegateEventName").ToString()); //this is the function/delegate name
-									await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetProperty("ActivationButton").ToString()); //button needed to activate our delegate
+									await writer.WriteAttributeStringAsync(null, "Group", null, ge.GetPropertyData("group").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "isActive", null, ge.GetPropertyData("isActive").ToString());
+									await writer.WriteAttributeStringAsync(null, "Function", null, ge.GetPropertyData("DelegateEventName").ToString()); //this is the function/delegate name
+									await writer.WriteAttributeStringAsync(null, "Activation", null, ge.GetPropertyData("ActivationButton").ToString()); //button needed to activate our delegate
 									break;
 							}
 							await writer.WriteEndElementAsync(); //end creation of event.

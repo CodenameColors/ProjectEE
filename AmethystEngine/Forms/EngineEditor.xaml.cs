@@ -1000,8 +1000,8 @@ namespace AmethystEngine.Forms
 						Width = 40,
 						Height = 40,
 						FontSize = 18,
-						Text = ((int)layergameevents[GameEventNum].GetPropertyData("group") == -1 ? "" : layergameevents[GameEventNum].GetProperty("group").ToString()),
-						Tag = layergameevents[GameEventNum].GetProperty("group").ToString(),
+						Text = ((int)layergameevents[GameEventNum].GetPropertyData("group") == -1 ? "" : layergameevents[GameEventNum].GetPropertyData("group").ToString()),
+						Tag = layergameevents[GameEventNum].GetPropertyData("group").ToString(),
 						Foreground = new SolidColorBrush(Colors.Black),
 						Background = ((int)layergameevents[GameEventNum].GetPropertyData("group") == -1 ? new SolidColorBrush(Color.FromArgb(100, 255, 0, 0)) : new SolidColorBrush(Color.FromArgb(100, 100, 100, 100))),
 					};
@@ -3040,7 +3040,7 @@ namespace AmethystEngine.Forms
 				foreach(List<String> linesofcode in codelines)
 				{
 					if (ProjGE[Key].Count == 0) break; 
-					String Tests = ProjGE[Key][i++].GetProperty("DelegateEventName").ToString();
+					String Tests = ProjGE[Key][i++].GetPropertyData("DelegateEventName").ToString();
 					Cuprite.GenerateMethod(codelines[j++], ref lines, Tests, Key);
 					if (i > ProjGE[Key].Count - 1)
 						break;
@@ -4112,7 +4112,7 @@ namespace AmethystEngine.Forms
 				ContentControl CC = null;
 				foreach(UIElement ccc in uie)
 				{
-					if (!(ccc is TextBlock)) continue;
+					if (!(ccc is ContentControl)) continue;
 					if(((ContentControl)ccc).Name == ((TimeBlock)e.NewItems[0]).LinkedTextBoxName)
 					{
 						CC = ((ContentControl)ccc);

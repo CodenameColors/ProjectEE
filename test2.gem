@@ -1,0 +1,14 @@
+-ProjectName:
+test2
+-Thumbnail:
+C:\Users\Antonio\Documents\ProjectEE\ProjectEE\AmethystEngine\images\emma_colors_oc.png
+-GameLocation:
+C:\Users\Antonio\Documents\CreateTest\test2\test2_Game\bin\DesktopGL\AnyCPU\Debug\Game1.exe
+-ConfigLocation:
+C:\Users\Antonio\Documents\CreateTest\test2\test2_Game\Content\Config
+-Levels:
+C:\Users\Antonio\Documents\CreateTest\test2\test2_Game\Content\Levels
+-MainLevel:
+C:\Users\Antonio\Documents\CreateTest\test2\test2_Game\Content\Levels\level1.lvl
+-Dialogue:
+C:\Users\Antonio\Documents\CreateTest\test2\test2_Game\Content\Dialogue

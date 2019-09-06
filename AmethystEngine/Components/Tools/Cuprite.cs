@@ -47,6 +47,7 @@ namespace AmethystEngine.Components.Tools
 					Console.WriteLine("Build Successful!");
 					return true;
 				}
+				Console.WriteLine("Build Failure");
 				return false;
 			}
 			return false;
@@ -82,7 +83,7 @@ namespace AmethystEngine.Components.Tools
 			{
 				if (CodeLines[i].Contains("[NAMEHERE]"))
 				{
-					CodeLines[i] = CodeLines[i].Replace("[NAMEHERE]", ge.GetProperty("DelegateEventName").ToString());
+					CodeLines[i] = CodeLines[i].Replace("[NAMEHERE]", ge.GetPropertyData("DelegateEventName").ToString());
 				}
 			}
 			return CodeLines; //return the lines to gen.

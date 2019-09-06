@@ -259,7 +259,7 @@ namespace ProjectE_E.Components
 				if (EventLUT.ContainsKey((int)ge.GetPropertyData("group"))) continue;
 				EventLUT.Add(
 					(int)ge.GetPropertyData("group"),
-					Type.GetType("ProjectE_E.Components.Cuprite.MapEvents").GetMethod(ge.GetProperty("DelegateEventName").ToString())
+					Type.GetType("ProjectE_E.Components.Cuprite.MapEvents").GetMethod(ge.GetPropertyData("DelegateEventName").ToString())
 					);
 			}
 		}

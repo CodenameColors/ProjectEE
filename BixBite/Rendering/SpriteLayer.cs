@@ -70,7 +70,7 @@ namespace BixBite.Rendering
 
 		public void SetProperty(string Key, object Property)
 		{
-			if (!Properties.Any(m => m.Item1 == Key))
+			if (Properties.Any(m => m.Item1 == Key))
 				Properties[GetPropertyIndex(Key)] = new Tuple<string, object>(Key, Property);
 			else throw new PropertyNotFoundException(Key);
 
