@@ -170,6 +170,11 @@ namespace AmethystEngine.Forms
       //LevelEditorMain_Canvas.Background = new DrawingBrush();
     }
 
+		/// <summary>
+		/// When the GUI is loaded we need to set the Control pointers
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
 			PropertyBags = new ObservableCollection<object>();
@@ -188,20 +193,17 @@ namespace AmethystEngine.Forms
 			OpenLevels = new ObservableCollection<Level>();
 			OpenUIEdits = new ObservableCollection<GameUI>();
 
-			//PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
-			//LB.AddProperty("LevelName", new TextBox(), "Level1");
-			//LB.AddProperty("Width", new TextBox(), "50");
-			//LB.AddProperty("Height", new TextBox(), "50");
-			//LB.AddProperty("MainLevel?", new CheckBox(), true);
-
-			//scaleFullMapEditor();
-			//ObjectProperties_Control.Template.FindName("")
-
-			//load main level
 			LoadMainLevel(ProjectFilePath);
+    }
 
-		}
-
+		/// <summary>
+		/// This is the constructor that is used to load a recent project.
+		/// Sets up the Project Explorer
+		/// Also set the Currently working directory.
+		/// </summary>
+		/// <param name="FilePath"></param>
+		/// <param name="ProjectName"></param>
+		/// <param name="LevelPath"></param>
 		public EngineEditor(String FilePath, String ProjectName = "", String LevelPath = "")
     {
       InitializeComponent();
@@ -215,6 +217,11 @@ namespace AmethystEngine.Forms
 			CurrentWorkingDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\");
     }
 		
+		/// <summary>
+		/// This loaded the main file and searches for the main level path.
+		/// then loads it to the screen via ImportLevel();
+		/// </summary>
+		/// <param name="filepath"></param>
 		private void LoadMainLevel(String filepath)
 		{
 			using (StreamReader file = new StreamReader(filepath))
@@ -316,6 +323,11 @@ namespace AmethystEngine.Forms
       w.Show();
     }
 
+		/// <summary>
+		/// Open up the project settings window
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void ProjectSettingsMenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			Window w = new ProjectSettings(ProjectFilePath);
@@ -494,6 +506,12 @@ namespace AmethystEngine.Forms
 		#endregion
 
 		#region "Dynamic Template Binding"
+		/// <summary>
+		/// This method is activated when the user presses the Desc button in the Editor Objects section.
+		/// It is used to change the list objects from pictures, to pictures with a name caption.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Desc_CB_Click(object sender, RoutedEventArgs e)
 		{
 			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level")) //we are in the level editor.
@@ -523,6 +541,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// This method is here to change the templates and pointers when the user wants to change the editors via tab control
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void EditorWindows_TC_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			if (((TabItem)EditorWindows_TC.SelectedItem).Header == null) { EditorWindows_TC.SelectedIndex = 4; return; }
@@ -560,17 +583,6 @@ namespace AmethystEngine.Forms
 					((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control))).ItemsSource = PropertyBags;
 
 				Dialogue_CE_Tree = (TreeView)ContentLibrary_Control.Template.FindName("DialogueEditor_CE_TV", ContentLibrary_Control);
-				//if (SceneExplorer_Control != null)
-				//{
-				//	ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
-				//	SceneExplorer_Control.Template = cc;
-				//	Console.WriteLine(SceneExplorer_Control.Template.ToString());
-				//	TreeView tv = (TreeView)cc.FindName("UISceneExplorer_TreeView", SceneExplorer_Control); //(TreeView)SceneExplorer_Control.Template.FindName("UISceneExplorer_TreeView", SceneExplorer_Control);
-				//	if (tv == null) return;
-				//	SceneExplorer_TreeView = tv;
-				//	SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
-				//}
-
 			}
       else if(((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
       {
@@ -592,16 +604,16 @@ namespace AmethystEngine.Forms
 			}
     }
 
-		public void RUnthisthis()
-		{
-
-		}
-
     #endregion
 
     #region "File/Folder Viewer"
     #region "Folder viewer Tree"
     //TODO: Multi lined label
+		/// <summary>
+		/// This method is called when the user is traversing through the project tree view 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
     private void ProjectContentExplorer_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
       String TempPic = "/AmethystEngine;component/images/Ame_icon_small.png";
@@ -766,7 +778,12 @@ namespace AmethystEngine.Forms
     #region "Level Editor"
 
     #region "Tile Map"
-    //Creates a tile brush to paint the editor. Uses selected tile from tile map.
+    /// <summary>
+		/// This method is called when the user clicks on the tile map after they have imported one.
+		/// After clicking it then creates a tile brush for painting the level later.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
     private void TileMap_Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
 			int xtile, ytile, TileSetOffest = 0;
@@ -816,6 +833,11 @@ namespace AmethystEngine.Forms
 			TileMapGrid_Rect.Visibility = Visibility.Visible;
 		}
 
+		/// <summary>
+		/// Used for displaying the position of the mouse on the canvas of the tile map
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
     private void TileMap_Canvas_MouseMove(object sender, MouseEventArgs e)
     {
       Canvas TileMap_Canvas_temp = (Canvas)(ContentLibrary_Control.Template.FindName("TileMap_Canvas", ContentLibrary_Control));
@@ -845,8 +867,6 @@ namespace AmethystEngine.Forms
 
 			if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Tile)
 			{
-
-
 				if (CurrentTool == EditorTool.Brush)
 				{
 					//Are we allowed to paint?
@@ -1098,15 +1118,16 @@ namespace AmethystEngine.Forms
 			{
 
 			}
-
 			currentCC = ((ContentControl)sender);
 			Selector.SetIsSelected(((Control)currentCC), true);
 			LEcurect.IsHitTestVisible = false;
-
-
-
 		}
 
+		/// <summary>
+		/// Set the current selected sprite on a mouse click. And display its properties in the properties grid.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Sprite_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
 			//are we on a sprite layer?
@@ -1131,6 +1152,7 @@ namespace AmethystEngine.Forms
 			if (spr == null) return; //cannot find to return.
 
 			int i = 0;
+			//display properties to the properties grid
 			PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
 			LB.ClearProperties();
 			foreach (object o in spr.GetProperties().Select(m=>m.Item2))
@@ -1145,11 +1167,13 @@ namespace AmethystEngine.Forms
 
 		}
 
-		private void Sprite_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-		{
-			Console.WriteLine("Let go of a sprite object");
-		}
-
+		/// <summary>
+		/// This method is called then the mouse click is ending on the Level Editor canvas.
+		/// This is used to set variables like selection area etc.
+		/// Because its better to set those at the END of mouse movement.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
 		{
 			if ((SceneExplorer_TreeView.SelectedValue) == null) return;
@@ -1265,6 +1289,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 		
+		/// <summary>
+		/// Use this to get any Zindex of an object on a canvas. 
+		/// </summary>
+		/// <param name="treeitem"></param>
+		/// <returns></returns>
     private int GetTileZIndex(TreeView treeitem)
 		{
 			//are we clicked on a spritelayer? AND a tile layer?
@@ -1285,6 +1314,12 @@ namespace AmethystEngine.Forms
 			return -1;
 		}
 
+		/// <summary>
+		/// Used to get the location to snap to based on the current grid scale. TOP LEFT snap
+		/// </summary>
+		/// <param name="p"></param>
+		/// <param name="abs"></param>
+		/// <returns></returns>
 		private Point RelativeGridSnap(Point p, bool abs = true)
 		{
 
@@ -1324,7 +1359,13 @@ namespace AmethystEngine.Forms
 
     }
 
-    private Point GetGridSnapCords(Point p)
+		/// <summary>
+		/// Used to get the location to snap to based on the current grid scale. TOP LEFT snap
+		/// </summary>
+		/// <param name="p"></param>
+		/// <param name="abs"></param>
+		/// <returns></returns>
+		private Point GetGridSnapCords(Point p)
     {
 			int Xoff = 0; int YOff = 0;
 			if (p.X >= 40 || (int)(Math.Abs(Canvas_grid.Viewport.X)) > 0)
@@ -1487,10 +1528,15 @@ namespace AmethystEngine.Forms
       Canvas.SetLeft(FullMapSelection_Rect, 0); Canvas.SetTop(FullMapSelection_Rect, 0);
 			Canvas.SetZIndex(FullMapSelection_Rect, 100);
       
-      FullMapLEditor_Canvas.Children.Add(FullMapSelection_Rect);
+      //FullMapLEditor_Canvas.Children.Add(FullMapSelection_Rect);
 
     }
 
+		/// <summary>
+		/// Choose the cells in the X direction of the new map.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void XCellsVal_TB_TextChanged(object sender, TextChangedEventArgs e)
 		{
 			if (int.TryParse(((TextBox)sender).Text, out int numval) && Int32.TryParse(XCellsWidth_TB.Text, out int pixval))
@@ -1500,6 +1546,11 @@ namespace AmethystEngine.Forms
 			else LevelWidth_TB.Text = "0";
 		}
 
+		/// <summary>
+		/// Choose the cells in the Y direction of the new map
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void YCellsVal_TB_TextChanged(object sender, TextChangedEventArgs e)
 		{
 			if (Int32.TryParse(((TextBox)sender).Text, out int numval) && Int32.TryParse(XCellsHeight_TB.Text, out int pixval))
@@ -1692,6 +1743,11 @@ namespace AmethystEngine.Forms
 		#endregion
 
 		#region "Tools"
+		/// <summary>
+		/// Set the Level editor to selection AND deselect.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditorSelection_Click(object sender, RoutedEventArgs e)
 		{
 			if (CurrentTool != EditorTool.Select)
@@ -1704,12 +1760,22 @@ namespace AmethystEngine.Forms
 			if (SceneExplorer_TreeView.SelectedItem is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).layerType == LayerType.Sprite)
 				SetSpriteHitState(true);
 		}
-	
+
+		/// <summary>
+		/// Set the Level editor to brush
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditorBrush_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentTool = EditorTool.Brush;
 		}
 
+		/// <summary>
+		/// Takes a given selected area and fills it with the selected paint brush tile.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Fill_Click(object sender, RoutedEventArgs e)
 		{
 			if (SelectedTile_Canvas.Children.Count == 0) return;
@@ -1747,6 +1813,12 @@ namespace AmethystEngine.Forms
 			Deselect();
 		}
 
+		/// <summary>
+		/// Given a selection move these tiles down a layer. If it's the first layer don't move
+		/// ALSO only move to a layer with the same layer type.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void DownLaverLevelEditor_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			//we need to make sure that we have selected a sprite layer in the tree view.
@@ -1806,6 +1878,12 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// Given a selection move these tiles up a layer. If it's the last layer don't move
+		/// ALSO only move to a layer with the same layer type. 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void UpLaverLevelEditor_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			//we need to make sure that we have selected a sprite layer in the tree view.
@@ -1862,6 +1940,12 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// Sets the tool to eraser.
+		/// Also if there is a selection, erase it.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditorEraser_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentTool = EditorTool.Eraser;
@@ -1869,16 +1953,27 @@ namespace AmethystEngine.Forms
 				EraseSelection();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditorMove_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentTool = EditorTool.Move;
 		}
 
+		/// <summary>
+		/// Saves the level file.
+		/// Level data, tile sets, and editor info.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void SaveLevel_MenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
 			{
-				Title = "New Level File",
+				Title = "Save Level File",
 				FileName = "", //default file name
 				Filter = "txt files (*.lvl)|*.lvl|All files (*.*)|*.*",
 				FilterIndex = 2,
@@ -1912,6 +2007,11 @@ namespace AmethystEngine.Forms
 			CurrentLevel.ExportLevel(dlg.FileName + (dlg.FileName.Contains(".lvl") ? "" : ".lvl"), TileSetImages, celldim);
 		}
 
+		/// <summary>
+		/// Takes an existing level file and imports/ opens it in the editor.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private async void OpenLevel_MenuItem_ClickAsync(object sender, RoutedEventArgs e)
 		{
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
@@ -1940,11 +2040,11 @@ namespace AmethystEngine.Forms
 
 		}
 
-		private void GameEvent_BTN_Click(object sender, RoutedEventArgs e)
-		{
-			CurrentTool = EditorTool.Gameevent;
-		}
-
+		/// <summary>
+		/// Sets the editor window to allow the user to create a new Level
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void NewLevel_MenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			NewLevelData_CC.Visibility = Visibility.Visible;
@@ -1952,6 +2052,9 @@ namespace AmethystEngine.Forms
 			LevelEditorStatusBar_Grid.Visibility = Visibility.Hidden;
 		}
 
+		/// <summary>
+		/// Deselects all current selected tiles.
+		/// </summary>
 		private void Deselect()
 		{
 			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
@@ -1989,6 +2092,9 @@ namespace AmethystEngine.Forms
 			
 		}
 
+		/// <summary>
+		/// Erases all data in a selection.
+		/// </summary>
 		private void EraseSelection()
 		{
 			Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
@@ -2031,11 +2137,21 @@ namespace AmethystEngine.Forms
 			Deselect();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditorImage_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentTool = EditorTool.Image;
 		}
 		
+		/// <summary>
+		/// Opens up the game event window to allow users to create new game events or edit current ones
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void AddGameEvent_Click(object sender, RoutedEventArgs e)
 		{
 			if (CurrentLevel == null) return;
@@ -2043,6 +2159,11 @@ namespace AmethystEngine.Forms
 			ff.Show();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void EditGameEvents_Click(object sender, RoutedEventArgs e)
 		{
 			if (CurrentLevel == null) return;
@@ -2050,6 +2171,11 @@ namespace AmethystEngine.Forms
 			ff.Show();
 		}
 
+		/// <summary>
+		/// Chooses a currently existing game event, and sets the ref so the user can paint the level with game events
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void DeclareGameEvent_MI_Click(object sender, RoutedEventArgs e)
 		{
 			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
@@ -2064,6 +2190,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// This will auto load all the game events that all allowed to be painted to the context menu
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void MenuItem_MouseEnter(object sender, MouseEventArgs e)
 		{
 			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
@@ -2083,7 +2214,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-
+		/// <summary>
+		/// deselect all current selected data.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditorDeselect_Click(object sender, RoutedEventArgs e)
 		{
 			Deselect();
@@ -2091,7 +2226,12 @@ namespace AmethystEngine.Forms
 
 		#endregion
 
-		//cchanges the toolbar to the currenttool bar depedning on the tilemap tool selected
+		/// <summary>
+		/// There are 2 different tool bar options for the level editor. Sprite, and Tile.
+		/// This method will set the correct one 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditorLibary_TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			TabControl LELibary_TC = (TabControl)ContentLibrary_Control.Template.FindName("LevelEditorLibary_TabControl", ContentLibrary_Control);
@@ -2110,6 +2250,12 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// This method is activated when the user selects a different object in the scene explorer.
+		/// It will print out properties to the properties grid, and change displayed level if needed.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void SceneExplorer_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			Console.WriteLine("Changed Scene Object");
@@ -2595,7 +2741,7 @@ namespace AmethystEngine.Forms
 			LevelEditor_Canvas.Children.Clear();
 			FullMapLEditor_Canvas.Children.Clear();
 		}
-		#endregion
+		#endregion // end of Level editor region
 		
 		#region "Content Library"
 		/// <summary>
@@ -2845,6 +2991,7 @@ namespace AmethystEngine.Forms
       ((DispatcherFrame)f).Continue = false;
       return null;
     }
+
 		#region "WIP"
     public void ProcessOutputDataHandler(object sendingProcess, DataReceivedEventArgs outLine)
     {
@@ -2911,8 +3058,6 @@ namespace AmethystEngine.Forms
 		}
 		
 		//this is methods that im working now... they suck for now.
-		
-
 		private bool CanUseTool()
 		{
 			//what tool are you using?
@@ -3001,61 +3146,12 @@ namespace AmethystEngine.Forms
 
 		}
 
-		private void ResizeRect_MouseLMBTN_Up(object sender, MouseButtonEventArgs e)
-		{
-			Console.WriteLine("Moved CC Sprite");
-		}
-
-		private void ContentControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			Console.WriteLine("changed selection CC Sprite");
-		}
-
 		private void TxtQuantity_KeyDown(object sender, KeyEventArgs e)
 		{
 			Console.WriteLine("Text Property Key down " + ((TextBox)sender).Tag.ToString());
 
 		}
 
-		/// <summary>
-		/// this button will auto generate and MSBuild the games project files to allow game evnent use. IF code compiles w/no errors
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void CodeCompiling_BTN_Click(object sender, RoutedEventArgs e)
-		{
-			Dictionary<String, List<GameEvent>> ProjGE = Cuprite.GetProjectGameEvents(ProjectFilePath);
-			List<List<String>> codelines = new List<List<string>>();
-			foreach(String s in ProjGE.Keys)
-			{
-				foreach (GameEvent ge in ProjGE[s])
-					codelines.Add(Cuprite.GetMethodTemplate(ge));
-			}
-
-			System.Collections.Generic.IEnumerable<String> l = File.ReadLines(Cuprite.GetFilePath(ProjectFilePath));
-			List<String> lines = l.ToList();
-			int i = 0; int j = 0;
-			foreach (String Key in ProjGE.Keys)
-			{ 
-				foreach(List<String> linesofcode in codelines)
-				{
-					if (ProjGE[Key].Count == 0) break; 
-					String Tests = ProjGE[Key][i++].GetPropertyData("DelegateEventName").ToString();
-					Cuprite.GenerateMethod(codelines[j++], ref lines, Tests, Key);
-					if (i > ProjGE[Key].Count - 1)
-						break;
-				}
-				i = 0;
-			}
-
-			using (StreamWriter writer = new StreamWriter(Cuprite.GetFilePath(ProjectFilePath), false))
-			{
-				foreach(String s in lines)
-					writer.WriteLine(s);
-			}
-			Cuprite.BuildGameProjectFiles(ProjectFilePath);
-
-		}
 
 		/// <summary>
 		/// 
@@ -3076,8 +3172,6 @@ namespace AmethystEngine.Forms
 
 		}
 
-
-
 		private void Sprite_OnUnselected(object sender, RoutedEventArgs e)
 		{
 			//Item.Content = ((ListBoxItem)sender).Name + " was unselected.";
@@ -3086,10 +3180,54 @@ namespace AmethystEngine.Forms
 		}
 		#endregion
 
+		/// <summary>
+		/// this button will auto generate and MSBuild the games project files to allow game evnent use. IF code compiles w/no errors
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void CodeCompiling_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			Dictionary<String, List<GameEvent>> ProjGE = Cuprite.GetProjectGameEvents(ProjectFilePath);
+			List<List<String>> codelines = new List<List<string>>();
+			foreach (String s in ProjGE.Keys)
+			{
+				foreach (GameEvent ge in ProjGE[s])
+					codelines.Add(Cuprite.GetMethodTemplate(ge));
+			}
 
+			System.Collections.Generic.IEnumerable<String> l = File.ReadLines(Cuprite.GetFilePath(ProjectFilePath));
+			List<String> lines = l.ToList();
+			int i = 0; int j = 0;
+			foreach (String Key in ProjGE.Keys)
+			{
+				foreach (List<String> linesofcode in codelines)
+				{
+					if (ProjGE[Key].Count == 0) break;
+					String Tests = ProjGE[Key][i++].GetPropertyData("DelegateEventName").ToString();
+					Cuprite.GenerateMethod(codelines[j++], ref lines, Tests, Key);
+					if (i > ProjGE[Key].Count - 1)
+						break;
+				}
+				i = 0;
+			}
+
+			using (StreamWriter writer = new StreamWriter(Cuprite.GetFilePath(ProjectFilePath), false))
+			{
+				foreach (String s in lines)
+					writer.WriteLine(s);
+			}
+			Cuprite.BuildGameProjectFiles(ProjectFilePath);
+
+		}
+
+		//These are methods that have to deal with the UI editor tools
 		#region UI
 
-
+		/// <summary>
+		/// Deselects all selected sprite when clicking on the background canvas
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void UICanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			//you clicked on nothing. so deselect UI CCs
@@ -3099,11 +3237,23 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// It occurs when the mouse up on the background canvas
+		/// WIP...noting yet.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void UIEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
 		{
 
 		}
 
+		/// <summary>
+		/// occurs when the mouse moves over the background canvas
+		/// Displays the mouse position
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void UIEditor_BackCanvas_MouseMove(object sender, MouseEventArgs e)
 		{
 			Point p = Mouse.GetPosition(LevelEditor_BackCanvas);
@@ -3121,6 +3271,11 @@ namespace AmethystEngine.Forms
 
 		}
 
+		/// <summary>
+		/// This method is called when a moveable image is clicked on. (SPRITES)
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void ContentControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level"))
@@ -3211,6 +3366,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// This method is here when a movable image has been clicked and let go. (SPRITES)
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void ContentControl_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
 		{
 			if (CurrentTool == EditorTool.Select)
@@ -3222,6 +3382,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// this method is here when a movable image has been scaled (SPRITES)
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void ContentControl_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			if (SelectedUI == null) return;
@@ -3241,6 +3406,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// This method will add a Textbox to the UI editor.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void UIEditoGameTB_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentNewUI = NewUITool.Textbox;
@@ -3299,6 +3469,11 @@ namespace AmethystEngine.Forms
 			OpenUIEdits[0].AddUIElement(CurrentUIDictionary.Values.Last()); //TODO: use the selection Treeview
 		}
 
+		/// <summary>
+		/// This method will add a Image to the UI editor
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void UIEditoGameIMG_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
@@ -3330,6 +3505,12 @@ namespace AmethystEngine.Forms
 			OpenUIEdits[0].AddUIElement(CurrentUIDictionary.Values.Last()); //TODO: use the selection Treeview
 		}
 		
+		/// <summary>
+		/// This method is here to add an image to a grid.
+		/// This grid is here to allow the scaling of a text box image and NOT lose shape.
+		/// think of this like a frame
+		/// </summary>
+		/// <param name="g"></param>
 		public void InitimagesTBGrid(Grid g)
 		{
 			for(int i = 0; i < g.RowDefinitions.Count; i++)
@@ -3348,18 +3529,31 @@ namespace AmethystEngine.Forms
 
 		}
 
+		/// <summary>
+		/// Change the Text's font color for the game control in the UI editor.
+		/// </summary>
+		/// <param name="obj"></param>
 		void customCP_FontColorChanged(Color obj)
 		{
 			((TextBox)((Grid)SelectedUIControl.Content).Children[2]).Foreground = new SolidColorBrush(obj);
 			SelectedUI.SetProperty("FontColor", obj.ToString());
 		}
 
+		/// <summary>
+		/// Change's the background color for the game control in the UI editor.
+		/// </summary>
+		/// <param name="obj"></param>
 		void customCP_BackgroundColorChanged(Color obj)
 		{
 			((Grid)SelectedUIControl.Content).Background = new SolidColorBrush(obj);
 			SelectedUI.SetProperty("Background", obj.ToString());
 		}
 
+		/// <summary>
+		/// Changes the visibility of a border control. Also doesn't create it in the game.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void SetBorderVisibility(object sender, RoutedEventArgs e)
 		{
 			String Property = ((CheckBox)sender).Tag.ToString();
@@ -3376,6 +3570,12 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// This method is here as the DEFAULT property callback.
+		/// IF THIS IS CALLED YOU NEED TO FIX IT AND DECLARE THE CALLBACK 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void UIPropertyCallback(object sender, KeyEventArgs e)
 		{
 			if (Key.Enter == e.Key)
@@ -3391,8 +3591,15 @@ namespace AmethystEngine.Forms
 						Int32.Parse(((TextBox)sender).Text);
 				}
 			}
+
+			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// This method will change the image fill .
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void GameImage_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			if (SelectedUIControl.Tag.ToString() == "IMAGE")
@@ -3459,6 +3666,11 @@ namespace AmethystEngine.Forms
 
 		}
 
+		/// <summary>
+		/// change the Z index of the UI object.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void GameUI_ZIndex_Changed(object sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Enter)
@@ -3479,6 +3691,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// Show the context menu which allows editing if clicked.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void ContentControl_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
 		{
 			ContextMenu cm = this.FindResource("EditMovableControls_Template") as ContextMenu;
@@ -3487,6 +3704,11 @@ namespace AmethystEngine.Forms
 			cm.IsOpen = true;
 		}
 
+		/// <summary>
+		/// When you click the Editable option in the context menu REENABLE click events
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void EditMoveableControl_Click(object sender, RoutedEventArgs e)
 		{
 			((MenuItem)sender).IsChecked = !SelectedUIControl.IsHitTestVisible;
@@ -3505,6 +3727,11 @@ namespace AmethystEngine.Forms
 
 		}
 
+		/// <summary>
+		/// This method is here for when the user clicks and drags a GameUI object to move.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void ContentControl_PreviewMouseMove(object sender, MouseEventArgs e)
 		{
 			if (e.LeftButton == MouseButtonState.Pressed)
@@ -3529,6 +3756,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// Start to create a new UI file in editor.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void NewUI_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
@@ -3558,6 +3790,11 @@ namespace AmethystEngine.Forms
 			SelectedBaseUIControl = CC;
 		}
 
+		/// <summary>
+		/// Save UI file
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void SaveUIAs_Click(object sender, RoutedEventArgs e)
 		{
 			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
@@ -3586,6 +3823,10 @@ namespace AmethystEngine.Forms
 
 		}
 
+		/// <summary>
+		/// Get all the projects image paths for the image UI combobox.
+		/// </summary>
+		/// <returns></returns>
 		public List<String> GetAllProjectImages()
 		{
 			//get the images location
@@ -3593,6 +3834,11 @@ namespace AmethystEngine.Forms
 			return Directory.GetFiles(InitialDirectory).ToList();
 		}
 
+		/// <summary>
+		/// import a UI file to the editor.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void OpenUIFile_UIE(object sender, RoutedEventArgs e)
 		{
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
@@ -3636,6 +3882,39 @@ namespace AmethystEngine.Forms
 
 		#endregion
 
+		#region Dialogue
+
+		#region Timeline
+		/// <summary>
+		/// When you have the a Timeblock selected and are trying to change the start time in properties editor
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		public void SetStartTime(object sender, EventArgs e)
+		{
+			((TimeBlock)DialogueEditor_Timeline.SelectedControl).StartTime = double.Parse(((TextBox)sender).Text);
+		}
+
+		/// <summary>
+		/// When you have the a Timeblock selected and are trying to change the end time in properties editor
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		public void SetEndTime(object sender, EventArgs e)
+		{
+			((TimeBlock)DialogueEditor_Timeline.SelectedControl).EndTime = double.Parse(((TextBox)sender).Text);
+		}
+		#endregion
+
+		#region NodeEditor
+
+		#endregion
+
+		#region DialogueEditor
+
+		#endregion
+
+		#endregion
 
 		/// <summary>
 		/// method to draw a newly added/imported UI to the screen. Choose whether or not to breakdown the components for editing.
@@ -3865,6 +4144,11 @@ namespace AmethystEngine.Forms
 			CurrentEditorCanvas.Children.Add(BaseUI);
 		}
 
+		/// <summary>
+		/// Create a new Dialogue Scene
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void NewDialogueScene_MenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			AllDialogueEditor_Grid.Visibility = Visibility.Visible;
@@ -3879,6 +4163,12 @@ namespace AmethystEngine.Forms
 
 		}
 
+		/// <summary>
+		/// Occurs when a TimeBlock is clicked and Moved.
+		/// Displays ALL properties of the time block to the property grids
+		/// HOOK METHOD into timeline.dll
+		/// </summary>
+		/// <param name="sender"></param>
 		public void ShowTimelineSelectedProperties(object sender)
 		{
 			//CollapsedPropertyGrid.CollapsedPropertyGrid LB = ((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control)));
@@ -3953,21 +4243,22 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-		public void SetStartTime(object sender, EventArgs e)
-		{
-			((TimeBlock)DialogueEditor_Timeline.SelectedControl).StartTime = double.Parse(((TextBox)sender).Text);
-		}
-
-		public void SetEndTime(object sender, EventArgs e)
-		{
-			((TimeBlock)DialogueEditor_Timeline.SelectedControl).EndTime = double.Parse(((TextBox)sender).Text);
-		}
-
+		/// <summary>
+		/// Sets the duration time of the time block.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		public void SetDurationTime(object sender, EventArgs e)
 		{
 			((TimeBlock)DialogueEditor_Timeline.SelectedControl).Duration = double.Parse(((TextBox)sender).Text);
 		}
 
+		/// <summary>
+		/// Sets the dialogue text of the time block
+		/// Display is handled by binding in the timeline.dll
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		public void SetDialogueText(object sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Enter)
@@ -3976,6 +4267,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// Sets the Sprite Image for the timeblock. Also WIP for the timeline later.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		public void SetSpriteImagePath_Dia(object sender, EventArgs e)
 		{
 			if (DialogueEditor_Timeline.SelectedControl is null) return;
@@ -3986,10 +4282,17 @@ namespace AmethystEngine.Forms
 			}
 			else if (DialogueEditor_Timeline.SelectedControl is Timeline)
 			{
-
+				throw new NotImplementedException("The uer has somehow wanted to change the timeline sprite header image.");
 			}
 		}
 
+		/// <summary>
+		/// Set the lined Textbox that this Timeblock will change/interact with.
+		/// WIP : this can later be set on init default wise. Since all blocks in a row should be for ONE character
+		/// thus ONE TEXT box. but can be changed if needed still like before.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		public void SetLinkedTBName(object sender, EventArgs e)
 		{
 			if(DialogueEditor_Timeline.SelectedControl is Timeline)
@@ -4004,6 +4307,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// When adding a character to scene it will call this method. AFTER correct info is given.
+		/// This method right now will add a sprite, that is can be linked to change, and a UI object to the screen.
+		/// </summary>
+		/// <param name="c"></param>
 		public void AddCharacterHook(Character c)
 		{
 			CurActiveDialogueScene.Characters.Add(c);
@@ -4066,18 +4374,33 @@ namespace AmethystEngine.Forms
 
 		}
 
+		/// <summary>
+		/// This method is called on the play button press in the timeline editor
+		/// and it will set the Timeblock linked list. so the timeline knows how to traverse/increment after start.
+		/// </summary>
 		public void DialogueHook()
 		{
 			Console.WriteLine("Hook Activated");
 			CurActiveDialogueScene.SetTrack(CurActiveDialogueScene.Characters[0].Name, DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL);
 		}
 
+		/// <summary>
+		/// Testing my casting from one dll to another.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void DialogueEditorTesting_BTN(object sender, RoutedEventArgs e)
 		{
 			object t =  DialogueEditor_Timeline.GetTimelines()[0];
 			Timeline tt = (Timeline)t;
 		}
 
+		/// <summary>
+		/// Occurs on the add a Character "+" button.
+		/// Opens up the add character form. uses hooking.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void AddCharacterToScene(object sender, RoutedEventArgs e)
 		{
 
@@ -4094,7 +4417,11 @@ namespace AmethystEngine.Forms
 
 		}
 
-
+		/// <summary>
+		/// This method occurs AS the timeline is playing and the timeline has "entered" a new time block for that row.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void ActiveTBblocks_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
 			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
@@ -4141,12 +4468,23 @@ namespace AmethystEngine.Forms
 
 		}
 
+		/// <summary>
+		/// more testing methods. I use this one to add a sprite to the screen.
+		/// Test1 button
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void TestingAddingCharacterpictersdia(object sender, RoutedEventArgs e)
 		{
 			Sprite s = new Sprite("new sprite", "/AmethystEngine;component/images/Ame_icon_small.png",0 , 0, 400, 400);
 			CurActiveDialogueScene.Characters[0].DialogueSprites.Add(s);
 		}
-
+		/// <summary>
+		/// Used to change the ui and image manually . TESTING.
+		/// Test2 button
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Test2Dia_Click(object sender, RoutedEventArgs e)
 		{
 			DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL.First.Value.TrackSpritePath = "/AmethystEngine;component/images/Ame_icon_small.png";
@@ -4154,6 +4492,11 @@ namespace AmethystEngine.Forms
 			DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL.First.Value.CurrentDialogue = "Yo my dude!";
 		}
 
+		/// <summary>
+		/// Clicking on a timeblock will recieve the properties of said object.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void DialogueEditor_Timeline_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			Console.WriteLine("Clicked on Timeline");

@@ -51,6 +51,12 @@
     <Reference Include="Microsoft.Build.Conversion.v4.0" />
     <Reference Include="Microsoft.Build.Engine" />
     <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="NodeEditor">
+      <HintPath>Resources\NodeEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="OutputLog">
+      <HintPath>Resources\OutputLog.dll</HintPath>
+    </Reference>
     <Reference Include="PropertyGridEditor, Version=1.1.0.4, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\PropertyGridEditor.dll</HintPath>
