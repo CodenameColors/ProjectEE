@@ -24,6 +24,7 @@ using BixBite.Rendering.UI;
 using System.Threading;
 using TimelinePlayer.Components;
 using BixBite.Characters;
+using NodeEditor.Components;
 
 namespace AmethystEngine.Forms
 {
@@ -4159,6 +4160,7 @@ namespace AmethystEngine.Forms
 			ActiveDialogueScenes.Add(CurActiveDialogueScene);
 			DialogueEditor_Timeline.ActiveTBblocks.CollectionChanged += ActiveTBblocks_CollectionChanged;
 
+			DialogueEditor_Timeline.OnCreateTimeblockHook += CreateDialogueBlockForTimeline;
 			//DialogueEditor_Timeline.ItemsSource = new List<String>();
 
 		}
@@ -4220,8 +4222,6 @@ namespace AmethystEngine.Forms
 				PBag.Properties.Add(new Tuple<string, object, Control>("Sprite Image", new List<String>(), CB));
 				TextBox tb = new TextBox(); tb.KeyDown += SetDialogueText;
 				PBag.Properties.Add(new Tuple<string, object, Control>("Dialogue Text", TimeB.CurrentDialogue.ToString(), tb));
-
-
 
 				ComboBox CB1 = new ComboBox() { Height = 50 };
 				CB1.SelectionChanged += SetLinkedTBName;
@@ -4410,7 +4410,7 @@ namespace AmethystEngine.Forms
 
 			Character c = new Character();
 			Window w = new AddCharacterForm() { AddToScene = AddCharacterHook};
-			w.Show();
+			w.ShowDialog();
 
 			//CurActiveDialogueScene.Characters.Add(c);
 			//DialogueEditor_Timeline.AddTimeline(c.Name);
@@ -4429,11 +4429,45 @@ namespace AmethystEngine.Forms
 				if (e.NewItems == null && !File.Exists(((TimeBlock)e.NewItems[0]).TrackSpritePath)) return;
 				//changing the Image on the screen Sprite dialogue
 				Console.WriteLine("Added Active Time Block");
-				((Image)((Grid)CurSceneCharacterDisplays[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)].Item1.Content).Children[2]).Source = 
-					new BitmapImage(new Uri(((TimeBlock)e.NewItems[0]).TrackSpritePath, UriKind.Absolute));
+				try
+				{
+					((Image) ((Grid) CurSceneCharacterDisplays[
+								DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock) e.NewItems[0]).TimelineParent)].Item1.Content)
+							.Children[2]).Source =
+						new BitmapImage(new Uri(((TimeBlock) e.NewItems[0]).TrackSpritePath, UriKind.Absolute));
+				}
+				catch (UriFormatException uri)
+				{
+					Console.WriteLine("INVAILD URI. The sprite image wasn't set");
+					EngineOutputLog.AddErrorLogItem(-1, "Timeblocks sprite image wasn't set.", "DialogueEditor", false);
+					EngineOutputLog.AddLogItem("Timeblock failed on activated. See Error Log for more details");
+					if(resizeGrid.RowDefinitions.Last().Height.Value < 100)
+						resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+					OutputLogSpliter.IsEnabled = true;
+					return;
+				}
+
 				//here we change the dialogue text itself
-				GameUI gtb = CurActiveDialogueScene.DialogueBoxes[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)].UIElements.Single(m => m.UIName == ((TimeBlock)e.NewItems[0]).LinkedTextBoxName);
-				gtb.SetProperty("ContentText", ((TimeBlock)e.NewItems[0]).CurrentDialogue);
+
+				GameUI gtb = null;
+				try
+				{
+					gtb = CurActiveDialogueScene
+						.DialogueBoxes[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock) e.NewItems[0]).TimelineParent)]
+						.UIElements.Single(m => m.UIName == ((TimeBlock) e.NewItems[0]).LinkedTextBoxName);
+				}
+				catch (InvalidOperationException ioe)
+				{
+					Console.WriteLine("The Linked Textbox wasn't set!");
+					EngineOutputLog.AddErrorLogItem(-2, "Timeblocks linked textbox wasn't set.", "DialogueEditor", false);
+					EngineOutputLog.AddLogItem("Timeblock failed on activated. See Error Log for more details");
+					if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
+						resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+					OutputLogSpliter.IsEnabled = true;
+					return;
+				}
+
+				gtb.SetProperty("ContentText", ((((TimeBlock)e.NewItems[0]).LinkedDialogueBlock)as DialogueNodeBlock).DialogueData[0] );
 
 				UIElementCollection uie = ((Grid)CurSceneCharacterDisplays[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)].Item2.Content).Children;
 				ContentControl CC = null;
@@ -4516,7 +4550,33 @@ namespace AmethystEngine.Forms
 
 		}
 
+		public object CreateDialogueBlockForTimeline(object Timeblock)
+		{
+			int i = DialogueEditor_Timeline.GetTimelinePosition(DialogueEditor_Timeline.selectedTimeline, null);
+			DialogueNodeBlock dialogueNode = new DialogueNodeBlock(CurActiveDialogueScene.Characters[i].Name);
+			DialogueEditor_NodeGraph.AddDialogueBlockToGraph(dialogueNode, CurActiveDialogueScene.Characters[i].Name, Timeblock);
 
+			//Character
+			return dialogueNode;
+		}
+
+		private void ViewOutputLog_Click(object sender, RoutedEventArgs e)
+		{
+			if (sender is MenuItem mi)
+			{
+				if (!mi.IsChecked) //hide it
+				{
+					resizeGrid.RowDefinitions.Last().Height = new GridLength(1);
+					OutputLogSpliter.IsEnabled = false;
+				}
+				else //show it
+				{
+					resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+					OutputLogSpliter.IsEnabled = true;
+				}
+
+			}
+		}
 	}
 }
 
