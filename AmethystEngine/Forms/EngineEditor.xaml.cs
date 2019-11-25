@@ -729,7 +729,9 @@ namespace AmethystEngine.Forms
 			//copy the file
 			File.Copy(importfilename, destfilename, true);
 			//LoadInitalVars();
+			var v = CurrentProjectTreeView.SelectedValuePath;
 			LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\")); //reload the project to show the new file.
+			CurrentProjectTreeView.SelectedValuePath = v;
 
 			ContentLibaryObjList.Add(new EditorObject(destfilename, importstartlocation.Substring(
 				importstartlocation.LastIndexOfAny(new char[] { '\\', '/' }) + 1, len - 1), true, EObjectType.File));
@@ -3926,6 +3928,239 @@ namespace AmethystEngine.Forms
 		/// <para/>
 		/// FALSE = ONLY ONE Content control will be drawn. Base UI is editable in size, and position. Children are editable via properties
 		/// </param>
+		public ContentControl DrawUIToScreen(Canvas CurrentEditorCanvas, Canvas CurrentEditorCanvas_Back, GameUI gameUI, bool bcomps, String DesiredImageName_CC)
+		{
+			//set the position and the size of the Base UI
+			ContentControl BaseUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+			ContentControl RetCC = null;
+
+			BaseUI.Width = Int32.Parse(gameUI.GetPropertyData("Width").ToString());
+			BaseUI.Height = Int32.Parse(gameUI.GetPropertyData("Height").ToString());
+			BaseUI.BorderBrush = (((bool)gameUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+			BaseUI.BorderThickness = new Thickness(0);
+			BaseUI.Tag = "Border";
+			BaseUI.Name = gameUI.UIName;
+			//};
+			BaseUI.Content = new Grid()
+			{
+				HorizontalAlignment = HorizontalAlignment.Stretch,
+				VerticalAlignment = VerticalAlignment.Stretch,
+			};
+			((Grid)BaseUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = (((bool)gameUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent) });
+
+			//get the middle!
+			Point mid = new Point(CurrentEditorCanvas_Back.ActualWidth / 2, CurrentEditorCanvas_Back.ActualHeight / 2);
+			//get the true center point. Since origin is top left.
+			mid.X -= BaseUI.Width / 2; mid.Y -= BaseUI.Height / 2;
+			Canvas.SetLeft(BaseUI, mid.X); Canvas.SetTop(BaseUI, mid.Y);
+
+			//which drawing type?
+			if (bcomps)
+			{
+				//create all the child UI elements as editable content controls
+				foreach (GameUI childUI in gameUI.UIElements)
+				{
+					#region DefaultProperties
+					//set the position and the size of the Base UI
+					ContentControl CUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+					CUI.Width = Int32.Parse(childUI.GetPropertyData("Width").ToString());
+					CUI.Height = Int32.Parse(childUI.GetPropertyData("Height").ToString());
+					CUI.BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+					CUI.BorderThickness = new Thickness(2);
+					CUI.Tag = "Border";
+					CUI.Name = childUI.UIName;
+
+					CUI.Content = new Grid()
+					{
+						HorizontalAlignment = HorizontalAlignment.Stretch,
+						VerticalAlignment = VerticalAlignment.Stretch,
+						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("Background").ToString()),
+						IsHitTestVisible = false,
+					};
+					((Grid)CUI.Content).Children.Add(new Border()
+					{
+						BorderThickness = (((bool)childUI.GetPropertyData("ShowBorder")) ? new Thickness(2) : new Thickness(0)),
+						BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent)
+					});
+					CUI.Name = childUI.UIName;
+					Canvas.SetLeft(CUI, mid.X + Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()));
+					Canvas.SetTop(CUI, mid.Y + Int32.Parse(childUI.GetPropertyData("YOffset").ToString()));
+					Canvas.SetZIndex(CUI, Int32.Parse(childUI.GetPropertyData("Zindex").ToString()));
+					CurrentEditorCanvas.Children.Add(CUI);
+					#endregion
+
+					if (childUI is GameTextBlock)
+					{
+						CUI.Tag = "TEXTBOX";
+						//My Game textboxes can have background images. so we need implement my frame logic.
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						((Grid)CUI.Content).ShowGridLines = true;
+						InitimagesTBGrid(((Grid)CUI.Content));
+						SetTBBackgroundImage(((Grid)CUI.Content), childUI.GetPropertyData("Image").ToString());
+						//
+						TextBox tb = new TextBox()
+						{
+							Text = childUI.GetPropertyData("ContentText").ToString(),
+							Margin = new Thickness(2),
+							BorderThickness = new Thickness(0),
+							IsHitTestVisible = false,
+							VerticalContentAlignment = VerticalAlignment.Center,
+							HorizontalContentAlignment = HorizontalAlignment.Center,
+							FontSize = Int32.Parse(childUI.GetPropertyData("FontSize").ToString()),
+							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("FontColor").ToString()),
+							Background = Brushes.Transparent
+						};
+						Grid.SetColumn(tb, 1); Grid.SetRow(tb, 1);
+						((Grid)CUI.Content).Children.Add(tb);
+
+					}
+					else if (childUI is GameIMG)
+					{
+						CUI.Tag = "IMAGE";
+
+						String TB = childUI.GetPropertyData("Image").ToString();
+						Image img = new Image();
+						img.Stretch = Stretch.Fill;
+						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+						img.IsHitTestVisible = false;
+						((Grid)CUI.Content).Children.Add(new Rectangle() { });
+						((Grid)CUI.Content).Children.Add(img);
+
+
+					}
+					else if (childUI is GameButton)
+					{
+
+					}
+
+					CurrentUIDictionary.Add(childUI.UIName, childUI);
+				}
+				CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
+
+			}
+			else //all as one
+			{
+				//create all the child UI elements as editable content controls
+				foreach (GameUI childUI in gameUI.UIElements)
+				{
+					#region DefaultProperties
+					//set the position and the size of the Base UI
+					ContentControl CUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+					CUI.Width = Int32.Parse(childUI.GetPropertyData("Width").ToString());
+					CUI.Height = Int32.Parse(childUI.GetPropertyData("Height").ToString());
+					CUI.BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+					CUI.BorderThickness = new Thickness(0);
+					CUI.Tag = "Border";
+					CUI.Name = childUI.UIName;
+
+					CUI.Content = new Grid()
+					{
+						HorizontalAlignment = HorizontalAlignment.Stretch,
+						VerticalAlignment = VerticalAlignment.Stretch,
+						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("Background").ToString()),
+						IsHitTestVisible = false,
+					};
+					((Grid)CUI.Content).Children.Add(new Border()
+					{
+						BorderThickness = new Thickness(0),//(((bool)childUI.GetProperty("ShowBorder")) ? new Thickness(2) : new Thickness(0)),
+						BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent),
+						IsHitTestVisible = false
+					});
+					CUI.Name = childUI.UIName;
+					#endregion
+
+					if (childUI is GameTextBlock)
+					{
+						CUI.Tag = "TEXTBOX";
+						//My Game textboxes can have background images. so we need implement my frame logic.
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						InitimagesTBGrid(((Grid)CUI.Content));
+						SetTBBackgroundImage(((Grid)CUI.Content), childUI.GetPropertyData("Image").ToString());
+						//
+						TextBox tb = new TextBox()
+						{
+							Text = childUI.GetPropertyData("ContentText").ToString(),
+							Margin = new Thickness(2),
+							BorderThickness = new Thickness(0),
+							IsHitTestVisible = false,
+							VerticalContentAlignment = VerticalAlignment.Center,
+							HorizontalContentAlignment = HorizontalAlignment.Center,
+							FontSize = Int32.Parse(childUI.GetPropertyData("FontSize").ToString()),
+							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("FontColor").ToString()),
+							Background = Brushes.Transparent
+						};
+						Grid.SetColumn(tb, 1); Grid.SetRow(tb, 1);
+						((Grid)CUI.Content).Children.Add(tb);
+						CUI.Margin = new Thickness()
+						{
+							Left = Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()),
+							Top = Int32.Parse(childUI.GetPropertyData("YOffset").ToString()),
+							//Bottom = BaseUI.Height - (Top + CUI.Height),
+							//Right = BaseUI.Width - (Left + CUI.Width)
+						};
+						CUI.IsHitTestVisible = false;
+						CUI.VerticalAlignment = VerticalAlignment.Top;
+						CUI.HorizontalAlignment = HorizontalAlignment.Left;
+						CUI.BorderThickness = new Thickness(0);
+						((Grid)BaseUI.Content).Children.Add(CUI);
+					}
+					else if (childUI is GameIMG)
+					{
+						CUI.Tag = "IMAGE";
+
+						String TB = childUI.GetPropertyData("Image").ToString();
+						Image img = new Image() { IsHitTestVisible = false };
+						img.Stretch = Stretch.Fill;
+						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+						img.IsHitTestVisible = false;
+						((Grid)CUI.Content).Children.Add(new Rectangle() { });
+						CUI.Margin = new Thickness()
+						{
+							Left = Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()),
+							Top = Int32.Parse(childUI.GetPropertyData("YOffset").ToString()),
+						};
+						CUI.IsHitTestVisible = false;
+						CUI.VerticalAlignment = VerticalAlignment.Top;
+						CUI.HorizontalAlignment = HorizontalAlignment.Left;
+						((Grid)CUI.Content).Children.Add(img);
+						((Grid)BaseUI.Content).Children.Add(CUI);
+
+						if (childUI.UIName == DesiredImageName_CC)
+							RetCC = CUI;
+					}
+					else if (childUI is GameButton)
+					{
+
+					}
+				}
+			}
+			SelectedBaseUIControl = BaseUI;
+			SelectedUI = OpenUIEdits.Last();
+			CurrentEditorCanvas.Children.Add(BaseUI);
+			return RetCC;
+		}
+
+		/// <summary>
+		/// method to draw a newly added/imported UI to the screen. Choose whether or not to breakdown the components for editing.
+		/// </summary>
+		/// <param name="CurrentEditorCanvas">Current Canvas that you will draw the UI too</param>
+		/// <param name="gameUI">The Custom created UI that you want to draw</param>
+		/// <param name="bcomps">TRUE = multiple ContentControls will be drawn, and allowed to be edited 
+		/// <para/>
+		/// FALSE = ONLY ONE Content control will be drawn. Base UI is editable in size, and position. Children are editable via properties
+		/// </param>
 		public void DrawUIToScreen(Canvas CurrentEditorCanvas, Canvas CurrentEditorCanvas_Back, GameUI gameUI, bool bcomps)
 		{
 			//set the position and the size of the Base UI
@@ -4155,6 +4390,9 @@ namespace AmethystEngine.Forms
 			AllDialogueEditor_Grid.Visibility = Visibility.Visible;
 			DialogueEditor_Timeline.TimeBlockSync = DialogueHook;
 			DialogueEditor_Timeline.SelectionChanged_Hook = ShowTimelineSelectedProperties;
+			DialogueEditor_Timeline.Reset_Hook += ResetExecution_Hook;
+			DialogueEditor_NodeGraph.CurrentErrors.CollectionChanged += NodeEditorCurrentErrorsOnCollectionChanged;
+
 
 			CurActiveDialogueScene = new DialogueScene("Dialogue1");
 			ActiveDialogueScenes.Add(CurActiveDialogueScene);
@@ -4163,6 +4401,13 @@ namespace AmethystEngine.Forms
 			DialogueEditor_Timeline.OnCreateTimeblockHook += CreateDialogueBlockForTimeline;
 			//DialogueEditor_Timeline.ItemsSource = new List<String>();
 
+		}
+
+		private void ResetExecution_Hook()
+		{
+			DialogueEditor_NodeGraph.ResetExecution();
+			DialogueEditor_NodeGraph.EndblockExecution();
+			DialogueEditor_NodeGraph.StartBlockExecution();
 		}
 
 		/// <summary>
@@ -4179,63 +4424,74 @@ namespace AmethystEngine.Forms
 			if (sender is null) return;
 			else if(sender is TimeBlock)
 			{
-				PropertyBag PBag = new PropertyBag(sender);
+				PropertyBag timeblockPropertyBag = new PropertyBag(sender);
+				timeblockPropertyBag.Name = "Time Block Properties";
+				PropertyBag dialoguePropertyBag = new PropertyBag(sender);
+				dialoguePropertyBag.Name = "Dialogue Data";
 				TimeBlock TimeB = sender as TimeBlock;
 
 				if (PropertyBags.Count > 0)
 				{
-					if (sender != ((PropertyBag)PropertyBags[0]).Parent)
-					{ //if something else is displayed don't clear it
-						PropertyBags.Clear(); //clear the current property displayed
-						PropertyBags.Add(PBag);
-					}
-					else
-					{
-						PBag = (PropertyBag)PropertyBags[0];
-						///PBag.Properties.Clear();
-
-						PBag.Properties[0] = (new Tuple<string, object, Control>("Type", "Time Block", new TextBox() { IsEnabled = false }));
-						PBag.Properties[1] = (new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), new TextBox()));
-						PBag.Properties[2] = (new Tuple<string, object, Control>("End Time", TimeB.EndTime.ToString(), new TextBox()));
-						PBag.Properties[3] = (new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), new TextBox()));
-
-						return;
-					}
+					PropertyBags.Clear(); //clear the current property displayed
+					PropertyBags.Add(timeblockPropertyBag);
+					PropertyBags.Add(dialoguePropertyBag);
 				}
-				else PropertyBags.Add(PBag);
-
-
-				PBag.Properties.Add(new Tuple<string, object, Control>("Type", "Time Block", new TextBox() { IsEnabled = false }));
-				PBag.Properties.Add(new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), new TextBox()));
-				PBag.Properties.Add(new Tuple<string, object, Control>("End Time", TimeB.EndTime.ToString(), new TextBox()));
-				PBag.Properties.Add(new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), new TextBox()));
-
-				ComboBox CB = new ComboBox() { Height = 50, ItemTemplate = (DataTemplate)this.Resources["CBIMGItems"] };
-				CB.SelectionChanged += SetSpriteImagePath_Dia;
-				List<EditorObject> ComboItems = new List<EditorObject>();
-				foreach (Sprite filepath in CurActiveDialogueScene.Characters[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)sender).TimelineParent)].DialogueSprites)
+				else
 				{
-					ComboItems.Add(new EditorObject(filepath.ImgPathLocation, filepath.ImgPathLocation.Substring(filepath.ImgPathLocation.LastIndexOfAny(new char[] { '\\', '/' })), false));
+					PropertyBags.Add(timeblockPropertyBag);
+					PropertyBags.Add(dialoguePropertyBag);
 				}
-				CB.ItemsSource = ComboItems;
 
-				PBag.Properties.Add(new Tuple<string, object, Control>("Sprite Image", new List<String>(), CB));
-				TextBox tb = new TextBox(); tb.KeyDown += SetDialogueText;
-				PBag.Properties.Add(new Tuple<string, object, Control>("Dialogue Text", TimeB.CurrentDialogue.ToString(), tb));
+				
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Type", "Time Block", new TextBox() { IsEnabled = false }));
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), new TextBox()));
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("End Time", TimeB.EndTime.ToString(), new TextBox()));
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), new TextBox()));
 
-				ComboBox CB1 = new ComboBox() { Height = 50 };
-				CB1.SelectionChanged += SetLinkedTBName;
-				List<String> ComboItems1 = new List<String>();
-				foreach (GameUI Gameui in CurActiveDialogueScene.DialogueBoxes[DialogueEditor_Timeline.GetTimelinePosition(TimeB.TimelineParent)].UIElements)
+				int i = 0;
+				foreach (String s in (TimeB.LinkedDialogueBlock as DialogueNodeBlock)?.DialogueData)
 				{
-					if(Gameui is GameTextBlock)
+					ComboBox CB = new ComboBox() {Height = 50, ItemTemplate = (DataTemplate) this.Resources["CBIMGItems"]};
+					CB.SelectionChanged += SetSpriteImagePath_Dia;
+					List<EditorObject> ComboItems = new List<EditorObject>();
+					foreach (Sprite filepath in CurActiveDialogueScene
+						.Characters[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock) sender).TimelineParent)]
+						.DialogueSprites)
 					{
-						ComboItems1.Add(Gameui.UIName);
+						ComboItems.Add(new EditorObject(filepath.ImgPathLocation,
+							filepath.ImgPathLocation.Substring(filepath.ImgPathLocation.LastIndexOfAny(new char[] {'\\', '/'})),
+							false));
 					}
-				}
-				CB1.ItemsSource = ComboItems1;
-				PBag.Properties.Add(new Tuple<string, object, Control>("Linked TextBox", new List<String>(), CB1));
 
+					CB.ItemsSource = ComboItems;
+					int index = Array.FindIndex(ComboItems.ToArray(), x => x.Thumbnail.AbsolutePath == TimeB.TrackSpritePath);
+					if(index >= 0) CB.SelectedIndex = index;
+
+					dialoguePropertyBag.Properties.Add(
+						new Tuple<string, object, Control>("Sprite Image "+i, new List<String>(), CB));
+					TextBox tb = new TextBox();
+					tb.KeyDown += SetDialogueText;
+					dialoguePropertyBag.Properties.Add(new Tuple<string, object, Control>("Dialogue Text "+i,
+						s, tb));
+
+					ComboBox CB1 = new ComboBox() {Height = 50};
+					CB1.SelectionChanged += SetLinkedTBName;
+					List<String> ComboItems1 = new List<String>();
+					foreach (GameUI Gameui in CurActiveDialogueScene
+						.DialogueBoxes[DialogueEditor_Timeline.GetTimelinePosition(TimeB.TimelineParent)].UIElements)
+					{
+						if (Gameui is GameTextBlock)
+						{
+							ComboItems1.Add(Gameui.UIName);
+						}
+					}
+					index = Array.FindIndex(ComboItems1.ToArray(), x => x == TimeB.LinkedTextBoxName);
+					if (index >= 0) CB1.SelectedIndex = index;
+
+					CB1.ItemsSource = ComboItems1;
+					dialoguePropertyBag.Properties.Add(new Tuple<string, object, Control>("Linked TextBox "+i, new List<String>(), CB1));
+					i++;
+				}
 			}
 			else if(sender is Timeline)
 			{
@@ -4263,7 +4519,11 @@ namespace AmethystEngine.Forms
 		{
 			if (e.Key == Key.Enter)
 			{
-				((TimeBlock)DialogueEditor_Timeline.SelectedControl).CurrentDialogue = ((TextBox)sender).Text;
+				(((TimeBlock) DialogueEditor_Timeline.SelectedControl).LinkedDialogueBlock as DialogueNodeBlock)
+					.DialogueData[Grid.GetRow(sender as TextBox)/3] = ((TextBox)sender).Text;
+				((TimeBlock) DialogueEditor_Timeline.SelectedControl).CurrentDialogue =
+					(((TimeBlock) DialogueEditor_Timeline.SelectedControl).LinkedDialogueBlock as DialogueNodeBlock)
+					.DialogueData[0];
 			}
 		}
 
@@ -4312,65 +4572,58 @@ namespace AmethystEngine.Forms
 		/// This method right now will add a sprite, that is can be linked to change, and a UI object to the screen.
 		/// </summary>
 		/// <param name="c"></param>
-		public void AddCharacterHook(Character c)
+		public void AddCharacterHook(Character c, GameUI gameUi, String LinkedTextboxName, String LinkedDialogueImage_Text = null)
 		{
 			CurActiveDialogueScene.Characters.Add(c);
 			DialogueEditor_Timeline.AddTimeline(c.Name);
 
-			//add moveable scaleable sprite control.
-			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
-			CC.HorizontalAlignment = HorizontalAlignment.Center;
-			CC.VerticalAlignment = VerticalAlignment.Center;
-			Canvas.SetZIndex(CC, 1);
-
-			CC.Tag = "IMAGE";
-
-
-			String TB = "/AmethystEngine;component/images/emma_colors_oc.png";
-			ImageBrush ib = new ImageBrush();
-			Image img = new Image();
-			img.Stretch = Stretch.Fill;
-			img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
-			img.IsHitTestVisible = false;
-			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, IsHitTestVisible = false });
-			((Grid)CC.Content).Children.Add(new Rectangle() { });
-			((Grid)CC.Content).Children.Add(img);
-
-			DialogueEditore_Canvas.Children.Add(CC);
-			CurActiveDialogueScene.CharacterSprites.Add(
-				new Sprite(img.Source.ToString(), img.Source.ToString(), 0, 0, (int)img.ActualWidth, (int)ActualHeight)
-				);
-
-			//add GameUI control.
-			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+			if (LinkedDialogueImage_Text == null)
 			{
-				Title = "Open UI File",
-				FileName = "", //default file name
-				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\UI"),
-				Filter = "UI files (*.ui)|*.ui|All files (*.*)|*.*",
-				FilterIndex = 2,
-				RestoreDirectory = true
-			};
+				//add moveable scaleable sprite control.
+				ContentControl CC = ((ContentControl) this.TryFindResource("MoveableControls_Template"));
+				CC.HorizontalAlignment = HorizontalAlignment.Center;
+				CC.VerticalAlignment = VerticalAlignment.Center;
+				Canvas.SetZIndex(CC, 1);
 
-			Nullable<bool> result = dlg.ShowDialog();
-			// Process save file dialog box results
-			string filename = "";
-			if (result == true)
-			{
-				// Save document
-				filename = dlg.FileName;
-				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+				CC.Tag = "IMAGE";
+
+				String TB = "/AmethystEngine;component/images/emma_colors_oc.png";
+				ImageBrush ib = new ImageBrush();
+				Image img = new Image();
+				img.Stretch = Stretch.Fill;
+				img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+				img.IsHitTestVisible = false;
+				((Grid) CC.Content).Children.Add(new Border()
+					{BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, IsHitTestVisible = false});
+				((Grid) CC.Content).Children.Add(new Rectangle() { });
+				((Grid) CC.Content).Children.Add(img);
+
+				DialogueEditore_Canvas.Children.Add(CC);
+				CurActiveDialogueScene.CharacterSprites.Add(
+					new Sprite(img.Source.ToString(), img.Source.ToString(), 0, 0, (int) img.ActualWidth, (int) ActualHeight));
+
+				OpenUIEdits.Add(gameUi);
+				DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false);
+				CurActiveDialogueScene.DialogueBoxes.Add(OpenUIEdits.Last());
+
+				//create the pointers to the content controls. which is what displays my images to the screen
+				CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
 			}
-			else return; //invalid name
-			Console.WriteLine(dlg.FileName);
+			else
+			{
+				OpenUIEdits.Add(gameUi);
+				ContentControl CC= DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false, LinkedDialogueImage_Text);
+				Image img = (CC.Content as Grid).Children[2] as Image;
 
-			GameUI g = GameUI.ImportGameUI(dlg.FileName);
-			OpenUIEdits.Add(g);
-			DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false);
-			CurActiveDialogueScene.DialogueBoxes.Add(OpenUIEdits.Last());
+				CurActiveDialogueScene.CharacterSprites.Add(
+					new Sprite(img.Source.ToString(), img.Source.ToString(), 0, 0, (int)img.ActualWidth, (int)ActualHeight));
 
-			//create the pointers to the content controls. which is what displays my images to the screen
-			CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
+				
+				CurActiveDialogueScene.DialogueBoxes.Add(OpenUIEdits.Last());
+
+				//create the pointers to the content controls. which is what displays my images to the screen
+				CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
+			}
 
 		}
 
@@ -4409,7 +4662,7 @@ namespace AmethystEngine.Forms
 			//CurActiveDialogueScene.Characters.Add(new Character() { Name = "Antonio" });
 
 			Character c = new Character();
-			Window w = new AddCharacterForm() { AddToScene = AddCharacterHook};
+			Window w = new AddCharacterForm(ProjectFilePath) { AddToScene = AddCharacterHook};
 			w.ShowDialog();
 
 			//CurActiveDialogueScene.Characters.Add(c);
@@ -4424,6 +4677,13 @@ namespace AmethystEngine.Forms
 		/// <param name="e"></param>
 		private void ActiveTBblocks_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
+			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+			{
+				DialogueEditor_NodeGraph.EndblockExecution();
+				if (DialogueEditor_NodeGraph.CurrentExecutionBlock is NodeEditor.ExitBlockNode)
+					DialogueEditor_NodeGraph.EndblockExecution();
+			}
+
 			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
 			{
 				if (e.NewItems == null && !File.Exists(((TimeBlock)e.NewItems[0]).TrackSpritePath)) return;
@@ -4441,9 +4701,14 @@ namespace AmethystEngine.Forms
 					Console.WriteLine("INVAILD URI. The sprite image wasn't set");
 					EngineOutputLog.AddErrorLogItem(-1, "Timeblocks sprite image wasn't set.", "DialogueEditor", false);
 					EngineOutputLog.AddLogItem("Timeblock failed on activated. See Error Log for more details");
-					if(resizeGrid.RowDefinitions.Last().Height.Value < 100)
+					if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
 						resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
 					OutputLogSpliter.IsEnabled = true;
+					DialogueEditor_Timeline.PauseTimeline();
+					return;
+				}
+				catch
+				{
 					return;
 				}
 
@@ -4464,6 +4729,7 @@ namespace AmethystEngine.Forms
 					if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
 						resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
 					OutputLogSpliter.IsEnabled = true;
+					DialogueEditor_Timeline.PauseTimeline();
 					return;
 				}
 
@@ -4488,12 +4754,57 @@ namespace AmethystEngine.Forms
 						((TextBox)c).Text = gtb.GetPropertyData("ContentText").ToString();
 					}
 				}
-					//gtb.GetProperty("CurrentDialogue").ToString();
+				//gtb.GetProperty("CurrentDialogue").ToString();
+
+				//we need imcrement our node editor pointers
+				if (DialogueEditor_NodeGraph.StartBlockExecution())
+				{
+					if (DialogueEditor_NodeGraph.ExecuteBlock())
+					{
+					}
+					else
+					{
+						if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
+							resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+						OutputLogSpliter.IsEnabled = true;
+						DialogueEditor_Timeline.PauseTimeline();
+					}
+				}
+				else
+				{
+					if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
+						resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+					OutputLogSpliter.IsEnabled = true;
+					DialogueEditor_Timeline.PauseTimeline();
+				}
 
 			}
 			else
 			{
 				Console.WriteLine("Removed Active Time block");
+			}
+		}
+
+		private void NodeEditorCurrentErrorsOnCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			foreach (Exception ex in e.NewItems)
+			{
+				if (ex.Message == "Dialogue Scene Completed!")
+				{
+					EngineOutputLog.AddLogItem("Dialogue Scene Completed! :D");
+					EngineOutputLog.AddErrorLogItem(0, ex.Message, "BlockNodeEditor", false);
+				}
+				else if (ex.Message.Contains("Updated Runtime Var"))
+				{
+					EngineOutputLog.AddLogItem("Updated Global Runtime Var");
+					EngineOutputLog.AddErrorLogItem(0, ex.Message, "BlockNodeEditor", true);
+				}
+				else
+				{
+					EngineOutputLog.AddErrorLogItem(-1, ex.Message, "BlockNodeEditor", false);
+					EngineOutputLog.AddLogItem("Dialogue Error Found! Check Error Log for details.");
+
+				}
 			}
 		}
 

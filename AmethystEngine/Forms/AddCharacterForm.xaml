@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AmethystEngine.Forms"
         mc:Ignorable="d"
 				Background="#FF0E0D0D"
-        Title="Add Character to Dialogue Scene" Height="450" Width="800" AllowsTransparency="True" WindowStyle="None">
+        Title="Add Character to Dialogue Scene" Height="600" Width="800" AllowsTransparency="True" WindowStyle="None">
 
 	<Window.Resources>
 
@@ -29,6 +29,17 @@
 			</Border>
 		</DataTemplate>
 
+
+
+		<ContentControl x:Key="MoveableControls_Template"
+		                x:Shared="False" 
+										Canvas.Left="0"
+										Canvas.Top="0"
+		                Style="{DynamicResource DesignerItemStyle}"  >
+			<Grid x:Name="ResizeControl_Grid" IsHitTestVisible="True" >
+			</Grid>
+		</ContentControl>
+
 	</Window.Resources>
 
 	<Grid x:Name="MainGrid">
@@ -36,6 +47,7 @@
 			<RowDefinition Height="30"/>
 			<RowDefinition Height="30"/>
 			<RowDefinition Height="0" />
+			<RowDefinition Height="*" />
 			<RowDefinition Height="*" />
 			<RowDefinition Height="30"/>
 		</Grid.RowDefinitions>
@@ -61,6 +73,7 @@
 				<Label Content="Amethyst Engine"  Padding="40,7,0,0" Foreground="White" Grid.Column="0"/>
 
 				<Label x:Name="ProjectName_LBL" Content="Add a Character to the Dialogue Scene" Foreground="White" Grid.Column="7" HorizontalAlignment="Center"/>
+				<Button Content="X" Background="Transparent" BorderBrush="Transparent" Foreground="White" HorizontalAlignment="Center" Grid.Column="11" Width="20" Click="LBind_close" />
 			</Grid>
 		</Grid>
 
@@ -87,8 +100,37 @@
 			</ListBox.ItemsPanel>
 		</ListBox>
 
+		<GridSplitter Grid.Row="4" HorizontalAlignment="Stretch" VerticalAlignment="Top" IsEnabled="False" Height="5" Background="#FF484848"></GridSplitter>
+		<TextBlock Grid.Row="4" Foreground="White" Text="import a game UI control that this character will use to display text!" Margin="10,6,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBlock>
+		<Button Content="Import" Grid.Row="4" Height="20" Width="75" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="370,6,0,0" Click="ImportGameUI_BTN_Click"></Button>
+		<Canvas Grid.Row="4" x:Name="Back_PreivewUI_Grid" Margin="0,27,200,0">
+			<Canvas.Background>
+				<VisualBrush x:Name="Canvas_grid" TileMode="Tile" Stretch="Uniform" Viewport="0,0,20,20" ViewportUnits="Absolute" >
+					<VisualBrush.Visual>
+						<Rectangle Width="20" Height="20" Fill="Black" Stroke="Gray" StrokeThickness=".4" />
+					</VisualBrush.Visual>
+				</VisualBrush>
+			</Canvas.Background>
+			<Canvas x:Name="PreivewUI_Grid" Grid.Row="4" >
+			</Canvas>
+		</Canvas>
 		<!--confirm button-->
-		<Button x:Name="Confirm_BTN" Grid.Row="4" Content=" CONFIRM" Background="#FF383838" Foreground="White" BorderBrush="Transparent" Margin="5" Click="Confirm_BTN_Click" />
+		<Button x:Name="Confirm_BTN" Grid.Row="5" Content=" CONFIRM" Background="#FF383838" Foreground="White" BorderBrush="Transparent" Margin="5" Click="Confirm_BTN_Click" />
+
+		<TextBlock Grid.Row="4" Text="Linking:" Foreground="White" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="659,6,0,0"/>
+		<TextBlock Grid.Row="4" Text="What Text box will be used for Changing Dialogue?:" TextWrapping="Wrap" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="604,35,0,0" Height="34" Width="196"/>
+
+		<TextBlock Grid.Row="4" Text="Hint: This is highlighted in Orange!" TextWrapping="Wrap" FontSize="8" FontStyle="Italic" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="605,93,-1,0" Height="12" Width="196"/>
+		<ComboBox Grid.Row="4" x:Name="LinkedTextboxesChoice_CB" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="604,69,0,0" Width="191" SelectionChanged="LinkedTextboxesChoice_CB_SelectionChanged"/>
+
+		<TextBlock Grid.Row="4" Text="What Image box will be used for Image changes?:" TextWrapping="Wrap" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="605,105,-1,0" Height="34" Width="196"/>
+		<ComboBox Grid.Row="4" x:Name="LinkedImageBoxesChoice_CB" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="605,141,0,0" Width="190" SelectionChanged="LinkedImageBoxesChoice_CB_SelectionChanged"/>
+		<TextBlock Grid.Row="4" Text="Hint: This is highlighted in Blue!" TextWrapping="Wrap" FontSize="8" FontStyle="Italic" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="605,167,-1,0" Height="12" Width="196"/>
+
+		<TextBlock Grid.Row="4" Text="Log:" Foreground="White" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="678,179,0,0" RenderTransformOrigin="0.544,3.648"/>
+
+		<TextBlock x:Name="OutputLog_TB" Grid.Row="4" HorizontalAlignment="Left"  TextWrapping="Wrap" VerticalAlignment="Top" Height="49" Width="190" Background="#FF272727" Foreground="OrangeRed" Margin="605,206,0,0"/>
+
 
 	</Grid>
 </Window>

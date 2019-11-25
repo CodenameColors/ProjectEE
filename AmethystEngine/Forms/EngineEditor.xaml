@@ -923,7 +923,7 @@
 
 						<Grid.RowDefinitions>
 							<RowDefinition Height="4*"/>
-							<RowDefinition Height=".5*"/>
+							<RowDefinition Height="30"/>
 							<RowDefinition Height="4*"/>
 						</Grid.RowDefinitions>
 
@@ -1004,6 +1004,8 @@
 
 			<Label x:Name="label1" Content="Content Explorer" Grid.Column="1" HorizontalAlignment="Left" Margin="41,0,0,0" VerticalAlignment="Top" Foreground="White"/>
 			<Button x:Name="ContentExplorerImport_BTN"  Content="Import" Grid.Column="1" HorizontalAlignment="Right" Width="50" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373" Click="ContentExplorerImport_BTN_Click"/>
+			<Button x:Name="ContentExplorerNewFolder_BTN"  Content="New Folder" Grid.Column="1" HorizontalAlignment="Right" Width="65" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373" Click="ContentExplorerImport_BTN_Click" Margin="0,0,103,0"/>
+			<Button x:Name="ContentExplorerNewFile_BTN"  Content="New File" Grid.Column="1" HorizontalAlignment="Right" Width="53" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373" Click="ContentExplorerImport_BTN_Click" Margin="0,0,50,0"/>
 
 
 			<GridSplitter x:Name="Cont_Scene_GS" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="3" Background="#FF868686"/>

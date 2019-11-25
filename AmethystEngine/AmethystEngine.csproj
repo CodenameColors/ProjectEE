@@ -39,6 +39,9 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CollapsedPropertyGrid">
       <HintPath>Resources\CollapsedPropertyGrid.dll</HintPath>
@@ -239,7 +242,9 @@
       <Name>BixBite</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="favicon.ico" />
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\ErrorDocs\List of ErrorCodes.txt" />
   </ItemGroup>
