@@ -4390,6 +4390,7 @@ namespace AmethystEngine.Forms
 			AllDialogueEditor_Grid.Visibility = Visibility.Visible;
 			DialogueEditor_Timeline.TimeBlockSync = DialogueHook;
 			DialogueEditor_Timeline.SelectionChanged_Hook = ShowTimelineSelectedProperties;
+			DialogueEditor_NodeGraph.SelectionChanged_Hook = ShowTimelineSelectedProperties;
 			DialogueEditor_Timeline.Reset_Hook += ResetExecution_Hook;
 			DialogueEditor_NodeGraph.CurrentErrors.CollectionChanged += NodeEditorCurrentErrorsOnCollectionChanged;
 
@@ -4493,9 +4494,79 @@ namespace AmethystEngine.Forms
 					i++;
 				}
 			}
+			else if(sender is DialogueNodeBlock dialogueNodeBlock)
+			{
+				PropertyBag timeblockPropertyBag = new PropertyBag(sender);
+				timeblockPropertyBag.Name = "Time Block Properties";
+				PropertyBag dialoguePropertyBag = new PropertyBag(sender);
+				dialoguePropertyBag.Name = "Dialogue Data";
+
+				TimeBlock TimeB = dialogueNodeBlock.LinkedTimeBlock as TimeBlock;
+				if (TimeB == null) throw new NotImplementedException("The Linked TextBox has NOT been set!");
+
+				if (PropertyBags.Count > 0)
+				{
+					PropertyBags.Clear(); //clear the current property displayed
+					PropertyBags.Add(timeblockPropertyBag);
+					PropertyBags.Add(dialoguePropertyBag);
+				}
+				else
+				{
+					PropertyBags.Add(timeblockPropertyBag);
+					PropertyBags.Add(dialoguePropertyBag);
+				}
+
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Type", "Time Block", new TextBox() { IsEnabled = false }));
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), new TextBox()));
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("End Time", TimeB.EndTime.ToString(), new TextBox()));
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), new TextBox()));
+
+				int i = 0;
+				foreach (String s in dialogueNodeBlock.DialogueData)
+				{
+					ComboBox CB = new ComboBox() { Height = 50, ItemTemplate = (DataTemplate)this.Resources["CBIMGItems"] };
+					CB.SelectionChanged += SetSpriteImagePath_Dia;
+					List<EditorObject> ComboItems = new List<EditorObject>();
+					foreach (Sprite filepath in CurActiveDialogueScene.Characters[DialogueEditor_Timeline.GetTimelinePosition(null, TimeB)].DialogueSprites)
+					{
+						ComboItems.Add(new EditorObject(filepath.ImgPathLocation,
+							filepath.ImgPathLocation.Substring(filepath.ImgPathLocation.LastIndexOfAny(new char[] { '\\', '/' })),
+							false));
+					}
+
+					CB.ItemsSource = ComboItems;
+					int index = Array.FindIndex(ComboItems.ToArray(), x => x.Thumbnail.AbsolutePath == TimeB.TrackSpritePath);
+					if (index >= 0) CB.SelectedIndex = index;
+
+					dialoguePropertyBag.Properties.Add(
+						new Tuple<string, object, Control>("Sprite Image " + i, new List<String>(), CB));
+					TextBox tb = new TextBox();
+					tb.KeyDown += SetDialogueText;
+					dialoguePropertyBag.Properties.Add(new Tuple<string, object, Control>("Dialogue Text " + i,
+						s, tb));
+
+					ComboBox CB1 = new ComboBox() { Height = 50 };
+					CB1.SelectionChanged += SetLinkedTBName;
+					List<String> ComboItems1 = new List<String>();
+					foreach (GameUI Gameui in CurActiveDialogueScene
+						.DialogueBoxes[DialogueEditor_Timeline.GetTimelinePosition(TimeB.TimelineParent)].UIElements)
+					{
+						if (Gameui is GameTextBlock)
+						{
+							ComboItems1.Add(Gameui.UIName);
+						}
+					}
+					index = Array.FindIndex(ComboItems1.ToArray(), x => x == TimeB.LinkedTextBoxName);
+					if (index >= 0) CB1.SelectedIndex = index;
+
+					CB1.ItemsSource = ComboItems1;
+					dialoguePropertyBag.Properties.Add(new Tuple<string, object, Control>("Linked TextBox " + i, new List<String>(), CB1));
+					i++;
+				}
+			}
 			else if(sender is Timeline)
 			{
-				
+				PropertyBags.Clear(); //clear the current property displayed
 			}
 		}
 
@@ -4540,9 +4611,10 @@ namespace AmethystEngine.Forms
 				((TimeBlock)DialogueEditor_Timeline.SelectedControl).TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
 				((TimeBlock)DialogueEditor_Timeline.SelectedControl).Trackname = (((EditorObject)((ComboBox)sender).SelectedValue).Name);
 			}
-			else if (DialogueEditor_Timeline.SelectedControl is Timeline)
+			else if (DialogueEditor_Timeline.SelectedControl is Timeline timeline)
 			{
-				throw new NotImplementedException("The uer has somehow wanted to change the timeline sprite header image.");
+				//timeline.
+				//throw new NotImplementedException("The uer has somehow wanted to change the timeline sprite header image.");
 			}
 		}
 
@@ -4681,7 +4753,15 @@ namespace AmethystEngine.Forms
 			{
 				DialogueEditor_NodeGraph.EndblockExecution();
 				if (DialogueEditor_NodeGraph.CurrentExecutionBlock is NodeEditor.ExitBlockNode)
+				{
 					DialogueEditor_NodeGraph.EndblockExecution();
+					DialogueEditor_Timeline.PauseTimeline();
+				}
+				if (e.OldItems[0] is ChoiceTimeBlock choice)
+				{
+					//TODO: DISPLAY CHOICES LATER
+					DialogueEditor_Timeline.PauseTimeline();
+				}
 			}
 
 			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
@@ -4689,86 +4769,116 @@ namespace AmethystEngine.Forms
 				if (e.NewItems == null && !File.Exists(((TimeBlock)e.NewItems[0]).TrackSpritePath)) return;
 				//changing the Image on the screen Sprite dialogue
 				Console.WriteLine("Added Active Time Block");
-				try
-				{
-					((Image) ((Grid) CurSceneCharacterDisplays[
-								DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock) e.NewItems[0]).TimelineParent)].Item1.Content)
-							.Children[2]).Source =
-						new BitmapImage(new Uri(((TimeBlock) e.NewItems[0]).TrackSpritePath, UriKind.Absolute));
-				}
-				catch (UriFormatException uri)
-				{
-					Console.WriteLine("INVAILD URI. The sprite image wasn't set");
-					EngineOutputLog.AddErrorLogItem(-1, "Timeblocks sprite image wasn't set.", "DialogueEditor", false);
-					EngineOutputLog.AddLogItem("Timeblock failed on activated. See Error Log for more details");
-					if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
-						resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
-					OutputLogSpliter.IsEnabled = true;
-					DialogueEditor_Timeline.PauseTimeline();
-					return;
-				}
-				catch
-				{
-					return;
-				}
+				if (e.NewItems[0] is ChoiceTimeBlock choiceTimeBlock)
+				{//this means we need to display the choices to the user.
 
-				//here we change the dialogue text itself
-
-				GameUI gtb = null;
-				try
-				{
-					gtb = CurActiveDialogueScene
-						.DialogueBoxes[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock) e.NewItems[0]).TimelineParent)]
-						.UIElements.Single(m => m.UIName == ((TimeBlock) e.NewItems[0]).LinkedTextBoxName);
-				}
-				catch (InvalidOperationException ioe)
-				{
-					Console.WriteLine("The Linked Textbox wasn't set!");
-					EngineOutputLog.AddErrorLogItem(-2, "Timeblocks linked textbox wasn't set.", "DialogueEditor", false);
-					EngineOutputLog.AddLogItem("Timeblock failed on activated. See Error Log for more details");
-					if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
-						resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
-					OutputLogSpliter.IsEnabled = true;
-					DialogueEditor_Timeline.PauseTimeline();
-					return;
-				}
-
-				gtb.SetProperty("ContentText", ((((TimeBlock)e.NewItems[0]).LinkedDialogueBlock)as DialogueNodeBlock).DialogueData[0] );
-
-				UIElementCollection uie = ((Grid)CurSceneCharacterDisplays[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)].Item2.Content).Children;
-				ContentControl CC = null;
-				foreach(UIElement ccc in uie)
-				{
-					if (!(ccc is ContentControl)) continue;
-					if(((ContentControl)ccc).Name == ((TimeBlock)e.NewItems[0]).LinkedTextBoxName)
+					//first hide the current UI controls.
+					for (int i = 0; i < CurSceneCharacterDisplays.Count; i++)
 					{
-						CC = ((ContentControl)ccc);
+						CurSceneCharacterDisplays[i].Item1.Visibility = Visibility.Hidden;
+						CurSceneCharacterDisplays[i].Item2.Visibility = Visibility.Hidden;
+						Selector.SetIsSelected(CurSceneCharacterDisplays[i].Item2, false);
 					}
-				}
-				if (CC == null) return;
-				Grid g = (Grid)CC.Content;
-				foreach(UIElement c in g.Children)
-				{
-					if(c is TextBox)
-					{
-						((TextBox)c).Text = gtb.GetPropertyData("ContentText").ToString();
-					}
-				}
-				//gtb.GetProperty("CurrentDialogue").ToString();
 
-				//we need imcrement our node editor pointers
-				if (DialogueEditor_NodeGraph.StartBlockExecution())
-				{
-					if (DialogueEditor_NodeGraph.ExecuteBlock())
+					//FOR NOW display a list box of the options the user will choose from.
+					//TODO: change this to the GamelistBox after this is created
+					ListBox lb = new ListBox();
+					lb.VerticalAlignment = VerticalAlignment.Bottom;
+					lb.HorizontalAlignment = HorizontalAlignment.Stretch;
+					foreach(String datachoices in (choiceTimeBlock.LinkedDialogueBlock as DialogueNodeBlock).DialogueData)
 					{
+						lb.Items.Add(datachoices);
 					}
-					else
+					lb.SelectionChanged += UserChooseDialogueChoice;
+					DialogueEditor_Grid.Children.Add(lb);
+
+					//give the list box a onselectionchanged event.
+					//this event should CHANGE/LOAD in the new LinkedTimeblocks from the nodegraphs Dialogueblocks
+					//this should continue UNTIl an exit block is found
+					//THEN resume playing.
+				}
+				else
+				{
+					try
 					{
+						((Image)((Grid)CurSceneCharacterDisplays[
+									DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)].Item1.Content)
+								.Children[2]).Source =
+							new BitmapImage(new Uri(((TimeBlock)e.NewItems[0]).TrackSpritePath, UriKind.Absolute));
+					}
+					catch (UriFormatException uri)
+					{
+						Console.WriteLine("INVAILD URI. The sprite image wasn't set");
+						EngineOutputLog.AddErrorLogItem(-1, "Timeblocks sprite image wasn't set.", "DialogueEditor", false);
+						EngineOutputLog.AddLogItem("Timeblock failed on activated. See Error Log for more details");
 						if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
 							resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
 						OutputLogSpliter.IsEnabled = true;
 						DialogueEditor_Timeline.PauseTimeline();
+						return;
 					}
+					catch
+					{
+						return;
+					}
+
+					//here we change the dialogue text itself
+
+					GameUI gtb = null;
+					try
+					{
+						gtb = CurActiveDialogueScene
+							.DialogueBoxes[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)]
+							.UIElements.Single(m => m.UIName == ((TimeBlock)e.NewItems[0]).LinkedTextBoxName);
+					}
+					catch (InvalidOperationException ioe)
+					{
+						Console.WriteLine("The Linked Textbox wasn't set!");
+						EngineOutputLog.AddErrorLogItem(-2, "Timeblocks linked textbox wasn't set.", "DialogueEditor", false);
+						EngineOutputLog.AddLogItem("Timeblock failed on activated. See Error Log for more details");
+						if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
+							resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+						OutputLogSpliter.IsEnabled = true;
+						DialogueEditor_Timeline.PauseTimeline();
+						return;
+					}
+
+					gtb.SetProperty("ContentText", ((((TimeBlock)e.NewItems[0]).LinkedDialogueBlock) as DialogueNodeBlock).DialogueData[0]);
+
+					UIElementCollection uie = ((Grid)CurSceneCharacterDisplays[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)].Item2.Content).Children;
+					ContentControl CC = null;
+					foreach (UIElement ccc in uie)
+					{
+						if (!(ccc is ContentControl)) continue;
+						if (((ContentControl)ccc).Name == ((TimeBlock)e.NewItems[0]).LinkedTextBoxName)
+						{
+							CC = ((ContentControl)ccc);
+						}
+					}
+					if (CC == null) return;
+					Grid g = (Grid)CC.Content;
+					foreach (UIElement c in g.Children)
+					{
+						if (c is TextBox)
+						{
+							((TextBox)c).Text = gtb.GetPropertyData("ContentText").ToString();
+						}
+					}
+					//gtb.GetProperty("CurrentDialogue").ToString();
+
+					
+				}
+			}
+			else
+			{
+				Console.WriteLine("Removed Active Time block");
+			}
+
+			//we need imcrement our node editor pointers
+			if (DialogueEditor_NodeGraph.StartBlockExecution())
+			{
+				if (DialogueEditor_NodeGraph.ExecuteBlock())
+				{
 				}
 				else
 				{
@@ -4777,12 +4887,30 @@ namespace AmethystEngine.Forms
 					OutputLogSpliter.IsEnabled = true;
 					DialogueEditor_Timeline.PauseTimeline();
 				}
-
 			}
 			else
 			{
-				Console.WriteLine("Removed Active Time block");
+				if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
+					resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+				OutputLogSpliter.IsEnabled = true;
+				DialogueEditor_Timeline.PauseTimeline();
 			}
+
+		}
+
+		private void UserChooseDialogueChoice(object sender, SelectionChangedEventArgs e)
+		{
+			//show the controls again.
+			for (int i = 0; i < CurSceneCharacterDisplays.Count; i++)
+			{
+				CurSceneCharacterDisplays[i].Item1.Visibility = Visibility.Visible;
+				CurSceneCharacterDisplays[i].Item2.Visibility = Visibility.Visible;
+			}
+			DialogueEditor_Grid.Children.Remove(sender as ListBox);
+			
+			DialogueEditor_Grid.UpdateLayout(); //GC
+			DialogueEditor_Timeline.PlayTimeline();
+			//throw new NotImplementedException();
 		}
 
 		private void NodeEditorCurrentErrorsOnCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
