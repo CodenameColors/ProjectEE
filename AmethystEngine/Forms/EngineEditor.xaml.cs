@@ -138,6 +138,7 @@ namespace AmethystEngine.Forms
 		TreeView Dialogue_CE_Tree;
 		List<Tuple<ContentControl, ContentControl>> CurSceneCharacterDisplays = new List<Tuple<ContentControl, ContentControl>>();
 		CollapsedPropertyGrid.CollapsedPropertyGrid CPGrid = new CollapsedPropertyGrid.CollapsedPropertyGrid();
+		object DialogueEditorSelectedControl = null;
 		#endregion
 
 		#region Vars
@@ -3538,7 +3539,7 @@ namespace AmethystEngine.Forms
 		/// <param name="obj"></param>
 		void customCP_FontColorChanged(Color obj)
 		{
-			((TextBox)((Grid)SelectedUIControl.Content).Children[2]).Foreground = new SolidColorBrush(obj);
+			((TextBox)((Grid)SelectedUIControl.Content).Children[10]).Foreground = new SolidColorBrush(obj);
 			SelectedUI.SetProperty("FontColor", obj.ToString());
 		}
 
@@ -4400,6 +4401,7 @@ namespace AmethystEngine.Forms
 			DialogueEditor_Timeline.ActiveTBblocks.CollectionChanged += ActiveTBblocks_CollectionChanged;
 
 			DialogueEditor_Timeline.OnCreateTimeblockHook += CreateDialogueBlockForTimeline;
+			DialogueEditor_NodeGraph.OnCreateTimeblockHook += CreateTimeBlockForDialogue;
 			//DialogueEditor_Timeline.ItemsSource = new List<String>();
 
 		}
@@ -4425,6 +4427,7 @@ namespace AmethystEngine.Forms
 			if (sender is null) return;
 			else if(sender is TimeBlock)
 			{
+				DialogueEditorSelectedControl = sender;
 				PropertyBag timeblockPropertyBag = new PropertyBag(sender);
 				timeblockPropertyBag.Name = "Time Block Properties";
 				PropertyBag dialoguePropertyBag = new PropertyBag(sender);
@@ -4445,9 +4448,13 @@ namespace AmethystEngine.Forms
 
 				
 				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Type", "Time Block", new TextBox() { IsEnabled = false }));
-				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), new TextBox()));
-				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("End Time", TimeB.EndTime.ToString(), new TextBox()));
-				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), new TextBox()));
+
+				TextBox startime_TB = new TextBox(); startime_TB.KeyDown += DE_SetStartTime;
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), startime_TB));
+				TextBox endtime_TB = new TextBox(); endtime_TB.KeyDown += DE_SetEndTime;
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("End Time", TimeB.EndTime.ToString(), endtime_TB));
+				TextBox durationime_TB = new TextBox(); durationime_TB.KeyDown += DE_SetDurationTime;
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), durationime_TB));
 
 				int i = 0;
 				foreach (String s in (TimeB.LinkedDialogueBlock as DialogueNodeBlock)?.DialogueData)
@@ -4496,6 +4503,7 @@ namespace AmethystEngine.Forms
 			}
 			else if(sender is DialogueNodeBlock dialogueNodeBlock)
 			{
+				DialogueEditorSelectedControl = sender;
 				PropertyBag timeblockPropertyBag = new PropertyBag(sender);
 				timeblockPropertyBag.Name = "Time Block Properties";
 				PropertyBag dialoguePropertyBag = new PropertyBag(sender);
@@ -4516,10 +4524,14 @@ namespace AmethystEngine.Forms
 					PropertyBags.Add(dialoguePropertyBag);
 				}
 
-				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Type", "Time Block", new TextBox() { IsEnabled = false }));
-				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), new TextBox()));
-				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("End Time", TimeB.EndTime.ToString(), new TextBox()));
-				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), new TextBox()));
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Type", "Dialogue Block", new TextBox() { IsEnabled = false }));
+
+				TextBox startime_TB = new TextBox(); startime_TB.KeyDown += DE_SetStartTime;
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), startime_TB));
+				TextBox endtime_TB = new TextBox(); startime_TB.KeyDown += DE_SetEndTime;
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("End Time", TimeB.EndTime.ToString(), endtime_TB));
+				TextBox durationime_TB = new TextBox(); startime_TB.KeyDown += DE_SetDurationTime;
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), durationime_TB));
 
 				int i = 0;
 				foreach (String s in dialogueNodeBlock.DialogueData)
@@ -4575,9 +4587,53 @@ namespace AmethystEngine.Forms
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		public void SetDurationTime(object sender, EventArgs e)
+		public void DE_SetDurationTime(object sender, KeyEventArgs e)
 		{
-			((TimeBlock)DialogueEditor_Timeline.SelectedControl).Duration = double.Parse(((TextBox)sender).Text);
+			if (Key.Enter == e.Key)
+			{
+				if (DialogueEditorSelectedControl is TimeBlock timeBlock)
+				{
+					if (Int32.TryParse((sender as TextBox).Text, out int val))
+						timeBlock.Duration = val;
+				}
+				else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+				{
+					if (Int32.TryParse((sender as TextBox).Text, out int val))
+						(dialogue.LinkedTimeBlock as TimeBlock).Duration = val;
+				}
+			}
+		}
+		public void DE_SetStartTime(object sender, KeyEventArgs e)
+		{
+			if (Key.Enter == e.Key)
+			{
+				if (DialogueEditorSelectedControl is TimeBlock timeBlock)
+				{
+					if (Int32.TryParse((sender as TextBox).Text, out int val))
+						timeBlock.StartTime = val;
+				}
+				else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+				{
+					if (Int32.TryParse((sender as TextBox).Text, out int val))
+						(dialogue.LinkedTimeBlock as TimeBlock).StartTime = val;
+				}
+			}
+		}
+		public void DE_SetEndTime(object sender, KeyEventArgs e)
+		{
+			if (Key.Enter == e.Key)
+			{
+				if (DialogueEditorSelectedControl is TimeBlock timeBlock)
+				{
+					if (Int32.TryParse((sender as TextBox).Text, out int val))
+						timeBlock.EndTime = val;
+				}
+				else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+				{
+					if (Int32.TryParse((sender as TextBox).Text, out int val))
+						(dialogue.LinkedTimeBlock as TimeBlock).EndTime = val;
+				}
+			}
 		}
 
 		/// <summary>
@@ -4590,11 +4646,21 @@ namespace AmethystEngine.Forms
 		{
 			if (e.Key == Key.Enter)
 			{
-				(((TimeBlock) DialogueEditor_Timeline.SelectedControl).LinkedDialogueBlock as DialogueNodeBlock)
-					.DialogueData[Grid.GetRow(sender as TextBox)/3] = ((TextBox)sender).Text;
-				((TimeBlock) DialogueEditor_Timeline.SelectedControl).CurrentDialogue =
-					(((TimeBlock) DialogueEditor_Timeline.SelectedControl).LinkedDialogueBlock as DialogueNodeBlock)
-					.DialogueData[0];
+				if(DialogueEditorSelectedControl is TimeBlock timeBlock)
+				{
+					(timeBlock.LinkedDialogueBlock as DialogueNodeBlock).DialogueData[(Grid.GetRow(sender as TextBox)) / 3] = (sender as TextBox).Text; //set the dialogue data
+					timeBlock.CurrentDialogue = (sender as TextBox).Text; //set the timeblock data
+				}
+				else if(DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+				{
+					dialogue.DialogueData[(Grid.GetRow(sender as TextBox)) / 3] = (sender as TextBox).Text;
+					(dialogue.LinkedTimeBlock as TimeBlock).CurrentDialogue = (sender as TextBox).Text;
+				}
+				//(((TimeBlock) DialogueEditor_Timeline.SelectedControl).LinkedDialogueBlock as DialogueNodeBlock)
+				//	.DialogueData[Grid.GetRow(sender as TextBox)/3] = ((TextBox)sender).Text;
+				//((TimeBlock) DialogueEditor_Timeline.SelectedControl).CurrentDialogue =
+				//	(((TimeBlock) DialogueEditor_Timeline.SelectedControl).LinkedDialogueBlock as DialogueNodeBlock)
+				//	.DialogueData[0];
 			}
 		}
 
@@ -4605,11 +4671,19 @@ namespace AmethystEngine.Forms
 		/// <param name="e"></param>
 		public void SetSpriteImagePath_Dia(object sender, EventArgs e)
 		{
-			if (DialogueEditor_Timeline.SelectedControl is null) return;
-			else if (DialogueEditor_Timeline.SelectedControl is TimeBlock)
+			if (DialogueEditorSelectedControl is null) return;
+			else if (DialogueEditorSelectedControl is TimeBlock timeblock)
 			{
-				((TimeBlock)DialogueEditor_Timeline.SelectedControl).TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
-				((TimeBlock)DialogueEditor_Timeline.SelectedControl).Trackname = (((EditorObject)((ComboBox)sender).SelectedValue).Name);
+				timeblock.TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+				timeblock.Trackname = (((EditorObject)((ComboBox)sender).SelectedValue).Name);
+
+				//((TimeBlock)DialogueEditor_Timeline.SelectedControl).TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+				//((TimeBlock)DialogueEditor_Timeline.SelectedControl).Trackname = (((EditorObject)((ComboBox)sender).SelectedValue).Name);
+			}
+			else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+			{
+				(dialogue.LinkedTimeBlock as TimeBlock).TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+				(dialogue.LinkedTimeBlock as TimeBlock).Trackname = (((EditorObject)((ComboBox)sender).SelectedValue).Name);
 			}
 			else if (DialogueEditor_Timeline.SelectedControl is Timeline timeline)
 			{
@@ -4631,11 +4705,15 @@ namespace AmethystEngine.Forms
 			{
 
 			}
-			else if (DialogueEditor_Timeline.SelectedControl is TimeBlock)
+			else if (DialogueEditorSelectedControl is TimeBlock timeBlock)
 			{
-				((TimeBlock)DialogueEditor_Timeline.SelectedControl).LinkedTextBoxName = ((ComboBox)sender).SelectedItem.ToString();
+				timeBlock.LinkedTextBoxName = ((ComboBox)sender).SelectedItem.ToString();
 				//
 				//((TimeBlock)sender).
+			}
+			else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+			{
+				(dialogue.LinkedTimeBlock as TimeBlock).LinkedTextBoxName = (sender as ComboBox).SelectedItem.ToString();
 			}
 		}
 
@@ -4751,17 +4829,20 @@ namespace AmethystEngine.Forms
 		{
 			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
 			{
+				if (e.OldItems[0] is ChoiceTimeBlock choice)
+				{
+					//TODO: DISPLAY CHOICES LATER
+					DialogueEditor_Timeline.PauseTimeline();
+					return;
+				}
+
 				DialogueEditor_NodeGraph.EndblockExecution();
 				if (DialogueEditor_NodeGraph.CurrentExecutionBlock is NodeEditor.ExitBlockNode)
 				{
 					DialogueEditor_NodeGraph.EndblockExecution();
 					DialogueEditor_Timeline.PauseTimeline();
 				}
-				if (e.OldItems[0] is ChoiceTimeBlock choice)
-				{
-					//TODO: DISPLAY CHOICES LATER
-					DialogueEditor_Timeline.PauseTimeline();
-				}
+				
 			}
 
 			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
@@ -4865,20 +4946,28 @@ namespace AmethystEngine.Forms
 						}
 					}
 					//gtb.GetProperty("CurrentDialogue").ToString();
-
-					
 				}
-			}
-			else
-			{
-				Console.WriteLine("Removed Active Time block");
-			}
 
-			//we need imcrement our node editor pointers
-			if (DialogueEditor_NodeGraph.StartBlockExecution())
-			{
-				if (DialogueEditor_NodeGraph.ExecuteBlock())
+				//we need imcrement our node editor pointers
+				if (e.NewItems[0] is ChoiceTimeBlock)
 				{
+					//only check to make sure that we use this block, let the execution be handled by the selection changed event
+					DialogueEditor_NodeGraph.StartBlockExecution();
+					return;
+				}
+
+				if (DialogueEditor_NodeGraph.StartBlockExecution())
+				{
+					if (DialogueEditor_NodeGraph.ExecuteBlock())
+					{
+					}
+					else
+					{
+						if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
+							resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+						OutputLogSpliter.IsEnabled = true;
+						DialogueEditor_Timeline.PauseTimeline();
+					}
 				}
 				else
 				{
@@ -4887,14 +4976,14 @@ namespace AmethystEngine.Forms
 					OutputLogSpliter.IsEnabled = true;
 					DialogueEditor_Timeline.PauseTimeline();
 				}
+
 			}
 			else
 			{
-				if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
-					resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
-				OutputLogSpliter.IsEnabled = true;
-				DialogueEditor_Timeline.PauseTimeline();
+				Console.WriteLine("Removed Active Time block");
 			}
+
+			
 
 		}
 
@@ -4907,9 +4996,14 @@ namespace AmethystEngine.Forms
 				CurSceneCharacterDisplays[i].Item2.Visibility = Visibility.Visible;
 			}
 			DialogueEditor_Grid.Children.Remove(sender as ListBox);
-			
 			DialogueEditor_Grid.UpdateLayout(); //GC
-			DialogueEditor_Timeline.PlayTimeline();
+
+			DialogueEditor_NodeGraph.ChangeChoiceVar((sender as ListBox).SelectedIndex);
+
+			DialogueEditor_Timeline.ResumeTimeline();
+			DialogueEditor_NodeGraph.ExecuteBlock();
+			DialogueEditor_NodeGraph.EndblockExecution();
+			//(sender as ListBox).SelectedIndex;
 			//throw new NotImplementedException();
 		}
 
@@ -4989,14 +5083,26 @@ namespace AmethystEngine.Forms
 
 		}
 
-		public object CreateDialogueBlockForTimeline(object Timeblock)
+		public object CreateDialogueBlockForTimeline(object Timeblock, bool bChoices)
 		{
 			int i = DialogueEditor_Timeline.GetTimelinePosition(DialogueEditor_Timeline.selectedTimeline, null);
 			DialogueNodeBlock dialogueNode = new DialogueNodeBlock(CurActiveDialogueScene.Characters[i].Name);
+			dialogueNode.bChoice = bChoices;
 			DialogueEditor_NodeGraph.AddDialogueBlockToGraph(dialogueNode, CurActiveDialogueScene.Characters[i].Name, Timeblock);
 
 			//Character
 			return dialogueNode;
+		}
+
+		public object CreateTimeBlockForDialogue(object DialogueBlock)
+		{
+			int i = DialogueEditor_Timeline.GetTimelinePosition(DialogueEditor_Timeline.selectedTimeline, null);
+			TimeBlock timeBlock = new TimeBlock(DialogueEditor_Timeline.GetTimelines()[0], 0);
+
+			//DialogueEditor_NodeGraph.AddDialogueBlockToGraph(timeBlock, CurActiveDialogueScene.Characters[i].Name, DialogueBlock);
+			(DialogueBlock as DialogueNodeBlock).LinkedTimeBlock = timeBlock;
+			//Character
+			return timeBlock;
 		}
 
 		private void ViewOutputLog_Click(object sender, RoutedEventArgs e)
