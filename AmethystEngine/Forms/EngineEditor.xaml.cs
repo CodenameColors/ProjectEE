@@ -24,6 +24,7 @@ using BixBite.Rendering.UI;
 using System.Threading;
 using TimelinePlayer.Components;
 using BixBite.Characters;
+using NodeEditor;
 using NodeEditor.Components;
 
 namespace AmethystEngine.Forms
@@ -5122,12 +5123,81 @@ namespace AmethystEngine.Forms
 
 			}
 		}
+
+		private LinkedList<TimeBlock> GetDefaultTimeBlocks_LL()
+		{
+			LinkedList<TimeBlock> retLL = new LinkedList<TimeBlock>();
+			BaseNodeBlock currentBlock = DialogueEditor_NodeGraph.StartExecutionBlock;
+			AddTimeBlocksTillExit(ref retLL, currentBlock);
+			
+			return retLL;
+		}
+
+		private LinkedList<TimeBlock> GetChoiceTimeBlocks_LL(BaseNodeBlock currentBlock, int choice)
+		{
+			LinkedList<TimeBlock> retLL = new LinkedList<TimeBlock>();
+			//clear the timeblocks
+			DialogueEditor_Timeline.DeleteAllTimeBlocks();
+
+			// grab all the timeblocks BEFORE THE CURRENT ONE.
+			BaseNodeBlock currentTemp = DialogueEditor_NodeGraph.CurrentExecutionBlock;
+			while (!(currentTemp is StartBlockNode))
+			{
+				if (currentTemp is DialogueNodeBlock dialogue)
+				{
+					retLL.AddFirst(dialogue.LinkedTimeBlock as TimeBlock);
+				}
+				currentTemp = currentTemp.EntryNode.ConnectedNodes[0].ParentBlock;
+			}
+
+			//choose path and change pointer
+			currentBlock = currentBlock.OutputNodes[choice].ConnectedNodes[0].ParentBlock;
+
+			//add until exit is found.
+			AddTimeBlocksTillExit(ref retLL, currentBlock);
+			return retLL;
+		}
+
+		private void AddTimeBlocksTillExit(ref LinkedList<TimeBlock> output, BaseNodeBlock currentBlock)
+		{
+			//add until exit is found.
+			while (!(currentBlock is ExitBlockNode))
+			{
+				if (currentBlock is StartBlockNode start)
+				{
+					currentBlock = start.ExitNode.ConnectedNodes[0].ParentBlock;
+				}
+				else if (currentBlock is DialogueNodeBlock dialogue)
+				{
+					currentBlock = dialogue.OutputNodes[0].ConnectedNodes[0].ParentBlock;
+					output.AddLast(dialogue.LinkedTimeBlock as TimeBlock);
+				}
+				else if (currentBlock is SetConstantNodeBlock setConstant)
+				{
+					currentBlock = setConstant.ExitNode.ConnectedNodes[0].ParentBlock;
+				}
+				else if (currentBlock is ConditionalNodeBlock conditional)
+				{
+					currentBlock = conditional.TrueOutput.ConnectedNodes[0].ParentBlock;
+				}
+				else
+				{
+					currentBlock = currentBlock.OutputNodes[0].ConnectedNodes[0].ParentBlock;
+				}
+			}
+		}
+
+		private void DisplayTimeBlocks_LL()
+		{
+
+		}
+
 	}
 }
 
 //NOTES TO MY SELF
 /*
- * System.drawing.Image casuses memory leaks
+ * System.drawing.Image causes memory leaks
  * RenderTargetBitmap also causes memory leaks
  * 
  * REASON? They are not IDisposable
