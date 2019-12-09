@@ -179,7 +179,8 @@ namespace AmethystEngine.Forms
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
     private void Window_Loaded(object sender, RoutedEventArgs e)
-    {
+		{
+			this.MaxHeight = SystemParameters.MaximumWindowTrackHeight;
 			PropertyBags = new ObservableCollection<object>();
 			//Find and set level editor controls!
       FullMapLEditor_Canvas = (Canvas)ObjectProperties_Control.Template.FindName("LevelEditor_Canvas", ObjectProperties_Control);
@@ -484,10 +485,12 @@ namespace AmethystEngine.Forms
     private void LBind_FullScreen(object sender, RoutedEventArgs e)
     {
       if (WindowState != WindowState.Maximized)
-      {
-        WindowState = WindowState.Maximized;
-        WindowStyle = WindowStyle.None;
-      }
+			{ 
+	      WindowState = WindowState.Normal;
+				WindowStyle = WindowStyle.None;
+				WindowState = WindowState.Maximized;
+				ResizeMode = ResizeMode.NoResize;
+			}
       else
       {
         WindowState = WindowState.Normal;
@@ -4407,11 +4410,17 @@ namespace AmethystEngine.Forms
 
 		}
 
+		private LinkedList<TimeBlock> defLL;
 		private void ResetExecution_Hook()
 		{
 			DialogueEditor_NodeGraph.ResetExecution();
 			DialogueEditor_NodeGraph.EndblockExecution();
 			DialogueEditor_NodeGraph.StartBlockExecution();
+
+			//let's get the current DEFAULT timeblock LL
+			defLL = GetDefaultTimeBlocks_LL();
+			DisplayTimeBlocks_LL(defLL);
+
 		}
 
 		/// <summary>
@@ -4525,7 +4534,15 @@ namespace AmethystEngine.Forms
 					PropertyBags.Add(dialoguePropertyBag);
 				}
 
-				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Type", "Dialogue Block", new TextBox() { IsEnabled = false }));
+				try
+				{
+					timeblockPropertyBag.Properties.Add(
+						new Tuple<string, object, Control>("Type", "Dialogue Block", new TextBox() {IsEnabled = false}));
+				}
+				catch
+				{
+					return;
+				}
 
 				TextBox startime_TB = new TextBox(); startime_TB.KeyDown += DE_SetStartTime;
 				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), startime_TB));
@@ -4676,7 +4693,8 @@ namespace AmethystEngine.Forms
 			else if (DialogueEditorSelectedControl is TimeBlock timeblock)
 			{
 				timeblock.TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
-				timeblock.Trackname = (((EditorObject)((ComboBox)sender).SelectedValue).Name);
+				timeblock.Trackname = DialogueEditor_Timeline.GetTimelines()[
+					DialogueEditor_Timeline.GetTimelinePosition(null, timeblock)].TrackName;
 
 				//((TimeBlock)DialogueEditor_Timeline.SelectedControl).TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
 				//((TimeBlock)DialogueEditor_Timeline.SelectedControl).Trackname = (((EditorObject)((ComboBox)sender).SelectedValue).Name);
@@ -4684,7 +4702,7 @@ namespace AmethystEngine.Forms
 			else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
 			{
 				(dialogue.LinkedTimeBlock as TimeBlock).TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
-				(dialogue.LinkedTimeBlock as TimeBlock).Trackname = (((EditorObject)((ComboBox)sender).SelectedValue).Name);
+				(dialogue.LinkedTimeBlock as TimeBlock).Trackname = dialogue.Header;
 			}
 			else if (DialogueEditor_Timeline.SelectedControl is Timeline timeline)
 			{
@@ -4807,7 +4825,15 @@ namespace AmethystEngine.Forms
 		/// <param name="e"></param>
 		private void AddCharacterToScene(object sender, RoutedEventArgs e)
 		{
-
+			if (CurActiveDialogueScene == null)
+			{
+				EngineOutputLog.AddErrorLogItem(-3, "New Dialogue Scene hasn't been created yet.", "DialogueEditor", true);
+				EngineOutputLog.AddLogItem("Dialogue Scene error. See Error log for details");
+				if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
+					resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+				OutputLogSpliter.IsEnabled = true;
+				return;
+			}
 			Dialogue_CE_Tree.ItemsSource = CurActiveDialogueScene.Characters;
 
 			//CurActiveDialogueScene.Characters.Add(new Character() { Name = "Antonio" });
@@ -4815,6 +4841,8 @@ namespace AmethystEngine.Forms
 			Character c = new Character();
 			Window w = new AddCharacterForm(ProjectFilePath) { AddToScene = AddCharacterHook};
 			w.ShowDialog();
+
+			DialogueEditor_NodeGraph.SceneCharacters_list.Add(CurActiveDialogueScene.Characters.Last().Name);
 
 			//CurActiveDialogueScene.Characters.Add(c);
 			//DialogueEditor_Timeline.AddTimeline(c.Name);
@@ -5001,9 +5029,14 @@ namespace AmethystEngine.Forms
 
 			DialogueEditor_NodeGraph.ChangeChoiceVar((sender as ListBox).SelectedIndex);
 
+			defLL = GetChoiceTimeBlocks_LL(DialogueEditor_NodeGraph.CurrentExecutionBlock, (sender as ListBox).SelectedIndex);
+			DisplayTimeBlocksAfter_LL(defLL);
+
+			DialogueEditor_Timeline.UpdateLayout();
 			DialogueEditor_Timeline.ResumeTimeline();
 			DialogueEditor_NodeGraph.ExecuteBlock();
 			DialogueEditor_NodeGraph.EndblockExecution();
+			DialogueEditor_NodeGraph.StartBlockExecution();
 			//(sender as ListBox).SelectedIndex;
 			//throw new NotImplementedException();
 		}
@@ -5099,9 +5132,11 @@ namespace AmethystEngine.Forms
 		{
 			int i = DialogueEditor_Timeline.GetTimelinePosition(DialogueEditor_Timeline.selectedTimeline, null);
 			TimeBlock timeBlock = new TimeBlock(DialogueEditor_Timeline.GetTimelines()[0], 0);
+			timeBlock.Trackname = (DialogueBlock as DialogueNodeBlock)?.Header;
 
 			//DialogueEditor_NodeGraph.AddDialogueBlockToGraph(timeBlock, CurActiveDialogueScene.Characters[i].Name, DialogueBlock);
 			(DialogueBlock as DialogueNodeBlock).LinkedTimeBlock = timeBlock;
+			timeBlock.LinkedDialogueBlock = (DialogueBlock as DialogueNodeBlock);
 			//Character
 			return timeBlock;
 		}
@@ -5137,59 +5172,77 @@ namespace AmethystEngine.Forms
 		{
 			LinkedList<TimeBlock> retLL = new LinkedList<TimeBlock>();
 			//clear the timeblocks
-			DialogueEditor_Timeline.DeleteAllTimeBlocks();
+			DialogueEditor_Timeline.DeleteTimeBlocksAfter();
 
-			// grab all the timeblocks BEFORE THE CURRENT ONE.
-			BaseNodeBlock currentTemp = DialogueEditor_NodeGraph.CurrentExecutionBlock;
-			while (!(currentTemp is StartBlockNode))
+			try
 			{
-				if (currentTemp is DialogueNodeBlock dialogue)
-				{
-					retLL.AddFirst(dialogue.LinkedTimeBlock as TimeBlock);
-				}
-				currentTemp = currentTemp.EntryNode.ConnectedNodes[0].ParentBlock;
+				//choose path and change pointer
+				currentBlock = currentBlock.OutputNodes[choice].ConnectedNodes[0].ParentBlock;
+
+				//add until exit is found.
+				AddTimeBlocksTillExit(ref retLL, currentBlock);
 			}
+			catch
+			{ return retLL;}
 
-			//choose path and change pointer
-			currentBlock = currentBlock.OutputNodes[choice].ConnectedNodes[0].ParentBlock;
-
-			//add until exit is found.
-			AddTimeBlocksTillExit(ref retLL, currentBlock);
 			return retLL;
 		}
 
 		private void AddTimeBlocksTillExit(ref LinkedList<TimeBlock> output, BaseNodeBlock currentBlock)
 		{
 			//add until exit is found.
-			while (!(currentBlock is ExitBlockNode))
+			try
 			{
-				if (currentBlock is StartBlockNode start)
+				while (!(currentBlock is ExitBlockNode))
 				{
-					currentBlock = start.ExitNode.ConnectedNodes[0].ParentBlock;
+					if (currentBlock is StartBlockNode start)
+					{
+						currentBlock = start.ExitNode.ConnectedNodes[0].ParentBlock;
+					}
+					else if (currentBlock is DialogueNodeBlock dialogue)
+					{
+						currentBlock = dialogue.OutputNodes[0].ConnectedNodes[0].ParentBlock;
+						output.AddLast(dialogue.LinkedTimeBlock as TimeBlock);
+					}
+					else if (currentBlock is SetConstantNodeBlock setConstant)
+					{
+						currentBlock = setConstant.ExitNode.ConnectedNodes[0].ParentBlock;
+					}
+					else if (currentBlock is ConditionalNodeBlock conditional)
+					{
+						currentBlock = conditional.TrueOutput.ConnectedNodes[0].ParentBlock;
+					}
+					else
+					{
+						currentBlock = currentBlock.OutputNodes[0].ConnectedNodes[0].ParentBlock;
+					}
 				}
-				else if (currentBlock is DialogueNodeBlock dialogue)
-				{
-					currentBlock = dialogue.OutputNodes[0].ConnectedNodes[0].ParentBlock;
-					output.AddLast(dialogue.LinkedTimeBlock as TimeBlock);
-				}
-				else if (currentBlock is SetConstantNodeBlock setConstant)
-				{
-					currentBlock = setConstant.ExitNode.ConnectedNodes[0].ParentBlock;
-				}
-				else if (currentBlock is ConditionalNodeBlock conditional)
-				{
-					currentBlock = conditional.TrueOutput.ConnectedNodes[0].ParentBlock;
-				}
-				else
-				{
-					currentBlock = currentBlock.OutputNodes[0].ConnectedNodes[0].ParentBlock;
-				}
+			}
+			catch
+			{
+				return;
 			}
 		}
 
-		private void DisplayTimeBlocks_LL()
+		private void DisplayTimeBlocks_LL(LinkedList<TimeBlock> desiredLL)
 		{
+			DialogueEditor_Timeline.DeleteAllTimeBlocks();
+			List<String> chars =new List<string>();
+			foreach (Character character in CurActiveDialogueScene.Characters)
+			{
+				chars.Add(character.Name);
+			}
+			DialogueEditor_Timeline.AddTimeblock_LL(desiredLL, chars);
+		}
 
+		private void DisplayTimeBlocksAfter_LL(LinkedList<TimeBlock> desiredLL)
+		{
+			List<String> chars = new List<string>();
+			foreach (Character character in CurActiveDialogueScene.Characters)
+			{
+				chars.Add(character.Name);
+			}
+			DialogueEditor_Timeline.AddTimeblock_LL(desiredLL, chars, false);
 		}
 
 	}

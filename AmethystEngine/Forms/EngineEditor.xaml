@@ -919,7 +919,7 @@
 					<Grid Background="Black" />
 				</TabItem>
 				<TabItem Header="Dialogue Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
-					<Grid x:Name="AllDialogueEditor_Grid" Background="Black" Visibility="Visible" >
+					<Grid x:Name="AllDialogueEditor_Grid" Background="Black" Visibility="Hidden" >
 
 						<Grid.RowDefinitions>
 							<RowDefinition Height="4*"/>
