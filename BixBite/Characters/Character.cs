@@ -17,12 +17,11 @@ namespace BixBite.Characters
 
 		//every character has Dialogue Sprites
 		public ObservableCollection<Sprite> DialogueSprites { get; set; }
-		public ObservableCollection<String> DialogueSpritePaths { get; set; }
+		//public ObservableCollection<String> DialogueSpritePaths { get; set; }
 		//every character has list of animations.
 
 		public Character()
 		{
-			DialogueSpritePaths = new ObservableCollection<string>();
 			DialogueSprites = new ObservableCollection<Sprite>();
 		}
 

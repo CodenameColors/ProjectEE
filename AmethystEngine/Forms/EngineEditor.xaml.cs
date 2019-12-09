@@ -4768,7 +4768,7 @@ namespace AmethystEngine.Forms
 				((Grid) CC.Content).Children.Add(img);
 
 				DialogueEditore_Canvas.Children.Add(CC);
-				CurActiveDialogueScene.CharacterSprites.Add(
+				CurActiveDialogueScene.Characters.Last().DialogueSprites.Add(
 					new Sprite(img.Source.ToString(), img.Source.ToString(), 0, 0, (int) img.ActualWidth, (int) ActualHeight));
 
 				OpenUIEdits.Add(gameUi);
@@ -4784,7 +4784,7 @@ namespace AmethystEngine.Forms
 				ContentControl CC= DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false, LinkedDialogueImage_Text);
 				Image img = (CC.Content as Grid).Children[2] as Image;
 
-				CurActiveDialogueScene.CharacterSprites.Add(
+				CurActiveDialogueScene.Characters[CurActiveDialogueScene.Characters.IndexOf(c)].DialogueSprites.Add(
 					new Sprite(img.Source.ToString(), img.Source.ToString(), 0, 0, (int)img.ActualWidth, (int)ActualHeight));
 
 				
@@ -4803,7 +4803,7 @@ namespace AmethystEngine.Forms
 		public void DialogueHook()
 		{
 			Console.WriteLine("Hook Activated");
-			CurActiveDialogueScene.SetTrack(CurActiveDialogueScene.Characters[0].Name, DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL);
+			//CurActiveDialogueScene.SetTrack(CurActiveDialogueScene.Characters[0].Name, DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL);
 		}
 
 		/// <summary>
