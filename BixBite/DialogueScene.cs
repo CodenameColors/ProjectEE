@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Xml;
 using BixBite.Resources;
 using NodeEditor.Components;
+using TimelinePlayer.Components;
 
 namespace BixBite
 {
@@ -241,17 +242,17 @@ namespace BixBite
 			} //end of dialogue scene creation
 		}
 
-		private void CreateBlockNodeXML(XmlWriter writer, BaseNodeBlock blocknode)
+		private void CreateBlockNodeXML(XmlWriter writer, BaseNodeBlock blockNode)
 		{
-			writer.WriteStartElement(null, blocknode.GetType().ToString(), null);
-			writer.WriteAttributeString(null, "Key", null, blocknode.Name);
-			writer.WriteAttributeString(null, "LocX", null, blocknode.LocX);
-			writer.WriteAttributeString(null, "LocY", null, blocknode.LocY);
-			if(blocknode is DialogueNodeBlock dialogue) writer.WriteAttributeString(null, "Character", null, dialogue.Header);
+			writer.WriteStartElement(null, blockNode.GetType().ToString(), null);
+			writer.WriteAttributeString(null, "Key", null, blockNode.Name);
+			writer.WriteAttributeString(null, "LocX", null, blockNode.LocX.ToString());
+			writer.WriteAttributeString(null, "LocY", null, blockNode.LocY.ToString());
+			if(blockNode is DialogueNodeBlock dialogue) writer.WriteAttributeString(null, "Character", null, dialogue.Header);
 
 			writer.WriteStartElement(null, "Nodes", null);
 			//entry node
-			foreach (ConnectionNode cn in blocknode.EntryNode.ConnectedNodes)
+			foreach (ConnectionNode cn in blockNode.EntryNode.ConnectedNodes)
 			{
 				writer.WriteStartElement(null, "EntryNode", null);
 				writer.WriteAttributeString(null, "Type", null, "Entry");
@@ -264,7 +265,7 @@ namespace BixBite
 				writer.WriteEndElement(); //end of the EntryNode Tag
 			}
 			//exit node
-			foreach (ConnectionNode cn in blocknode.ExitNode.ConnectedNodes)
+			foreach (ConnectionNode cn in blockNode.ExitNode.ConnectedNodes)
 			{
 				writer.WriteStartElement(null, "ExitNode", null);
 				writer.WriteAttributeString(null, "Type", null, "Exit");
@@ -278,7 +279,7 @@ namespace BixBite
 			}
 		
 			//input nodes
-			foreach (ConnectionNode input in blocknode.InputNodes)
+			foreach (ConnectionNode input in blockNode.InputNodes)
 			{
 				writer.WriteStartElement(null, "Inputs", null);
 				foreach (ConnectionNode cn in input.ConnectedNodes)
@@ -289,17 +290,67 @@ namespace BixBite
 					writer.WriteStartElement(null, "Connection", null);
 					writer.WriteAttributeString(null, "FromNode", null, cn.ParentBlock.Name);
 					writer.WriteAttributeString(null, "Node", null, cn.ParentBlock.DType.ToString());
-					writer.WriteAttributeString(null, "Ind", null, );
+					writer.WriteAttributeString(null, "Ind", null, 
+						Array.FindIndex(cn.ParentBlock.OutputNodes.ToArray(), x => x == cn).ToString()); //get the index
 				}
 				writer.WriteEndElement(); //end of the Inputs Tag
 			}
 			//output nodes
-			foreach (var VARIABLE in Characters)
+			foreach (ConnectionNode output in blockNode.OutputNodes)
 			{
-				
+				writer.WriteStartElement(null, "Outputs", null);
+				foreach (ConnectionNode cn in output.ConnectedNodes)
+				{
+					writer.WriteStartElement(null, "InputNode", null);
+					writer.WriteAttributeString(null, "Type", null, cn.NodeType.ToString());
+
+					writer.WriteStartElement(null, "Connection", null);
+					writer.WriteAttributeString(null, "ToNode", null, cn.ParentBlock.Name);
+					writer.WriteAttributeString(null, "Node", null, cn.ParentBlock.DType.ToString());
+					writer.WriteAttributeString(null, "Ind", null,
+						Array.FindIndex(cn.ParentBlock.OutputNodes.ToArray(), x => x == cn).ToString()); //get the index
+				}
+				writer.WriteEndElement(); //end of the Outputs Tag
 			}
 			writer.WriteEndElement(); //end of the Nodes Tag
 
+			//the dialogue block holds more data than the other nodes.
+			if (blockNode is DialogueNodeBlock dialogueNode)
+			{
+				writer.WriteStartElement(null, "Timeblock", null);
+				writer.WriteAttributeString(null, "Start", null, (dialogueNode.LinkedTimeBlock as TimeBlock)?.StartTime.ToString());
+				writer.WriteAttributeString(null, "End", null, (dialogueNode.LinkedTimeBlock as TimeBlock)?.EndTime.ToString());
+				writer.WriteEndElement(); //end of the TimeBlock Tag
+
+				writer.WriteStartElement(null, "Data", null);
+				for (int i = 0; i < dialogueNode.OutputNodes.Count; i++)
+				{
+					writer.WriteStartElement(null, "DiaChoice", null);
+
+					//Sprite
+					if (dialogueNode.DialogueSprites[i] is Sprite sprite)
+					{
+						writer.WriteStartElement(null, "Sprite", null);
+						writer.WriteAttributeString(null, "Name", null, sprite.Name);
+						writer.WriteAttributeString(null, "Location", null, sprite.ImgPathLocation);
+						writer.WriteAttributeString(null, "Width", null, sprite.GetPropertyData("width").ToString());
+						writer.WriteAttributeString(null, "Height", null, sprite.GetPropertyData("height").ToString());
+						writer.WriteAttributeString(null, "x", null, sprite.GetPropertyData("x").ToString());
+						writer.WriteAttributeString(null, "y", null, sprite.GetPropertyData("y").ToString());
+						writer.WriteEndElement(); //end of the Sprite Tag
+
+					}
+					else Console.WriteLine("No Sprite Data found for this dialogue block!!!");
+
+					//DialogueChoice
+					writer.WriteStartElement(null, "DialogueText", null);
+					writer.WriteAttributeString(null, "Text", null, dialogueNode.DialogueTextOptions[i]);
+					writer.WriteEndElement(); //end of the DialogueText Tag
+
+					writer.WriteEndElement(); //end of the DiaChoice Tag
+				}
+				writer.WriteEndElement(); //end of the Data Tag
+			}
 			writer.WriteEndElement(); //end of the BlockType Tag
 		}
 

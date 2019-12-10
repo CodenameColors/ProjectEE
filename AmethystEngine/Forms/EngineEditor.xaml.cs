@@ -4467,7 +4467,7 @@ namespace AmethystEngine.Forms
 				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), durationime_TB));
 
 				int i = 0;
-				foreach (String s in (TimeB.LinkedDialogueBlock as DialogueNodeBlock)?.DialogueData)
+				foreach (String s in (TimeB.LinkedDialogueBlock as DialogueNodeBlock)?.DialogueTextOptions)
 				{
 					ComboBox CB = new ComboBox() {Height = 50, ItemTemplate = (DataTemplate) this.Resources["CBIMGItems"]};
 					CB.SelectionChanged += SetSpriteImagePath_Dia;
@@ -4552,7 +4552,7 @@ namespace AmethystEngine.Forms
 				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), durationime_TB));
 
 				int i = 0;
-				foreach (String s in dialogueNodeBlock.DialogueData)
+				foreach (String s in dialogueNodeBlock.DialogueTextOptions)
 				{
 					ComboBox CB = new ComboBox() { Height = 50, ItemTemplate = (DataTemplate)this.Resources["CBIMGItems"] };
 					CB.SelectionChanged += SetSpriteImagePath_Dia;
@@ -4666,12 +4666,12 @@ namespace AmethystEngine.Forms
 			{
 				if(DialogueEditorSelectedControl is TimeBlock timeBlock)
 				{
-					(timeBlock.LinkedDialogueBlock as DialogueNodeBlock).DialogueData[(Grid.GetRow(sender as TextBox)) / 3] = (sender as TextBox).Text; //set the dialogue data
+					(timeBlock.LinkedDialogueBlock as DialogueNodeBlock).DialogueTextOptions[(Grid.GetRow(sender as TextBox)) / 3] = (sender as TextBox).Text; //set the dialogue data
 					timeBlock.CurrentDialogue = (sender as TextBox).Text; //set the timeblock data
 				}
 				else if(DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
 				{
-					dialogue.DialogueData[(Grid.GetRow(sender as TextBox)) / 3] = (sender as TextBox).Text;
+					dialogue.DialogueTextOptions[(Grid.GetRow(sender as TextBox)) / 3] = (sender as TextBox).Text;
 					(dialogue.LinkedTimeBlock as TimeBlock).CurrentDialogue = (sender as TextBox).Text;
 				}
 				//(((TimeBlock) DialogueEditor_Timeline.SelectedControl).LinkedDialogueBlock as DialogueNodeBlock)
@@ -4895,7 +4895,7 @@ namespace AmethystEngine.Forms
 					ListBox lb = new ListBox();
 					lb.VerticalAlignment = VerticalAlignment.Bottom;
 					lb.HorizontalAlignment = HorizontalAlignment.Stretch;
-					foreach(String datachoices in (choiceTimeBlock.LinkedDialogueBlock as DialogueNodeBlock).DialogueData)
+					foreach(String datachoices in (choiceTimeBlock.LinkedDialogueBlock as DialogueNodeBlock).DialogueTextOptions)
 					{
 						lb.Items.Add(datachoices);
 					}
@@ -4953,7 +4953,7 @@ namespace AmethystEngine.Forms
 						return;
 					}
 
-					gtb.SetProperty("ContentText", ((((TimeBlock)e.NewItems[0]).LinkedDialogueBlock) as DialogueNodeBlock).DialogueData[0]);
+					gtb.SetProperty("ContentText", ((((TimeBlock)e.NewItems[0]).LinkedDialogueBlock) as DialogueNodeBlock).DialogueTextOptions[0]);
 
 					UIElementCollection uie = ((Grid)CurSceneCharacterDisplays[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)].Item2.Content).Children;
 					ContentControl CC = null;
