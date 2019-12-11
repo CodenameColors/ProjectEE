@@ -5245,6 +5245,34 @@ namespace AmethystEngine.Forms
 			DialogueEditor_Timeline.AddTimeblock_LL(desiredLL, chars, false);
 		}
 
+		private void SaveDialogueSceneAs_MI_Click(object sender, RoutedEventArgs e)
+		{
+			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
+			{
+				Title = "New Level File",
+				FileName = "", //default file name
+				Filter = "txt files (*.lvl)|*.lvl|All files (*.*)|*.*",
+				FilterIndex = 2,
+				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\UI"),
+				RestoreDirectory = true
+			};
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+			Console.WriteLine(dlg.FileName);
+
+			CurActiveDialogueScene.ExportScene(
+				dlg.FileName, CurActiveDialogueScene.Characters, CurActiveDialogueScene.DialogueBoxes
+				, null, null);
+		}
 	}
 }
 
