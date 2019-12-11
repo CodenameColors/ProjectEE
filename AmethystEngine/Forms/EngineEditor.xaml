@@ -117,7 +117,7 @@
 							<MenuItem x:Name="NewDialogueScene_MenuItem" Header="New Dialogue Scene" Foreground="Black" Click="NewDialogueScene_MenuItem_Click"/>
 							<MenuItem Header="Open Dialogue Scene" Foreground="Black"/>
 							<MenuItem Header="Save Dialogue Scene" Foreground="Black"/>
-							<MenuItem Header="Save Dialogue Scene As" Foreground="Black"   />
+							<MenuItem Header="Save Dialogue Scene As" Foreground="Black" Click="SaveDialogueSceneAs_MI_Click" />
 						</MenuItem>
 					</Menu>
 					<Menu DockPanel.Dock="Top" Grid.Column="1" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >

@@ -659,7 +659,14 @@ namespace AmethystEngine.Forms
 
       }
       SearchResultList.ItemsSource = null;
-      SearchResultList.ItemsSource = ContentLibaryObjList;
+      try
+      {
+	      SearchResultList.ItemsSource = ContentLibaryObjList;
+      }
+      catch
+      {
+	      return;
+      }
     }
 
     private void ListDirectory(TreeView treeView, string path)
@@ -4476,9 +4483,17 @@ namespace AmethystEngine.Forms
 						.Characters[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock) sender).TimelineParent)]
 						.DialogueSprites)
 					{
-						ComboItems.Add(new EditorObject(filepath.ImgPathLocation,
-							filepath.ImgPathLocation.Substring(filepath.ImgPathLocation.LastIndexOfAny(new char[] {'\\', '/'})),
-							false));
+						try
+						{
+							ComboItems.Add(new EditorObject(filepath.ImgPathLocation,
+								filepath.ImgPathLocation.Substring(filepath.ImgPathLocation.LastIndexOfAny(new char[] {'\\', '/'})),
+								false));
+						}
+						catch (ArgumentException ae)
+						{
+							Console.WriteLine(ae.Message);
+							continue;
+						}
 					}
 
 					CB.ItemsSource = ComboItems;
@@ -4559,9 +4574,15 @@ namespace AmethystEngine.Forms
 					List<EditorObject> ComboItems = new List<EditorObject>();
 					foreach (Sprite filepath in CurActiveDialogueScene.Characters[DialogueEditor_Timeline.GetTimelinePosition(null, TimeB)].DialogueSprites)
 					{
-						ComboItems.Add(new EditorObject(filepath.ImgPathLocation,
-							filepath.ImgPathLocation.Substring(filepath.ImgPathLocation.LastIndexOfAny(new char[] { '\\', '/' })),
-							false));
+						try
+						{
+							ComboItems.Add(new EditorObject(filepath.ImgPathLocation,
+								filepath.ImgPathLocation.Substring(filepath.ImgPathLocation.LastIndexOfAny(new char[] {'\\', '/'})),
+								false));
+						}
+						catch (ArgumentException ae){
+							Console.WriteLine(ae.Message);
+							continue; }
 					}
 
 					CB.ItemsSource = ComboItems;
@@ -4703,6 +4724,10 @@ namespace AmethystEngine.Forms
 			{
 				(dialogue.LinkedTimeBlock as TimeBlock).TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
 				(dialogue.LinkedTimeBlock as TimeBlock).Trackname = dialogue.Header;
+				dialogue.DialogueSprites.Add(new Sprite(
+					((EditorObject)((ComboBox)sender).SelectedValue).Name,
+					((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath, 
+					0,0,0,0));
 			}
 			else if (DialogueEditor_Timeline.SelectedControl is Timeline timeline)
 			{
@@ -4741,7 +4766,7 @@ namespace AmethystEngine.Forms
 		/// This method right now will add a sprite, that is can be linked to change, and a UI object to the screen.
 		/// </summary>
 		/// <param name="c"></param>
-		public void AddCharacterHook(Character c, GameUI gameUi, String LinkedTextboxName, String LinkedDialogueImage_Text = null)
+		public void AddCharacterHook(Character c, GameUI gameUi, String GameFileUI, String LinkedTextboxName, String LinkedDialogueImage_Text = null)
 		{
 			CurActiveDialogueScene.Characters.Add(c);
 			DialogueEditor_Timeline.AddTimeline(c.Name);
@@ -4774,6 +4799,7 @@ namespace AmethystEngine.Forms
 				OpenUIEdits.Add(gameUi);
 				DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false);
 				CurActiveDialogueScene.DialogueBoxes.Add(OpenUIEdits.Last());
+				CurActiveDialogueScene.DialogueBoxesFilePaths.Add(GameFileUI);
 
 				//create the pointers to the content controls. which is what displays my images to the screen
 				CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
@@ -4789,6 +4815,7 @@ namespace AmethystEngine.Forms
 
 				
 				CurActiveDialogueScene.DialogueBoxes.Add(OpenUIEdits.Last());
+				CurActiveDialogueScene.DialogueBoxesFilePaths.Add(GameFileUI);
 
 				//create the pointers to the content controls. which is what displays my images to the screen
 				CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
@@ -5251,9 +5278,9 @@ namespace AmethystEngine.Forms
 			{
 				Title = "New Level File",
 				FileName = "", //default file name
-				Filter = "txt files (*.lvl)|*.lvl|All files (*.*)|*.*",
+				Filter = "txt files (*.dials)|*.lvl|All files (*.*)|*.*",
 				FilterIndex = 2,
-				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\UI"),
+				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Dialogue"),
 				RestoreDirectory = true
 			};
 
@@ -5269,9 +5296,27 @@ namespace AmethystEngine.Forms
 			else return; //invalid name
 			Console.WriteLine(dlg.FileName);
 
+			//get the Params list of this scene
+			List<Tuple<String, object>> varDataList = new List<Tuple<string, object>>();
+			foreach (BlockNodeEditor.RuntimeVars rtVars in DialogueEditor_NodeGraph.TestingVars_list)
+			{
+				varDataList.Add(new Tuple<string, object>(rtVars.VarName, rtVars.OrginalVarData));
+			}
+
+			List<BaseNodeBlock> BlockNodes = new List<BaseNodeBlock>();
+			foreach (UIElement uie in DialogueEditor_NodeGraph.NodeCanvas.Children)
+			{
+				if (uie is BaseNodeBlock bn)
+				{
+					bn.LocX = Canvas.GetLeft(bn);
+					bn.LocY = Canvas.GetTop(bn);
+					BlockNodes.Add(bn);
+				}
+			}
+
 			CurActiveDialogueScene.ExportScene(
-				dlg.FileName, CurActiveDialogueScene.Characters, CurActiveDialogueScene.DialogueBoxes
-				, null, null);
+				dlg.FileName, CurActiveDialogueScene.Characters.ToList(), CurActiveDialogueScene.DialogueBoxesFilePaths
+				, varDataList, BlockNodes);
 		}
 	}
 }

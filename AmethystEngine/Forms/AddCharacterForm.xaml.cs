@@ -28,14 +28,14 @@ namespace AmethystEngine.Forms
 		Character DesiredCharacter = new Character();
 		private GameUI desiredGameUi;
 		ObservableCollection<EditorObject> Sprites = new ObservableCollection<EditorObject>();
-		public delegate void HooKfunction(Character c, GameUI gameUi, String LinkedTextboxName, String LinkedDialogueImage = null);
+		public delegate void HooKfunction(Character c, GameUI gameUi, String GameUIFIlePath, String LinkedTextboxName, String LinkedDialogueImage = null);
 		public HooKfunction AddToScene;
 		private String ProjectFilePath ="";
 
 
 		private List<Border> DialogueImageChoices_List = new List<Border>();
 		private List<TextBox> DialogueTextboxChoices_List = new List<TextBox>();
-
+		private String CurrentUIFilePath = "";
 
 
 		public AddCharacterForm(String projectFilePath)
@@ -168,7 +168,7 @@ namespace AmethystEngine.Forms
 				bFail = true;
 			}
 			if (bFail) return;
-			if (AddToScene != null) AddToScene(DesiredCharacter, desiredGameUi, LinkedTextboxesChoice_CB.SelectedItem.ToString(), (LinkedImageBoxesChoice_CB.Text));
+			if (AddToScene != null) AddToScene(DesiredCharacter, desiredGameUi, CurrentUIFilePath,LinkedTextboxesChoice_CB.SelectedItem.ToString(), (LinkedImageBoxesChoice_CB.Text));
 			this.Close();
 		}
 
@@ -199,9 +199,9 @@ namespace AmethystEngine.Forms
 			Console.WriteLine(dlg.FileName);
 
 			GameUI g = GameUI.ImportGameUI(dlg.FileName);
+			CurrentUIFilePath = dlg.FileName;
+			PreivewUI_Grid.Children.Clear();
 			DrawUIToScreen(PreivewUI_Grid, Back_PreivewUI_Grid, g, false);
-
-
 		}
 
 		/// <summary>

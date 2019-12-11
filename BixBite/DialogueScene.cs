@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Xml;
 using BixBite.Resources;
+using NodeEditor;
 using NodeEditor.Components;
 using TimelinePlayer.Components;
 
@@ -42,7 +43,7 @@ namespace BixBite
 
 		//each scene will also contain multiple different GameUI (Dialogue Boxes)
 		public List<GameUI> DialogueBoxes = new List<GameUI>();
-
+		public List<String> DialogueBoxesFilePaths = new List<string>();
 		/// <summary>
 		/// Dialogue scenes have internal parameters that are used for this scene ALONE.
 		/// this list keeps track of them.
@@ -67,8 +68,11 @@ namespace BixBite
 
 		public DialogueScene(String Name)
 		{
-			this.SceneName = Name;
+			Properties = new ObservableCollection<Tuple<string, object>>();
 			AddProperty("SceneName", Name);
+
+			this.SceneName = Name;
+			
 		}
 
 		//PROPERTIES 
@@ -192,16 +196,18 @@ namespace BixBite
 			};
 			//settings.Async = true;
 
-			using (XmlWriter writer = XmlWriter.Create(filePath, settings))
+			using (XmlWriter writer = XmlWriter.Create(filePath+".dials", settings))
 			{
 				writer.WriteStartElement(null, "DialogueScene", null);
 				writer.WriteAttributeString(null, "Name", null, GetPropertyData("SceneName").ToString());
 
 				writer.WriteStartElement(null, "Characters", null); //create "Characters" Tag
+				int i = 0;
 				foreach (Character character in characters) //create a character tag
 				{
 					writer.WriteStartElement(null, "Character", null);
 					writer.WriteAttributeString(null, "Name", null, character.Name);
+					writer.WriteAttributeString(null, "UI", null, GameUIs[i++]);
 
 					writer.WriteStartElement(null, "Images", null);
 					foreach (Sprite sprite in character.DialogueSprites)
@@ -248,70 +254,98 @@ namespace BixBite
 			writer.WriteAttributeString(null, "Key", null, blockNode.Name);
 			writer.WriteAttributeString(null, "LocX", null, blockNode.LocX.ToString());
 			writer.WriteAttributeString(null, "LocY", null, blockNode.LocY.ToString());
-			if(blockNode is DialogueNodeBlock dialogue) writer.WriteAttributeString(null, "Character", null, dialogue.Header);
+			if (blockNode is DialogueNodeBlock dialogue)
+				writer.WriteAttributeString(null, "Character", null, dialogue.Header);
 
 			writer.WriteStartElement(null, "Nodes", null);
 			//entry node
-			foreach (ConnectionNode cn in blockNode.EntryNode.ConnectedNodes)
+			if (blockNode.EntryNode != null)
 			{
-				writer.WriteStartElement(null, "EntryNode", null);
-				writer.WriteAttributeString(null, "Type", null, "Entry");
+				foreach (ConnectionNode cn in blockNode.EntryNode.ConnectedNodes)
+				{
+					writer.WriteStartElement(null, "EntryNode", null);
+					writer.WriteAttributeString(null, "Type", null, cn.NodeType.ToString());
 
-				writer.WriteStartElement(null, "Connection", null);
-				writer.WriteAttributeString(null, "FromBlock", null, cn.ParentBlock.Name);
-				writer.WriteAttributeString(null, "Node", null, "Exit");
-				writer.WriteAttributeString(null, "Ind", null, "0");
-				writer.WriteEndElement(); //end of the Connection Tag
-				writer.WriteEndElement(); //end of the EntryNode Tag
+					writer.WriteStartElement(null, "Connection", null);
+					writer.WriteAttributeString(null, "FromBlock", null, cn.ParentBlock.Name);
+					writer.WriteAttributeString(null, "Node", null, "Exit");
+					writer.WriteAttributeString(null, "Ind", null, "0");
+					writer.WriteEndElement(); //end of the Connection Tag
+					writer.WriteEndElement(); //end of the EntryNode Tag
+				}
 			}
+
 			//exit node
-			foreach (ConnectionNode cn in blockNode.ExitNode.ConnectedNodes)
+			if (blockNode.ExitNode != null)
 			{
-				writer.WriteStartElement(null, "ExitNode", null);
-				writer.WriteAttributeString(null, "Type", null, "Exit");
+				foreach (ConnectionNode cn in blockNode.ExitNode.ConnectedNodes)
+				{
+					writer.WriteStartElement(null, "ExitNode", null);
+					writer.WriteAttributeString(null, "Type", null, cn.NodeType.ToString());
 
-				writer.WriteStartElement(null, "Connection", null);
-				writer.WriteAttributeString(null, "ToBlock", null, cn.ParentBlock.Name);
-				writer.WriteAttributeString(null, "Node", null, "Entry");
-				writer.WriteAttributeString(null, "Ind", null, "0");
-				writer.WriteEndElement(); //end of the Connection Tag
-				writer.WriteEndElement(); //end of the EntryNode Tag
+					writer.WriteStartElement(null, "Connection", null);
+					writer.WriteAttributeString(null, "ToBlock", null, cn.ParentBlock.Name);
+					writer.WriteAttributeString(null, "Node", null, "Entry");
+					writer.WriteAttributeString(null, "Ind", null, "0");
+					writer.WriteEndElement(); //end of the Connection Tag
+					writer.WriteEndElement(); //end of the EntryNode Tag
+				}
 			}
-		
+
 			//input nodes
-			foreach (ConnectionNode input in blockNode.InputNodes)
+			if (blockNode.InputNodes != null)
 			{
-				writer.WriteStartElement(null, "Inputs", null);
-				foreach (ConnectionNode cn in input.ConnectedNodes)
+				foreach (ConnectionNode input in blockNode.InputNodes)
 				{
-					writer.WriteStartElement(null, "InputNode", null);
-					writer.WriteAttributeString(null, "Type", null, cn.NodeType.ToString());
+					writer.WriteStartElement(null, "Inputs", null);
+					foreach (ConnectionNode cn in input.ConnectedNodes)
+					{
+						writer.WriteStartElement(null, "InputNode", null);
+						writer.WriteAttributeString(null, "Type", null, cn.NodeType.ToString());
 
-					writer.WriteStartElement(null, "Connection", null);
-					writer.WriteAttributeString(null, "FromNode", null, cn.ParentBlock.Name);
-					writer.WriteAttributeString(null, "Node", null, cn.ParentBlock.DType.ToString());
-					writer.WriteAttributeString(null, "Ind", null, 
-						Array.FindIndex(cn.ParentBlock.OutputNodes.ToArray(), x => x == cn).ToString()); //get the index
+						writer.WriteStartElement(null, "Connection", null);
+						writer.WriteAttributeString(null, "FromNode", null, cn.ParentBlock.Name);
+						writer.WriteAttributeString(null, "Node", null, cn.ParentBlock.DType.ToString());
+						int ind = 0;
+						if (!(cn.ParentBlock is StartBlockNode start))
+							ind = Array.FindIndex(cn.ParentBlock.OutputNodes.ToArray(), x => x == cn);
+						if (ind != -1) writer.WriteAttributeString(null, "Ind", null, ind.ToString()); //get the index
+						else writer.WriteAttributeString(null, "Ind", null, "0"); //get the index
+						writer.WriteEndElement(); //end of the Connection Tag
+						writer.WriteEndElement(); //end of the Input Tag
+					}
+					writer.WriteEndElement(); //end of the Inputs Tag
 				}
-				writer.WriteEndElement(); //end of the Inputs Tag
 			}
+
 			//output nodes
-			foreach (ConnectionNode output in blockNode.OutputNodes)
+			if (blockNode.OutputNodes != null)
 			{
-				writer.WriteStartElement(null, "Outputs", null);
-				foreach (ConnectionNode cn in output.ConnectedNodes)
+				foreach (ConnectionNode output in blockNode.OutputNodes)
 				{
-					writer.WriteStartElement(null, "InputNode", null);
-					writer.WriteAttributeString(null, "Type", null, cn.NodeType.ToString());
+					writer.WriteStartElement(null, "Outputs", null);
+					foreach (ConnectionNode cn in output.ConnectedNodes)
+					{
+						writer.WriteStartElement(null, "OutputNode", null);
+						writer.WriteAttributeString(null, "Type", null, cn.NodeType.ToString());
 
-					writer.WriteStartElement(null, "Connection", null);
-					writer.WriteAttributeString(null, "ToNode", null, cn.ParentBlock.Name);
-					writer.WriteAttributeString(null, "Node", null, cn.ParentBlock.DType.ToString());
-					writer.WriteAttributeString(null, "Ind", null,
-						Array.FindIndex(cn.ParentBlock.OutputNodes.ToArray(), x => x == cn).ToString()); //get the index
+						writer.WriteStartElement(null, "Connection", null);
+						writer.WriteAttributeString(null, "ToNode", null, cn.ParentBlock.Name);
+						writer.WriteAttributeString(null, "Node", null, cn.ParentBlock.DType.ToString());
+						int ind = 0;
+						if (!(cn.ParentBlock is ExitBlockNode exit))
+							ind = Array.FindIndex(cn.ParentBlock.OutputNodes.ToArray(), x => x == cn);
+						if(ind != -1)writer.WriteAttributeString(null, "Ind", null, ind.ToString()); //get the index
+						else writer.WriteAttributeString(null, "Ind", null, "0"); //get the index
+						writer.WriteEndElement(); //end of the Connection Tag
+						writer.WriteEndElement(); //end of the Output Tag
+						
+					}
+					writer.WriteEndElement(); //end of the Outputs Tag
+					
 				}
-				writer.WriteEndElement(); //end of the Outputs Tag
 			}
+
 			writer.WriteEndElement(); //end of the Nodes Tag
 
 			//the dialogue block holds more data than the other nodes.
@@ -328,7 +362,7 @@ namespace BixBite
 					writer.WriteStartElement(null, "DiaChoice", null);
 
 					//Sprite
-					if (dialogueNode.DialogueSprites[i] is Sprite sprite)
+					if (dialogueNode.DialogueSprites.Count > 0 && dialogueNode.DialogueSprites[i] is Sprite sprite)
 					{
 						writer.WriteStartElement(null, "Sprite", null);
 						writer.WriteAttributeString(null, "Name", null, sprite.Name);
