@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -36,7 +37,9 @@ namespace BixBite
 		/// <summary>
 		/// List of characters in this scene
 		/// </summary>
-		public ObservableCollection<Character> Characters = new ObservableCollection<Character>();
+		public ObservableCollection<SceneCharacter> Characters = new ObservableCollection<SceneCharacter>();
+
+		public ObservableCollection<Timeline> Timelines = new ObservableCollection<Timeline>();
 
 		//The displaying of the current character sprite
 		//public List<Sprite> CharacterSprites = new List<Sprite>();
@@ -48,7 +51,7 @@ namespace BixBite
 		/// Dialogue scenes have internal parameters that are used for this scene ALONE.
 		/// this list keeps track of them.
 		/// </summary>
-		public List<Tuple<String, object>> DialogueSceneParams = new List<Tuple<string, object>>();
+		public List<BlockNodeEditor.RuntimeVars> DialogueSceneParams = new List<BlockNodeEditor.RuntimeVars>();
 
 		/// <summary>
 		/// Every dialogue scene can have branching paths and or multiple dialogue blocks.
@@ -148,7 +151,7 @@ namespace BixBite
 		#endregion
 
 
-		public void AddCharacterToScene(Character deschar)
+		public void AddCharacterToScene(SceneCharacter deschar)
 		{
 			Characters.Add(deschar);
 		}
@@ -160,7 +163,7 @@ namespace BixBite
 		/// <param name="sprite"></param>
 		public void AddSprite(String CharName, Sprite sprite)
 		{
-			foreach (Character c in Characters)
+			foreach (SceneCharacter c in Characters)
 			{
 				if (c.Name.Contains(CharName))
 				{
@@ -171,9 +174,330 @@ namespace BixBite
 			}
 		}
 
-		public void ImportScene(String FilePath)
+		public static DialogueScene ImportScene(String FilePath, ref List<Tuple<String, String, int, String, String, int>> connectionList)
 		{
+			//Create our return GameUI
+			DialogueScene retDialogueScene = null;
 
+			XmlReaderSettings settings = new XmlReaderSettings
+			{
+				//Async = true
+			};
+
+			using (XmlReader reader = XmlReader.Create(FilePath, settings))
+			{
+				while (reader.Read() )
+				{
+					//skip to a DialogueScene node
+					while (reader.Name != "DialogueScene")
+						reader.Read();
+
+					//by this time we have found the dialogue scene tag
+					retDialogueScene = new DialogueScene(reader.GetAttribute("Name"));
+
+					//skip to a Characters node
+					while (reader.Name != "Characters")
+						reader.Read();
+
+					//at this point we have found the characters section of the file. So loop until the end of the tag is found.
+					do
+					{
+						reader.Read();
+						if (reader.Name == "Character" && reader.NodeType == XmlNodeType.Element)
+						{
+							//add the character to the scene
+							retDialogueScene.Characters.Add(new SceneCharacter(reader.GetAttribute("Horizontal"), reader.GetAttribute("Vertical"))
+							{
+								Name = reader.GetAttribute("Name"),
+								LinkedImageBox = reader.GetAttribute("LinkedImgBox"),
+								HorizontalAnchor = reader.GetAttribute("Horizontal"),
+								VerticalAnchor = reader.GetAttribute("Vertical"),
+							});
+							//add the timeline for the added character to the scene. SET THE Windows settigns in the engine. NOT HERE.
+							retDialogueScene.Timelines.Add(new Timeline(60, 200) {TrackName = retDialogueScene.Characters.Last().Name});
+							retDialogueScene.DialogueBoxesFilePaths.Add(reader.GetAttribute("UI"));
+							do
+							{
+								reader.Read();
+								if (reader.Name == "Image" && reader.NodeType == XmlNodeType.Element)
+								{
+									String path = reader.GetAttribute("Path");
+									if (System.IO.File.Exists(reader.GetAttribute("Path")))
+									{
+										System.Drawing.Image img =
+											System.Drawing.Image.FromFile(
+												reader.GetAttribute("Path") ?? throw new InvalidOperationException());
+										retDialogueScene.Characters.Last().DialogueSprites.Add(
+											new Sprite(
+												path.Substring(path.LastIndexOfAny(new char[]{'/','\\'}),  path.LastIndexOf('.') - path.LastIndexOfAny(new char[] { '/', '\\' })),
+												path,
+												0,0,
+												img.Width,
+												img.Height
+											)
+										);
+									}
+
+								}
+							} while (reader.Name.Trim() != "Character" && XmlNodeType.EndElement != reader.NodeType && !reader.EOF);
+						}
+					} while (reader.Name.Trim() != "Characters");
+
+					//skip to a Characters node
+					while (reader.Name != "Params")
+						reader.Read();
+
+					//at this point we have found the params section of the file. So loop until the end of the tag is found.
+					do
+					{
+						reader.Read();
+						if (reader.Name == "Var" && reader.NodeType == XmlNodeType.Element)
+						{
+							retDialogueScene.DialogueSceneParams.Add(
+								new BlockNodeEditor.RuntimeVars() {
+									VarName = reader.GetAttribute("Name"),
+									Type = Type.GetType(reader.GetAttribute("Type")) ,
+									OrginalVarData = Convert.ChangeType(reader.GetAttribute("DefaultVal"), Type.GetType(reader.GetAttribute("Type"))),
+									VarData = Convert.ChangeType(reader.GetAttribute("DefaultVal"), Type.GetType(reader.GetAttribute("Type"))),
+								}
+								//new Tuple<string, object>(reader.GetAttribute("Name"), Convert.ChangeType(reader.GetAttribute("DefaultVal"), Type.GetType(reader.GetAttribute("Type"))))  //())
+								);
+						}
+
+					} while (reader.Name.Trim() != "Params");
+
+
+					//skip to a BlockNodes node
+					while (reader.Name != "BlockNodes")
+						reader.Read();
+
+
+					//The last type of data to load into memory is all the block nodes for this scene. There are quite a few, so we use a helper.
+					do
+					{
+						reader.Read();
+						if (reader.Name.Contains("NodeEditor") && reader.NodeType == XmlNodeType.Element)
+						{
+							CreateBlockNodeFromXML(reader, ref retDialogueScene, ref connectionList);
+						}
+					}
+					while (reader.Name.Trim() != "BlockNodes") ;
+
+					//The last type of data to load into memory is all the block nodes for this scene. There are quite a few, so we use a helper.
+					do
+					{
+						reader.Read();
+					}
+					while (reader.Name.Trim() != "DialogueScene" && reader.NodeType != XmlNodeType.EndElement);
+
+					return retDialogueScene;
+				}
+			}
+			return retDialogueScene;
+		}
+
+		/// <summary>
+		/// This method will take any base block node and create and fill in that block nodes data from the XML given.
+		/// </summary>
+		/// <param name="reader">XMLReader current place</param>
+		/// <param name="blocknodes_list">This is used to add to [ref]</param>
+		/// <param name="ConnectionList">this is used to add to [ref]. {from, ConType, to, ConType, index}</param>
+		private static void CreateBlockNodeFromXML(XmlReader reader, ref DialogueScene curDialogueScene, ref List<Tuple<String, String, int, String, String, int>> ConnectionList)
+		{
+			//first what type of block node is it?
+			Type t = Type.GetType(String.Format("{0}, {1}", reader.Name, "NodeEditor"));
+			BaseNodeBlock baseNode;
+			if (t.Name.Contains("Dialogue"))
+				baseNode = (BaseNodeBlock)Activator.CreateInstance(t, new object[]{reader.GetAttribute("Character"), false});
+			else if (t.Name.Contains("GetConstant"))
+				baseNode = (BaseNodeBlock)Activator.CreateInstance(t, new object[]
+				{
+					 ECOnnectionType.Int,
+					 curDialogueScene.DialogueSceneParams.Find(x=>x.VarName == reader.GetAttribute("Key").Split('_')[1])
+				});
+			else if(t.Name.Contains("SetConstant"))
+				baseNode = (BaseNodeBlock)Activator.CreateInstance(t, new object[] { ECOnnectionType.NONE });
+			else
+				baseNode = (BaseNodeBlock)Activator.CreateInstance(t);
+
+			baseNode.Name = reader.GetAttribute("Key");
+			baseNode.LocX = double.Parse(reader.GetAttribute("LocX"));
+			baseNode.LocY = double.Parse(reader.GetAttribute("LocY"));
+
+
+			//skip to nodes
+			while (reader.Name != "Nodes")
+				reader.Read();
+
+			//there are 4 different nodes types
+			do
+			{
+				reader.Read();
+
+				//entry
+				if (reader.Name == "EntryNode")
+				{
+					baseNode.EntryNode.NodeType = (ECOnnectionType) Enum.Parse(typeof(ECOnnectionType), reader.GetAttribute("Type")); //(ECOnnectionType) reader.GetAttribute("Type");
+					do
+					{
+						reader.Read();
+						if (reader.Name == "Connection")
+						{
+							ConnectionList.Add(new Tuple<string, string, int, string, string, int>(
+								reader.GetAttribute("FromBlock"),
+								ECOnnectionType.Exit.ToString(),
+								int.Parse(reader.GetAttribute("Ind")),
+								baseNode.Name,
+								ECOnnectionType.Enter.ToString(),
+								0
+							));
+						}
+					} while (reader.Name.Trim() != "EntryNode");
+				}
+
+				//exit
+				if (reader.Name == "ExitNode")
+				{
+					baseNode.ExitNode.NodeType = (ECOnnectionType)Enum.Parse(typeof(ECOnnectionType), reader.GetAttribute("Type"));
+					do
+					{
+						reader.Read();
+						//we are not adding a connection to the connection list because this is input to output NOT output to input
+					} while (reader.Name.Trim() != "ExitNode");
+				}
+
+				//inputs multiples are possible
+				if (reader.Name == "Inputs")
+				{
+					do
+					{
+						reader.Read();
+						reader.Read();
+						if (reader.Name == "InputNode")
+						{
+							baseNode.InputNodes.Add(new ConnectionNode(
+								baseNode, "InputNode"+baseNode.InputNodes.Count, 
+								(ECOnnectionType)Enum.Parse(typeof(ECOnnectionType), reader.GetAttribute("Type")))
+							);
+							if(!(baseNode is DialogueNodeBlock)) baseNode.DType = baseNode.InputNodes[0].NodeType;
+							do
+							{
+								reader.Read();
+								if (reader.Name == "Connection")
+								{
+									ConnectionList.Add(new Tuple<string, string, int, string, string, int>(
+										reader.GetAttribute("FromBlock"), 
+										reader.GetAttribute("Node"),
+										int.Parse(reader.GetAttribute("Ind")),
+										baseNode.Name,
+										(reader.GetAttribute("Node") == "Exit" ? ECOnnectionType.Enter.ToString() : reader.GetAttribute("Node")),
+										baseNode.InputNodes.Count-1
+									));
+								}
+							} while (reader.Name.Trim() != "InputNode");
+						}
+					} while (reader.Name.Trim() != "Inputs");
+				}
+
+
+				//outputs multiples are possible
+				if (reader.Name == "Outputs" && !reader.IsEmptyElement)
+				{
+					do
+					{
+						reader.Read();
+						reader.Read();
+						if (reader.Name == "OutputNode")
+						{
+							baseNode.OutputNodes.Add(new ConnectionNode(
+								baseNode, "OutputNode" + baseNode.OutputNodes.Count ,
+								(ECOnnectionType)Enum.Parse(typeof(ECOnnectionType), reader.GetAttribute("Type")))
+							);
+							if (!(baseNode is DialogueNodeBlock)) baseNode.DType = baseNode.OutputNodes[0].NodeType;
+							do
+							{
+								reader.Read();
+								if (reader.Name == "Connection")
+								{
+									//ConnectionList.Add(new Tuple<string, string, int>(reader.GetAttribute("FromBlock"), baseNode.Name, int.Parse(reader.GetAttribute("Ind"))));
+								}
+							} while (reader.Name.Trim() != "OutputNode");
+						}
+					} while (reader.Name.Trim() != "Outputs");
+				}
+			}
+			while (reader.Name.Trim() != "Nodes");
+
+			//if it's a dialogue node there are a few more things of data we need to import
+			if (baseNode is DialogueNodeBlock dialogue)
+			{
+				//First up load the Timeblock data
+
+				//skip to TimeBlock
+				while (reader.Name != "Timeblock")
+					reader.Read();
+
+				//TimeLines have not been made yet. So we need to set the parent timeline to null for now. But set this in the engine.
+				if (dialogue.OutputNodes.Count > 1)
+				{
+					dialogue.LinkedTimeBlock = new ChoiceTimeBlock(
+						Array.Find(curDialogueScene.Timelines.ToArray(), x => x.TrackName == dialogue.Header),
+						Double.Parse(reader.GetAttribute("Start")))
+					{
+						EndTime = Double.Parse(reader.GetAttribute("End")), Trackname = dialogue.Header,
+						LinkedDialogueBlock = dialogue,
+						LinkedTextBoxName = reader.GetAttribute("LinkedTextBox")
+					};
+				}
+				else
+				{
+					dialogue.LinkedTimeBlock = new TimeBlock(
+						Array.Find(curDialogueScene.Timelines.ToArray(), x => x.TrackName == dialogue.Header),
+						Double.Parse(reader.GetAttribute("Start")))
+					{
+						EndTime = Double.Parse(reader.GetAttribute("End")), Trackname = dialogue.Header,
+						LinkedDialogueBlock = dialogue,
+						LinkedTextBoxName = reader.GetAttribute("LinkedTextBox"),
+					};
+				}
+
+				//skip to Data
+				while (reader.Name != "Data")
+					reader.Read();
+
+				do
+				{
+					reader.Read();
+					if (reader.Name == "DiaChoice")
+					{
+						do
+						{
+							reader.Read();
+							if (reader.Name == "Sprite")
+							{
+								(dialogue.LinkedTimeBlock as TimeBlock).TrackSpritePath = reader.GetAttribute("Location");
+								dialogue.DialogueSprites.Add(
+									new Sprite(
+									reader.GetAttribute("Name"),
+									reader.GetAttribute("Location"),
+									int.Parse(reader.GetAttribute("x")),
+									int.Parse(reader.GetAttribute("y")),
+									int.Parse(reader.GetAttribute("Width")),
+									int.Parse(reader.GetAttribute("Height"))
+									));
+							}
+							else if (reader.Name == "DialogueText")
+							{
+								dialogue.DialogueTextOptions.Add(reader.GetAttribute("Text"));
+								(dialogue.LinkedTimeBlock as TimeBlock).CurrentDialogue = dialogue.DialogueTextOptions[0];
+							}
+						} while (reader.Name != "DiaChoice");
+					}
+				} while (reader.Name != "Data");
+
+				//Last load the DialogueData
+			}
+			curDialogueScene.DialogueBlockNodes.Add(baseNode);
 		}
 
 		/// <summary>
@@ -184,7 +508,7 @@ namespace BixBite
 		/// <param name="GameUIs">List of UI files in use</param>
 		/// <param name="sceneParams">List of params for this scene</param>
 		/// <param name="SceneBlockNodes">List of all the block nodes for this scene</param>
-		public void ExportScene(String filePath, List<Character> characters, List<String> GameUIs,List<Tuple<String, object>> sceneParams, List<BaseNodeBlock> SceneBlockNodes)
+		public void ExportScene(String filePath, List<SceneCharacter> characters, List<String> GameUIs,List<Tuple<String, object>> sceneParams, List<BaseNodeBlock> SceneBlockNodes)
 		{
 			XmlWriterSettings settings = new XmlWriterSettings
 			{
@@ -203,11 +527,15 @@ namespace BixBite
 
 				writer.WriteStartElement(null, "Characters", null); //create "Characters" Tag
 				int i = 0;
-				foreach (Character character in characters) //create a character tag
+				foreach (SceneCharacter character in characters) //create a character tag
 				{
 					writer.WriteStartElement(null, "Character", null);
 					writer.WriteAttributeString(null, "Name", null, character.Name);
 					writer.WriteAttributeString(null, "UI", null, GameUIs[i++]);
+					writer.WriteAttributeString(null, "LinkedImgBox", null, character.LinkedImageBox);
+					writer.WriteAttributeString(null, "Horizontal", null, character.HorizontalAnchor);
+					writer.WriteAttributeString(null, "Vertical", null, character.VerticalAnchor);
+
 
 					writer.WriteStartElement(null, "Images", null);
 					foreach (Sprite sprite in character.DialogueSprites)
@@ -268,8 +596,8 @@ namespace BixBite
 
 					writer.WriteStartElement(null, "Connection", null);
 					writer.WriteAttributeString(null, "FromBlock", null, cn.ParentBlock.Name);
-					writer.WriteAttributeString(null, "Node", null, "Exit");
-					writer.WriteAttributeString(null, "Ind", null, "0");
+					writer.WriteAttributeString(null, "Node", null, "Enter");
+					writer.WriteAttributeString(null, "Ind", null, Array.FindIndex(blockNode.EntryNode.ConnectedNodes.ToArray(), x => x == cn).ToString());
 					writer.WriteEndElement(); //end of the Connection Tag
 					writer.WriteEndElement(); //end of the EntryNode Tag
 				}
@@ -285,49 +613,49 @@ namespace BixBite
 
 					writer.WriteStartElement(null, "Connection", null);
 					writer.WriteAttributeString(null, "ToBlock", null, cn.ParentBlock.Name);
-					writer.WriteAttributeString(null, "Node", null, "Entry");
-					writer.WriteAttributeString(null, "Ind", null, "0");
+					writer.WriteAttributeString(null, "Node", null, "Exit");
+					writer.WriteAttributeString(null, "Ind", null, Array.FindIndex(blockNode.ExitNode.ConnectedNodes.ToArray(), x => x == cn).ToString());
 					writer.WriteEndElement(); //end of the Connection Tag
 					writer.WriteEndElement(); //end of the EntryNode Tag
 				}
 			}
 
 			//input nodes
-			if (blockNode.InputNodes != null)
+			if (blockNode.InputNodes != null && blockNode.InputNodes.Count > 0 )
 			{
+				writer.WriteStartElement(null, "Inputs", null);
 				foreach (ConnectionNode input in blockNode.InputNodes)
 				{
-					writer.WriteStartElement(null, "Inputs", null);
 					foreach (ConnectionNode cn in input.ConnectedNodes)
 					{
 						writer.WriteStartElement(null, "InputNode", null);
-						writer.WriteAttributeString(null, "Type", null, cn.NodeType.ToString());
+						writer.WriteAttributeString(null, "Type", null, input.NodeType.ToString());
 
 						writer.WriteStartElement(null, "Connection", null);
-						writer.WriteAttributeString(null, "FromNode", null, cn.ParentBlock.Name);
+						writer.WriteAttributeString(null, "FromBlock", null, cn.ParentBlock.Name);
 						writer.WriteAttributeString(null, "Node", null, cn.ParentBlock.DType.ToString());
 						int ind = 0;
 						if (!(cn.ParentBlock is StartBlockNode start))
 							ind = Array.FindIndex(cn.ParentBlock.OutputNodes.ToArray(), x => x == cn);
 						if (ind != -1) writer.WriteAttributeString(null, "Ind", null, ind.ToString()); //get the index
-						else writer.WriteAttributeString(null, "Ind", null, "0"); //get the index
+						else writer.WriteAttributeString(null, "Ind", null, Array.FindIndex(blockNode.InputNodes.ToArray(), x => x == input).ToString()); //get the index
 						writer.WriteEndElement(); //end of the Connection Tag
 						writer.WriteEndElement(); //end of the Input Tag
 					}
-					writer.WriteEndElement(); //end of the Inputs Tag
 				}
+				writer.WriteEndElement(); //end of the Inputs Tag
 			}
 
 			//output nodes
-			if (blockNode.OutputNodes != null)
+			if (blockNode.OutputNodes != null && blockNode.OutputNodes.Count > 0)
 			{
+				writer.WriteStartElement(null, "Outputs", null);
 				foreach (ConnectionNode output in blockNode.OutputNodes)
 				{
-					writer.WriteStartElement(null, "Outputs", null);
 					foreach (ConnectionNode cn in output.ConnectedNodes)
 					{
 						writer.WriteStartElement(null, "OutputNode", null);
-						writer.WriteAttributeString(null, "Type", null, cn.NodeType.ToString());
+						writer.WriteAttributeString(null, "Type", null, output.NodeType.ToString());
 
 						writer.WriteStartElement(null, "Connection", null);
 						writer.WriteAttributeString(null, "ToNode", null, cn.ParentBlock.Name);
@@ -336,14 +664,13 @@ namespace BixBite
 						if (!(cn.ParentBlock is ExitBlockNode exit))
 							ind = Array.FindIndex(cn.ParentBlock.OutputNodes.ToArray(), x => x == cn);
 						if(ind != -1)writer.WriteAttributeString(null, "Ind", null, ind.ToString()); //get the index
-						else writer.WriteAttributeString(null, "Ind", null, "0"); //get the index
+						else writer.WriteAttributeString(null, "Ind", null, Array.FindIndex(blockNode.OutputNodes.ToArray(), x=>x==output).ToString()); //get the index
 						writer.WriteEndElement(); //end of the Connection Tag
 						writer.WriteEndElement(); //end of the Output Tag
 						
 					}
-					writer.WriteEndElement(); //end of the Outputs Tag
-					
 				}
+				writer.WriteEndElement(); //end of the Outputs Tag
 			}
 
 			writer.WriteEndElement(); //end of the Nodes Tag
@@ -354,6 +681,7 @@ namespace BixBite
 				writer.WriteStartElement(null, "Timeblock", null);
 				writer.WriteAttributeString(null, "Start", null, (dialogueNode.LinkedTimeBlock as TimeBlock)?.StartTime.ToString());
 				writer.WriteAttributeString(null, "End", null, (dialogueNode.LinkedTimeBlock as TimeBlock)?.EndTime.ToString());
+				writer.WriteAttributeString(null, "LinkedTextBox", null, (dialogueNode.LinkedTimeBlock as TimeBlock)?.LinkedTextBoxName);
 				writer.WriteEndElement(); //end of the TimeBlock Tag
 
 				writer.WriteStartElement(null, "Data", null);

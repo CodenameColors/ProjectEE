@@ -56,7 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BixBiteTypes.cs" />
-    <Compile Include="Characters\Character.cs" />
+    <Compile Include="Characters\SceneCharacter.cs" />
     <Compile Include="Characters\Enemy.cs" />
     <Compile Include="Characters\NPC.cs" />
     <Compile Include="Characters\PartyMember.cs" />

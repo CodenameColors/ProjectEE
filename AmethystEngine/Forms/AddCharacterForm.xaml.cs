@@ -25,10 +25,10 @@ namespace AmethystEngine.Forms
   /// </summary>
   public partial class AddCharacterForm : Window
   {
-		Character DesiredCharacter = new Character();
+		SceneCharacter _desiredSceneCharacter = new SceneCharacter(HorizontalAlignment.Left.ToString(), VerticalAlignment.Bottom.ToString());
 		private GameUI desiredGameUi;
 		ObservableCollection<EditorObject> Sprites = new ObservableCollection<EditorObject>();
-		public delegate void HooKfunction(Character c, GameUI gameUi, String GameUIFIlePath, String LinkedTextboxName, String LinkedDialogueImage = null);
+		public delegate void HooKfunction(SceneCharacter c, GameUI gameUi, String GameUIFIlePath, String LinkedTextboxName, String LinkedDialogueImage = null);
 		public HooKfunction AddToScene;
 		private String ProjectFilePath ="";
 
@@ -118,7 +118,7 @@ namespace AmethystEngine.Forms
 		{
 			if(Key.Enter == e.Key)
 			{
-				DesiredCharacter.Name = CharacterName_TB.Text;
+				_desiredSceneCharacter.Name = CharacterName_TB.Text;
 			}
 		}
 
@@ -150,14 +150,14 @@ namespace AmethystEngine.Forms
 		{
 			bool bFail = false;
 			foreach(EditorObject eobj in Sprites)
-				DesiredCharacter.DialogueSprites.Add(new BixBite.Rendering.Sprite(eobj.Name, eobj.Thumbnail.AbsolutePath,0,0,0,0));
-			if (DesiredCharacter.Name == null) DesiredCharacter.Name = CharacterName_TB.Text;
+				_desiredSceneCharacter.DialogueSprites.Add(new BixBite.Rendering.Sprite(eobj.Name, eobj.Thumbnail.AbsolutePath,0,0,0,0));
+			if (_desiredSceneCharacter.Name == null) _desiredSceneCharacter.Name = CharacterName_TB.Text;
 			if (desiredGameUi == null )
 			{
 				OutputLog_TB.Text += "GameUI not imported!" + "\n";
 				bFail = true;
 			}
-			if (DesiredCharacter == null)
+			if (_desiredSceneCharacter == null)
 			{
 				OutputLog_TB.Text += "Character not set!" + "\n";
 				bFail = true;
@@ -168,7 +168,7 @@ namespace AmethystEngine.Forms
 				bFail = true;
 			}
 			if (bFail) return;
-			if (AddToScene != null) AddToScene(DesiredCharacter, desiredGameUi, CurrentUIFilePath,LinkedTextboxesChoice_CB.SelectedItem.ToString(), (LinkedImageBoxesChoice_CB.Text));
+			if (AddToScene != null) AddToScene(_desiredSceneCharacter, desiredGameUi, CurrentUIFilePath,LinkedTextboxesChoice_CB.SelectedItem.ToString(), (LinkedImageBoxesChoice_CB.Text));
 			this.Close();
 		}
 

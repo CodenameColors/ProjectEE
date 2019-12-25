@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -26,6 +27,7 @@ using TimelinePlayer.Components;
 using BixBite.Characters;
 using NodeEditor;
 using NodeEditor.Components;
+using NodeEditor.Components.Logic;
 
 namespace AmethystEngine.Forms
 {
@@ -4399,23 +4401,115 @@ namespace AmethystEngine.Forms
 		/// <param name="e"></param>
 		private void NewDialogueScene_MenuItem_Click(object sender, RoutedEventArgs e)
 		{
-			AllDialogueEditor_Grid.Visibility = Visibility.Visible;
-			DialogueEditor_Timeline.TimeBlockSync = DialogueHook;
-			DialogueEditor_Timeline.SelectionChanged_Hook = ShowTimelineSelectedProperties;
-			DialogueEditor_NodeGraph.SelectionChanged_Hook = ShowTimelineSelectedProperties;
-			DialogueEditor_Timeline.Reset_Hook += ResetExecution_Hook;
-			DialogueEditor_NodeGraph.CurrentErrors.CollectionChanged += NodeEditorCurrentErrorsOnCollectionChanged;
-
-
+			SetupDialogueSceneHooks();
 			CurActiveDialogueScene = new DialogueScene("Dialogue1");
 			ActiveDialogueScenes.Add(CurActiveDialogueScene);
-			DialogueEditor_Timeline.ActiveTBblocks.CollectionChanged += ActiveTBblocks_CollectionChanged;
-
-			DialogueEditor_Timeline.OnCreateTimeblockHook += CreateDialogueBlockForTimeline;
-			DialogueEditor_NodeGraph.OnCreateTimeblockHook += CreateTimeBlockForDialogue;
+			
 			//DialogueEditor_Timeline.ItemsSource = new List<String>();
 
 		}
+
+		private void ChangeDialogueUIAnchorPostion_Hook(HorizontalAlignment hori, VerticalAlignment vert, int timelineind)
+		{
+			double gridw = DialogueEditor_BackCanvas.ActualWidth;
+			double gridh = DialogueEditor_BackCanvas.ActualHeight;
+//CurSceneCharacterDisplays[timelineind].Item2
+
+			if (hori == HorizontalAlignment.Left && vert == VerticalAlignment.Top)
+			{
+				Canvas.SetLeft(CurSceneCharacterDisplays[timelineind].Item2, 0);
+				Canvas.SetTop(CurSceneCharacterDisplays[timelineind].Item2, 0);
+
+				CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Left;
+				CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Top;
+
+				//for file data
+				CurActiveDialogueScene.Characters[timelineind].HorizontalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment.ToString();
+				CurActiveDialogueScene.Characters[timelineind].VerticalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment.ToString();
+			}
+			else if (hori == HorizontalAlignment.Right && vert == VerticalAlignment.Top)
+			{
+				Canvas.SetLeft(CurSceneCharacterDisplays[timelineind].Item2, gridw - CurSceneCharacterDisplays[timelineind].Item2.Width);
+				Canvas.SetTop(CurSceneCharacterDisplays[timelineind].Item2, 0);
+
+				CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Right;
+				CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Top;
+
+				//for file data
+				CurActiveDialogueScene.Characters[timelineind].HorizontalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment.ToString();
+				CurActiveDialogueScene.Characters[timelineind].VerticalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment.ToString();
+			}
+			else if (hori == HorizontalAlignment.Left && vert == VerticalAlignment.Bottom)
+			{
+				Canvas.SetLeft(CurSceneCharacterDisplays[timelineind].Item2, 0);
+				Canvas.SetTop(CurSceneCharacterDisplays[timelineind].Item2, gridh - CurSceneCharacterDisplays[timelineind].Item2.Height);
+
+				CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Left;
+				CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Bottom;
+
+				//for file data
+				CurActiveDialogueScene.Characters[timelineind].HorizontalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment.ToString();
+				CurActiveDialogueScene.Characters[timelineind].VerticalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment.ToString();
+			}
+			else if (hori == HorizontalAlignment.Right && vert == VerticalAlignment.Bottom)
+			{
+				Canvas.SetLeft(CurSceneCharacterDisplays[timelineind].Item2, gridw - CurSceneCharacterDisplays[timelineind].Item2.Width);
+				Canvas.SetTop(CurSceneCharacterDisplays[timelineind].Item2, gridh - CurSceneCharacterDisplays[timelineind].Item2.Height);
+
+				CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Right;
+				CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Bottom;
+				
+				//for file data
+				CurActiveDialogueScene.Characters[timelineind].HorizontalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment.ToString();
+				CurActiveDialogueScene.Characters[timelineind].VerticalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment.ToString();
+			}
+		}
+
+		private void DialogueEditor_BackCanvas_OnSizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			double gridw = DialogueEditor_BackCanvas.ActualWidth;
+			double gridh = DialogueEditor_BackCanvas.ActualHeight;
+			foreach (Tuple<ContentControl, ContentControl> GameUICC in CurSceneCharacterDisplays)
+			{
+				HorizontalAlignment hori = GameUICC.Item2.HorizontalAlignment;
+				VerticalAlignment vert = GameUICC.Item2.VerticalAlignment;
+				
+
+				if (hori == HorizontalAlignment.Left && vert == VerticalAlignment.Top)
+				{
+					Canvas.SetLeft(GameUICC.Item2, 0);
+					Canvas.SetTop(GameUICC.Item2, 0);
+				}
+				else if (hori == HorizontalAlignment.Right && vert == VerticalAlignment.Top)
+				{
+					Canvas.SetLeft(GameUICC.Item2,
+						gridw - GameUICC.Item2.ActualWidth);
+					Canvas.SetTop(GameUICC.Item2, 0);
+				}
+				else if (hori == HorizontalAlignment.Left && vert == VerticalAlignment.Bottom)
+				{
+					Canvas.SetLeft(GameUICC.Item2, 0);
+					Canvas.SetTop(GameUICC.Item2,
+						gridh - GameUICC.Item2.ActualHeight);
+				}
+				else if (hori == HorizontalAlignment.Right && vert == VerticalAlignment.Bottom)
+				{
+					Canvas.SetLeft(GameUICC.Item2,
+						gridw - GameUICC.Item2.ActualWidth);
+					Canvas.SetTop(GameUICC.Item2,
+						gridh - GameUICC.Item2.ActualHeight);
+				}
+			}
+		}
+
 
 		private LinkedList<TimeBlock> defLL;
 		private void ResetExecution_Hook()
@@ -4463,8 +4557,12 @@ namespace AmethystEngine.Forms
 					PropertyBags.Add(dialoguePropertyBag);
 				}
 
-				
-				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Type", "Time Block", new TextBox() { IsEnabled = false }));
+				try
+				{
+					timeblockPropertyBag.Properties.Add(
+						new Tuple<string, object, Control>("Type", "Time Block", new TextBox() {IsEnabled = false}));
+				}
+				catch { return; }
 
 				TextBox startime_TB = new TextBox(); startime_TB.KeyDown += DE_SetStartTime;
 				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), startime_TB));
@@ -4561,9 +4659,9 @@ namespace AmethystEngine.Forms
 
 				TextBox startime_TB = new TextBox(); startime_TB.KeyDown += DE_SetStartTime;
 				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), startime_TB));
-				TextBox endtime_TB = new TextBox(); startime_TB.KeyDown += DE_SetEndTime;
+				TextBox endtime_TB = new TextBox(); endtime_TB.KeyDown += DE_SetEndTime;
 				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("End Time", TimeB.EndTime.ToString(), endtime_TB));
-				TextBox durationime_TB = new TextBox(); startime_TB.KeyDown += DE_SetDurationTime;
+				TextBox durationime_TB = new TextBox(); durationime_TB.KeyDown += DE_SetDurationTime;
 				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), durationime_TB));
 
 				int i = 0;
@@ -4711,6 +4809,11 @@ namespace AmethystEngine.Forms
 		public void SetSpriteImagePath_Dia(object sender, EventArgs e)
 		{
 			if (DialogueEditorSelectedControl is null) return;
+			else if (DialogueEditorSelectedControl is ChoiceTimeBlock choiceTime)
+			{
+				choiceTime.TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+				choiceTime.Trackname = CurActiveDialogueScene.Characters[0].Name;
+			}
 			else if (DialogueEditorSelectedControl is TimeBlock timeblock)
 			{
 				timeblock.TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
@@ -4766,7 +4869,7 @@ namespace AmethystEngine.Forms
 		/// This method right now will add a sprite, that is can be linked to change, and a UI object to the screen.
 		/// </summary>
 		/// <param name="c"></param>
-		public void AddCharacterHook(Character c, GameUI gameUi, String GameFileUI, String LinkedTextboxName, String LinkedDialogueImage_Text = null)
+		public void AddCharacterHook(SceneCharacter c, GameUI gameUi, String GameFileUI, String LinkedTextboxName, String LinkedDialogueImage_Text = null)
 		{
 			CurActiveDialogueScene.Characters.Add(c);
 			DialogueEditor_Timeline.AddTimeline(c.Name);
@@ -4812,8 +4915,9 @@ namespace AmethystEngine.Forms
 
 				CurActiveDialogueScene.Characters[CurActiveDialogueScene.Characters.IndexOf(c)].DialogueSprites.Add(
 					new Sprite(img.Source.ToString(), img.Source.ToString(), 0, 0, (int)img.ActualWidth, (int)ActualHeight));
+				CurActiveDialogueScene.Characters.Last().LinkedImageBox = LinkedDialogueImage_Text;
 
-				
+
 				CurActiveDialogueScene.DialogueBoxes.Add(OpenUIEdits.Last());
 				CurActiveDialogueScene.DialogueBoxesFilePaths.Add(GameFileUI);
 
@@ -4865,7 +4969,7 @@ namespace AmethystEngine.Forms
 
 			//CurActiveDialogueScene.Characters.Add(new Character() { Name = "Antonio" });
 
-			Character c = new Character();
+			SceneCharacter c = new SceneCharacter(HorizontalAlignment.Left.ToString(), VerticalAlignment.Bottom.ToString());
 			Window w = new AddCharacterForm(ProjectFilePath) { AddToScene = AddCharacterHook};
 			w.ShowDialog();
 
@@ -4893,12 +4997,20 @@ namespace AmethystEngine.Forms
 				}
 
 				DialogueEditor_NodeGraph.EndblockExecution();
+				if (DialogueEditor_NodeGraph.CurrentExecutionBlock is NodeEditor.Components.SetConstantNodeBlock)
+				{
+					if (DialogueEditor_NodeGraph.StartBlockExecution())
+					{
+						DialogueEditor_NodeGraph.ExecuteBlock();
+						DialogueEditor_NodeGraph.EndblockExecution();
+					}
+				}
+
 				if (DialogueEditor_NodeGraph.CurrentExecutionBlock is NodeEditor.ExitBlockNode)
 				{
 					DialogueEditor_NodeGraph.EndblockExecution();
 					DialogueEditor_Timeline.PauseTimeline();
 				}
-				
 			}
 
 			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
@@ -5032,7 +5144,6 @@ namespace AmethystEngine.Forms
 					OutputLogSpliter.IsEnabled = true;
 					DialogueEditor_Timeline.PauseTimeline();
 				}
-
 			}
 			else
 			{
@@ -5061,9 +5172,28 @@ namespace AmethystEngine.Forms
 
 			DialogueEditor_Timeline.UpdateLayout();
 			DialogueEditor_Timeline.ResumeTimeline();
-			DialogueEditor_NodeGraph.ExecuteBlock();
-			DialogueEditor_NodeGraph.EndblockExecution();
-			DialogueEditor_NodeGraph.StartBlockExecution();
+			if (DialogueEditor_NodeGraph.StartBlockExecution())
+			{
+				if (DialogueEditor_NodeGraph.ExecuteBlock())
+				{
+					DialogueEditor_NodeGraph.EndblockExecution();
+					DialogueEditor_NodeGraph.StartBlockExecution();
+
+					if (DialogueEditor_NodeGraph.CurrentExecutionBlock is NodeEditor.ExitBlockNode)
+					{
+						DialogueEditor_NodeGraph.EndblockExecution();
+						DialogueEditor_Timeline.PauseTimeline();
+					}
+				}
+			}
+			else
+			{
+				DialogueEditor_Timeline.PauseTimeline();
+				if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
+					resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+				OutputLogSpliter.IsEnabled = true;
+			}
+
 			//(sender as ListBox).SelectedIndex;
 			//throw new NotImplementedException();
 		}
@@ -5228,8 +5358,9 @@ namespace AmethystEngine.Forms
 					}
 					else if (currentBlock is DialogueNodeBlock dialogue)
 					{
+						if (!output.Contains(dialogue.LinkedTimeBlock as TimeBlock))
+							output.AddLast(dialogue.LinkedTimeBlock as TimeBlock);
 						currentBlock = dialogue.OutputNodes[0].ConnectedNodes[0].ParentBlock;
-						output.AddLast(dialogue.LinkedTimeBlock as TimeBlock);
 					}
 					else if (currentBlock is SetConstantNodeBlock setConstant)
 					{
@@ -5247,6 +5378,7 @@ namespace AmethystEngine.Forms
 			}
 			catch
 			{
+				Console.WriteLine("Error Adding blocks to LL while traversing to exit");
 				return;
 			}
 		}
@@ -5255,7 +5387,7 @@ namespace AmethystEngine.Forms
 		{
 			DialogueEditor_Timeline.DeleteAllTimeBlocks();
 			List<String> chars =new List<string>();
-			foreach (Character character in CurActiveDialogueScene.Characters)
+			foreach (SceneCharacter character in CurActiveDialogueScene.Characters)
 			{
 				chars.Add(character.Name);
 			}
@@ -5265,11 +5397,74 @@ namespace AmethystEngine.Forms
 		private void DisplayTimeBlocksAfter_LL(LinkedList<TimeBlock> desiredLL)
 		{
 			List<String> chars = new List<string>();
-			foreach (Character character in CurActiveDialogueScene.Characters)
+			foreach (SceneCharacter character in CurActiveDialogueScene.Characters)
 			{
 				chars.Add(character.Name);
 			}
 			DialogueEditor_Timeline.AddTimeblock_LL(desiredLL, chars, false);
+
+			foreach (Timeline timeline in DialogueEditor_Timeline.GetTimelines())
+			{
+				if (timeline.TimelineisNull_flag)
+				{ timeline.ActiveBlock = timeline.timeBlocksLL.First; }
+				else if (timeline.ActiveBlock != null)
+					timeline.ActiveBlock = timeline.ActiveBlock.Next;
+				else if (timeline.ActiveBlock == null)
+					timeline.ActiveBlock = timeline.timeBlocksLL.First;
+				timeline.TimelineisNull_flag = false;
+			}
+
+		}
+
+		private void LoadTimelineWithSelectedPath(object selectedblock)
+		{
+			if (!(selectedblock is BaseNodeBlock)) return;
+			DialogueEditor_Timeline.DeleteAllTimeBlocks(); //delete all timeline data
+
+			//next up use the current block and build the new list from that.
+			BaseNodeBlock tempblock = selectedblock as BaseNodeBlock;
+			LinkedList<TimeBlock> timeBlocks = new LinkedList<TimeBlock>();
+
+			AddTimeblocksTillStart(ref timeBlocks, tempblock);
+			AddTimeBlocksTillExit(ref timeBlocks, tempblock);
+
+			DisplayTimeBlocks_LL(timeBlocks);
+		}
+
+		private void AddTimeblocksTillStart(ref LinkedList<TimeBlock> output, BaseNodeBlock tempblock)
+		{
+			try
+			{ 
+				while (!(tempblock is StartBlockNode))
+				{
+					//back track and add.
+					if (tempblock is ExitBlockNode exit)
+					{
+						tempblock = exit.EntryNode.ConnectedNodes[0].ParentBlock;
+					}
+					else if (tempblock is DialogueNodeBlock dialogue)
+					{
+						tempblock = dialogue.EntryNode.ConnectedNodes[0].ParentBlock;
+						output.AddFirst(dialogue.LinkedTimeBlock as TimeBlock);
+					}
+					else if (tempblock is SetConstantNodeBlock setConstant)
+					{
+						tempblock = setConstant.EntryNode.ConnectedNodes[0].ParentBlock;
+					}
+					else if (tempblock is ConditionalNodeBlock conditional)
+					{
+						tempblock = conditional.EntryNode.ConnectedNodes[0].ParentBlock;
+					}
+					else
+					{
+						tempblock = tempblock.InputNodes[0].ConnectedNodes[0].ParentBlock;
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+			}
 		}
 
 		private void SaveDialogueSceneAs_MI_Click(object sender, RoutedEventArgs e)
@@ -5317,6 +5512,357 @@ namespace AmethystEngine.Forms
 			CurActiveDialogueScene.ExportScene(
 				dlg.FileName, CurActiveDialogueScene.Characters.ToList(), CurActiveDialogueScene.DialogueBoxesFilePaths
 				, varDataList, BlockNodes);
+		}
+
+		private void OpenDialogueScene_MI_Click(object sender, RoutedEventArgs e)
+		{
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+			{
+				Title = "Open Dialogue File",
+				FileName = "", //default file name
+				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Dialogue"),
+				Filter = "Dialogue Scene files (*.dials)|*.dials",
+				FilterIndex = 2,
+				RestoreDirectory = true
+			};
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+			Console.WriteLine(dlg.FileName);
+			int charcnt = 0;
+			//DIALOGUE SCENE HOOKS
+			SetupDialogueSceneHooks();
+
+			List<Tuple<String, String, int, String ,String, int>> connectiList = new List<Tuple<string, String, int, String, string, int>>();
+
+			DialogueScene dia = DialogueScene.ImportScene(dlg.FileName, ref connectiList);
+			
+			foreach (Timeline tl in dia.Timelines)
+			{
+				tl.TrackImagePath = dia.Characters[charcnt++].DialogueSprites[0].ImgPathLocation;
+				DialogueEditor_Timeline.AddTimeline(tl);
+			}
+			//this is an import function so we need to remove the DEFAULT start and End Block.
+			//AND SET THE DialogueNodegraph.Start ref.
+			DialogueEditor_NodeGraph.NodeCanvas.Children.Clear();
+			foreach (BaseNodeBlock bn in dia.DialogueBlockNodes)
+			{
+				if (bn is StartBlockNode start)
+					DialogueEditor_NodeGraph.StartExecutionBlock = start;
+			}
+
+			//Add the variables to the scene
+			for (int i = 1; i < dia.DialogueSceneParams.Count; i++)
+			{
+				DialogueEditor_NodeGraph.bAddNew_Flag = true;
+				DialogueEditor_NodeGraph.AddRuntimeVar(dia.DialogueSceneParams[i]);
+			}
+
+			//If there are dialogue that have choices we need to set them.
+			SetUpAddedDialogueBlocks(dia);
+
+			//add characters to the editor objects section
+			CurActiveDialogueScene = dia;
+			Dialogue_CE_Tree.ItemsSource = CurActiveDialogueScene.Characters;
+
+			for (int i = 0; i < CurActiveDialogueScene.Characters.Count; i++)
+			{
+				CurActiveDialogueScene.DialogueBoxes.Add(GameUI.ImportGameUI(CurActiveDialogueScene.DialogueBoxesFilePaths[i]));
+				DialogueEditor_NodeGraph.SceneCharacters_list.Add(CurActiveDialogueScene.Characters[i].Name);
+			}
+
+			Console.WriteLine(Canvas.GetLeft(dia.DialogueBlockNodes[dia.DialogueBlockNodes.Count-1]));
+
+			DialogueEditor_NodeGraph.NodeCanvas.UpdateLayout();
+
+			foreach (Tuple<String, String, int, String , String, int> tup in connectiList)
+			{
+				try
+				{
+					BaseNodeBlock fromBlock = dia.DialogueBlockNodes.Find(x => x.Name == tup.Item1);
+					ConnectionNode fromBlockNode = GetFromConnectionNode(fromBlock, tup);
+
+
+					BaseNodeBlock toBlock = dia.DialogueBlockNodes.Find(x => x.Name == tup.Item4);
+					ConnectionNode toBlockNode = GetToConnectionNode(toBlock, tup);
+
+					DialogueEditor_NodeGraph.ConnectNodes(
+						fromBlockNode,
+						GetNodePosition(fromBlock, fromBlockNode),
+						toBlockNode,
+						GetNodePosition(toBlock, toBlockNode)
+					);
+				}
+				catch
+				{
+					Console.WriteLine("FAILED CONNECTION @ :\n" + tup.ToString());
+					continue;
+				}
+			}
+
+			charcnt = 0;
+			foreach (GameUI gameUi in dia.DialogueBoxes)
+			{
+				OpenUIEdits.Add(gameUi);
+				ContentControl CC = DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false, CurActiveDialogueScene.Characters[charcnt].LinkedImageBox );
+
+				//(DialogueEditor_Grid.Children[DialogueEditor_Grid.Children.Count - 1] as ContentControl).HorizontalAlignment =
+				//	HorizontalAlignment.Right;
+				//(DialogueEditor_Grid.Children[DialogueEditor_Grid.Children.Count - 1] as ContentControl).VerticalAlignment= VerticalAlignment.Bottom;
+				//DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false);
+
+				//create the pointers to the content controls. which is what displays my images to the screen
+				CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
+
+				//Change the Display positon of the 
+				HorizontalAlignment hori = 0;
+				VerticalAlignment vert = 0;
+				if (CurActiveDialogueScene.Characters[charcnt].HorizontalAnchor == HorizontalAlignment.Left.ToString())
+				{
+					hori = HorizontalAlignment.Left;
+				}
+				else
+				{
+					hori = HorizontalAlignment.Right;
+				}
+				if (CurActiveDialogueScene.Characters[charcnt].VerticalAnchor == VerticalAlignment.Top.ToString())
+				{
+					vert = VerticalAlignment.Top;
+				}
+				else
+				{
+					vert = VerticalAlignment.Bottom;
+				}
+				ChangeDialogueUIAnchorPostion_Hook(hori, vert, charcnt);
+				charcnt++;
+			}
+		}
+
+		private ConnectionNode GetFromConnectionNode(BaseNodeBlock fromBlock, Tuple<String, String, int, String, String, int> tup)
+		{
+			ConnectionNode fromBlockNode = null;
+			if (fromBlock is StartBlockNode start)//|| fromBlock is ExitBlockNode)
+			{
+				fromBlockNode = start.ExitNode;
+			}
+			else if (fromBlock is BaseArithmeticBlock arth)
+			{
+				fromBlockNode = arth.OutValue;
+			}
+			else if (fromBlock is BaseLogicNodeBlock logi)
+			{
+				fromBlockNode = logi.Output;
+			}
+			else if (fromBlock is ConditionalNodeBlock condi)
+			{
+				fromBlockNode = (tup.Item3 == 0 ? condi.TrueOutput : condi.FalseOutput);
+			}
+			else if (fromBlock is SetConstantNodeBlock seti)
+			{
+				if (tup.Item2 == "Exit")
+					fromBlockNode = seti.ExitNode;
+				else fromBlockNode = seti.OutValue;
+			}
+			else if (fromBlock is GetConstantNodeBlock getvar)
+			{
+				fromBlockNode = getvar.output;
+			}
+			else if (fromBlock is DialogueNodeBlock dialogue)
+			{
+				fromBlockNode = dialogue.OutputNodes[tup.Item3];
+			}
+			return fromBlockNode;
+		}
+
+		private ConnectionNode GetToConnectionNode(BaseNodeBlock fromBlock, Tuple<String, String, int, String, String, int> tup)
+		{
+			ConnectionNode fromBlockNode = null;
+			if (fromBlock is ExitBlockNode exit)//|| fromBlock is ExitBlockNode)
+			{
+				fromBlockNode = exit.EntryNode;
+			}
+			else if (fromBlock is BaseArithmeticBlock arth)
+			{
+				fromBlockNode = arth.InputNodes[tup.Item6];
+			}
+			else if (fromBlock is BaseLogicNodeBlock logi)
+			{
+				fromBlockNode = logi.InputNodes[tup.Item6];
+			}
+			else if (fromBlock is ConditionalNodeBlock condi)
+			{
+				if (tup.Item5 == "Enter")
+					fromBlockNode = condi.EntryNode;
+				else fromBlockNode = condi.InputNodes[tup.Item6];
+			}
+			else if (fromBlock is SetConstantNodeBlock seti)
+			{
+				if (tup.Item5 == "Enter")
+					fromBlockNode = seti.EntryNode;
+				else fromBlockNode = seti.InputNodes[tup.Item6];
+			}
+			else if (fromBlock is DialogueNodeBlock dialogue)
+			{
+				if (tup.Item5 == "Enter")
+					fromBlockNode = dialogue.EntryNode;
+				else fromBlockNode = dialogue.InputNodes[tup.Item6];
+			}
+			return fromBlockNode;
+		}
+
+		private void SetUpAddedDialogueBlocks(DialogueScene dia)
+		{
+			//If there are dialogue that have choices we need to set them.
+			foreach (BaseNodeBlock bn in dia.DialogueBlockNodes)
+			{
+				//display the nodes.
+				Canvas.SetLeft(bn, bn.LocX);
+				Canvas.SetTop(bn, bn.LocY);
+
+				AllDialogueEditor_Grid.Visibility = Visibility.Visible;
+				bn.ApplyTemplate();
+				DialogueEditor_NodeGraph.AddToNodeEditor(bn);
+				bn.ApplyTemplate();
+				//var v = bn.FindResource("MainBorder");
+				if (bn is DialogueNodeBlock dialo)
+				{
+					//add Inputs display wise
+					Button b = dialo.Template.FindName("AddInputNode_BTN", dialo) as Button;
+					if (dialo.InputNodes.Count > 1)
+					{
+						dialo.bChoice = true;
+						int i = 1;
+						int j = dialo.InputNodes.Count;
+						while (i++ < j)
+						{
+							DialogueEditor_NodeGraph.bAddNew_Flag = false;
+							DialogueEditor_NodeGraph.AddDialogueInput(b);
+						}
+					}
+
+					//add outputs display wise
+					Button v = dialo.Template.FindName("AddOutputNode_BTN", dialo) as Button;
+					if (dialo.OutputNodes.Count > 1)
+					{
+						dialo.bChoice = true;
+						int i = 1;
+						int j = dialo.DialogueTextOptions.Count;
+						while (i++ < j)
+						{
+							DialogueEditor_NodeGraph.bAddNew_Flag = false;
+							DialogueEditor_NodeGraph.AddDialogueBlockOutput(v);
+						}
+					}
+				}
+				//CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
+			}
+		}
+
+		private Point GetNodePosition(BaseNodeBlock NodeBlock, ConnectionNode DesNode)
+		{
+			Point retPoint = new Point(0, 0);
+
+			if (NodeBlock is StartBlockNode || NodeBlock is ExitBlockNode)
+			{
+				if (NodeBlock.EntryNode == DesNode)
+				{
+					retPoint.X = Canvas.GetLeft(NodeBlock);
+					retPoint.Y = Canvas.GetTop(NodeBlock) + 30;
+				}
+				else if (NodeBlock.ExitNode == DesNode)
+				{
+					retPoint.X = Canvas.GetLeft(NodeBlock) + 75;
+					retPoint.Y = Canvas.GetTop(NodeBlock) + 30;
+				}
+			}
+			else if (NodeBlock is BaseArithmeticBlock || NodeBlock is BaseLogicNodeBlock
+			                                     || NodeBlock is ConditionalNodeBlock 
+			                                     || NodeBlock is SetConstantNodeBlock)
+			{
+				if (NodeBlock.EntryNode == DesNode)
+				{
+					retPoint.X = Canvas.GetLeft(NodeBlock);
+					retPoint.Y = Canvas.GetTop(NodeBlock) + 10;
+				}
+				else if(NodeBlock.ExitNode == DesNode)
+				{
+					retPoint.X = Canvas.GetLeft(NodeBlock) + 150;
+					retPoint.Y = Canvas.GetTop(NodeBlock) + 10;
+				}
+				else if (NodeBlock.InputNodes.FindIndex(x=> x == DesNode) >=0)
+				{
+					int idx = NodeBlock.InputNodes.FindIndex(x => x == DesNode);
+					retPoint.X = Canvas.GetLeft(NodeBlock);
+					retPoint.Y = 20 + Canvas.GetTop(NodeBlock) + ((idx * 30) + 15);
+				}
+				else if (NodeBlock.OutputNodes.FindIndex(x => x == DesNode) >= 0)
+				{
+					int idx = NodeBlock.OutputNodes.FindIndex(x => x == DesNode);
+					retPoint.X = 150 + Canvas.GetLeft(NodeBlock);
+					retPoint.Y = 20 + Canvas.GetTop(NodeBlock) + ((idx * 30) + 15);
+				}
+			}
+			else if (NodeBlock is GetConstantNodeBlock getvar)
+			{
+				if (getvar.output == DesNode)
+				{
+					retPoint.X = Canvas.GetLeft(NodeBlock) + 95;
+					retPoint.Y = Canvas.GetTop(NodeBlock) + 40;
+				}
+			}
+			else if (NodeBlock is DialogueNodeBlock)
+			{
+				//- I1=>20 + (40 * (i)) + 20
+				//- O1=>X = 15,Y = 20 + (40 * (i)) + 20
+				if (NodeBlock.EntryNode == DesNode)
+				{
+					retPoint.X = Canvas.GetLeft(NodeBlock);
+					retPoint.Y = Canvas.GetTop(NodeBlock) + 10;
+				}
+				else if (NodeBlock.InputNodes.FindIndex(x => x == DesNode) >= 0)
+				{
+					int idx = NodeBlock.InputNodes.FindIndex(x => x == DesNode);
+					retPoint.X = Canvas.GetLeft(NodeBlock);
+					retPoint.Y = 20 + Canvas.GetTop(NodeBlock) + ((idx * 40) + 20);
+				}
+				else if (NodeBlock.OutputNodes.FindIndex(x => x == DesNode) >= 0)
+				{
+					int idx = NodeBlock.OutputNodes.FindIndex(x => x == DesNode);
+					retPoint.X = 150 + Canvas.GetLeft(NodeBlock);
+					retPoint.Y = 20 + (NodeBlock.InputNodes.Count*40) + Canvas.GetTop(NodeBlock) + ((idx * 40) + 20);
+				}
+			}
+
+			Console.WriteLine(retPoint);
+			return retPoint;
+		}
+
+		private void SetupDialogueSceneHooks()
+		{
+			//DIALOGUE SCENE HOOKS
+			AllDialogueEditor_Grid.Visibility = Visibility.Visible;
+
+			DialogueEditor_Timeline.TimeBlockSync = DialogueHook;
+			DialogueEditor_Timeline.SelectionChanged_Hook = ShowTimelineSelectedProperties;
+			DialogueEditor_Timeline.ActiveTBblocks.CollectionChanged += ActiveTBblocks_CollectionChanged;
+			DialogueEditor_Timeline.OnCreateTimeblockHook += CreateDialogueBlockForTimeline;
+			DialogueEditor_Timeline.Reset_Hook += ResetExecution_Hook;
+			DialogueEditor_Timeline.ChangeUIPosition_Hook += ChangeDialogueUIAnchorPostion_Hook;
+
+			DialogueEditor_NodeGraph.CurrentErrors.CollectionChanged += NodeEditorCurrentErrorsOnCollectionChanged;
+			DialogueEditor_NodeGraph.SelectionChanged_Hook = ShowTimelineSelectedProperties;
+			DialogueEditor_NodeGraph.OnCreateTimeblockHook += CreateTimeBlockForDialogue;
+			DialogueEditor_NodeGraph.TimelineLoad_Hook += LoadTimelineWithSelectedPath;
+
+
 		}
 	}
 }

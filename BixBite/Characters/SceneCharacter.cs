@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace BixBite.Characters
 {
-	public class Character
+	public class SceneCharacter
 	{
 		//Every Character has a name
 		public String Name { get; set; }
@@ -20,10 +20,17 @@ namespace BixBite.Characters
 		//public ObservableCollection<String> DialogueSpritePaths { get; set; }
 		//every character has list of animations.
 
-		public Character()
+		public String LinkedImageBox = "";
+
+		public String HorizontalAnchor = "";
+		public String VerticalAnchor = "";
+
+		public SceneCharacter(String horizontal, String vertical)
 		{
 			DialogueSprites = new ObservableCollection<Sprite>();
-		}
+			HorizontalAnchor = horizontal;
+			VerticalAnchor = vertical;
+	}
 
 	}
 }
