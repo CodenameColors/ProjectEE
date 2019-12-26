@@ -5278,8 +5278,18 @@ namespace AmethystEngine.Forms
 		{
 			int i = DialogueEditor_Timeline.GetTimelinePosition(DialogueEditor_Timeline.selectedTimeline, null);
 			DialogueNodeBlock dialogueNode = new DialogueNodeBlock(CurActiveDialogueScene.Characters[i].Name);
-			dialogueNode.bChoice = bChoices;
 			DialogueEditor_NodeGraph.AddDialogueBlockToGraph(dialogueNode, CurActiveDialogueScene.Characters[i].Name, Timeblock);
+
+			dialogueNode.bChoice = bChoices;
+			if (bChoices)
+			{
+				(dialogueNode.LinkedTimeBlock as TimeBlock).Trackname = "choice";
+				dialogueNode.Header = "Dialogue Choice";
+			}
+			else
+				(dialogueNode.LinkedTimeBlock as TimeBlock).Trackname = CurActiveDialogueScene.Characters[i].Name;
+
+			//TODO: This needs to be changed for the word choice.
 
 			//Character
 			return dialogueNode;
