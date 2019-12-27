@@ -316,13 +316,23 @@ namespace BixBite
 					 curDialogueScene.DialogueSceneParams.Find(x=>x.VarName == reader.GetAttribute("Key").Split('_')[1])
 				});
 			else if(t.Name.Contains("SetConstant"))
-				baseNode = (BaseNodeBlock)Activator.CreateInstance(t, new object[] { ECOnnectionType.NONE });
+				baseNode = (BaseNodeBlock)Activator.CreateInstance(t, new object[] { ECOnnectionType.NONE, false });
 			else
 				baseNode = (BaseNodeBlock)Activator.CreateInstance(t);
 
 			baseNode.Name = reader.GetAttribute("Key");
 			baseNode.LocX = double.Parse(reader.GetAttribute("LocX"));
 			baseNode.LocY = double.Parse(reader.GetAttribute("LocY"));
+			if (baseNode is SetConstantNodeBlock setvar)
+			{
+				setvar.DType = (ECOnnectionType)Enum.Parse(typeof(ECOnnectionType), reader.GetAttribute("DataType"));
+			}
+			if (reader.GetAttribute("NewVal") != null)
+			{
+				baseNode.NewValConnected = false;
+				baseNode.NewValue_Constant = reader.GetAttribute("NewVal");
+			}
+			
 
 
 			//skip to nodes
@@ -373,7 +383,7 @@ namespace BixBite
 					{
 						reader.Read();
 						reader.Read();
-						if (reader.Name == "InputNode")
+						if (reader.Name == "InputNode" && reader.NodeType != XmlNodeType.EndElement)
 						{
 							baseNode.InputNodes.Add(new ConnectionNode(
 								baseNode, "InputNode"+baseNode.InputNodes.Count, 
@@ -385,6 +395,7 @@ namespace BixBite
 								reader.Read();
 								if (reader.Name == "Connection")
 								{
+									if (reader.GetAttribute("Node") == "") break; // this means the node exists BUT there is no connection set for this node
 									ConnectionList.Add(new Tuple<string, string, int, string, string, int>(
 										reader.GetAttribute("FromBlock"), 
 										reader.GetAttribute("Node"),
@@ -440,9 +451,12 @@ namespace BixBite
 				//TimeLines have not been made yet. So we need to set the parent timeline to null for now. But set this in the engine.
 				if (dialogue.OutputNodes.Count > 1)
 				{
-					dialogue.LinkedTimeBlock = new ChoiceTimeBlock(
-						Array.Find(curDialogueScene.Timelines.ToArray(), x => x.TrackName == dialogue.Header),
-						Double.Parse(reader.GetAttribute("Start")))
+					Timeline tltemp = null;
+					if (Array.Find(curDialogueScene.Timelines.ToArray(), x => x.TrackName == dialogue.Header) != null)
+						tltemp = Array.Find(curDialogueScene.Timelines.ToArray(), x => x.TrackName == dialogue.Header);
+					else
+						tltemp = curDialogueScene.Timelines[0];
+					dialogue.LinkedTimeBlock = new ChoiceTimeBlock(tltemp, Double.Parse(reader.GetAttribute("Start")))
 					{
 						EndTime = Double.Parse(reader.GetAttribute("End")), Trackname = dialogue.Header,
 						LinkedDialogueBlock = dialogue,
@@ -582,6 +596,12 @@ namespace BixBite
 			writer.WriteAttributeString(null, "Key", null, blockNode.Name);
 			writer.WriteAttributeString(null, "LocX", null, blockNode.LocX.ToString());
 			writer.WriteAttributeString(null, "LocY", null, blockNode.LocY.ToString());
+			if (blockNode.DType != ECOnnectionType.NONE)
+				writer.WriteAttributeString(null, "DataType", null, blockNode.DType.ToString());
+
+			if (!blockNode.NewValConnected && blockNode.NewValue_Constant != null)
+				writer.WriteAttributeString(null, "NewVal", null, blockNode.NewValue_Constant);
+
 			if (blockNode is DialogueNodeBlock dialogue)
 				writer.WriteAttributeString(null, "Character", null, dialogue.Header);
 
@@ -626,19 +646,35 @@ namespace BixBite
 				writer.WriteStartElement(null, "Inputs", null);
 				foreach (ConnectionNode input in blockNode.InputNodes)
 				{
-					foreach (ConnectionNode cn in input.ConnectedNodes)
+					if (input.ConnectedNodes.Count > 0)
+					{
+						foreach (ConnectionNode cn in input.ConnectedNodes)
+						{
+							writer.WriteStartElement(null, "InputNode", null);
+							writer.WriteAttributeString(null, "Type", null, input.NodeType.ToString());
+
+							writer.WriteStartElement(null, "Connection", null);
+							writer.WriteAttributeString(null, "FromBlock", null, cn.ParentBlock.Name);
+							writer.WriteAttributeString(null, "Node", null, cn.ParentBlock.DType.ToString());
+							int ind = 0;
+							if (!(cn.ParentBlock is StartBlockNode start))
+								ind = Array.FindIndex(cn.ParentBlock.OutputNodes.ToArray(), x => x == cn);
+							if (ind != -1) writer.WriteAttributeString(null, "Ind", null, ind.ToString()); //get the index
+							else writer.WriteAttributeString(null, "Ind", null, Array.FindIndex(blockNode.InputNodes.ToArray(), x => x == input).ToString()); //get the index
+							writer.WriteEndElement(); //end of the Connection Tag
+							writer.WriteEndElement(); //end of the Input Tag
+						}
+					}
+					else
 					{
 						writer.WriteStartElement(null, "InputNode", null);
 						writer.WriteAttributeString(null, "Type", null, input.NodeType.ToString());
 
 						writer.WriteStartElement(null, "Connection", null);
-						writer.WriteAttributeString(null, "FromBlock", null, cn.ParentBlock.Name);
-						writer.WriteAttributeString(null, "Node", null, cn.ParentBlock.DType.ToString());
-						int ind = 0;
-						if (!(cn.ParentBlock is StartBlockNode start))
-							ind = Array.FindIndex(cn.ParentBlock.OutputNodes.ToArray(), x => x == cn);
-						if (ind != -1) writer.WriteAttributeString(null, "Ind", null, ind.ToString()); //get the index
-						else writer.WriteAttributeString(null, "Ind", null, Array.FindIndex(blockNode.InputNodes.ToArray(), x => x == input).ToString()); //get the index
+						writer.WriteAttributeString(null, "FromBlock", null, "");
+						writer.WriteAttributeString(null, "Node", null, "");
+						writer.WriteAttributeString(null, "Ind", null, ""); //get the index
+
 						writer.WriteEndElement(); //end of the Connection Tag
 						writer.WriteEndElement(); //end of the Input Tag
 					}
@@ -652,22 +688,38 @@ namespace BixBite
 				writer.WriteStartElement(null, "Outputs", null);
 				foreach (ConnectionNode output in blockNode.OutputNodes)
 				{
-					foreach (ConnectionNode cn in output.ConnectedNodes)
+					if (output.ConnectedNodes.Count > 0)
+					{
+						foreach (ConnectionNode cn in output.ConnectedNodes)
+						{
+							writer.WriteStartElement(null, "OutputNode", null);
+							writer.WriteAttributeString(null, "Type", null, output.NodeType.ToString());
+
+							writer.WriteStartElement(null, "Connection", null);
+							writer.WriteAttributeString(null, "ToNode", null, cn.ParentBlock.Name);
+							writer.WriteAttributeString(null, "Node", null, cn.ParentBlock.DType.ToString());
+							int ind = 0;
+							if (!(cn.ParentBlock is ExitBlockNode exit))
+								ind = Array.FindIndex(cn.ParentBlock.OutputNodes.ToArray(), x => x == cn);
+							if (ind != -1) writer.WriteAttributeString(null, "Ind", null, ind.ToString()); //get the index
+							else writer.WriteAttributeString(null, "Ind", null, Array.FindIndex(blockNode.OutputNodes.ToArray(), x => x == output).ToString()); //get the index
+							writer.WriteEndElement(); //end of the Connection Tag
+							writer.WriteEndElement(); //end of the Output Tag
+
+						}
+					}
+					else
 					{
 						writer.WriteStartElement(null, "OutputNode", null);
 						writer.WriteAttributeString(null, "Type", null, output.NodeType.ToString());
 
 						writer.WriteStartElement(null, "Connection", null);
-						writer.WriteAttributeString(null, "ToNode", null, cn.ParentBlock.Name);
-						writer.WriteAttributeString(null, "Node", null, cn.ParentBlock.DType.ToString());
-						int ind = 0;
-						if (!(cn.ParentBlock is ExitBlockNode exit))
-							ind = Array.FindIndex(cn.ParentBlock.OutputNodes.ToArray(), x => x == cn);
-						if(ind != -1)writer.WriteAttributeString(null, "Ind", null, ind.ToString()); //get the index
-						else writer.WriteAttributeString(null, "Ind", null, Array.FindIndex(blockNode.OutputNodes.ToArray(), x=>x==output).ToString()); //get the index
+						writer.WriteAttributeString(null, "ToNode", null, "");
+						writer.WriteAttributeString(null, "Node", null, "");
+						writer.WriteAttributeString(null, "Ind", null, ""); //get the index
+
 						writer.WriteEndElement(); //end of the Connection Tag
-						writer.WriteEndElement(); //end of the Output Tag
-						
+						writer.WriteEndElement(); //end of the Input Tag
 					}
 				}
 				writer.WriteEndElement(); //end of the Outputs Tag

@@ -5744,20 +5744,6 @@ namespace AmethystEngine.Forms
 				//var v = bn.FindResource("MainBorder");
 				if (bn is DialogueNodeBlock dialo)
 				{
-					//add Inputs display wise
-					Button b = dialo.Template.FindName("AddInputNode_BTN", dialo) as Button;
-					if (dialo.InputNodes.Count > 1)
-					{
-						dialo.bChoice = true;
-						int i = 1;
-						int j = dialo.InputNodes.Count;
-						while (i++ < j)
-						{
-							DialogueEditor_NodeGraph.bAddNew_Flag = false;
-							DialogueEditor_NodeGraph.AddDialogueInput(b);
-						}
-					}
-
 					//add outputs display wise
 					Button v = dialo.Template.FindName("AddOutputNode_BTN", dialo) as Button;
 					if (dialo.OutputNodes.Count > 1)
@@ -5769,6 +5755,23 @@ namespace AmethystEngine.Forms
 						{
 							DialogueEditor_NodeGraph.bAddNew_Flag = false;
 							DialogueEditor_NodeGraph.AddDialogueBlockOutput(v);
+							(dialo.LinkedTimeBlock as TimeBlock).Trackname = "choice";
+						}
+					}
+
+
+					//add Inputs display wise
+					Button b = dialo.Template.FindName("AddInputNode_BTN", dialo) as Button;
+					if (dialo.InputNodes.Count > 1)
+					{
+						dialo.bChoice = true;
+						int i = 1;
+						int j = dialo.InputNodes.Count;
+						while (i++ < j)
+						{
+							DialogueEditor_NodeGraph.bAddNew_Flag = false;
+							DialogueEditor_NodeGraph.AddDialogueInput(b);
+							(dialo.LinkedTimeBlock as TimeBlock).Trackname = "choice";
 						}
 					}
 				}
