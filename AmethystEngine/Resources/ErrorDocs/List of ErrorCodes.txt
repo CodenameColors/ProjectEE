@@ -1,0 +1,8 @@
+﻿LevelEditor:
+
+UIEditor
+
+DialogueEditor
+-1 = Timeblocks sprite image wasn't set.
+-2 = Timeblocks linked textbox wasn't set.
+-3 = New Dialogue Scene hasn't been created yet.

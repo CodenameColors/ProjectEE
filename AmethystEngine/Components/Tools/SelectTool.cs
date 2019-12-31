@@ -76,11 +76,11 @@ namespace AmethystEngine.Components.Tools
 			foreach(Sprite spr in sprites)
 			{
 				//since the top, left are doubles check both Math.Floor, and Math.Ceil
-				if ((int)spr.GetProperty("x") == Math.Floor(Canvas.GetLeft(cc)) &&
-					(int)spr.GetProperty("y") == Math.Floor(Canvas.GetTop(cc)))
+				if ((int)spr.GetPropertyData("x") == Math.Floor(Canvas.GetLeft(cc)) &&
+					(int)spr.GetPropertyData("y") == Math.Floor(Canvas.GetTop(cc)))
 					return spr;
-				else if ((int)spr.GetProperty("x") == Math.Ceiling(Canvas.GetLeft(cc)) &&
-					(int)spr.GetProperty("y") == Math.Ceiling(Canvas.GetTop(cc)))
+				else if ((int)spr.GetPropertyData("x") == Math.Ceiling(Canvas.GetLeft(cc)) &&
+					(int)spr.GetPropertyData("y") == Math.Ceiling(Canvas.GetTop(cc)))
 					return spr;
 			}
 			return null;
@@ -114,7 +114,7 @@ namespace AmethystEngine.Components.Tools
 			{
 				foreach(BixBite.GameEvent ge in SLGEvents)
 				{
-					if((int)ge.GetProperty("group") == group)
+					if((int)ge.GetPropertyData("group") == group)
 					{
 						return ge;
 					}

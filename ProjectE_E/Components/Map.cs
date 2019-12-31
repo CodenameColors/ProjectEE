@@ -96,8 +96,8 @@ namespace ProjectE_E.Components
 				}
 			}
 
-			mapwidth = 40 * (int)level.GetProperty("xCells");
-			mapheight = 40 * (int)level.GetProperty("yCells");
+			mapwidth = 40 * (int)level.GetPropertyData("xCells");
+			mapheight = 40 * (int)level.GetPropertyData("yCells");
 
 
 		}
@@ -172,10 +172,10 @@ namespace ProjectE_E.Components
 			{
 				Texture2D texture = sprites[spr.ImgPathLocation];
 				Rectangle r = new Rectangle();
-				r.X = (int)spr.GetProperty("x");
-				r.Y = (int)spr.GetProperty("y");
-				r.Width = (int)spr.GetProperty("width");
-				r.Height = (int)spr.GetProperty("height");
+				r.X = (int)spr.GetPropertyData("x");
+				r.Y = (int)spr.GetPropertyData("y");
+				r.Width = (int)spr.GetPropertyData("width");
+				r.Height = (int)spr.GetPropertyData("height");
 				MapTiles.Add(new Tile(texture, r, 0, 0));
 			}
 		}
@@ -185,8 +185,8 @@ namespace ProjectE_E.Components
 
 			foreach(GameEvent g in gameEvents)
 			{
-				if(!MapEvents.ContainsKey((int)g.GetProperty("group")))
-					MapEvents.Add((int)g.GetProperty("group"),g);
+				if(!MapEvents.ContainsKey((int)g.GetPropertyData("group")))
+					MapEvents.Add((int)g.GetPropertyData("group"),g);
 			}
 
 			List<Tile> GETiles = new List<Tile>();//MapTiles.Where(item => item.EventGroup != 0);
@@ -223,7 +223,7 @@ namespace ProjectE_E.Components
 					{
 						foreach(GameEvent g in gameEvents)
 						{
-							if((int)g.GetProperty("group") == GELocations[i, j])
+							if((int)g.GetPropertyData("group") == GELocations[i, j])
 							{
 								eventnum = (int)g.eventType;
 									break;
@@ -256,10 +256,10 @@ namespace ProjectE_E.Components
 			ClearEventLUT();
 			foreach (GameEvent ge in gameEvents)
 			{
-				if (EventLUT.ContainsKey((int)ge.GetProperty("group"))) continue;
+				if (EventLUT.ContainsKey((int)ge.GetPropertyData("group"))) continue;
 				EventLUT.Add(
-					(int)ge.GetProperty("group"),
-					Type.GetType("ProjectE_E.Components.Cuprite.MapEvents").GetMethod(ge.GetProperty("DelegateEventName").ToString())
+					(int)ge.GetPropertyData("group"),
+					Type.GetType("ProjectE_E.Components.Cuprite.MapEvents").GetMethod(ge.GetPropertyData("DelegateEventName").ToString())
 					);
 			}
 		}
