@@ -1,4 +1,6 @@
-﻿using BixBite.Characters;
+﻿#define DEV_DEBUG
+
+using BixBite.Characters;
 using BixBite.Rendering;
 using BixBite.Rendering.UI;
 using System;
@@ -13,6 +15,7 @@ using System.Xml;
 using BixBite.Resources;
 using NodeEditor;
 using NodeEditor.Components;
+using NodeEditor.Components.Logic;
 using TimelinePlayer.Components;
 
 namespace BixBite
@@ -306,19 +309,55 @@ namespace BixBite
 		{
 			//first what type of block node is it?
 			Type t = Type.GetType(String.Format("{0}, {1}", reader.Name, "NodeEditor"));
-			BaseNodeBlock baseNode;
+			BaseNodeBlock baseNode = null;
 			if (t.Name.Contains("Dialogue"))
-				baseNode = (BaseNodeBlock)Activator.CreateInstance(t, new object[]{reader.GetAttribute("Character"), false});
+				baseNode = (DialogueNodeBlock)Activator.CreateInstance(t, new object[]{reader.GetAttribute("Character"), false});
 			else if (t.Name.Contains("GetConstant"))
-				baseNode = (BaseNodeBlock)Activator.CreateInstance(t, new object[]
+				baseNode = (GetConstantNodeBlock)Activator.CreateInstance(t, new object[]
 				{
 					 ECOnnectionType.Int,
-					 curDialogueScene.DialogueSceneParams.Find(x=>x.VarName == reader.GetAttribute("Key").Split('_')[1])
+					 curDialogueScene.DialogueSceneParams.Find(x=>x.VarName == reader.GetAttribute("Key").Split('_')[1]),
+					 false
 				});
 			else if(t.Name.Contains("SetConstant"))
 				baseNode = (BaseNodeBlock)Activator.CreateInstance(t, new object[] { ECOnnectionType.NONE, false });
+			else if (t.Name.Contains("Conditional"))
+			{
+				if (reader.GetAttribute("Key").Contains("LT_"))
+				{
+					baseNode = (ConditionalNodeBlock)Activator.CreateInstance(t, new object[] { ECOnnectionType.Int, EConditionalTypes.Less, false });
+				}
+				else if (reader.GetAttribute("Key").Contains("LE_"))
+				{
+					baseNode = (ConditionalNodeBlock)Activator.CreateInstance(t, new object[] { ECOnnectionType.Int, EConditionalTypes.LessEquals, false });
+				}
+				else if (reader.GetAttribute("Key").Contains("GT_"))
+				{
+					baseNode = (ConditionalNodeBlock)Activator.CreateInstance(t, new object[] { ECOnnectionType.Int, EConditionalTypes.Greater, false });
+				}
+				else if (reader.GetAttribute("Key").Contains("GE_"))
+				{
+					baseNode = (ConditionalNodeBlock)Activator.CreateInstance(t, new object[] { ECOnnectionType.Int, EConditionalTypes.GreaterEquals, false });
+				}
+				else if (reader.GetAttribute("Key").Contains("Eq_"))
+				{
+					baseNode = (ConditionalNodeBlock)Activator.CreateInstance(t, new object[] { ECOnnectionType.Int, EConditionalTypes.Equals, false });
+				}
+				else if (reader.GetAttribute("Key").Contains("NEq_"))
+				{
+					baseNode = (ConditionalNodeBlock)Activator.CreateInstance(t, new object[] { ECOnnectionType.Int, EConditionalTypes.NotEquals, false });
+				}
+				baseNode.DType = ECOnnectionType.Int;
+			}
+			else if(t.Namespace.Contains("Logic") || t.Namespace.Contains("Arithmetic"))
+				baseNode = (BaseNodeBlock)Activator.CreateInstance(t, new object[]{false});
 			else
-				baseNode = (BaseNodeBlock)Activator.CreateInstance(t);
+			{
+				baseNode = (BaseNodeBlock) Activator.CreateInstance(t);
+#if DEV_DEBUG
+				Console.WriteLine(t.Name + "||" + t.Namespace);
+#endif
+			}
 
 			baseNode.Name = reader.GetAttribute("Key");
 			baseNode.LocX = double.Parse(reader.GetAttribute("LocX"));
@@ -333,8 +372,6 @@ namespace BixBite
 				baseNode.NewValue_Constant = reader.GetAttribute("NewVal");
 			}
 			
-
-
 			//skip to nodes
 			while (reader.Name != "Nodes")
 				reader.Read();
@@ -424,7 +461,7 @@ namespace BixBite
 								baseNode, "OutputNode" + baseNode.OutputNodes.Count ,
 								(ECOnnectionType)Enum.Parse(typeof(ECOnnectionType), reader.GetAttribute("Type")))
 							);
-							if (!(baseNode is DialogueNodeBlock)) baseNode.DType = baseNode.OutputNodes[0].NodeType;
+							if (!(baseNode is DialogueNodeBlock || baseNode is ConditionalNodeBlock)) baseNode.DType = baseNode.OutputNodes[0].NodeType;
 							do
 							{
 								reader.Read();
@@ -612,12 +649,28 @@ namespace BixBite
 				foreach (ConnectionNode cn in blockNode.EntryNode.ConnectedNodes)
 				{
 					writer.WriteStartElement(null, "EntryNode", null);
-					writer.WriteAttributeString(null, "Type", null, cn.NodeType.ToString());
+					writer.WriteAttributeString(null, "Type", null, "Enter");
 
 					writer.WriteStartElement(null, "Connection", null);
 					writer.WriteAttributeString(null, "FromBlock", null, cn.ParentBlock.Name);
-					writer.WriteAttributeString(null, "Node", null, "Enter");
-					writer.WriteAttributeString(null, "Ind", null, Array.FindIndex(blockNode.EntryNode.ConnectedNodes.ToArray(), x => x == cn).ToString());
+					writer.WriteAttributeString(null, "Node", null, cn.NodeType.ToString());
+					int ind = -1;
+					if (blockNode.EntryNode.ConnectedNodes[0].ParentBlock.ExitNode != null)
+					{
+						ind = Array.FindIndex(blockNode.EntryNode.ConnectedNodes[0].ParentBlock.ExitNode.ConnectedNodes.ToArray(),
+							x => x == blockNode.EntryNode);
+						if (ind >= 0)
+							writer.WriteAttributeString(null, "Ind", null, ind.ToString());
+					}
+					if (blockNode.EntryNode.ConnectedNodes[0].ParentBlock.OutputNodes != null)
+					{
+						ind = Array.FindIndex(blockNode.EntryNode.ConnectedNodes[0].ParentBlock.OutputNodes.ToArray(),
+							x => x == blockNode.EntryNode.ConnectedNodes[0]);
+						if (ind >= 0)
+							writer.WriteAttributeString(null, "Ind", null, ind.ToString());
+					}
+					if(ind == -1)
+						Console.WriteLine("Incorrect!! No node found during saving.");
 					writer.WriteEndElement(); //end of the Connection Tag
 					writer.WriteEndElement(); //end of the EntryNode Tag
 				}
@@ -629,11 +682,11 @@ namespace BixBite
 				foreach (ConnectionNode cn in blockNode.ExitNode.ConnectedNodes)
 				{
 					writer.WriteStartElement(null, "ExitNode", null);
-					writer.WriteAttributeString(null, "Type", null, cn.NodeType.ToString());
+					writer.WriteAttributeString(null, "Type", null, "Exit");
 
 					writer.WriteStartElement(null, "Connection", null);
 					writer.WriteAttributeString(null, "ToBlock", null, cn.ParentBlock.Name);
-					writer.WriteAttributeString(null, "Node", null, "Exit");
+					writer.WriteAttributeString(null, "Node", null, cn.NodeType.ToString());
 					writer.WriteAttributeString(null, "Ind", null, Array.FindIndex(blockNode.ExitNode.ConnectedNodes.ToArray(), x => x == cn).ToString());
 					writer.WriteEndElement(); //end of the Connection Tag
 					writer.WriteEndElement(); //end of the EntryNode Tag

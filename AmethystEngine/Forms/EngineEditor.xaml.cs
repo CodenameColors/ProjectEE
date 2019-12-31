@@ -27,6 +27,7 @@ using TimelinePlayer.Components;
 using BixBite.Characters;
 using NodeEditor;
 using NodeEditor.Components;
+using NodeEditor.Components.Arithmetic;
 using NodeEditor.Components.Logic;
 
 namespace AmethystEngine.Forms
@@ -587,8 +588,19 @@ namespace AmethystEngine.Forms
 				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["DialogueEditorObjects_Template"];
 				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["DialogueEditorObjectExplorer_Template"];
 				UpdateLayout();
-				if (((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control))).ItemsSource == null)
-					((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control))).ItemsSource = PropertyBags;
+				if (((CollapsedPropertyGrid.CollapsedPropertyGrid) (ObjectProperties_Control.Template.FindName(
+					    "DialoguePropertyGrid", ObjectProperties_Control))).ItemsSource == null)
+				{
+					try
+					{
+						((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control))).ItemsSource = PropertyBags;
+					}
+					catch
+					{
+						((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control))).ItemsSource = null;
+						((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control))).ItemsSource = PropertyBags;
+					}
+				}
 
 				Dialogue_CE_Tree = (TreeView)ContentLibrary_Control.Template.FindName("DialogueEditor_CE_TV", ContentLibrary_Control);
 			}
@@ -3609,7 +3621,7 @@ namespace AmethystEngine.Forms
 				}
 			}
 
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 
 		/// <summary>
@@ -5168,6 +5180,7 @@ namespace AmethystEngine.Forms
 			DialogueEditor_NodeGraph.ChangeChoiceVar((sender as ListBox).SelectedIndex);
 
 			defLL = GetChoiceTimeBlocks_LL(DialogueEditor_NodeGraph.CurrentExecutionBlock, (sender as ListBox).SelectedIndex);
+			if (defLL is null) return;
 			DisplayTimeBlocksAfter_LL(defLL);
 
 			DialogueEditor_Timeline.UpdateLayout();
@@ -5337,7 +5350,9 @@ namespace AmethystEngine.Forms
 
 		private LinkedList<TimeBlock> GetChoiceTimeBlocks_LL(BaseNodeBlock currentBlock, int choice)
 		{
-			LinkedList<TimeBlock> retLL = new LinkedList<TimeBlock>();
+			if (currentBlock.OutputNodes[choice].ConnectedNodes[0] != null &&
+			    currentBlock.OutputNodes[choice].ConnectedNodes[0].ParentBlock is ExitBlockNode) return null;
+				LinkedList<TimeBlock> retLL = new LinkedList<TimeBlock>();
 			//clear the timeblocks
 			DialogueEditor_Timeline.DeleteTimeBlocksAfter();
 
@@ -5582,7 +5597,6 @@ namespace AmethystEngine.Forms
 			//add characters to the editor objects section
 			CurActiveDialogueScene = dia;
 			Dialogue_CE_Tree.ItemsSource = CurActiveDialogueScene.Characters;
-
 			for (int i = 0; i < CurActiveDialogueScene.Characters.Count; i++)
 			{
 				CurActiveDialogueScene.DialogueBoxes.Add(GameUI.ImportGameUI(CurActiveDialogueScene.DialogueBoxesFilePaths[i]));
@@ -5591,8 +5605,9 @@ namespace AmethystEngine.Forms
 
 			Console.WriteLine(Canvas.GetLeft(dia.DialogueBlockNodes[dia.DialogueBlockNodes.Count-1]));
 
-			DialogueEditor_NodeGraph.NodeCanvas.UpdateLayout();
 
+			DialogueEditor_NodeGraph.NodeCanvas.UpdateLayout();
+			//connect all the blocks that we just added.
 			foreach (Tuple<String, String, int, String , String, int> tup in connectiList)
 			{
 				try
@@ -5619,6 +5634,7 @@ namespace AmethystEngine.Forms
 			}
 
 			charcnt = 0;
+			//Dialogue Boxes per character
 			foreach (GameUI gameUi in dia.DialogueBoxes)
 			{
 				OpenUIEdits.Add(gameUi);
@@ -5652,6 +5668,7 @@ namespace AmethystEngine.Forms
 					vert = VerticalAlignment.Bottom;
 				}
 				ChangeDialogueUIAnchorPostion_Hook(hori, vert, charcnt);
+				DialogueEditor_NodeGraph.bAddNew_Flag = true;
 				charcnt++;
 			}
 		}
