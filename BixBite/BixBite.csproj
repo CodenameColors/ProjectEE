@@ -36,6 +36,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="NodeEditor">
+      <HintPath>..\AmethystEngine\Resources\NodeEditor.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -45,20 +48,30 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="TimelinePlayer">
+      <HintPath>..\AmethystEngine\Resources\TimelinePlayer.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BixBiteTypes.cs" />
-    <Compile Include="Characters\Character.cs" />
+    <Compile Include="Characters\SceneCharacter.cs" />
     <Compile Include="Characters\Enemy.cs" />
     <Compile Include="Characters\NPC.cs" />
     <Compile Include="Characters\PartyMember.cs" />
     <Compile Include="Characters\Player.cs" />
+    <Compile Include="DialogueScene.cs" />
     <Compile Include="Effects\ImageEffect.cs" />
     <Compile Include="GameEvent.cs" />
     <Compile Include="Level.cs" />
+    <Compile Include="Rendering\UI\GameButton.cs" />
+    <Compile Include="Rendering\UI\GameIMG.cs" />
+    <Compile Include="Rendering\UI\GameTextBlock.cs" />
+    <Compile Include="Rendering\UI\GameUI.cs" />
+    <Compile Include="Rendering\UI\GameSmartTextBox.cs" />
+    <Compile Include="Rendering\UI\UIComponent.cs" />
+    <Compile Include="Resources\EE_Exceptions.cs" />
     <Compile Include="Resources\IProperties.cs" />
     <Compile Include="Resources\ObservableDictionary.cs" />
     <Compile Include="Resources\ObservablePropertyDictionary.cs" />

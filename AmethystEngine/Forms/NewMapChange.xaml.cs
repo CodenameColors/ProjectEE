@@ -247,13 +247,13 @@ namespace AmethystEngine.Forms
 					{
 						BitmapImage bitmap = new BitmapImage(new Uri(sprite.ImgPathLocation, UriKind.Absolute));
 						Image img = new Image(); img.Source = bitmap;
-						Rectangle r = new Rectangle() { Width = (int)sprite.GetProperty("width"), Height = (int)sprite.GetProperty("height"), Fill = new ImageBrush(img.Source) };//Make a rectange the size of the image
+						Rectangle r = new Rectangle() { Width = (int)sprite.GetPropertyData("width"), Height = (int)sprite.GetPropertyData("height"), Fill = new ImageBrush(img.Source) };//Make a rectange the size of the image
 
 						ContentControl CC = ((ContentControl)this.TryFindResource("MoveableImages_Template"));
-						CC.Width = (int)sprite.GetProperty("width");
-						CC.Height = (int)sprite.GetProperty("height");
+						CC.Width = (int)sprite.GetPropertyData("width");
+						CC.Height = (int)sprite.GetPropertyData("height");
 
-						Canvas.SetLeft(CC, (int)sprite.GetProperty("x")); Canvas.SetTop(CC, (int)sprite.GetProperty("y")); Canvas.SetZIndex(CC, Zindex);
+						Canvas.SetLeft(CC, (int)sprite.GetPropertyData("x")); Canvas.SetTop(CC, (int)sprite.GetPropertyData("y")); Canvas.SetZIndex(CC, Zindex);
 						((Rectangle)CC.Content).Fill = new ImageBrush(img.Source);
 						LevelEditor_Canvas.Children.Add(CC);
 					}

@@ -154,7 +154,7 @@
 		</TabControl>
 
 		<GridSplitter HorizontalAlignment="Left" Grid.Row="1" Grid.Column="1" Width="3" Background="#FF484848" />
-		<TextBlock x:Name="GameEventLog_TB" Grid.Column="1" HorizontalAlignment="Left" Margin="10,400,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Height="60" Width="582" Background="White" Foreground="Black"/>
+		<TextBlock x:Name="GameEventLog_TB" Grid.Column="1" HorizontalAlignment="Left" Margin="10,400,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Height="60" Width="582" Background="#FF212121" Foreground="White"/>
 	</Grid>
 </Window>
 

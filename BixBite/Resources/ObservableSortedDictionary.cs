@@ -37,7 +37,7 @@ using System.Runtime.Serialization;
 namespace BixBite.Resources
 {
     [Serializable]
-    public class ObservableSortedDictionary<TKey, TValue> : ObservableDictionary<TKey, TValue>, ISerializable, IDeserializationCallback
+    public class ObservableSortedDictionary<TKey, TValue> : ObservableCollection<TKey, TValue>, ISerializable, IDeserializationCallback
     {
         #region constructors
 

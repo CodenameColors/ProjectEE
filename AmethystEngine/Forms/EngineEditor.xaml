@@ -4,16 +4,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 				xmlns:pgrid ="clr-namespace:PropertyGridEditor;assembly=PropertyGridEditor"
+				xmlns:cpgrid="clr-namespace:CollapsedPropertyGrid;assembly=CollapsedPropertyGrid"
         xmlns:local="clr-namespace:AmethystEngine" 
 				xmlns:Bix="clr-namespace:BixBite;assembly=BixBite"
 				xmlns:BixRen="clr-namespace:BixBite.Rendering;assembly=BixBite"
+				xmlns:BixUI="clr-namespace:BixBite.Rendering.UI;assembly=BixBite"
 				xmlns:BixRes="clr-namespace:BixBite.Resources;assembly=BixBite"
 				xmlns:src="clr-namespace:AmethystEngine.Resources"
 				xmlns:WpfToolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
+				xmlns:BixChar="clr-namespace:BixBite.Characters;assembly=BixBite"
 				xmlns:DiagramDesigner="clr-namespace:DiagramDesigner" x:Class="AmethystEngine.Forms.EngineEditor"
-				
+				xmlns:Tline="clr-namespace:TimelinePlayer;assembly=TimelinePlayer"
+				xmlns:ne="clr-namespace:NodeEditor;assembly=NodeEditor"
+				xmlns:ol="clr-namespace:OutputLog;assembly=OutputLog"
 				mc:Ignorable="d" Background="#FF0E0D0D"
-        Title="AmethystEngine" Height="1000" Width="1600" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
+        Title="AmethystEngine" Height="800" Width="1200" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
 
 
 	<Window.Resources>
@@ -54,6 +59,11 @@
 				<Setter Property="FontSize" Value="12" />
 			</Style>
 
+			<ContextMenu x:Key="EditMovableControls_Template">
+				<MenuItem x:Name="Edit_CM" IsChecked="False" Header="Edit" Click="EditMoveableControl_Click">
+				</MenuItem>
+			</ContextMenu>
+
 			<ContextMenu x:Key="LevelContextMenu_Template">
 				<MenuItem Header="Add Tile Layer" Click="AddTileLayer_Click"/>
 				<MenuItem Header="Add Sprite Layer" Click="SpriteLayer_Click" />
@@ -83,6 +93,91 @@
 				</ComboBox>
 			</DataTemplate>
 
+			<ControlTemplate x:Key="DialogueEditorObjectExplorer_Template">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition/>
+						<ColumnDefinition Width="Auto" MinWidth="44"/>
+						<ColumnDefinition Width="Auto" MinWidth="292"/>
+					</Grid.ColumnDefinitions>
+
+					<Menu DockPanel.Dock="Top" Grid.Column="0" Background="Transparent" Foreground="White" VerticalAlignment="Top" Margin="0,4,0,3" Height="18">
+						<MenuItem Header="Dialogue Scene" Foreground="White">
+							<MenuItem x:Name="NewDialogueScene_MenuItem" Header="New Dialogue Scene" Foreground="Black" Click="NewDialogueScene_MenuItem_Click"/>
+							<MenuItem Header="Open Dialogue Scene" Foreground="Black" Click="OpenDialogueScene_MI_Click"/>
+							<MenuItem Header="Save Dialogue Scene" Foreground="Black"/>
+							<MenuItem Header="Save Dialogue Scene As" Foreground="Black" Click="SaveDialogueSceneAs_MI_Click" />
+						</MenuItem>
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="1" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Test" Click="DialogueEditorTesting_BTN"/>
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="2" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Test1" Click="TestingAddingCharacterpictersdia"/>
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="3" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Test 2" Click="Test2Dia_Click" />
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="4" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Move" />
+					</Menu>
+
+				</Grid>
+			</ControlTemplate>
+
+			<ControlTemplate x:Key="UIEditorObjectExplorer_Template">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition/>
+						<ColumnDefinition Width="Auto" MinWidth="44"/>
+						<ColumnDefinition Width="Auto" MinWidth="292"/>
+					</Grid.ColumnDefinitions>
+
+					<Menu DockPanel.Dock="Top" Grid.Column="0" Background="Transparent" Foreground="White" VerticalAlignment="Top" Margin="0,4,0,3" Height="18">
+						<MenuItem Header="UI" Foreground="White">
+							<MenuItem x:Name="NewLevel_MenuItem" Header="New UI" Foreground="Black" Click="NewUI_BTN_Click"/>
+							<MenuItem Header="Open UI" Foreground="Black" Click="OpenUIFile_UIE"/>
+							<MenuItem Header="Save UI" Foreground="Black"/>
+							<MenuItem Header="Save UI As" Foreground="Black" Click="SaveUIAs_Click"  />
+						</MenuItem>
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="1" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Draw"/>
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="2" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Selection" />
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="3" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Deselect" />
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="4" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Move" />
+					</Menu>
+
+				</Grid>
+			</ControlTemplate>
 
 
 			<!--<BixRes:ObservablePropertyDictionary x:Key="PropertyStyles"/>-->
@@ -213,10 +308,54 @@
 
 			<!--#endregion-->
 
-			<ControlTemplate x:Key="UIEditorObjects_Template">
-				
+			<ControlTemplate x:Key="DialogueEditorObjects_Template">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="30"/>
+						<RowDefinition Height="*"/>
+					</Grid.RowDefinitions>
+
+					<TextBlock Text="Add A Character" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,7,0,7"/>
+					<Button Content="+" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="106,5,0,5" Height="20" VerticalContentAlignment="Top" Width="20" RenderTransformOrigin="1.5,0.5" Click="AddCharacterToScene"/>
+
+					<TreeView x:Name="DialogueEditor_CE_TV" Grid.Row="1" Background="#FF383838">
+						<TreeView.Resources>
+							<HierarchicalDataTemplate DataType="{x:Type BixChar:SceneCharacter}" ItemsSource="{Binding DialogueSprites}">
+								<StackPanel Orientation="Horizontal">
+									<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50" />
+									<TextBlock Text="{Binding Name}" Foreground="White" />
+								</StackPanel>
+							</HierarchicalDataTemplate>
+							<DataTemplate DataType="{x:Type BixRen:Sprite}">
+								<StackPanel Orientation="Horizontal">
+									<Image Margin="0,0,5,0" Source="{Binding ImgPathLocation}" Width="50" Height="50"  />
+									<TextBlock Text="{Binding Name}" Foreground="White" />
+								</StackPanel>
+							</DataTemplate>
+						</TreeView.Resources>
+
+					</TreeView>
+				</Grid>
 			</ControlTemplate>
-			
+
+
+			<ControlTemplate x:Key="UIEditorObjects_Template" >
+				<Grid x:Name="LevelEditorTileMap_ToolBar_Grid" Background="#FF2B2B2B" VerticalAlignment="Stretch" Margin="5,4,10,8">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="75"/>
+						<RowDefinition Height="75"/>
+						<RowDefinition Height="75"/>
+						<RowDefinition Height="75"/>
+						<RowDefinition Height="75"/>
+						<RowDefinition Height="75"/>
+					</Grid.RowDefinitions>
+
+					<Button x:Name="UIEditoGameTB_BTN" Grid.Row="0" Content="Textbox" Click="UIEditoGameTB_BTN_Click"/>
+					<Button x:Name="UIEditoGameIMG_BTN" Grid.Row="1" Content="Image Box" Click="UIEditoGameIMG_BTN_Click"/>
+					<Button x:Name="UIEditoGameBTN_BTN" Grid.Row="2" Content="Button"/>
+				</Grid>
+			</ControlTemplate>
+
 			<ControlTemplate x:Key="LevelEditorTileMap_Template">
 				<TabControl x:Name="LevelEditorLibary_TabControl" Background="#FF2B2B2B" SelectionChanged="LevelEditorLibary_TabControl_SelectionChanged">
 
@@ -289,12 +428,29 @@
 				</ListBox>
 			</ControlTemplate>
 
-			<ContentControl x:Key="UIEditorSceneExplorer">
-				
-			</ContentControl>
-			
+			<ControlTemplate x:Key="UIEditorSceneExplorer_Template">
+				<TreeView x:Name="UISceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,0,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
+								 SelectedItemChanged="UISceneExplorer_TreeView_SelectedItemChanged" Loaded="UISceneExplorer_TreeView_Loaded">
+					<TreeView.Resources>
+						<HierarchicalDataTemplate DataType="{x:Type BixUI:GameUI}" ItemsSource="{Binding UIElements}">
+							<StackPanel Orientation="Horizontal">
+								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
+								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="20" MaxHeight="15" />
+								<TextBlock Text="{Binding UIName}" Foreground="White" />
+							</StackPanel>
+						</HierarchicalDataTemplate>
+						<DataTemplate DataType="{x:Type BixUI:GameTextBlock}">
+							<StackPanel Orientation="Horizontal">
+								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
+								<TextBlock Text="{Binding TBName}" Foreground="White" />
+							</StackPanel>
+						</DataTemplate>
+					</TreeView.Resources>
+				</TreeView>
+			</ControlTemplate>
+
 			<ControlTemplate x:Key="LevelEditorSceneExplorer_Template">
-				<TreeView x:Name="SceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,25,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
+				<TreeView x:Name="LESceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,0,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
 								 SelectedItemChanged="SceneExplorer_TreeView_SelectedItemChanged">
 					<TreeView.Resources>
 						<HierarchicalDataTemplate DataType="{x:Type Bix:Level}" ItemsSource="{Binding Layers}">
@@ -319,12 +475,18 @@
 					</TreeView.Resources>
 				</TreeView>
 			</ControlTemplate>
-			
-			
-			<ControlTemplate x:Key="UIEditorProperty_Template">
-				
+
+			<ControlTemplate x:Key="DialogueEditorProperty_Template">
+				<cpgrid:CollapsedPropertyGrid x:Name="DialoguePropertyGrid" Margin="0,54,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  BorderBrush="#FF828790" Background="#FF383838"/>
 			</ControlTemplate>
-			
+
+
+			<ControlTemplate x:Key="UIEditorProperty_Template">
+				<pgrid:PropGrid x:Name="UIPropertyGrid" Margin="0,54,0,0">
+
+				</pgrid:PropGrid>
+			</ControlTemplate>
+
 			<ControlTemplate x:Key="LevelEditorProperty_Template">
 				<Grid VerticalAlignment="Stretch" Grid.Column="2" Margin="0,45,0,0" Background="#FF2B2B2B">
 					<Grid.RowDefinitions>
@@ -354,17 +516,21 @@
 					<!--<pgrid:PropGrid x:Name="Properties_Grid" Grid.Row="1">
 						
 					</pgrid:PropGrid>-->
-					
+
 					<!--<Label Content="Properties:" VerticalAlignment="Top" HorizontalAlignment="Stretch" Grid.Row="1" Foreground="White"/>-->
 					<!--<ListView HorizontalAlignment="Stretch" Margin="0,4,0,0" Grid.Row="1" VerticalAlignment="Stretch" x:Name="LEditProperty_LB"
 									ItemsSource="{Binding Source={StaticResource PropertyStyles}}" Background="Transparent" IsSynchronizedWithCurrentItem="True">
 						<ListView.ItemContainerStyle>
 							<Style TargetType="{x:Type ListViewItem}">
 								<Style.Resources>
-									--><!--Foreground for Selected ListViewItem--><!--
+									-->
+					<!--Foreground for Selected ListViewItem-->
+					<!--
 									<SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" 
                                  Color="Black"/>
-									--><!--Background for Selected ListViewItem--><!--
+									-->
+					<!--Background for Selected ListViewItem-->
+					<!--
 									<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
                                  Color="Transparent"/>
 								</Style.Resources>
@@ -372,7 +538,9 @@
 						</ListView.ItemContainerStyle>
 						<ListView.View>
 
-							--><!--<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>--><!--
+							-->
+					<!--<WrapPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsItemsHost="True"/>-->
+					<!--
 
 							<GridView ColumnHeaderContainerStyle="{StaticResource LeditorLV_Style}" >
 								<GridViewColumn Header="Property" DisplayMemberBinding="{Binding Key}">
@@ -384,7 +552,7 @@
 							</GridView>
 						</ListView.View>
 					</ListView>-->
-					
+
 					<GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
 				</Grid>
 			</ControlTemplate>
@@ -429,6 +597,20 @@
 				</Border>
 			</DataTemplate>
 
+			<DataTemplate x:Key="CBIMGItems">
+				<Border     
+                  Margin="5"
+                  BorderThickness="1"
+                  BorderBrush="Transparent"
+                  VerticalAlignment="Top"
+                  >
+
+					<StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+						<Image Height="50" Grid.Column="0" HorizontalAlignment="Center" Stretch="Fill" VerticalAlignment="Top" Width="50" Source="{Binding Thumbnail}"/>
+						<TextBlock Text="{Binding Name}" Foreground="Black" HorizontalAlignment="Stretch" Height="auto" TextWrapping="Wrap" FontSize="10"/>
+					</StackPanel>
+				</Border>
+			</DataTemplate>
 
 			<DataTemplate x:Key="BigEdit">
 				<Border         Width="75" x:Name="EditorObject_Bor"
@@ -489,18 +671,37 @@
 											Height="130"
 											Canvas.Top="150"
 											Canvas.Left="470"
-											Selector.IsSelected="False"
+											SizeChanged="ContentControl_SizeChanged"
+											PreviewMouseLeftButtonDown="ContentControl_PreviewMouseLeftButtonDown"
+											PreviewMouseLeftButtonUp="ContentControl_PreviewMouseLeftButtonUp"
 											Selector.Unselected="Sprite_OnUnselected"
-											MouseLeftButtonUp="Sprite_MouseLeftButtonUp"
-											Style="{DynamicResource DesignerItemStyle}" 
-											MouseLeftButtonDown="ContentControl_MouseLeftButtonDown" Selector.SelectionChanged="ContentControl_SelectionChanged">
+											Style="{DynamicResource DesignerItemStyle}" >
 				<Rectangle x:Name="ResizeImage_rect" IsHitTestVisible="True" 
 										Stretch="Fill" MouseLeftButtonDown="Sprite_MouseLeftButtonDown" 
 									  >
-					<Rectangle.Fill>
+					<!--<Rectangle.Fill>
 						<ImageBrush x:Name="ResizeImage_Image" ImageSource="/AmethystEngine;component/images/smol megumin.jpg" />
-					</Rectangle.Fill>
+					</Rectangle.Fill>-->
 				</Rectangle>
+			</ContentControl>
+
+
+			<ContentControl x:Key="MoveableControls_Template"
+											x:Shared="False" 
+											Width="130"
+											Height="130"
+											Canvas.Top="150"
+											Canvas.Left="470"
+											SizeChanged="ContentControl_SizeChanged"
+											PreviewMouseRightButtonUp="ContentControl_PreviewMouseRightButtonUp"	
+											PreviewMouseLeftButtonDown="ContentControl_PreviewMouseLeftButtonDown"
+											PreviewMouseLeftButtonUp="ContentControl_PreviewMouseLeftButtonUp"
+											Selector.Unselected="Sprite_OnUnselected"
+											Style="{DynamicResource DesignerItemStyle}" PreviewMouseRightButtonDown="ContentControl_PreviewMouseRightButtonDown" PreviewMouseMove="ContentControl_PreviewMouseMove" >
+				<Grid x:Name="ResizeControl_Grid" IsHitTestVisible="True" 
+										MouseLeftButtonDown="Sprite_MouseLeftButtonDown" 
+									  >
+				</Grid>
 			</ContentControl>
 
 
@@ -515,6 +716,7 @@
 			<RowDefinition Height="25*" />
 			<RowDefinition Height="3" />
 			<RowDefinition Height="10*" />
+			<RowDefinition Height="1"/>
 		</Grid.RowDefinitions>
 		<GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter2" Background="#FF868686" ResizeDirection="Rows"/>
 		<!--I wanted a different color background.-->
@@ -566,6 +768,7 @@
 						<MenuItem Header="UI"  Foreground="Black" IsChecked="True" IsCheckable="True"/>
 						<MenuItem Header="Particle"  Foreground="Black" IsChecked="True" IsCheckable="True"/>
 						<Separator />
+						<MenuItem Header="Error/Output log"  Foreground="Black" IsChecked="False" IsCheckable="True" Click="ViewOutputLog_Click"/>
 					</MenuItem>
 				</Menu>
 				<Menu DockPanel.Dock="Top" Grid.Column="4" Background="Transparent" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0">
@@ -608,7 +811,7 @@
 				<TextBlock Text="+" Margin="0,0,1,2" VerticalAlignment="Center"/>
 			</Button>
 			<ContentControl x:Name="ContentLibrary_Control" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
-               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" Margin="0,46,0,-1" Template="{DynamicResource UIEditorObjects_Template}">
+               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" Margin="0,46,0,-1" Template="{DynamicResource DialogueEditorObjects_Template}">
 				<Expander Header="Expander" Height="100" Width="100">
 					<Grid Background="#FFE5E5E5"/>
 				</Expander>
@@ -618,17 +821,17 @@
 			<Label x:Name="label4" Content="Properties" Foreground="White" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
 
-			<ContentControl x:Name="ObjectProperties_Control" Template="{DynamicResource UIEditorProperty_Template}" Grid.Column="2" Grid.ColumnSpan="2"/>
+			<ContentControl x:Name="ObjectProperties_Control" Template="{DynamicResource DialogueEditorProperty_Template}" Grid.Column="2" Grid.ColumnSpan="2"/>
 
 			<ContentControl x:Name="EditorToolBar_CC" Grid.Column="1" Height="25" VerticalAlignment="Top" Margin="10,4,123,0"
-											Template="{DynamicResource LevelEditorTileMapToolBar_Template}"/>
+											Template="{DynamicResource DialogueEditorObjectExplorer_Template}"/>
 
 			<!--This is the main editor window-->
 
 
 			<GridSplitter x:Name="gridSplitter" Grid.Column="1" HorizontalAlignment="Left"  VerticalAlignment="Stretch" Width="3"  Background="#FF868686" />
 			<GridSplitter x:Name="gridSplitter1" Grid.Column="2" HorizontalAlignment="Left"  VerticalAlignment="Stretch" Width="3"  Background="#FF868686"/>
-			<TabControl x:Name="EditorWindows_TC" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White" Margin="10,30,5,6" BorderBrush="#FF3C3C3C" SelectionChanged="EditorWindows_TC_SelectionChanged">
+			<TabControl x:Name="EditorWindows_TC" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Black" Margin="10,30,5,6" BorderBrush="#FF3C3C3C" SelectionChanged="EditorWindows_TC_SelectionChanged">
 				<!--LEVEL EDITOR STARTS HERE-->
 				<TabItem Header="Level Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 					<Grid Background="#FF3C3C3C">
@@ -716,13 +919,58 @@
 					<Grid Background="Black" />
 				</TabItem>
 				<TabItem Header="Dialogue Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
-					<Grid Background="Black" />
+					<Grid x:Name="AllDialogueEditor_Grid" Background="Black" Visibility="Hidden" >
+
+						<Grid.RowDefinitions>
+							<RowDefinition Height="4*"/>
+							<RowDefinition Height="20"/>
+							<RowDefinition Height="4*"/>
+						</Grid.RowDefinitions>
+
+						<Grid x:Name="DialogueEditor_Grid" Grid.Row="0" Grid.RowSpan="1">
+							<Grid.RowDefinitions>
+								<RowDefinition Height="4*"/>
+								<RowDefinition Height="3"/>
+								<RowDefinition Height="2*"/>
+							</Grid.RowDefinitions>
+							<Canvas Grid.Row="0" Grid.Column="0" x:Name="DialogueEditor_BackCanvas" IsHitTestVisible="True" ClipToBounds="True" SizeChanged="DialogueEditor_BackCanvas_OnSizeChanged">
+								<Canvas.Background>
+									<VisualBrush x:Name="DialogueEditor_VB" TileMode="Tile" Stretch="Uniform" Viewport="0,0,40,40" ViewportUnits="Absolute" >
+										<VisualBrush.Visual>
+											<Rectangle Width="40" Height="40" Fill="Black" Stroke="Gray" StrokeThickness=".4" />
+										</VisualBrush.Visual>
+									</VisualBrush>
+								</Canvas.Background>
+								<Canvas x:Name="DialogueEditore_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+							</Canvas>
+							<Tline:TimelinePlayer x:Name="DialogueEditor_Timeline" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="Auto" Width="Auto" PreviewMouseLeftButtonDown="DialogueEditor_Timeline_PreviewMouseLeftButtonDown" >
+
+							</Tline:TimelinePlayer>
+							<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Background="#FF444444" ResizeDirection="Rows"/>
+						</Grid>
+						<ne:BlockNodeEditor x:Name="DialogueEditor_NodeGraph" Grid.Row="2">
+
+						</ne:BlockNodeEditor>
+						<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Background="#FF444444" ResizeDirection="Rows"/>
+					</Grid>
 				</TabItem>
 				<TabItem Header="Cutscene Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 					<Grid Background="Black" />
 				</TabItem>
 				<TabItem  IsSelected="True" Header="UI Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
-					<Grid Background="Black" />
+					<Grid Background="Black" >
+						<Canvas Grid.Row="0" x:Name="UIEditor_BackCanvas" IsHitTestVisible="True" Grid.Column="0" MouseLeftButtonDown="UICanvas_MouseLeftButtonDown" 
+										ClipToBounds="True" MouseLeftButtonUp="UIEditor_BackCanvas_MouseLeftButtonUp" MouseMove="UIEditor_BackCanvas_MouseMove">
+							<Canvas.Background>
+								<VisualBrush x:Name="UICanvas_grid" TileMode="Tile" Stretch="Uniform" Viewport="0,0,40,40" ViewportUnits="Absolute" >
+									<VisualBrush.Visual>
+										<Rectangle Width="40" Height="40" Fill="Black" Stroke="Gray" StrokeThickness=".4" />
+									</VisualBrush.Visual>
+								</VisualBrush>
+							</Canvas.Background>
+							<Canvas x:Name="UIEditor_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+						</Canvas>
+					</Grid>
 				</TabItem>
 				<TabItem Header="Particle Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 					<Grid Background="Black" />
@@ -754,6 +1002,8 @@
 
 			<Label x:Name="label1" Content="Content Explorer" Grid.Column="1" HorizontalAlignment="Left" Margin="41,0,0,0" VerticalAlignment="Top" Foreground="White"/>
 			<Button x:Name="ContentExplorerImport_BTN"  Content="Import" Grid.Column="1" HorizontalAlignment="Right" Width="50" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373" Click="ContentExplorerImport_BTN_Click"/>
+			<Button x:Name="ContentExplorerNewFolder_BTN"  Content="New Folder" Grid.Column="1" HorizontalAlignment="Right" Width="65" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373" Click="ContentExplorerImport_BTN_Click" Margin="0,0,103,0"/>
+			<Button x:Name="ContentExplorerNewFile_BTN"  Content="New File" Grid.Column="1" HorizontalAlignment="Right" Width="53" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373" Click="ContentExplorerImport_BTN_Click" Margin="0,0,50,0"/>
 
 
 			<GridSplitter x:Name="Cont_Scene_GS" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="3" Background="#FF868686"/>
@@ -761,12 +1011,12 @@
 			<Button x:Name="SceneViewAdd_BTN" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="AUTO" Content="Add +" 
 							Foreground="White" Background="#FF4F4F4F" Height="26" BorderThickness="0" Margin="0,0,1,0" Click="SceneViewAdd_BTN_Click"/>
 
-			<ContentControl x:Name="SceneExplorer_control" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,0,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch"
-											 Template="{DynamicResource LevelEditorSceneExplorer_Template}">
-				
+			<ContentControl x:Name="SceneExplorer_Control" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,26,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch"
+											 Template="{DynamicResource UIEditorSceneExplorer_Template}">
+
 			</ContentControl>
-			
-			
+
+
 
 			<ListBox x:Name="SearchResultList" Grid.Column="1" HorizontalAlignment="Stretch" Margin="3,25,0,0" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
                Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" SelectionChanged="SearchResultList_SelectionChanged" ScrollViewer.VerticalScrollBarVisibility="Hidden" MouseDoubleClick="SearchResultList_MouseDoubleClick"
@@ -782,7 +1032,7 @@
 
 		<!--This takes care of GUI resizing with the custom window we created.-->
 		<Rectangle Stroke="{x:Null}" Fill="Transparent" VerticalAlignment="Top" Height="5" x:Name="top" Margin="4,0,5,0" />
-		<Rectangle Stroke="{x:Null}" Fill="Transparent" x:Name="bottom" Height="5" VerticalAlignment="Bottom" Margin="5,0,5,0" Grid.Row="3"/>
+		<Rectangle Stroke="{x:Null}" Fill="Transparent" x:Name="bottom" Height="10" VerticalAlignment="Bottom" Margin="5,0,5,0" Grid.Row="4"/>
 		<Rectangle Stroke="{x:Null}" Fill="Transparent" Grid.RowSpan="4" HorizontalAlignment="Left" Margin="0,5,0,5" Width="5" x:Name="left"/>
 		<Rectangle Stroke="{x:Null}" Fill="Transparent" Margin="0,5,0,5" Width="5" Grid.RowSpan="4" HorizontalAlignment="Right" x:Name="right" />
 		<Rectangle Stroke="{x:Null}" Fill="Transparent" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="4" Width="5" Height="5" x:Name="bottomLeft" />
@@ -790,5 +1040,20 @@
 		<Rectangle Stroke="{x:Null}" Fill="Transparent" HorizontalAlignment="Right" Width="5" Height="5" VerticalAlignment="Top" x:Name="topRight" />
 		<Rectangle Stroke="{x:Null}" Fill="Transparent" HorizontalAlignment="Left" Width="6" VerticalAlignment="Top" Height="5" x:Name="topLeft" />
 
+		<!--This takes care of GUI resizing with the custom window we created.-->
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" VerticalAlignment="Top" Height="1" Margin="1,0,1,0" />
+		
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" Grid.RowSpan="4" HorizontalAlignment="Left" Width="1"/>
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" Width="1" Grid.RowSpan="4" HorizontalAlignment="Right"  />
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="4" Width="1" Height="1"/>
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" Grid.Row="4" VerticalAlignment="Bottom" Height="1" Width="1" HorizontalAlignment="Right" />
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" HorizontalAlignment="Right" Width="1" Height="1" VerticalAlignment="Top" />
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" HorizontalAlignment="Left" Width="1" VerticalAlignment="Top" Height="1"  />
+
+
+		<ol:OutputLog x:Name="EngineOutputLog" Grid.Row="4"></ol:OutputLog>
+
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" Height="1" VerticalAlignment="Bottom"  Margin="1,0,1,0" Grid.Row="4"/>
+		<GridSplitter x:Name="OutputLogSpliter" Grid.Row="3" Height="2" ResizeDirection="Rows" Background="#FF868686" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"></GridSplitter>
 	</Grid>
 </Window>
