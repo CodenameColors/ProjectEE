@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -22,6 +23,12 @@ using BixBite.Resources;
 using PropertyGridEditor;
 using BixBite.Rendering.UI;
 using System.Threading;
+using TimelinePlayer.Components;
+using BixBite.Characters;
+using NodeEditor;
+using NodeEditor.Components;
+using NodeEditor.Components.Arithmetic;
+using NodeEditor.Components.Logic;
 
 namespace AmethystEngine.Forms
 {
@@ -127,6 +134,23 @@ namespace AmethystEngine.Forms
 		Dictionary<String, GameUI> CurrentUIDictionary = new Dictionary<String, GameUI>();
 		#endregion
 
+		#region DialogueEditor
+
+		#region Pointers
+		ObservableCollection<DialogueScene> ActiveDialogueScenes = new ObservableCollection<DialogueScene>();
+		DialogueScene CurActiveDialogueScene;
+		TreeView Dialogue_CE_Tree;
+		List<Tuple<ContentControl, ContentControl>> CurSceneCharacterDisplays = new List<Tuple<ContentControl, ContentControl>>();
+		CollapsedPropertyGrid.CollapsedPropertyGrid CPGrid = new CollapsedPropertyGrid.CollapsedPropertyGrid();
+		object DialogueEditorSelectedControl = null;
+		#endregion
+
+		#region Vars
+		ObservableCollection<object> PropertyBags { get; set; }
+		#endregion
+
+		#endregion
+
 		TreeView SceneExplorer_TreeView = new TreeView();
 		ListBox EditorObjects_LB = new ListBox();
 
@@ -152,9 +176,16 @@ namespace AmethystEngine.Forms
       //LevelEditorMain_Canvas.Background = new DrawingBrush();
     }
 
+		/// <summary>
+		/// When the GUI is loaded we need to set the Control pointers
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
     private void Window_Loaded(object sender, RoutedEventArgs e)
-    {
-      //Find and set level editor controls!
+		{
+			this.MaxHeight = SystemParameters.MaximumWindowTrackHeight;
+			PropertyBags = new ObservableCollection<object>();
+			//Find and set level editor controls!
       FullMapLEditor_Canvas = (Canvas)ObjectProperties_Control.Template.FindName("LevelEditor_Canvas", ObjectProperties_Control);
       FullMapLEditor_VB = (VisualBrush)ObjectProperties_Control.Template.FindName("FullLeditorGrid_VB", ObjectProperties_Control);
 			
@@ -169,20 +200,17 @@ namespace AmethystEngine.Forms
 			OpenLevels = new ObservableCollection<Level>();
 			OpenUIEdits = new ObservableCollection<GameUI>();
 
-			//PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
-			//LB.AddProperty("LevelName", new TextBox(), "Level1");
-			//LB.AddProperty("Width", new TextBox(), "50");
-			//LB.AddProperty("Height", new TextBox(), "50");
-			//LB.AddProperty("MainLevel?", new CheckBox(), true);
-
-			//scaleFullMapEditor();
-			//ObjectProperties_Control.Template.FindName("")
-
-			//load main level
 			LoadMainLevel(ProjectFilePath);
+    }
 
-		}
-
+		/// <summary>
+		/// This is the constructor that is used to load a recent project.
+		/// Sets up the Project Explorer
+		/// Also set the Currently working directory.
+		/// </summary>
+		/// <param name="FilePath"></param>
+		/// <param name="ProjectName"></param>
+		/// <param name="LevelPath"></param>
 		public EngineEditor(String FilePath, String ProjectName = "", String LevelPath = "")
     {
       InitializeComponent();
@@ -196,6 +224,11 @@ namespace AmethystEngine.Forms
 			CurrentWorkingDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\");
     }
 		
+		/// <summary>
+		/// This loaded the main file and searches for the main level path.
+		/// then loads it to the screen via ImportLevel();
+		/// </summary>
+		/// <param name="filepath"></param>
 		private void LoadMainLevel(String filepath)
 		{
 			using (StreamReader file = new StreamReader(filepath))
@@ -297,6 +330,11 @@ namespace AmethystEngine.Forms
       w.Show();
     }
 
+		/// <summary>
+		/// Open up the project settings window
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void ProjectSettingsMenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			Window w = new ProjectSettings(ProjectFilePath);
@@ -450,10 +488,12 @@ namespace AmethystEngine.Forms
     private void LBind_FullScreen(object sender, RoutedEventArgs e)
     {
       if (WindowState != WindowState.Maximized)
-      {
-        WindowState = WindowState.Maximized;
-        WindowStyle = WindowStyle.None;
-      }
+			{ 
+	      WindowState = WindowState.Normal;
+				WindowStyle = WindowStyle.None;
+				WindowState = WindowState.Maximized;
+				ResizeMode = ResizeMode.NoResize;
+			}
       else
       {
         WindowState = WindowState.Normal;
@@ -475,6 +515,12 @@ namespace AmethystEngine.Forms
 		#endregion
 
 		#region "Dynamic Template Binding"
+		/// <summary>
+		/// This method is activated when the user presses the Desc button in the Editor Objects section.
+		/// It is used to change the list objects from pictures, to pictures with a name caption.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Desc_CB_Click(object sender, RoutedEventArgs e)
 		{
 			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level")) //we are in the level editor.
@@ -504,6 +550,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// This method is here to change the templates and pointers when the user wants to change the editors via tab control
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void EditorWindows_TC_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			if (((TabItem)EditorWindows_TC.SelectedItem).Header == null) { EditorWindows_TC.SelectedIndex = 4; return; }
@@ -533,7 +584,25 @@ namespace AmethystEngine.Forms
 			}
 			else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Dialogue"))
 			{
+				ObjectProperties_Control.Template = (ControlTemplate)this.Resources["DialogueEditorProperty_Template"];
 				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["DialogueEditorObjects_Template"];
+				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["DialogueEditorObjectExplorer_Template"];
+				UpdateLayout();
+				if (((CollapsedPropertyGrid.CollapsedPropertyGrid) (ObjectProperties_Control.Template.FindName(
+					    "DialoguePropertyGrid", ObjectProperties_Control))).ItemsSource == null)
+				{
+					try
+					{
+						((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control))).ItemsSource = PropertyBags;
+					}
+					catch
+					{
+						((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control))).ItemsSource = null;
+						((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control))).ItemsSource = PropertyBags;
+					}
+				}
+
+				Dialogue_CE_Tree = (TreeView)ContentLibrary_Control.Template.FindName("DialogueEditor_CE_TV", ContentLibrary_Control);
 			}
       else if(((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
       {
@@ -555,16 +624,16 @@ namespace AmethystEngine.Forms
 			}
     }
 
-		public void RUnthisthis()
-		{
-
-		}
-
     #endregion
 
     #region "File/Folder Viewer"
     #region "Folder viewer Tree"
     //TODO: Multi lined label
+		/// <summary>
+		/// This method is called when the user is traversing through the project tree view 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
     private void ProjectContentExplorer_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
       String TempPic = "/AmethystEngine;component/images/Ame_icon_small.png";
@@ -604,7 +673,14 @@ namespace AmethystEngine.Forms
 
       }
       SearchResultList.ItemsSource = null;
-      SearchResultList.ItemsSource = ContentLibaryObjList;
+      try
+      {
+	      SearchResultList.ItemsSource = ContentLibaryObjList;
+      }
+      catch
+      {
+	      return;
+      }
     }
 
     private void ListDirectory(TreeView treeView, string path)
@@ -679,7 +755,9 @@ namespace AmethystEngine.Forms
 			//copy the file
 			File.Copy(importfilename, destfilename, true);
 			//LoadInitalVars();
+			var v = CurrentProjectTreeView.SelectedValuePath;
 			LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\")); //reload the project to show the new file.
+			CurrentProjectTreeView.SelectedValuePath = v;
 
 			ContentLibaryObjList.Add(new EditorObject(destfilename, importstartlocation.Substring(
 				importstartlocation.LastIndexOfAny(new char[] { '\\', '/' }) + 1, len - 1), true, EObjectType.File));
@@ -729,7 +807,12 @@ namespace AmethystEngine.Forms
     #region "Level Editor"
 
     #region "Tile Map"
-    //Creates a tile brush to paint the editor. Uses selected tile from tile map.
+    /// <summary>
+		/// This method is called when the user clicks on the tile map after they have imported one.
+		/// After clicking it then creates a tile brush for painting the level later.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
     private void TileMap_Canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
 			int xtile, ytile, TileSetOffest = 0;
@@ -779,6 +862,11 @@ namespace AmethystEngine.Forms
 			TileMapGrid_Rect.Visibility = Visibility.Visible;
 		}
 
+		/// <summary>
+		/// Used for displaying the position of the mouse on the canvas of the tile map
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
     private void TileMap_Canvas_MouseMove(object sender, MouseEventArgs e)
     {
       Canvas TileMap_Canvas_temp = (Canvas)(ContentLibrary_Control.Template.FindName("TileMap_Canvas", ContentLibrary_Control));
@@ -808,14 +896,12 @@ namespace AmethystEngine.Forms
 
 			if (((SpriteLayer)SceneExplorer_TreeView.SelectedValue).layerType == LayerType.Tile)
 			{
-
-
 				if (CurrentTool == EditorTool.Brush)
 				{
 					//Are we allowed to paint?
 					if (Canvas_grid.Viewport.X > 0 || Canvas_grid.Viewport.Y > 0)
 						return; //we are out of the bounds negative wise (viewport)
-					if ((int)CurrentLevel.GetProperty("xCells") < p.X / 40 || (int)CurrentLevel.GetProperty("yCells") < p.Y / 40)
+					if ((int)CurrentLevel.GetPropertyData("xCells") < p.X / 40 || (int)CurrentLevel.GetPropertyData("yCells") < p.Y / 40)
 						return;
 
 					if (SelectedTile_Canvas.Children.Count == 0) return;
@@ -963,10 +1049,10 @@ namespace AmethystEngine.Forms
 						Width = 40,
 						Height = 40,
 						FontSize = 18,
-						Text = ((int)layergameevents[GameEventNum].GetProperty("group") == -1 ? "" : layergameevents[GameEventNum].GetProperty("group").ToString()),
-						Tag = layergameevents[GameEventNum].GetProperty("group").ToString(),
+						Text = ((int)layergameevents[GameEventNum].GetPropertyData("group") == -1 ? "" : layergameevents[GameEventNum].GetPropertyData("group").ToString()),
+						Tag = layergameevents[GameEventNum].GetPropertyData("group").ToString(),
 						Foreground = new SolidColorBrush(Colors.Black),
-						Background = ((int)layergameevents[GameEventNum].GetProperty("group") == -1 ? new SolidColorBrush(Color.FromArgb(100, 255, 0, 0)) : new SolidColorBrush(Color.FromArgb(100, 100, 100, 100))),
+						Background = ((int)layergameevents[GameEventNum].GetPropertyData("group") == -1 ? new SolidColorBrush(Color.FromArgb(100, 255, 0, 0)) : new SolidColorBrush(Color.FromArgb(100, 100, 100, 100))),
 					};
 					Border b = new Border() { Width = 40, Height = 40 };
 					b.Child = tb;
@@ -977,7 +1063,7 @@ namespace AmethystEngine.Forms
 					//create event data for the game event.
 					
 					
-					CurrentLevel.Layers[curLayer].AddToLayer((int)layergameevents[GameEventNum].GetProperty("group"), (int)p.Y/40, (int)p.X/40, null);
+					CurrentLevel.Layers[curLayer].AddToLayer((int)layergameevents[GameEventNum].GetPropertyData("group"), (int)p.Y/40, (int)p.X/40, null);
 					EventData ed = new EventData()
 					{
 						newx = 0,
@@ -1006,11 +1092,11 @@ namespace AmethystEngine.Forms
 					PropGrid PGrid = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
 					PGrid.ClearProperties();
 					int i = 0;
-					foreach (object o in ge.getProperties().Values)
+					foreach (object o in ge.GetProperties().Select(m=>m.Item1))
 					{
 						if (o is String || o is int)
 						{
-							PGrid.AddProperty(ge.getProperties().Keys.ToList()[i], new TextBox() { IsEnabled = false }, o.ToString(), ge.PropertyCallback);
+							PGrid.AddProperty(ge.GetProperties().Select(m=>m.Item2).ToList()[i].ToString(), new TextBox() { IsEnabled = false }, o.ToString(), ge.PropertyCallback);
 						}
 						i++;
 					}
@@ -1061,15 +1147,16 @@ namespace AmethystEngine.Forms
 			{
 
 			}
-
 			currentCC = ((ContentControl)sender);
 			Selector.SetIsSelected(((Control)currentCC), true);
 			LEcurect.IsHitTestVisible = false;
-
-
-
 		}
 
+		/// <summary>
+		/// Set the current selected sprite on a mouse click. And display its properties in the properties grid.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Sprite_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
 		{
 			//are we on a sprite layer?
@@ -1094,13 +1181,14 @@ namespace AmethystEngine.Forms
 			if (spr == null) return; //cannot find to return.
 
 			int i = 0;
+			//display properties to the properties grid
 			PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
 			LB.ClearProperties();
-			foreach (object o in spr.getProperties().Values)
+			foreach (object o in spr.GetProperties().Select(m=>m.Item2))
 			{
 				if (o is String || o is int)
 				{
-					LB.AddProperty(spr.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), spr.PropertyTBCallback);
+					LB.AddProperty(spr.GetProperties().Select(m=>m.Item1).ToList()[i], new TextBox(), o.ToString(), spr.PropertyTBCallback);
 				}
 				i++;
 			}
@@ -1108,11 +1196,13 @@ namespace AmethystEngine.Forms
 
 		}
 
-		private void Sprite_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-		{
-			Console.WriteLine("Let go of a sprite object");
-		}
-
+		/// <summary>
+		/// This method is called then the mouse click is ending on the Level Editor canvas.
+		/// This is used to set variables like selection area etc.
+		/// Because its better to set those at the END of mouse movement.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
 		{
 			if ((SceneExplorer_TreeView.SelectedValue) == null) return;
@@ -1228,6 +1318,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 		
+		/// <summary>
+		/// Use this to get any Zindex of an object on a canvas. 
+		/// </summary>
+		/// <param name="treeitem"></param>
+		/// <returns></returns>
     private int GetTileZIndex(TreeView treeitem)
 		{
 			//are we clicked on a spritelayer? AND a tile layer?
@@ -1248,6 +1343,12 @@ namespace AmethystEngine.Forms
 			return -1;
 		}
 
+		/// <summary>
+		/// Used to get the location to snap to based on the current grid scale. TOP LEFT snap
+		/// </summary>
+		/// <param name="p"></param>
+		/// <param name="abs"></param>
+		/// <returns></returns>
 		private Point RelativeGridSnap(Point p, bool abs = true)
 		{
 
@@ -1287,7 +1388,13 @@ namespace AmethystEngine.Forms
 
     }
 
-    private Point GetGridSnapCords(Point p)
+		/// <summary>
+		/// Used to get the location to snap to based on the current grid scale. TOP LEFT snap
+		/// </summary>
+		/// <param name="p"></param>
+		/// <param name="abs"></param>
+		/// <returns></returns>
+		private Point GetGridSnapCords(Point p)
     {
 			int Xoff = 0; int YOff = 0;
 			if (p.X >= 40 || (int)(Math.Abs(Canvas_grid.Viewport.X)) > 0)
@@ -1450,10 +1557,15 @@ namespace AmethystEngine.Forms
       Canvas.SetLeft(FullMapSelection_Rect, 0); Canvas.SetTop(FullMapSelection_Rect, 0);
 			Canvas.SetZIndex(FullMapSelection_Rect, 100);
       
-      FullMapLEditor_Canvas.Children.Add(FullMapSelection_Rect);
+      //FullMapLEditor_Canvas.Children.Add(FullMapSelection_Rect);
 
     }
 
+		/// <summary>
+		/// Choose the cells in the X direction of the new map.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void XCellsVal_TB_TextChanged(object sender, TextChangedEventArgs e)
 		{
 			if (int.TryParse(((TextBox)sender).Text, out int numval) && Int32.TryParse(XCellsWidth_TB.Text, out int pixval))
@@ -1463,6 +1575,11 @@ namespace AmethystEngine.Forms
 			else LevelWidth_TB.Text = "0";
 		}
 
+		/// <summary>
+		/// Choose the cells in the Y direction of the new map
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void YCellsVal_TB_TextChanged(object sender, TextChangedEventArgs e)
 		{
 			if (Int32.TryParse(((TextBox)sender).Text, out int numval) && Int32.TryParse(XCellsHeight_TB.Text, out int pixval))
@@ -1585,8 +1702,8 @@ namespace AmethystEngine.Forms
     {
 			Level TempLevel = CurrentLevel;
 			if (TempLevel == null) return; //TODO: Remove after i make force select work on tree view.
-			FullMapLEditor_Canvas.Width = (int)TempLevel.GetProperty("xCells") * 10;
-      FullMapLEditor_Canvas.Height = (int)TempLevel.GetProperty("yCells") * 10;
+			FullMapLEditor_Canvas.Width = (int)TempLevel.GetPropertyData("xCells") * 10;
+      FullMapLEditor_Canvas.Height = (int)TempLevel.GetPropertyData("yCells") * 10;
 
       FullMapLEditor_VB.Viewport = new Rect(0, 0, 10, 10);
 			
@@ -1645,7 +1762,7 @@ namespace AmethystEngine.Forms
 		private void FullMapEditorFill(Sprite spr, ImageBrush i, int zindex)
 		{
 			Rectangle r = new Rectangle() { Width = 10, Height = 10, Fill = i };
-			Canvas.SetLeft(r, (int)spr.GetProperty("x") / 4); Canvas.SetTop(r, (int)spr.GetProperty("y") / 4); Canvas.SetZIndex(r, zindex); // divide 4 because scaling.
+			Canvas.SetLeft(r, (int)spr.GetPropertyData("x") / 4); Canvas.SetTop(r, (int)spr.GetPropertyData("y") / 4); Canvas.SetZIndex(r, zindex); // divide 4 because scaling.
 			FullMapLEditor_Canvas.Children.Add(r);
 		}
 
@@ -1655,6 +1772,11 @@ namespace AmethystEngine.Forms
 		#endregion
 
 		#region "Tools"
+		/// <summary>
+		/// Set the Level editor to selection AND deselect.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditorSelection_Click(object sender, RoutedEventArgs e)
 		{
 			if (CurrentTool != EditorTool.Select)
@@ -1667,12 +1789,22 @@ namespace AmethystEngine.Forms
 			if (SceneExplorer_TreeView.SelectedItem is SpriteLayer && ((SpriteLayer)SceneExplorer_TreeView.SelectedItem).layerType == LayerType.Sprite)
 				SetSpriteHitState(true);
 		}
-	
+
+		/// <summary>
+		/// Set the Level editor to brush
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditorBrush_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentTool = EditorTool.Brush;
 		}
 
+		/// <summary>
+		/// Takes a given selected area and fills it with the selected paint brush tile.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Fill_Click(object sender, RoutedEventArgs e)
 		{
 			if (SelectedTile_Canvas.Children.Count == 0) return;
@@ -1690,7 +1822,7 @@ namespace AmethystEngine.Forms
 			{
 				for (int j = 0; j < rows; j++)
 				{
-					if ((int)CurrentLevel.GetProperty("xCells")-1 <= i || (int)CurrentLevel.GetProperty("yCells")-1 <= j)
+					if ((int)CurrentLevel.GetPropertyData("xCells")-1 <= i || (int)CurrentLevel.GetPropertyData("yCells")-1 <= j)
 						break;
 
 					Point p = new Point(begginning.X + (int)(40 * i), begginning.Y + (int)(40 * j));
@@ -1710,6 +1842,12 @@ namespace AmethystEngine.Forms
 			Deselect();
 		}
 
+		/// <summary>
+		/// Given a selection move these tiles down a layer. If it's the first layer don't move
+		/// ALSO only move to a layer with the same layer type.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void DownLaverLevelEditor_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			//we need to make sure that we have selected a sprite layer in the tree view.
@@ -1769,6 +1907,12 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// Given a selection move these tiles up a layer. If it's the last layer don't move
+		/// ALSO only move to a layer with the same layer type. 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void UpLaverLevelEditor_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			//we need to make sure that we have selected a sprite layer in the tree view.
@@ -1825,6 +1969,12 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// Sets the tool to eraser.
+		/// Also if there is a selection, erase it.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditorEraser_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentTool = EditorTool.Eraser;
@@ -1832,16 +1982,27 @@ namespace AmethystEngine.Forms
 				EraseSelection();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditorMove_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentTool = EditorTool.Move;
 		}
 
+		/// <summary>
+		/// Saves the level file.
+		/// Level data, tile sets, and editor info.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void SaveLevel_MenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
 			{
-				Title = "New Level File",
+				Title = "Save Level File",
 				FileName = "", //default file name
 				Filter = "txt files (*.lvl)|*.lvl|All files (*.*)|*.*",
 				FilterIndex = 2,
@@ -1875,6 +2036,11 @@ namespace AmethystEngine.Forms
 			CurrentLevel.ExportLevel(dlg.FileName + (dlg.FileName.Contains(".lvl") ? "" : ".lvl"), TileSetImages, celldim);
 		}
 
+		/// <summary>
+		/// Takes an existing level file and imports/ opens it in the editor.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private async void OpenLevel_MenuItem_ClickAsync(object sender, RoutedEventArgs e)
 		{
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
@@ -1903,11 +2069,11 @@ namespace AmethystEngine.Forms
 
 		}
 
-		private void GameEvent_BTN_Click(object sender, RoutedEventArgs e)
-		{
-			CurrentTool = EditorTool.Gameevent;
-		}
-
+		/// <summary>
+		/// Sets the editor window to allow the user to create a new Level
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void NewLevel_MenuItem_Click(object sender, RoutedEventArgs e)
 		{
 			NewLevelData_CC.Visibility = Visibility.Visible;
@@ -1915,6 +2081,9 @@ namespace AmethystEngine.Forms
 			LevelEditorStatusBar_Grid.Visibility = Visibility.Hidden;
 		}
 
+		/// <summary>
+		/// Deselects all current selected tiles.
+		/// </summary>
 		private void Deselect()
 		{
 			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
@@ -1952,6 +2121,9 @@ namespace AmethystEngine.Forms
 			
 		}
 
+		/// <summary>
+		/// Erases all data in a selection.
+		/// </summary>
 		private void EraseSelection()
 		{
 			Point pos = Mouse.GetPosition(LevelEditor_BackCanvas);
@@ -1968,7 +2140,7 @@ namespace AmethystEngine.Forms
 			{
 				for (int j = 0; j < rows; j++)
 				{
-					if ((int)CurrentLevel.GetProperty("xCells") - 1 <= i || (int)CurrentLevel.GetProperty("yCells") - 1 <= j)
+					if ((int)CurrentLevel.GetPropertyData("xCells") - 1 <= i || (int)CurrentLevel.GetPropertyData("yCells") - 1 <= j)
 						break;
 					//find the tile on the layer that is selected.
 					Rectangle rr = SelectTool.FindTile(LevelEditor_Canvas, LevelEditor_Canvas.Children.OfType<Rectangle>().ToList(), 
@@ -1994,11 +2166,21 @@ namespace AmethystEngine.Forms
 			Deselect();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditorImage_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentTool = EditorTool.Image;
 		}
 		
+		/// <summary>
+		/// Opens up the game event window to allow users to create new game events or edit current ones
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void AddGameEvent_Click(object sender, RoutedEventArgs e)
 		{
 			if (CurrentLevel == null) return;
@@ -2006,6 +2188,11 @@ namespace AmethystEngine.Forms
 			ff.Show();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void EditGameEvents_Click(object sender, RoutedEventArgs e)
 		{
 			if (CurrentLevel == null) return;
@@ -2013,6 +2200,11 @@ namespace AmethystEngine.Forms
 			ff.Show();
 		}
 
+		/// <summary>
+		/// Chooses a currently existing game event, and sets the ref so the user can paint the level with game events
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void DeclareGameEvent_MI_Click(object sender, RoutedEventArgs e)
 		{
 			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
@@ -2027,6 +2219,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// This will auto load all the game events that all allowed to be painted to the context menu
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void MenuItem_MouseEnter(object sender, MouseEventArgs e)
 		{
 			if (!(SceneExplorer_TreeView.SelectedValue is SpriteLayer)) return;
@@ -2046,7 +2243,11 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-
+		/// <summary>
+		/// deselect all current selected data.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditorDeselect_Click(object sender, RoutedEventArgs e)
 		{
 			Deselect();
@@ -2054,7 +2255,12 @@ namespace AmethystEngine.Forms
 
 		#endregion
 
-		//cchanges the toolbar to the currenttool bar depedning on the tilemap tool selected
+		/// <summary>
+		/// There are 2 different tool bar options for the level editor. Sprite, and Tile.
+		/// This method will set the correct one 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void LevelEditorLibary_TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			TabControl LELibary_TC = (TabControl)ContentLibrary_Control.Template.FindName("LevelEditorLibary_TabControl", ContentLibrary_Control);
@@ -2073,6 +2279,12 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// This method is activated when the user selects a different object in the scene explorer.
+		/// It will print out properties to the properties grid, and change displayed level if needed.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void SceneExplorer_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			Console.WriteLine("Changed Scene Object");
@@ -2108,15 +2320,15 @@ namespace AmethystEngine.Forms
 				int i = 0;
 				PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
 				LB.ClearProperties();
-				foreach (object o in ((Level)e.NewValue).getProperties().Values)
+				foreach (object o in ((Level)e.NewValue).GetProperties().Select(m => m.Item2))
 				{
 					if (o is String || o is int)
 					{
-						LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), ((Level)e.NewValue).PropertyTBCallback);
+						LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new TextBox(), o.ToString(), ((Level)e.NewValue).PropertyTBCallback);
 					}
 					else if (o is bool)
 					{
-						LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, ((Level)e.NewValue).PropertyCheckBoxCallback);
+						LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new CheckBox(), (bool)o, ((Level)e.NewValue).PropertyCheckBoxCallback);
 					}
 
 					i++;
@@ -2139,15 +2351,15 @@ namespace AmethystEngine.Forms
 				PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
 				SpriteLayer SL = (SpriteLayer)e.NewValue;
 				LB.ClearProperties();
-				foreach (object o in SL.getProperties().Values)
+				foreach (object o in SL.GetProperties().Select(m=>m.Item2))
 				{
 					if (o is String || o is int)
 					{
-						LB.AddProperty(SL.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), SL.PropertyTBCallback);
+						LB.AddProperty(SL.GetProperties().Select(m=>m.Item1).ToList()[i], new TextBox(), o.ToString(), SL.PropertyTBCallback);
 					}
 					else if (o is bool)
 					{
-						LB.AddProperty(SL.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, SL.PropertyCheckBoxCallback);
+						LB.AddProperty(SL.GetProperties().Select(m=>m.Item1).ToList()[i], new CheckBox(), (bool)o, SL.PropertyCheckBoxCallback);
 					}
 
 					i++;
@@ -2297,13 +2509,13 @@ namespace AmethystEngine.Forms
 						{
 							Source = bitmap
 						};
-						Rectangle r = new Rectangle() { Width = (int)sprite.GetProperty("width"), Height = (int)sprite.GetProperty("height"), Fill = new ImageBrush(img.Source) };//Make a rectange the size of the image
+						Rectangle r = new Rectangle() { Width = (int)sprite.GetPropertyData("width"), Height = (int)sprite.GetPropertyData("height"), Fill = new ImageBrush(img.Source) };//Make a rectange the size of the image
 
 						ContentControl CC = ((ContentControl)this.TryFindResource("MoveableImages_Template"));
-						CC.Width = (int)sprite.GetProperty("width");
-						CC.Height = (int)sprite.GetProperty("height");
+						CC.Width = (int)sprite.GetPropertyData("width");
+						CC.Height = (int)sprite.GetPropertyData("height");
 
-						Canvas.SetLeft(CC, (int)sprite.GetProperty("x")); Canvas.SetTop(CC, (int)sprite.GetProperty("y")); Canvas.SetZIndex(CC, Zindex);
+						Canvas.SetLeft(CC, (int)sprite.GetPropertyData("x")); Canvas.SetTop(CC, (int)sprite.GetPropertyData("y")); Canvas.SetZIndex(CC, Zindex);
 						Selector.SetIsSelected(CC, false);
 						CC.MouseRightButtonDown += ContentControl_MouseLeftButtonDown;
 						((Rectangle)CC.Content).Fill = new ImageBrush(img.Source);
@@ -2415,15 +2627,15 @@ namespace AmethystEngine.Forms
 
 				int i = 0;
 				PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
-				foreach (object o in CurrentLevel.getProperties().Values)
+				foreach (object o in CurrentLevel.GetProperties().Select(m => m.Item2))
 				{
 					if (o is String || o is int)
 					{
-						LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
+						LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
 					}
 					else if (o is bool)
 					{
-						LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
+						LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
 					}
 
 					i++;
@@ -2480,15 +2692,15 @@ namespace AmethystEngine.Forms
 
 			int i = 0;
 			PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
-			foreach (object o in CurrentLevel.getProperties().Values)
+			foreach (object o in CurrentLevel.GetProperties().Select(m => m.Item2))
 			{
 				if (o is String || o is int)
 				{
-					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
+					LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
 				}
 				else if (o is bool)
 				{
-					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
+					LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
 				}
 
 				i++;
@@ -2539,15 +2751,15 @@ namespace AmethystEngine.Forms
 
 			int i = 0;
 			PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
-			foreach (object o in CurrentLevel.getProperties().Values)
+			foreach (object o in CurrentLevel.GetProperties().Select(m => m.Item2))
 			{
 				if (o is String || o is int)
 				{
-					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
+					LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new TextBox(), o.ToString(), CurrentLevel.PropertyTBCallback);
 				}
 				else if (o is bool)
 				{
-					LB.AddProperty(CurrentLevel.getProperties().Keys.ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
+					LB.AddProperty(CurrentLevel.GetProperties().Select(m => m.Item1).ToList()[i], new CheckBox(), (bool)o, CurrentLevel.PropertyCheckBoxCallback);
 				}
 
 				i++;
@@ -2558,7 +2770,7 @@ namespace AmethystEngine.Forms
 			LevelEditor_Canvas.Children.Clear();
 			FullMapLEditor_Canvas.Children.Clear();
 		}
-		#endregion
+		#endregion // end of Level editor region
 		
 		#region "Content Library"
 		/// <summary>
@@ -2743,7 +2955,7 @@ namespace AmethystEngine.Forms
 		{
 			Level TempLevel = ((Level)SceneExplorer_TreeView.SelectedValue);
 			TempLevel.AddLayer("new tile", LayerType.Tile);
-			TempLevel.Layers.Last().DefineLayerDataType(LayerType.Tile, (int)TempLevel.GetProperty("xCells"), (int)TempLevel.GetProperty("yCells"));
+			TempLevel.Layers.Last().DefineLayerDataType(LayerType.Tile, (int)TempLevel.GetPropertyData("xCells"), (int)TempLevel.GetPropertyData("yCells"));
 		}
 		private void SpriteLayer_Click(object sender, RoutedEventArgs e)
 		{
@@ -2755,7 +2967,7 @@ namespace AmethystEngine.Forms
 		{
 			Level TempLevel = ((Level)SceneExplorer_TreeView.SelectedValue);
 			TempLevel.AddLayer("new GOL", LayerType.GameEvent);
-			TempLevel.Layers.Last().DefineLayerDataType(LayerType.GameEvent, (int)TempLevel.GetProperty("xCells"), (int)TempLevel.GetProperty("yCells"));
+			TempLevel.Layers.Last().DefineLayerDataType(LayerType.GameEvent, (int)TempLevel.GetPropertyData("xCells"), (int)TempLevel.GetPropertyData("yCells"));
 
 
 		}
@@ -2808,6 +3020,7 @@ namespace AmethystEngine.Forms
       ((DispatcherFrame)f).Continue = false;
       return null;
     }
+
 		#region "WIP"
     public void ProcessOutputDataHandler(object sendingProcess, DataReceivedEventArgs outLine)
     {
@@ -2874,8 +3087,6 @@ namespace AmethystEngine.Forms
 		}
 		
 		//this is methods that im working now... they suck for now.
-		
-
 		private bool CanUseTool()
 		{
 			//what tool are you using?
@@ -2964,61 +3175,12 @@ namespace AmethystEngine.Forms
 
 		}
 
-		private void ResizeRect_MouseLMBTN_Up(object sender, MouseButtonEventArgs e)
-		{
-			Console.WriteLine("Moved CC Sprite");
-		}
-
-		private void ContentControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			Console.WriteLine("changed selection CC Sprite");
-		}
-
 		private void TxtQuantity_KeyDown(object sender, KeyEventArgs e)
 		{
 			Console.WriteLine("Text Property Key down " + ((TextBox)sender).Tag.ToString());
 
 		}
 
-		/// <summary>
-		/// this button will auto generate and MSBuild the games project files to allow game evnent use. IF code compiles w/no errors
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void CodeCompiling_BTN_Click(object sender, RoutedEventArgs e)
-		{
-			Dictionary<String, List<GameEvent>> ProjGE = Cuprite.GetProjectGameEvents(ProjectFilePath);
-			List<List<String>> codelines = new List<List<string>>();
-			foreach(String s in ProjGE.Keys)
-			{
-				foreach (GameEvent ge in ProjGE[s])
-					codelines.Add(Cuprite.GetMethodTemplate(ge));
-			}
-
-			System.Collections.Generic.IEnumerable<String> l = File.ReadLines(Cuprite.GetFilePath(ProjectFilePath));
-			List<String> lines = l.ToList();
-			int i = 0; int j = 0;
-			foreach (String Key in ProjGE.Keys)
-			{ 
-				foreach(List<String> linesofcode in codelines)
-				{
-					if (ProjGE[Key].Count == 0) break; 
-					String Tests = ProjGE[Key][i++].GetProperty("DelegateEventName").ToString();
-					Cuprite.GenerateMethod(codelines[j++], ref lines, Tests, Key);
-					if (i > ProjGE[Key].Count - 1)
-						break;
-				}
-				i = 0;
-			}
-
-			using (StreamWriter writer = new StreamWriter(Cuprite.GetFilePath(ProjectFilePath), false))
-			{
-				foreach(String s in lines)
-					writer.WriteLine(s);
-			}
-			Cuprite.BuildGameProjectFiles(ProjectFilePath);
-
-		}
 
 		/// <summary>
 		/// 
@@ -3039,8 +3201,6 @@ namespace AmethystEngine.Forms
 
 		}
 
-
-
 		private void Sprite_OnUnselected(object sender, RoutedEventArgs e)
 		{
 			//Item.Content = ((ListBoxItem)sender).Name + " was unselected.";
@@ -3049,8 +3209,54 @@ namespace AmethystEngine.Forms
 		}
 		#endregion
 
-		
+		/// <summary>
+		/// this button will auto generate and MSBuild the games project files to allow game evnent use. IF code compiles w/no errors
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void CodeCompiling_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			Dictionary<String, List<GameEvent>> ProjGE = Cuprite.GetProjectGameEvents(ProjectFilePath);
+			List<List<String>> codelines = new List<List<string>>();
+			foreach (String s in ProjGE.Keys)
+			{
+				foreach (GameEvent ge in ProjGE[s])
+					codelines.Add(Cuprite.GetMethodTemplate(ge));
+			}
 
+			System.Collections.Generic.IEnumerable<String> l = File.ReadLines(Cuprite.GetFilePath(ProjectFilePath));
+			List<String> lines = l.ToList();
+			int i = 0; int j = 0;
+			foreach (String Key in ProjGE.Keys)
+			{
+				foreach (List<String> linesofcode in codelines)
+				{
+					if (ProjGE[Key].Count == 0) break;
+					String Tests = ProjGE[Key][i++].GetPropertyData("DelegateEventName").ToString();
+					Cuprite.GenerateMethod(codelines[j++], ref lines, Tests, Key);
+					if (i > ProjGE[Key].Count - 1)
+						break;
+				}
+				i = 0;
+			}
+
+			using (StreamWriter writer = new StreamWriter(Cuprite.GetFilePath(ProjectFilePath), false))
+			{
+				foreach (String s in lines)
+					writer.WriteLine(s);
+			}
+			Cuprite.BuildGameProjectFiles(ProjectFilePath);
+
+		}
+
+		//These are methods that have to deal with the UI editor tools
+		#region UI
+
+		/// <summary>
+		/// Deselects all selected sprite when clicking on the background canvas
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void UICanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			//you clicked on nothing. so deselect UI CCs
@@ -3060,11 +3266,23 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// It occurs when the mouse up on the background canvas
+		/// WIP...noting yet.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void UIEditor_BackCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
 		{
 
 		}
 
+		/// <summary>
+		/// occurs when the mouse moves over the background canvas
+		/// Displays the mouse position
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void UIEditor_BackCanvas_MouseMove(object sender, MouseEventArgs e)
 		{
 			Point p = Mouse.GetPosition(LevelEditor_BackCanvas);
@@ -3073,7 +3291,7 @@ namespace AmethystEngine.Forms
 
 			//which way is mouse moving?
 			MPos -= (Vector)e.GetPosition(LevelEditor_Canvas);
-			
+
 			//is the middle mouse button down?
 			if (e.MiddleButton == MouseButtonState.Pressed)
 			{
@@ -3082,6 +3300,11 @@ namespace AmethystEngine.Forms
 
 		}
 
+		/// <summary>
+		/// This method is called when a moveable image is clicked on. (SPRITES)
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void ContentControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
 		{
 			if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Level"))
@@ -3098,7 +3321,7 @@ namespace AmethystEngine.Forms
 					Console.WriteLine(point.ToString());
 				}
 			}
-			else if(((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
+			else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
 			{
 				if (SelectedUIControl != null) Selector.SetIsSelected(SelectedUIControl, false);
 				SelectedUIControl = (ContentControl)sender;
@@ -3110,62 +3333,73 @@ namespace AmethystEngine.Forms
 				int i = 0;
 				PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("UIPropertyGrid", ObjectProperties_Control)));
 				LB.ClearProperties();
-				foreach (object o in CurrentUIDictionary[SelectedUIControl.Name].getProperties().Values)
+				foreach (object o in CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item2))
 				{
-					if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "Zindex")
+					if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "Zindex")
 					{
 						TextBox TB = new TextBox(); TB.KeyDown += GameUI_ZIndex_Changed;
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB,
 							o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
 					}
-					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "ShowBorder")
+					else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "ShowBorder")
 					{
 						CheckBox CB = new CheckBox() { VerticalAlignment = VerticalAlignment.Center };
 						CB.Click += SetBorderVisibility;
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i],
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
 							CB,
 							o);
 					}
-					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "Image")
+					else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "Image")
 					{
-						ComboBox CB = new ComboBox() { Height=50, ItemTemplate = (DataTemplate)this.Resources["CBIMGItems"] };
+						ComboBox CB = new ComboBox() { Height = 50, ItemTemplate = (DataTemplate)this.Resources["CBIMGItems"] };
 						CB.SelectionChanged += GameImage_SelectionChanged;
 						List<EditorObject> ComboItems = new List<EditorObject>();
-						foreach(String filepath in GetAllProjectImages())
+						foreach (String filepath in GetAllProjectImages())
 						{
 							ComboItems.Add(new EditorObject(filepath, filepath.Substring(filepath.LastIndexOfAny(new char[] { '\\', '/' })), false));
 						}
 						CB.ItemsSource = ComboItems;
 
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], 
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
 							CB,
 							new List<String>());
 					}
-					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "Background")
+					else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "Background")
 					{
 						DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
 						TB.SelectedColorChanged += customCP_BackgroundColorChanged;
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB,
 							o.ToString());
 					}
-					else if (CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i] == "FontColor")
+					else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "FontColor")
 					{
 						DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
 						TB.SelectedColorChanged += customCP_FontColorChanged;
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB,
 							o.ToString());
 					}
 					else
 					{
 						TextBox TB = new TextBox(); TB.KeyDown += UIPropertyCallback;
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].getProperties().Keys.ToList()[i], TB,
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB,
 							o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
 					}
 					i++;
 				}
 			}
+			else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Dialogue"))
+			{
+				//if (SelectedUIControl != null) Selector.SetIsSelected(((ContentControl)sender), false);
+				SelectedUIControl = (ContentControl)sender;
+				Selector.SetIsSelected(SelectedUIControl, true);
+			}
 		}
 
+		/// <summary>
+		/// This method is here when a movable image has been clicked and let go. (SPRITES)
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void ContentControl_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
 		{
 			if (CurrentTool == EditorTool.Select)
@@ -3173,10 +3407,15 @@ namespace AmethystEngine.Forms
 				Point point = new Point(Canvas.GetLeft((ContentControl)sender), Canvas.GetTop((ContentControl)sender));
 				LESelectedSprite.SetProperty("x", (int)point.X);
 				LESelectedSprite.SetProperty("y", (int)point.Y);
-				Console.WriteLine(point.ToString()+ "MUP");
+				Console.WriteLine(point.ToString() + "MUP");
 			}
 		}
 
+		/// <summary>
+		/// this method is here when a movable image has been scaled (SPRITES)
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void ContentControl_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			if (SelectedUI == null) return;
@@ -3189,15 +3428,18 @@ namespace AmethystEngine.Forms
 					Console.WriteLine("SpriteSizeChanged");
 				}
 			}
-			else if(((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
+			else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
 			{
 				SelectedUI.SetProperty("Width", (int)((ContentControl)sender).Width);
 				SelectedUI.SetProperty("Height", (int)((ContentControl)sender).Height);
 			}
 		}
 
-		
-
+		/// <summary>
+		/// This method will add a Textbox to the UI editor.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void UIEditoGameTB_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			CurrentNewUI = NewUITool.Textbox;
@@ -3214,9 +3456,22 @@ namespace AmethystEngine.Forms
 			img.Stretch = Stretch.Fill;
 			//img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
 			img.IsHitTestVisible = false;
-			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false});
-			((Grid)CC.Content).Children.Add(img);
-			((Grid)CC.Content).Children.Add(new TextBox()
+			((Grid)CC.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+			((Grid)CC.Content).RowDefinitions.Add(new RowDefinition() { });
+			((Grid)CC.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+
+			((Grid)CC.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+			((Grid)CC.Content).ColumnDefinitions.Add(new ColumnDefinition() { });
+			((Grid)CC.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+
+			((Grid)CC.Content).ShowGridLines = true;
+
+			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false });
+			Grid.SetColumnSpan(((Grid)CC.Content).Children[((Grid)CC.Content).Children.Count - 1], 3);
+			Grid.SetRowSpan(((Grid)CC.Content).Children[((Grid)CC.Content).Children.Count - 1], 3);
+
+			InitimagesTBGrid((Grid)CC.Content);
+		 ((Grid)CC.Content).Children.Add(new TextBox()
 			{
 				Text = "Sameple Text",
 				Margin = new Thickness(2),
@@ -3228,6 +3483,9 @@ namespace AmethystEngine.Forms
 				FontSize = 24,
 				Foreground = Brushes.White
 			});
+			Grid.SetRow(((Grid)CC.Content).Children[((Grid)CC.Content).Children.Count - 1], 1);
+			Grid.SetColumn(((Grid)CC.Content).Children[((Grid)CC.Content).Children.Count - 1], 1);
+
 
 			int i = 1; String name = "NewTextBox";
 			while (CurrentUIDictionary.ContainsKey(name))
@@ -3240,6 +3498,11 @@ namespace AmethystEngine.Forms
 			OpenUIEdits[0].AddUIElement(CurrentUIDictionary.Values.Last()); //TODO: use the selection Treeview
 		}
 
+		/// <summary>
+		/// This method will add a Image to the UI editor
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void UIEditoGameIMG_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
@@ -3252,14 +3515,14 @@ namespace AmethystEngine.Forms
 
 			String TB = "/AmethystEngine;component/images/emma_colors_oc.png";
 			ImageBrush ib = new ImageBrush();
-			Image img = new Image();
+			Image img = new Image() { IsHitTestVisible = false };
 			img.Stretch = Stretch.Fill;
 			img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
 			img.IsHitTestVisible = false;
 			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, IsHitTestVisible = false });
 			((Grid)CC.Content).Children.Add(new Rectangle() { });
 			((Grid)CC.Content).Children.Add(img);
-
+			
 			int i = 1; String name = "NewImgBox";
 			while (CurrentUIDictionary.ContainsKey(name))
 			{
@@ -3270,24 +3533,56 @@ namespace AmethystEngine.Forms
 			CurrentUIDictionary.Add(name, new GameIMG(name, 50, 50, 1, 0, 0));
 			OpenUIEdits[0].AddUIElement(CurrentUIDictionary.Values.Last()); //TODO: use the selection Treeview
 		}
+		
+		/// <summary>
+		/// This method is here to add an image to a grid.
+		/// This grid is here to allow the scaling of a text box image and NOT lose shape.
+		/// think of this like a frame
+		/// </summary>
+		/// <param name="g"></param>
+		public void InitimagesTBGrid(Grid g)
+		{
+			for(int i = 0; i < g.RowDefinitions.Count; i++)
+			{
+				for(int j = 0; j < g.ColumnDefinitions.Count; j++)
+				{
+					Image img = new Image() { IsHitTestVisible = false, Stretch = Stretch.Fill };
+					Grid.SetRow(img, i); Grid.SetColumn(img, j);
+					g.Children.Add(img);
+				}
+			}
+		}
 
 		private void ContentControl_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			
+
 		}
-		
+
+		/// <summary>
+		/// Change the Text's font color for the game control in the UI editor.
+		/// </summary>
+		/// <param name="obj"></param>
 		void customCP_FontColorChanged(Color obj)
 		{
-			((TextBox)((Grid)SelectedUIControl.Content).Children[2]).Foreground = new SolidColorBrush(obj);
+			((TextBox)((Grid)SelectedUIControl.Content).Children[10]).Foreground = new SolidColorBrush(obj);
 			SelectedUI.SetProperty("FontColor", obj.ToString());
 		}
 
+		/// <summary>
+		/// Change's the background color for the game control in the UI editor.
+		/// </summary>
+		/// <param name="obj"></param>
 		void customCP_BackgroundColorChanged(Color obj)
 		{
 			((Grid)SelectedUIControl.Content).Background = new SolidColorBrush(obj);
 			SelectedUI.SetProperty("Background", obj.ToString());
 		}
 
+		/// <summary>
+		/// Changes the visibility of a border control. Also doesn't create it in the game.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void SetBorderVisibility(object sender, RoutedEventArgs e)
 		{
 			String Property = ((CheckBox)sender).Tag.ToString();
@@ -3300,10 +3595,16 @@ namespace AmethystEngine.Forms
 				else
 					((Border)((Grid)SelectedUIControl.Content).Children[0]).Visibility = Visibility.Visible;
 
-				SelectedUI.SetProperty("ShowBorder", !((bool)SelectedUI.GetProperty("ShowBorder")));
+				SelectedUI.SetProperty("ShowBorder", !((bool)SelectedUI.GetPropertyData("ShowBorder")));
 			}
 		}
 
+		/// <summary>
+		/// This method is here as the DEFAULT property callback.
+		/// IF THIS IS CALLED YOU NEED TO FIX IT AND DECLARE THE CALLBACK 
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void UIPropertyCallback(object sender, KeyEventArgs e)
 		{
 			if (Key.Enter == e.Key)
@@ -3315,36 +3616,94 @@ namespace AmethystEngine.Forms
 				String Property = ((TextBox)sender).Tag.ToString();
 				if (Property == "FontSize")
 				{
-					((TextBox)((Grid)SelectedUIControl.Content).Children[2]).FontSize = Int32.Parse(((TextBox)sender).Text);
+					((TextBox)((Grid)SelectedUIControl.Content).Children[((Grid)SelectedUIControl.Content).Children.Count-1]).FontSize =
+						Int32.Parse(((TextBox)sender).Text);
 				}
 			}
+
+			//throw new NotImplementedException();
 		}
 
-
+		/// <summary>
+		/// This method will change the image fill .
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void GameImage_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			if (SelectedUIControl.Tag.ToString() == "IMAGE")
 				((Image)((Grid)SelectedUIControl.Content).Children[2]).Source =
 					new BitmapImage(((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail);
 
-			if(SelectedUI is GameIMG)
+			if (SelectedUI is GameIMG)
 			{
 				SelectedUI.SetProperty("Image", ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
 			}
 
-			if(SelectedUIControl.Tag.ToString() == "TEXTBOX")
+			if (SelectedUIControl.Tag.ToString() == "TEXTBOX")
 			{
-				((Image)((Grid)SelectedUIControl.Content).Children[1]).Source =
-					new BitmapImage(((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail);
+				//this sets it display wise
+				SetTBBackgroundImage(((Grid)SelectedUIControl.Content), ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
 				SelectedUI.SetProperty("Image", ((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+				//this sets it data wise.
+			}
+		}
 
+		/// <summary>
+		/// This method is here to set the background. In order to allow stretching this method using framing logic.
+		/// Or "Margins" for the image.
+		/// </summary>
+		/// <param name="g"></param>
+		/// <param name="IMGPath"></param>
+		private void SetTBBackgroundImage(Grid g, String IMGPath)
+		{
+			if (!File.Exists(IMGPath)) return;
+			foreach (UIElement uie in g.Children)
+			{
+				if (!(uie is Image)) continue;
+
+				int vert = Grid.GetRow(uie);
+				int hori = Grid.GetColumn(uie);
+				double width = 0; double height = 0;
+				double x = 0; double y = 0;
+
+				BitmapImage bmp = new BitmapImage(new Uri(IMGPath));
+
+				if (vert != 1) { height = 90;  }
+				else
+				{
+					height = bmp.Height-180; y = 90;
+				}
+				if (vert == 2) y = bmp.Height - 90;
+
+				if (hori != 1) { width = 90; }
+				else
+				{
+					width = bmp.Width - 180; x = 90;
+				}
+				if (hori == 2) x = bmp.Width - 90;
+
+				var crop = new CroppedBitmap(bmp, new Int32Rect((int)x, (int)y, (int)width, (int)height));
+				// using BitmapImage version to prove its created successfully
+				Image image2 = new Image
+				{
+					Source = crop //cropped
+				};
+
+				((Image)uie).Source = crop;
 			}
 
 		}
 
+		/// <summary>
+		/// change the Z index of the UI object.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void GameUI_ZIndex_Changed(object sender, KeyEventArgs e)
 		{
-			if (e.Key == Key.Enter) {
+			if (e.Key == Key.Enter)
+			{
 				if (((ContentControl)SelectedUIControl).Tag.ToString() == "Border")
 				{
 					return;
@@ -3357,11 +3716,15 @@ namespace AmethystEngine.Forms
 						SelectedUI.SetProperty("Zindex", val);
 					}
 				}
-				
+
 			}
 		}
 
-
+		/// <summary>
+		/// Show the context menu which allows editing if clicked.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void ContentControl_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
 		{
 			ContextMenu cm = this.FindResource("EditMovableControls_Template") as ContextMenu;
@@ -3370,6 +3733,11 @@ namespace AmethystEngine.Forms
 			cm.IsOpen = true;
 		}
 
+		/// <summary>
+		/// When you click the Editable option in the context menu REENABLE click events
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void EditMoveableControl_Click(object sender, RoutedEventArgs e)
 		{
 			((MenuItem)sender).IsChecked = !SelectedUIControl.IsHitTestVisible;
@@ -3378,8 +3746,6 @@ namespace AmethystEngine.Forms
 				item.IsHitTestVisible = !item.IsHitTestVisible;
 			}
 		}
-
-		
 
 		private void UISceneExplorer_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
@@ -3390,23 +3756,40 @@ namespace AmethystEngine.Forms
 
 		}
 
+		/// <summary>
+		/// This method is here for when the user clicks and drags a GameUI object to move.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void ContentControl_PreviewMouseMove(object sender, MouseEventArgs e)
 		{
-			if(e.LeftButton == MouseButtonState.Pressed)
+			if (e.LeftButton == MouseButtonState.Pressed)
 			{
-				
+
 				Console.WriteLine("Moved UI CC");
-				if (SelectedBaseUIControl != null && (SelectedUI is GameTextBlock || SelectedUI is GameIMG))
+				if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
 				{
-					Vector RelOrigin = new Vector((int)Canvas.GetLeft(SelectedBaseUIControl), (int)Canvas.GetTop(SelectedBaseUIControl));
-					Vector ControlPos = new Vector((int)Canvas.GetLeft(SelectedUIControl), (int)Canvas.GetTop(SelectedUIControl));
-					Vector Offset = ControlPos - RelOrigin;
-					SelectedUI.SetProperty("Xoffset", (int)Offset.X);
-					SelectedUI.SetProperty("YOffset", (int)Offset.Y);
+					if (SelectedBaseUIControl != null && (SelectedUI is GameTextBlock || SelectedUI is GameIMG))
+					{
+						Vector RelOrigin = new Vector((int)Canvas.GetLeft(SelectedBaseUIControl), (int)Canvas.GetTop(SelectedBaseUIControl));
+						Vector ControlPos = new Vector((int)Canvas.GetLeft(SelectedUIControl), (int)Canvas.GetTop(SelectedUIControl));
+						Vector Offset = ControlPos - RelOrigin;
+						SelectedUI.SetProperty("Xoffset", (int)Offset.X);
+						SelectedUI.SetProperty("YOffset", (int)Offset.Y);
+					}
+				}
+				else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Dialogue"))
+				{
+
 				}
 			}
 		}
 
+		/// <summary>
+		/// Start to create a new UI file in editor.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void NewUI_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
@@ -3418,7 +3801,7 @@ namespace AmethystEngine.Forms
 				SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
 			}
 			ContentControl CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
-			
+
 			CC.HorizontalAlignment = HorizontalAlignment.Center;
 			CC.VerticalAlignment = VerticalAlignment.Center;
 			((Grid)CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray });
@@ -3436,6 +3819,11 @@ namespace AmethystEngine.Forms
 			SelectedBaseUIControl = CC;
 		}
 
+		/// <summary>
+		/// Save UI file
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void SaveUIAs_Click(object sender, RoutedEventArgs e)
 		{
 			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
@@ -3461,9 +3849,13 @@ namespace AmethystEngine.Forms
 			Console.WriteLine(dlg.FileName);
 
 			OpenUIEdits[0].ExportUI(dlg.FileName);
-			
+
 		}
 
+		/// <summary>
+		/// Get all the projects image paths for the image UI combobox.
+		/// </summary>
+		/// <returns></returns>
 		public List<String> GetAllProjectImages()
 		{
 			//get the images location
@@ -3471,6 +3863,11 @@ namespace AmethystEngine.Forms
 			return Directory.GetFiles(InitialDirectory).ToList();
 		}
 
+		/// <summary>
+		/// import a UI file to the editor.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void OpenUIFile_UIE(object sender, RoutedEventArgs e)
 		{
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
@@ -3495,7 +3892,7 @@ namespace AmethystEngine.Forms
 			else return; //invalid name
 			Console.WriteLine(dlg.FileName);
 
-			GameUI g =  GameUI.ImportGameUI(dlg.FileName);
+			GameUI g = GameUI.ImportGameUI(dlg.FileName);
 			OpenUIEdits.Add(g);
 
 			ControlTemplate cc = (ControlTemplate)this.Resources["UIEditorSceneExplorer_Template"];
@@ -3507,10 +3904,46 @@ namespace AmethystEngine.Forms
 				SceneExplorer_TreeView.ItemsSource = OpenUIEdits;
 			}
 
-			DrawUIToScreen(UIEditor_Canvas, UIEditor_BackCanvas,OpenUIEdits.Last(), false);
-			
+			DrawUIToScreen(UIEditor_Canvas, UIEditor_BackCanvas, OpenUIEdits.Last(), true);
+
 		}
 
+
+		#endregion
+
+		#region Dialogue
+
+		#region Timeline
+		/// <summary>
+		/// When you have the a Timeblock selected and are trying to change the start time in properties editor
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		public void SetStartTime(object sender, EventArgs e)
+		{
+			((TimeBlock)DialogueEditor_Timeline.SelectedControl).StartTime = double.Parse(((TextBox)sender).Text);
+		}
+
+		/// <summary>
+		/// When you have the a Timeblock selected and are trying to change the end time in properties editor
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		public void SetEndTime(object sender, EventArgs e)
+		{
+			((TimeBlock)DialogueEditor_Timeline.SelectedControl).EndTime = double.Parse(((TextBox)sender).Text);
+		}
+		#endregion
+
+		#region NodeEditor
+
+		#endregion
+
+		#region DialogueEditor
+
+		#endregion
+
+		#endregion
 
 		/// <summary>
 		/// method to draw a newly added/imported UI to the screen. Choose whether or not to breakdown the components for editing.
@@ -3521,14 +3954,15 @@ namespace AmethystEngine.Forms
 		/// <para/>
 		/// FALSE = ONLY ONE Content control will be drawn. Base UI is editable in size, and position. Children are editable via properties
 		/// </param>
-		public void DrawUIToScreen(Canvas CurrentEditorCanvas, Canvas CurrentEditorCanvas_Back, GameUI gameUI, bool bcomps)
+		public ContentControl DrawUIToScreen(Canvas CurrentEditorCanvas, Canvas CurrentEditorCanvas_Back, GameUI gameUI, bool bcomps, String DesiredImageName_CC)
 		{
 			//set the position and the size of the Base UI
 			ContentControl BaseUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
-			
-			BaseUI.Width = Int32.Parse(gameUI.GetProperty("Width").ToString());
-			BaseUI.Height = Int32.Parse(gameUI.GetProperty("Height").ToString());
-			BaseUI.BorderBrush = (((bool)gameUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+			ContentControl RetCC = null;
+
+			BaseUI.Width = Int32.Parse(gameUI.GetPropertyData("Width").ToString());
+			BaseUI.Height = Int32.Parse(gameUI.GetPropertyData("Height").ToString());
+			BaseUI.BorderBrush = (((bool)gameUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
 			BaseUI.BorderThickness = new Thickness(0);
 			BaseUI.Tag = "Border";
 			BaseUI.Name = gameUI.UIName;
@@ -3538,10 +3972,10 @@ namespace AmethystEngine.Forms
 				HorizontalAlignment = HorizontalAlignment.Stretch,
 				VerticalAlignment = VerticalAlignment.Stretch,
 			};
-			((Grid)BaseUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = (((bool)gameUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent) });
+			((Grid)BaseUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = (((bool)gameUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent) });
 
 			//get the middle!
-			Point mid = new Point(CurrentEditorCanvas_Back.ActualWidth / 2, CurrentEditorCanvas_Back.ActualHeight/2);
+			Point mid = new Point(CurrentEditorCanvas_Back.ActualWidth / 2, CurrentEditorCanvas_Back.ActualHeight / 2);
 			//get the true center point. Since origin is top left.
 			mid.X -= BaseUI.Width / 2; mid.Y -= BaseUI.Height / 2;
 			Canvas.SetLeft(BaseUI, mid.X); Canvas.SetTop(BaseUI, mid.Y);
@@ -3555,9 +3989,9 @@ namespace AmethystEngine.Forms
 					#region DefaultProperties
 					//set the position and the size of the Base UI
 					ContentControl CUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
-					CUI.Width = Int32.Parse(childUI.GetProperty("Width").ToString());
-					CUI.Height = Int32.Parse(childUI.GetProperty("Height").ToString());
-					CUI.BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+					CUI.Width = Int32.Parse(childUI.GetPropertyData("Width").ToString());
+					CUI.Height = Int32.Parse(childUI.GetPropertyData("Height").ToString());
+					CUI.BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
 					CUI.BorderThickness = new Thickness(2);
 					CUI.Tag = "Border";
 					CUI.Name = childUI.UIName;
@@ -3566,55 +4000,57 @@ namespace AmethystEngine.Forms
 					{
 						HorizontalAlignment = HorizontalAlignment.Stretch,
 						VerticalAlignment = VerticalAlignment.Stretch,
-						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("Background").ToString()),
+						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("Background").ToString()),
 						IsHitTestVisible = false,
 					};
 					((Grid)CUI.Content).Children.Add(new Border()
 					{
-						BorderThickness = (((bool)childUI.GetProperty("ShowBorder")) ? new Thickness(2) : new Thickness(0)),
-						BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent)
+						BorderThickness = (((bool)childUI.GetPropertyData("ShowBorder")) ? new Thickness(2) : new Thickness(0)),
+						BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent)
 					});
 					CUI.Name = childUI.UIName;
-					Canvas.SetLeft(CUI, mid.X + Int32.Parse(childUI.GetProperty("Xoffset").ToString()));
-					Canvas.SetTop(CUI, mid.Y + Int32.Parse(childUI.GetProperty("YOffset").ToString()));
-					Canvas.SetZIndex(CUI, Int32.Parse(childUI.GetProperty("Zindex").ToString()));
+					Canvas.SetLeft(CUI, mid.X + Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()));
+					Canvas.SetTop(CUI, mid.Y + Int32.Parse(childUI.GetPropertyData("YOffset").ToString()));
+					Canvas.SetZIndex(CUI, Int32.Parse(childUI.GetPropertyData("Zindex").ToString()));
 					CurrentEditorCanvas.Children.Add(CUI);
 					#endregion
 
 					if (childUI is GameTextBlock)
 					{
 						CUI.Tag = "TEXTBOX";
+						//My Game textboxes can have background images. so we need implement my frame logic.
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
 
-						String TB = "/AmethystEngine;component/images/SmallTextBubble_Purple.png";
-						String TB1 = "/AmethystEngine;component/images/SmallTextBubble_Orange.png";
-						Image img = new Image();
-						img.Stretch = Stretch.Fill;
-						img.Source = new BitmapImage(new Uri(
-							(File.Exists(childUI.GetProperty("Image").ToString()) ? childUI.GetProperty("Image").ToString() : ""),
-							UriKind.RelativeOrAbsolute
-							));
-						img.IsHitTestVisible = false;
-						//((Grid)CUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false });
-						((Grid)CUI.Content).Children.Add(img);
-						((Grid)CUI.Content).Children.Add(new TextBox()
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						((Grid)CUI.Content).ShowGridLines = true;
+						InitimagesTBGrid(((Grid)CUI.Content));
+						SetTBBackgroundImage(((Grid)CUI.Content), childUI.GetPropertyData("Image").ToString());
+						//
+						TextBox tb = new TextBox()
 						{
-							Text = "Sameple Text",
+							Text = childUI.GetPropertyData("ContentText").ToString(),
 							Margin = new Thickness(2),
-							BorderBrush = ((bool)childUI.GetProperty("ShowBorder") ? Brushes.Gray : Brushes.Transparent),
+							BorderThickness = new Thickness(0),
 							IsHitTestVisible = false,
 							VerticalContentAlignment = VerticalAlignment.Center,
 							HorizontalContentAlignment = HorizontalAlignment.Center,
-							FontSize = Int32.Parse(childUI.GetProperty("FontSize").ToString()),
-							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("FontColor").ToString()),
+							FontSize = Int32.Parse(childUI.GetPropertyData("FontSize").ToString()),
+							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("FontColor").ToString()),
 							Background = Brushes.Transparent
-						});
+						};
+						Grid.SetColumn(tb, 1); Grid.SetRow(tb, 1);
+						((Grid)CUI.Content).Children.Add(tb);
 
 					}
 					else if (childUI is GameIMG)
 					{
 						CUI.Tag = "IMAGE";
 
-						String TB = childUI.GetProperty("Image").ToString();
+						String TB = childUI.GetPropertyData("Image").ToString();
 						Image img = new Image();
 						img.Stretch = Stretch.Fill;
 						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
@@ -3631,6 +4067,8 @@ namespace AmethystEngine.Forms
 
 					CurrentUIDictionary.Add(childUI.UIName, childUI);
 				}
+				CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
+
 			}
 			else //all as one
 			{
@@ -3640,9 +4078,9 @@ namespace AmethystEngine.Forms
 					#region DefaultProperties
 					//set the position and the size of the Base UI
 					ContentControl CUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
-					CUI.Width = Int32.Parse(childUI.GetProperty("Width").ToString());
-					CUI.Height = Int32.Parse(childUI.GetProperty("Height").ToString());
-					CUI.BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+					CUI.Width = Int32.Parse(childUI.GetPropertyData("Width").ToString());
+					CUI.Height = Int32.Parse(childUI.GetPropertyData("Height").ToString());
+					CUI.BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
 					CUI.BorderThickness = new Thickness(0);
 					CUI.Tag = "Border";
 					CUI.Name = childUI.UIName;
@@ -3651,13 +4089,13 @@ namespace AmethystEngine.Forms
 					{
 						HorizontalAlignment = HorizontalAlignment.Stretch,
 						VerticalAlignment = VerticalAlignment.Stretch,
-						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("Background").ToString()),
+						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("Background").ToString()),
 						IsHitTestVisible = false,
 					};
 					((Grid)CUI.Content).Children.Add(new Border()
 					{
 						BorderThickness = new Thickness(0),//(((bool)childUI.GetProperty("ShowBorder")) ? new Thickness(2) : new Thickness(0)),
-						BorderBrush = (((bool)childUI.GetProperty("ShowBorder")) ? Brushes.Gray : Brushes.Transparent),
+						BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent),
 						IsHitTestVisible = false
 					});
 					CUI.Name = childUI.UIName;
@@ -3666,31 +4104,35 @@ namespace AmethystEngine.Forms
 					if (childUI is GameTextBlock)
 					{
 						CUI.Tag = "TEXTBOX";
-						Image img = new Image() { IsHitTestVisible = false };
-						img.Stretch = Stretch.Fill;
-						img.Source = new BitmapImage(new Uri(
-							(File.Exists(childUI.GetProperty("Image").ToString()) ? childUI.GetProperty("Image").ToString() : ""),
-							UriKind.RelativeOrAbsolute
-							));
-						img.IsHitTestVisible = false;
-						//((Grid)CUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, Background = Brushes.Transparent, IsHitTestVisible = false });
-						((Grid)CUI.Content).Children.Add(img);
-						((Grid)CUI.Content).Children.Add(new TextBox()
+						//My Game textboxes can have background images. so we need implement my frame logic.
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						InitimagesTBGrid(((Grid)CUI.Content));
+						SetTBBackgroundImage(((Grid)CUI.Content), childUI.GetPropertyData("Image").ToString());
+						//
+						TextBox tb = new TextBox()
 						{
-							Text = "Sameple Text",
+							Text = childUI.GetPropertyData("ContentText").ToString(),
 							Margin = new Thickness(2),
 							BorderThickness = new Thickness(0),
 							IsHitTestVisible = false,
 							VerticalContentAlignment = VerticalAlignment.Center,
 							HorizontalContentAlignment = HorizontalAlignment.Center,
-							FontSize = Int32.Parse(childUI.GetProperty("FontSize").ToString()),
-							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetProperty("FontColor").ToString()),
+							FontSize = Int32.Parse(childUI.GetPropertyData("FontSize").ToString()),
+							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("FontColor").ToString()),
 							Background = Brushes.Transparent
-						});
+						};
+						Grid.SetColumn(tb, 1); Grid.SetRow(tb, 1);
+						((Grid)CUI.Content).Children.Add(tb);
 						CUI.Margin = new Thickness()
 						{
-							Left = Int32.Parse(childUI.GetProperty("Xoffset").ToString()),
-							Top = Int32.Parse(childUI.GetProperty("YOffset").ToString()),
+							Left = Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()),
+							Top = Int32.Parse(childUI.GetPropertyData("YOffset").ToString()),
 							//Bottom = BaseUI.Height - (Top + CUI.Height),
 							//Right = BaseUI.Width - (Left + CUI.Width)
 						};
@@ -3704,7 +4146,7 @@ namespace AmethystEngine.Forms
 					{
 						CUI.Tag = "IMAGE";
 
-						String TB = childUI.GetProperty("Image").ToString();
+						String TB = childUI.GetPropertyData("Image").ToString();
 						Image img = new Image() { IsHitTestVisible = false };
 						img.Stretch = Stretch.Fill;
 						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
@@ -3712,8 +4154,240 @@ namespace AmethystEngine.Forms
 						((Grid)CUI.Content).Children.Add(new Rectangle() { });
 						CUI.Margin = new Thickness()
 						{
-							Left = Int32.Parse(childUI.GetProperty("Xoffset").ToString()),
-							Top = Int32.Parse(childUI.GetProperty("YOffset").ToString()),
+							Left = Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()),
+							Top = Int32.Parse(childUI.GetPropertyData("YOffset").ToString()),
+						};
+						CUI.IsHitTestVisible = false;
+						CUI.VerticalAlignment = VerticalAlignment.Top;
+						CUI.HorizontalAlignment = HorizontalAlignment.Left;
+						((Grid)CUI.Content).Children.Add(img);
+						((Grid)BaseUI.Content).Children.Add(CUI);
+
+						if (childUI.UIName == DesiredImageName_CC)
+							RetCC = CUI;
+					}
+					else if (childUI is GameButton)
+					{
+
+					}
+				}
+			}
+			SelectedBaseUIControl = BaseUI;
+			SelectedUI = OpenUIEdits.Last();
+			CurrentEditorCanvas.Children.Add(BaseUI);
+			return RetCC;
+		}
+
+		/// <summary>
+		/// method to draw a newly added/imported UI to the screen. Choose whether or not to breakdown the components for editing.
+		/// </summary>
+		/// <param name="CurrentEditorCanvas">Current Canvas that you will draw the UI too</param>
+		/// <param name="gameUI">The Custom created UI that you want to draw</param>
+		/// <param name="bcomps">TRUE = multiple ContentControls will be drawn, and allowed to be edited 
+		/// <para/>
+		/// FALSE = ONLY ONE Content control will be drawn. Base UI is editable in size, and position. Children are editable via properties
+		/// </param>
+		public void DrawUIToScreen(Canvas CurrentEditorCanvas, Canvas CurrentEditorCanvas_Back, GameUI gameUI, bool bcomps)
+		{
+			//set the position and the size of the Base UI
+			ContentControl BaseUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+			
+			BaseUI.Width = Int32.Parse(gameUI.GetPropertyData("Width").ToString());
+			BaseUI.Height = Int32.Parse(gameUI.GetPropertyData("Height").ToString());
+			BaseUI.BorderBrush = (((bool)gameUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+			BaseUI.BorderThickness = new Thickness(0);
+			BaseUI.Tag = "Border";
+			BaseUI.Name = gameUI.UIName;
+			//};
+			BaseUI.Content = new Grid()
+			{
+				HorizontalAlignment = HorizontalAlignment.Stretch,
+				VerticalAlignment = VerticalAlignment.Stretch,
+			};
+			((Grid)BaseUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = (((bool)gameUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent) });
+
+			//get the middle!
+			Point mid = new Point(CurrentEditorCanvas_Back.ActualWidth / 2, CurrentEditorCanvas_Back.ActualHeight/2);
+			//get the true center point. Since origin is top left.
+			mid.X -= BaseUI.Width / 2; mid.Y -= BaseUI.Height / 2;
+			Canvas.SetLeft(BaseUI, mid.X); Canvas.SetTop(BaseUI, mid.Y);
+
+			//which drawing type?
+			if (bcomps)
+			{
+				//create all the child UI elements as editable content controls
+				foreach (GameUI childUI in gameUI.UIElements)
+				{
+					#region DefaultProperties
+					//set the position and the size of the Base UI
+					ContentControl CUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+					CUI.Width = Int32.Parse(childUI.GetPropertyData("Width").ToString());
+					CUI.Height = Int32.Parse(childUI.GetPropertyData("Height").ToString());
+					CUI.BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+					CUI.BorderThickness = new Thickness(2);
+					CUI.Tag = "Border";
+					CUI.Name = childUI.UIName;
+
+					CUI.Content = new Grid()
+					{
+						HorizontalAlignment = HorizontalAlignment.Stretch,
+						VerticalAlignment = VerticalAlignment.Stretch,
+						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("Background").ToString()),
+						IsHitTestVisible = false,
+					};
+					((Grid)CUI.Content).Children.Add(new Border()
+					{
+						BorderThickness = (((bool)childUI.GetPropertyData("ShowBorder")) ? new Thickness(2) : new Thickness(0)),
+						BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent)
+					});
+					CUI.Name = childUI.UIName;
+					Canvas.SetLeft(CUI, mid.X + Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()));
+					Canvas.SetTop(CUI, mid.Y + Int32.Parse(childUI.GetPropertyData("YOffset").ToString()));
+					Canvas.SetZIndex(CUI, Int32.Parse(childUI.GetPropertyData("Zindex").ToString()));
+					CurrentEditorCanvas.Children.Add(CUI);
+					#endregion
+
+					if (childUI is GameTextBlock)
+					{
+						CUI.Tag = "TEXTBOX";
+						//My Game textboxes can have background images. so we need implement my frame logic.
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						((Grid)CUI.Content).ShowGridLines = true;
+						InitimagesTBGrid(((Grid)CUI.Content));
+						SetTBBackgroundImage(((Grid)CUI.Content), childUI.GetPropertyData("Image").ToString());
+						//
+						TextBox tb = new TextBox()
+						{
+							Text = childUI.GetPropertyData("ContentText").ToString(),
+							Margin = new Thickness(2),
+							BorderThickness = new Thickness(0),
+							IsHitTestVisible = false,
+							VerticalContentAlignment = VerticalAlignment.Center,
+							HorizontalContentAlignment = HorizontalAlignment.Center,
+							FontSize = Int32.Parse(childUI.GetPropertyData("FontSize").ToString()),
+							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("FontColor").ToString()),
+							Background = Brushes.Transparent
+						};
+						Grid.SetColumn(tb, 1); Grid.SetRow(tb, 1);
+						((Grid)CUI.Content).Children.Add(tb);
+
+					}
+					else if (childUI is GameIMG)
+					{
+						CUI.Tag = "IMAGE";
+
+						String TB = childUI.GetPropertyData("Image").ToString();
+						Image img = new Image();
+						img.Stretch = Stretch.Fill;
+						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+						img.IsHitTestVisible = false;
+						((Grid)CUI.Content).Children.Add(new Rectangle() { });
+						((Grid)CUI.Content).Children.Add(img);
+
+
+					}
+					else if (childUI is GameButton)
+					{
+
+					}
+
+					CurrentUIDictionary.Add(childUI.UIName, childUI);
+				}
+				CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
+				
+			}
+			else //all as one
+			{
+				//create all the child UI elements as editable content controls
+				foreach (GameUI childUI in gameUI.UIElements)
+				{
+					#region DefaultProperties
+					//set the position and the size of the Base UI
+					ContentControl CUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+					CUI.Width = Int32.Parse(childUI.GetPropertyData("Width").ToString());
+					CUI.Height = Int32.Parse(childUI.GetPropertyData("Height").ToString());
+					CUI.BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+					CUI.BorderThickness = new Thickness(0);
+					CUI.Tag = "Border";
+					CUI.Name = childUI.UIName;
+
+					CUI.Content = new Grid()
+					{
+						HorizontalAlignment = HorizontalAlignment.Stretch,
+						VerticalAlignment = VerticalAlignment.Stretch,
+						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("Background").ToString()),
+						IsHitTestVisible = false,
+					};
+					((Grid)CUI.Content).Children.Add(new Border()
+					{
+						BorderThickness = new Thickness(0),//(((bool)childUI.GetProperty("ShowBorder")) ? new Thickness(2) : new Thickness(0)),
+						BorderBrush = (((bool)childUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent),
+						IsHitTestVisible = false
+					});
+					CUI.Name = childUI.UIName;
+					#endregion
+
+					if (childUI is GameTextBlock)
+					{
+						CUI.Tag = "TEXTBOX";
+						//My Game textboxes can have background images. so we need implement my frame logic.
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { });
+						((Grid)CUI.Content).RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
+
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { });
+						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
+						InitimagesTBGrid(((Grid)CUI.Content));
+						SetTBBackgroundImage(((Grid)CUI.Content), childUI.GetPropertyData("Image").ToString());
+						//
+						TextBox tb = new TextBox()
+						{
+							Text = childUI.GetPropertyData("ContentText").ToString(),
+							Margin = new Thickness(2),
+							BorderThickness = new Thickness(0),
+							IsHitTestVisible = false,
+							VerticalContentAlignment = VerticalAlignment.Center,
+							HorizontalContentAlignment = HorizontalAlignment.Center,
+							FontSize = Int32.Parse(childUI.GetPropertyData("FontSize").ToString()),
+							Foreground = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("FontColor").ToString()),
+							Background = Brushes.Transparent
+						};
+						Grid.SetColumn(tb, 1); Grid.SetRow(tb, 1);
+						((Grid)CUI.Content).Children.Add(tb);
+						CUI.Margin = new Thickness()
+						{
+							Left = Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()),
+							Top = Int32.Parse(childUI.GetPropertyData("YOffset").ToString()),
+							//Bottom = BaseUI.Height - (Top + CUI.Height),
+							//Right = BaseUI.Width - (Left + CUI.Width)
+						};
+						CUI.IsHitTestVisible = false;
+						CUI.VerticalAlignment = VerticalAlignment.Top;
+						CUI.HorizontalAlignment = HorizontalAlignment.Left;
+						CUI.BorderThickness = new Thickness(0);
+						((Grid)BaseUI.Content).Children.Add(CUI);
+					}
+					else if (childUI is GameIMG)
+					{
+						CUI.Tag = "IMAGE";
+
+						String TB = childUI.GetPropertyData("Image").ToString();
+						Image img = new Image() { IsHitTestVisible = false };
+						img.Stretch = Stretch.Fill;
+						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+						img.IsHitTestVisible = false;
+						((Grid)CUI.Content).Children.Add(new Rectangle() { });
+						CUI.Margin = new Thickness()
+						{
+							Left = Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()),
+							Top = Int32.Parse(childUI.GetPropertyData("YOffset").ToString()),
 						};
 						CUI.IsHitTestVisible = false;
 						CUI.VerticalAlignment = VerticalAlignment.Top;
@@ -3727,21 +4401,1505 @@ namespace AmethystEngine.Forms
 					}
 				}
 			}
-			SelectedUI = OpenUIEdits.Last();
-			CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
-			CurrentEditorCanvas.Children.Add(BaseUI);
 			SelectedBaseUIControl = BaseUI;
+			SelectedUI = OpenUIEdits.Last();
+			CurrentEditorCanvas.Children.Add(BaseUI);
+		}
+
+		/// <summary>
+		/// Create a new Dialogue Scene
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void NewDialogueScene_MenuItem_Click(object sender, RoutedEventArgs e)
+		{
+			SetupDialogueSceneHooks();
+			CurActiveDialogueScene = new DialogueScene("Dialogue1");
+			ActiveDialogueScenes.Add(CurActiveDialogueScene);
+			
+			//DialogueEditor_Timeline.ItemsSource = new List<String>();
+
+		}
+
+		private void ChangeDialogueUIAnchorPostion_Hook(HorizontalAlignment hori, VerticalAlignment vert, int timelineind)
+		{
+			double gridw = DialogueEditor_BackCanvas.ActualWidth;
+			double gridh = DialogueEditor_BackCanvas.ActualHeight;
+//CurSceneCharacterDisplays[timelineind].Item2
+
+			if (hori == HorizontalAlignment.Left && vert == VerticalAlignment.Top)
+			{
+				Canvas.SetLeft(CurSceneCharacterDisplays[timelineind].Item2, 0);
+				Canvas.SetTop(CurSceneCharacterDisplays[timelineind].Item2, 0);
+
+				CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Left;
+				CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Top;
+
+				//for file data
+				CurActiveDialogueScene.Characters[timelineind].HorizontalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment.ToString();
+				CurActiveDialogueScene.Characters[timelineind].VerticalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment.ToString();
+			}
+			else if (hori == HorizontalAlignment.Right && vert == VerticalAlignment.Top)
+			{
+				Canvas.SetLeft(CurSceneCharacterDisplays[timelineind].Item2, gridw - CurSceneCharacterDisplays[timelineind].Item2.Width);
+				Canvas.SetTop(CurSceneCharacterDisplays[timelineind].Item2, 0);
+
+				CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Right;
+				CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Top;
+
+				//for file data
+				CurActiveDialogueScene.Characters[timelineind].HorizontalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment.ToString();
+				CurActiveDialogueScene.Characters[timelineind].VerticalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment.ToString();
+			}
+			else if (hori == HorizontalAlignment.Left && vert == VerticalAlignment.Bottom)
+			{
+				Canvas.SetLeft(CurSceneCharacterDisplays[timelineind].Item2, 0);
+				Canvas.SetTop(CurSceneCharacterDisplays[timelineind].Item2, gridh - CurSceneCharacterDisplays[timelineind].Item2.Height);
+
+				CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Left;
+				CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Bottom;
+
+				//for file data
+				CurActiveDialogueScene.Characters[timelineind].HorizontalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment.ToString();
+				CurActiveDialogueScene.Characters[timelineind].VerticalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment.ToString();
+			}
+			else if (hori == HorizontalAlignment.Right && vert == VerticalAlignment.Bottom)
+			{
+				Canvas.SetLeft(CurSceneCharacterDisplays[timelineind].Item2, gridw - CurSceneCharacterDisplays[timelineind].Item2.Width);
+				Canvas.SetTop(CurSceneCharacterDisplays[timelineind].Item2, gridh - CurSceneCharacterDisplays[timelineind].Item2.Height);
+
+				CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Right;
+				CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Bottom;
+				
+				//for file data
+				CurActiveDialogueScene.Characters[timelineind].HorizontalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment.ToString();
+				CurActiveDialogueScene.Characters[timelineind].VerticalAnchor =
+					CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment.ToString();
+			}
+		}
+
+		private void DialogueEditor_BackCanvas_OnSizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			double gridw = DialogueEditor_BackCanvas.ActualWidth;
+			double gridh = DialogueEditor_BackCanvas.ActualHeight;
+			foreach (Tuple<ContentControl, ContentControl> GameUICC in CurSceneCharacterDisplays)
+			{
+				HorizontalAlignment hori = GameUICC.Item2.HorizontalAlignment;
+				VerticalAlignment vert = GameUICC.Item2.VerticalAlignment;
+				
+
+				if (hori == HorizontalAlignment.Left && vert == VerticalAlignment.Top)
+				{
+					Canvas.SetLeft(GameUICC.Item2, 0);
+					Canvas.SetTop(GameUICC.Item2, 0);
+				}
+				else if (hori == HorizontalAlignment.Right && vert == VerticalAlignment.Top)
+				{
+					Canvas.SetLeft(GameUICC.Item2,
+						gridw - GameUICC.Item2.ActualWidth);
+					Canvas.SetTop(GameUICC.Item2, 0);
+				}
+				else if (hori == HorizontalAlignment.Left && vert == VerticalAlignment.Bottom)
+				{
+					Canvas.SetLeft(GameUICC.Item2, 0);
+					Canvas.SetTop(GameUICC.Item2,
+						gridh - GameUICC.Item2.ActualHeight);
+				}
+				else if (hori == HorizontalAlignment.Right && vert == VerticalAlignment.Bottom)
+				{
+					Canvas.SetLeft(GameUICC.Item2,
+						gridw - GameUICC.Item2.ActualWidth);
+					Canvas.SetTop(GameUICC.Item2,
+						gridh - GameUICC.Item2.ActualHeight);
+				}
+			}
 		}
 
 
+		private LinkedList<TimeBlock> defLL;
+		private void ResetExecution_Hook()
+		{
+			DialogueEditor_NodeGraph.ResetExecution();
+			DialogueEditor_NodeGraph.EndblockExecution();
+			DialogueEditor_NodeGraph.StartBlockExecution();
+
+			//let's get the current DEFAULT timeblock LL
+			defLL = GetDefaultTimeBlocks_LL();
+			DisplayTimeBlocks_LL(defLL);
+
+		}
+
+		/// <summary>
+		/// Occurs when a TimeBlock is clicked and Moved.
+		/// Displays ALL properties of the time block to the property grids
+		/// HOOK METHOD into timeline.dll
+		/// </summary>
+		/// <param name="sender"></param>
+		public void ShowTimelineSelectedProperties(object sender)
+		{
+			//CollapsedPropertyGrid.CollapsedPropertyGrid LB = ((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control)));
+			
+			CollapsedPropertyGrid.CollapsedPropertyGrid LB = ((CollapsedPropertyGrid.CollapsedPropertyGrid)(ObjectProperties_Control.Template.FindName("DialoguePropertyGrid", ObjectProperties_Control)));
+			if (sender is null) return;
+			else if(sender is TimeBlock)
+			{
+				DialogueEditorSelectedControl = sender;
+				PropertyBag timeblockPropertyBag = new PropertyBag(sender);
+				timeblockPropertyBag.Name = "Time Block Properties";
+				PropertyBag dialoguePropertyBag = new PropertyBag(sender);
+				dialoguePropertyBag.Name = "Dialogue Data";
+				TimeBlock TimeB = sender as TimeBlock;
+
+				if (PropertyBags.Count > 0)
+				{
+					PropertyBags.Clear(); //clear the current property displayed
+					PropertyBags.Add(timeblockPropertyBag);
+					PropertyBags.Add(dialoguePropertyBag);
+				}
+				else
+				{
+					PropertyBags.Add(timeblockPropertyBag);
+					PropertyBags.Add(dialoguePropertyBag);
+				}
+
+				try
+				{
+					timeblockPropertyBag.Properties.Add(
+						new Tuple<string, object, Control>("Type", "Time Block", new TextBox() {IsEnabled = false}));
+				}
+				catch { return; }
+
+				TextBox startime_TB = new TextBox(); startime_TB.KeyDown += DE_SetStartTime;
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), startime_TB));
+				TextBox endtime_TB = new TextBox(); endtime_TB.KeyDown += DE_SetEndTime;
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("End Time", TimeB.EndTime.ToString(), endtime_TB));
+				TextBox durationime_TB = new TextBox(); durationime_TB.KeyDown += DE_SetDurationTime;
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), durationime_TB));
+
+				int i = 0;
+				foreach (String s in (TimeB.LinkedDialogueBlock as DialogueNodeBlock)?.DialogueTextOptions)
+				{
+					ComboBox CB = new ComboBox() {Height = 50, ItemTemplate = (DataTemplate) this.Resources["CBIMGItems"]};
+					CB.SelectionChanged += SetSpriteImagePath_Dia;
+					List<EditorObject> ComboItems = new List<EditorObject>();
+					foreach (Sprite filepath in CurActiveDialogueScene
+						.Characters[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock) sender).TimelineParent)]
+						.DialogueSprites)
+					{
+						try
+						{
+							ComboItems.Add(new EditorObject(filepath.ImgPathLocation,
+								filepath.ImgPathLocation.Substring(filepath.ImgPathLocation.LastIndexOfAny(new char[] {'\\', '/'})),
+								false));
+						}
+						catch (ArgumentException ae)
+						{
+							Console.WriteLine(ae.Message);
+							continue;
+						}
+					}
+
+					CB.ItemsSource = ComboItems;
+					int index = Array.FindIndex(ComboItems.ToArray(), x => x.Thumbnail.AbsolutePath == TimeB.TrackSpritePath);
+					if(index >= 0) CB.SelectedIndex = index;
+
+					dialoguePropertyBag.Properties.Add(
+						new Tuple<string, object, Control>("Sprite Image "+i, new List<String>(), CB));
+					TextBox tb = new TextBox();
+					tb.KeyDown += SetDialogueText;
+					dialoguePropertyBag.Properties.Add(new Tuple<string, object, Control>("Dialogue Text "+i,
+						s, tb));
+
+					ComboBox CB1 = new ComboBox() {Height = 50};
+					CB1.SelectionChanged += SetLinkedTBName;
+					List<String> ComboItems1 = new List<String>();
+					foreach (GameUI Gameui in CurActiveDialogueScene
+						.DialogueBoxes[DialogueEditor_Timeline.GetTimelinePosition(TimeB.TimelineParent)].UIElements)
+					{
+						if (Gameui is GameTextBlock)
+						{
+							ComboItems1.Add(Gameui.UIName);
+						}
+					}
+					index = Array.FindIndex(ComboItems1.ToArray(), x => x == TimeB.LinkedTextBoxName);
+					if (index >= 0) CB1.SelectedIndex = index;
+
+					CB1.ItemsSource = ComboItems1;
+					dialoguePropertyBag.Properties.Add(new Tuple<string, object, Control>("Linked TextBox "+i, new List<String>(), CB1));
+					i++;
+				}
+			}
+			else if(sender is DialogueNodeBlock dialogueNodeBlock)
+			{
+				DialogueEditorSelectedControl = sender;
+				PropertyBag timeblockPropertyBag = new PropertyBag(sender);
+				timeblockPropertyBag.Name = "Time Block Properties";
+				PropertyBag dialoguePropertyBag = new PropertyBag(sender);
+				dialoguePropertyBag.Name = "Dialogue Data";
+
+				TimeBlock TimeB = dialogueNodeBlock.LinkedTimeBlock as TimeBlock;
+				if (TimeB == null) throw new NotImplementedException("The Linked TextBox has NOT been set!");
+
+				if (PropertyBags.Count > 0)
+				{
+					PropertyBags.Clear(); //clear the current property displayed
+					PropertyBags.Add(timeblockPropertyBag);
+					PropertyBags.Add(dialoguePropertyBag);
+				}
+				else
+				{
+					PropertyBags.Add(timeblockPropertyBag);
+					PropertyBags.Add(dialoguePropertyBag);
+				}
+
+				try
+				{
+					timeblockPropertyBag.Properties.Add(
+						new Tuple<string, object, Control>("Type", "Dialogue Block", new TextBox() {IsEnabled = false}));
+				}
+				catch
+				{
+					return;
+				}
+
+				TextBox startime_TB = new TextBox(); startime_TB.KeyDown += DE_SetStartTime;
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Start Time", TimeB.StartTime.ToString(), startime_TB));
+				TextBox endtime_TB = new TextBox(); endtime_TB.KeyDown += DE_SetEndTime;
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("End Time", TimeB.EndTime.ToString(), endtime_TB));
+				TextBox durationime_TB = new TextBox(); durationime_TB.KeyDown += DE_SetDurationTime;
+				timeblockPropertyBag.Properties.Add(new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), durationime_TB));
+
+				int i = 0;
+				foreach (String s in dialogueNodeBlock.DialogueTextOptions)
+				{
+					ComboBox CB = new ComboBox() { Height = 50, ItemTemplate = (DataTemplate)this.Resources["CBIMGItems"] };
+					CB.SelectionChanged += SetSpriteImagePath_Dia;
+					List<EditorObject> ComboItems = new List<EditorObject>();
+					foreach (Sprite filepath in CurActiveDialogueScene.Characters[DialogueEditor_Timeline.GetTimelinePosition(null, TimeB)].DialogueSprites)
+					{
+						try
+						{
+							ComboItems.Add(new EditorObject(filepath.ImgPathLocation,
+								filepath.ImgPathLocation.Substring(filepath.ImgPathLocation.LastIndexOfAny(new char[] {'\\', '/'})),
+								false));
+						}
+						catch (ArgumentException ae){
+							Console.WriteLine(ae.Message);
+							continue; }
+					}
+
+					CB.ItemsSource = ComboItems;
+					int index = Array.FindIndex(ComboItems.ToArray(), x => x.Thumbnail.AbsolutePath == TimeB.TrackSpritePath);
+					if (index >= 0) CB.SelectedIndex = index;
+
+					dialoguePropertyBag.Properties.Add(
+						new Tuple<string, object, Control>("Sprite Image " + i, new List<String>(), CB));
+					TextBox tb = new TextBox();
+					tb.KeyDown += SetDialogueText;
+					dialoguePropertyBag.Properties.Add(new Tuple<string, object, Control>("Dialogue Text " + i,
+						s, tb));
+
+					ComboBox CB1 = new ComboBox() { Height = 50 };
+					CB1.SelectionChanged += SetLinkedTBName;
+					List<String> ComboItems1 = new List<String>();
+					foreach (GameUI Gameui in CurActiveDialogueScene
+						.DialogueBoxes[DialogueEditor_Timeline.GetTimelinePosition(TimeB.TimelineParent)].UIElements)
+					{
+						if (Gameui is GameTextBlock)
+						{
+							ComboItems1.Add(Gameui.UIName);
+						}
+					}
+					index = Array.FindIndex(ComboItems1.ToArray(), x => x == TimeB.LinkedTextBoxName);
+					if (index >= 0) CB1.SelectedIndex = index;
+
+					CB1.ItemsSource = ComboItems1;
+					dialoguePropertyBag.Properties.Add(new Tuple<string, object, Control>("Linked TextBox " + i, new List<String>(), CB1));
+					i++;
+				}
+			}
+			else if(sender is Timeline)
+			{
+				PropertyBags.Clear(); //clear the current property displayed
+			}
+		}
+
+		/// <summary>
+		/// Sets the duration time of the time block.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		public void DE_SetDurationTime(object sender, KeyEventArgs e)
+		{
+			if (Key.Enter == e.Key)
+			{
+				if (DialogueEditorSelectedControl is TimeBlock timeBlock)
+				{
+					if (Int32.TryParse((sender as TextBox).Text, out int val))
+						timeBlock.Duration = val;
+				}
+				else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+				{
+					if (Int32.TryParse((sender as TextBox).Text, out int val))
+						(dialogue.LinkedTimeBlock as TimeBlock).Duration = val;
+				}
+			}
+		}
+		public void DE_SetStartTime(object sender, KeyEventArgs e)
+		{
+			if (Key.Enter == e.Key)
+			{
+				if (DialogueEditorSelectedControl is TimeBlock timeBlock)
+				{
+					if (Int32.TryParse((sender as TextBox).Text, out int val))
+						timeBlock.StartTime = val;
+				}
+				else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+				{
+					if (Int32.TryParse((sender as TextBox).Text, out int val))
+						(dialogue.LinkedTimeBlock as TimeBlock).StartTime = val;
+				}
+			}
+		}
+		public void DE_SetEndTime(object sender, KeyEventArgs e)
+		{
+			if (Key.Enter == e.Key)
+			{
+				if (DialogueEditorSelectedControl is TimeBlock timeBlock)
+				{
+					if (Int32.TryParse((sender as TextBox).Text, out int val))
+						timeBlock.EndTime = val;
+				}
+				else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+				{
+					if (Int32.TryParse((sender as TextBox).Text, out int val))
+						(dialogue.LinkedTimeBlock as TimeBlock).EndTime = val;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Sets the dialogue text of the time block
+		/// Display is handled by binding in the timeline.dll
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		public void SetDialogueText(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter)
+			{
+				if(DialogueEditorSelectedControl is TimeBlock timeBlock)
+				{
+					(timeBlock.LinkedDialogueBlock as DialogueNodeBlock).DialogueTextOptions[(Grid.GetRow(sender as TextBox)) / 3] = (sender as TextBox).Text; //set the dialogue data
+					timeBlock.CurrentDialogue = (sender as TextBox).Text; //set the timeblock data
+				}
+				else if(DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+				{
+					dialogue.DialogueTextOptions[(Grid.GetRow(sender as TextBox)) / 3] = (sender as TextBox).Text;
+					(dialogue.LinkedTimeBlock as TimeBlock).CurrentDialogue = (sender as TextBox).Text;
+				}
+				//(((TimeBlock) DialogueEditor_Timeline.SelectedControl).LinkedDialogueBlock as DialogueNodeBlock)
+				//	.DialogueData[Grid.GetRow(sender as TextBox)/3] = ((TextBox)sender).Text;
+				//((TimeBlock) DialogueEditor_Timeline.SelectedControl).CurrentDialogue =
+				//	(((TimeBlock) DialogueEditor_Timeline.SelectedControl).LinkedDialogueBlock as DialogueNodeBlock)
+				//	.DialogueData[0];
+			}
+		}
+
+		/// <summary>
+		/// Sets the Sprite Image for the timeblock. Also WIP for the timeline later.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		public void SetSpriteImagePath_Dia(object sender, EventArgs e)
+		{
+			if (DialogueEditorSelectedControl is null) return;
+			else if (DialogueEditorSelectedControl is ChoiceTimeBlock choiceTime)
+			{
+				choiceTime.TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+				choiceTime.Trackname = CurActiveDialogueScene.Characters[0].Name;
+			}
+			else if (DialogueEditorSelectedControl is TimeBlock timeblock)
+			{
+				timeblock.TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+				timeblock.Trackname = DialogueEditor_Timeline.GetTimelines()[
+					DialogueEditor_Timeline.GetTimelinePosition(null, timeblock)].TrackName;
+
+				//((TimeBlock)DialogueEditor_Timeline.SelectedControl).TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+				//((TimeBlock)DialogueEditor_Timeline.SelectedControl).Trackname = (((EditorObject)((ComboBox)sender).SelectedValue).Name);
+			}
+			else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+			{
+				(dialogue.LinkedTimeBlock as TimeBlock).TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
+				(dialogue.LinkedTimeBlock as TimeBlock).Trackname = dialogue.Header;
+				dialogue.DialogueSprites.Add(new Sprite(
+					((EditorObject)((ComboBox)sender).SelectedValue).Name,
+					((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath, 
+					0,0,0,0));
+			}
+			else if (DialogueEditor_Timeline.SelectedControl is Timeline timeline)
+			{
+				//timeline.
+				//throw new NotImplementedException("The uer has somehow wanted to change the timeline sprite header image.");
+			}
+		}
+
+		/// <summary>
+		/// Set the lined Textbox that this Timeblock will change/interact with.
+		/// WIP : this can later be set on init default wise. Since all blocks in a row should be for ONE character
+		/// thus ONE TEXT box. but can be changed if needed still like before.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		public void SetLinkedTBName(object sender, EventArgs e)
+		{
+			if(DialogueEditor_Timeline.SelectedControl is Timeline)
+			{
+
+			}
+			else if (DialogueEditorSelectedControl is TimeBlock timeBlock)
+			{
+				timeBlock.LinkedTextBoxName = ((ComboBox)sender).SelectedItem.ToString();
+				//
+				//((TimeBlock)sender).
+			}
+			else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+			{
+				(dialogue.LinkedTimeBlock as TimeBlock).LinkedTextBoxName = (sender as ComboBox).SelectedItem.ToString();
+			}
+		}
+
+		/// <summary>
+		/// When adding a character to scene it will call this method. AFTER correct info is given.
+		/// This method right now will add a sprite, that is can be linked to change, and a UI object to the screen.
+		/// </summary>
+		/// <param name="c"></param>
+		public void AddCharacterHook(SceneCharacter c, GameUI gameUi, String GameFileUI, String LinkedTextboxName, String LinkedDialogueImage_Text = null)
+		{
+			CurActiveDialogueScene.Characters.Add(c);
+			DialogueEditor_Timeline.AddTimeline(c.Name);
+
+			if (LinkedDialogueImage_Text == null)
+			{
+				//add moveable scaleable sprite control.
+				ContentControl CC = ((ContentControl) this.TryFindResource("MoveableControls_Template"));
+				CC.HorizontalAlignment = HorizontalAlignment.Center;
+				CC.VerticalAlignment = VerticalAlignment.Center;
+				Canvas.SetZIndex(CC, 1);
+
+				CC.Tag = "IMAGE";
+
+				String TB = "/AmethystEngine;component/images/emma_colors_oc.png";
+				ImageBrush ib = new ImageBrush();
+				Image img = new Image();
+				img.Stretch = Stretch.Fill;
+				img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
+				img.IsHitTestVisible = false;
+				((Grid) CC.Content).Children.Add(new Border()
+					{BorderThickness = new Thickness(2), BorderBrush = Brushes.Gray, IsHitTestVisible = false});
+				((Grid) CC.Content).Children.Add(new Rectangle() { });
+				((Grid) CC.Content).Children.Add(img);
+
+				DialogueEditore_Canvas.Children.Add(CC);
+				CurActiveDialogueScene.Characters.Last().DialogueSprites.Add(
+					new Sprite(img.Source.ToString(), img.Source.ToString(), 0, 0, (int) img.ActualWidth, (int) ActualHeight));
+
+				OpenUIEdits.Add(gameUi);
+				DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false);
+				CurActiveDialogueScene.DialogueBoxes.Add(OpenUIEdits.Last());
+				CurActiveDialogueScene.DialogueBoxesFilePaths.Add(GameFileUI);
+
+				//create the pointers to the content controls. which is what displays my images to the screen
+				CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
+			}
+			else
+			{
+				OpenUIEdits.Add(gameUi);
+				ContentControl CC= DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false, LinkedDialogueImage_Text);
+				Image img = (CC.Content as Grid).Children[2] as Image;
+
+				CurActiveDialogueScene.Characters[CurActiveDialogueScene.Characters.IndexOf(c)].DialogueSprites.Add(
+					new Sprite(img.Source.ToString(), img.Source.ToString(), 0, 0, (int)img.ActualWidth, (int)ActualHeight));
+				CurActiveDialogueScene.Characters.Last().LinkedImageBox = LinkedDialogueImage_Text;
 
 
+				CurActiveDialogueScene.DialogueBoxes.Add(OpenUIEdits.Last());
+				CurActiveDialogueScene.DialogueBoxesFilePaths.Add(GameFileUI);
+
+				//create the pointers to the content controls. which is what displays my images to the screen
+				CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
+			}
+
+		}
+
+		/// <summary>
+		/// This method is called on the play button press in the timeline editor
+		/// and it will set the Timeblock linked list. so the timeline knows how to traverse/increment after start.
+		/// </summary>
+		public void DialogueHook()
+		{
+			Console.WriteLine("Hook Activated");
+			//CurActiveDialogueScene.SetTrack(CurActiveDialogueScene.Characters[0].Name, DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL);
+		}
+
+		/// <summary>
+		/// Testing my casting from one dll to another.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void DialogueEditorTesting_BTN(object sender, RoutedEventArgs e)
+		{
+			object t =  DialogueEditor_Timeline.GetTimelines()[0];
+			Timeline tt = (Timeline)t;
+		}
+
+		/// <summary>
+		/// Occurs on the add a Character "+" button.
+		/// Opens up the add character form. uses hooking.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void AddCharacterToScene(object sender, RoutedEventArgs e)
+		{
+			if (CurActiveDialogueScene == null)
+			{
+				EngineOutputLog.AddErrorLogItem(-3, "New Dialogue Scene hasn't been created yet.", "DialogueEditor", true);
+				EngineOutputLog.AddLogItem("Dialogue Scene error. See Error log for details");
+				if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
+					resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+				OutputLogSpliter.IsEnabled = true;
+				return;
+			}
+			Dialogue_CE_Tree.ItemsSource = CurActiveDialogueScene.Characters;
+
+			//CurActiveDialogueScene.Characters.Add(new Character() { Name = "Antonio" });
+
+			SceneCharacter c = new SceneCharacter(HorizontalAlignment.Left.ToString(), VerticalAlignment.Bottom.ToString());
+			Window w = new AddCharacterForm(ProjectFilePath) { AddToScene = AddCharacterHook};
+			w.ShowDialog();
+
+			DialogueEditor_NodeGraph.SceneCharacters_list.Add(CurActiveDialogueScene.Characters.Last().Name);
+
+			//CurActiveDialogueScene.Characters.Add(c);
+			//DialogueEditor_Timeline.AddTimeline(c.Name);
+
+		}
+
+		/// <summary>
+		/// This method occurs AS the timeline is playing and the timeline has "entered" a new time block for that row.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ActiveTBblocks_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
+			{
+				if (e.OldItems[0] is ChoiceTimeBlock choice)
+				{
+					//TODO: DISPLAY CHOICES LATER
+					DialogueEditor_Timeline.PauseTimeline();
+					return;
+				}
+
+				DialogueEditor_NodeGraph.EndblockExecution();
+				if (DialogueEditor_NodeGraph.CurrentExecutionBlock is NodeEditor.Components.SetConstantNodeBlock)
+				{
+					if (DialogueEditor_NodeGraph.StartBlockExecution())
+					{
+						DialogueEditor_NodeGraph.ExecuteBlock();
+						DialogueEditor_NodeGraph.EndblockExecution();
+					}
+				}
+
+				if (DialogueEditor_NodeGraph.CurrentExecutionBlock is NodeEditor.ExitBlockNode)
+				{
+					DialogueEditor_NodeGraph.EndblockExecution();
+					DialogueEditor_Timeline.PauseTimeline();
+				}
+			}
+
+			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+			{
+				if (e.NewItems == null && !File.Exists(((TimeBlock)e.NewItems[0]).TrackSpritePath)) return;
+				//changing the Image on the screen Sprite dialogue
+				Console.WriteLine("Added Active Time Block");
+				if (e.NewItems[0] is ChoiceTimeBlock choiceTimeBlock)
+				{//this means we need to display the choices to the user.
+
+					//first hide the current UI controls.
+					for (int i = 0; i < CurSceneCharacterDisplays.Count; i++)
+					{
+						CurSceneCharacterDisplays[i].Item1.Visibility = Visibility.Hidden;
+						CurSceneCharacterDisplays[i].Item2.Visibility = Visibility.Hidden;
+						Selector.SetIsSelected(CurSceneCharacterDisplays[i].Item2, false);
+					}
+
+					//FOR NOW display a list box of the options the user will choose from.
+					//TODO: change this to the GamelistBox after this is created
+					ListBox lb = new ListBox();
+					lb.VerticalAlignment = VerticalAlignment.Bottom;
+					lb.HorizontalAlignment = HorizontalAlignment.Stretch;
+					foreach(String datachoices in (choiceTimeBlock.LinkedDialogueBlock as DialogueNodeBlock).DialogueTextOptions)
+					{
+						lb.Items.Add(datachoices);
+					}
+					lb.SelectionChanged += UserChooseDialogueChoice;
+					DialogueEditor_Grid.Children.Add(lb);
+
+					//give the list box a onselectionchanged event.
+					//this event should CHANGE/LOAD in the new LinkedTimeblocks from the nodegraphs Dialogueblocks
+					//this should continue UNTIl an exit block is found
+					//THEN resume playing.
+				}
+				else
+				{
+					try
+					{
+						((Image)((Grid)CurSceneCharacterDisplays[
+									DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)].Item1.Content)
+								.Children[2]).Source =
+							new BitmapImage(new Uri(((TimeBlock)e.NewItems[0]).TrackSpritePath, UriKind.Absolute));
+					}
+					catch (UriFormatException uri)
+					{
+						Console.WriteLine("INVAILD URI. The sprite image wasn't set");
+						EngineOutputLog.AddErrorLogItem(-1, "Timeblocks sprite image wasn't set.", "DialogueEditor", false);
+						EngineOutputLog.AddLogItem("Timeblock failed on activated. See Error Log for more details");
+						if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
+							resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+						OutputLogSpliter.IsEnabled = true;
+						DialogueEditor_Timeline.PauseTimeline();
+						return;
+					}
+					catch
+					{
+						return;
+					}
+
+					//here we change the dialogue text itself
+
+					GameUI gtb = null;
+					try
+					{
+						gtb = CurActiveDialogueScene
+							.DialogueBoxes[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)]
+							.UIElements.Single(m => m.UIName == ((TimeBlock)e.NewItems[0]).LinkedTextBoxName);
+					}
+					catch (InvalidOperationException ioe)
+					{
+						Console.WriteLine("The Linked Textbox wasn't set!");
+						EngineOutputLog.AddErrorLogItem(-2, "Timeblocks linked textbox wasn't set.", "DialogueEditor", false);
+						EngineOutputLog.AddLogItem("Timeblock failed on activated. See Error Log for more details");
+						if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
+							resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+						OutputLogSpliter.IsEnabled = true;
+						DialogueEditor_Timeline.PauseTimeline();
+						return;
+					}
+
+					gtb.SetProperty("ContentText", ((((TimeBlock)e.NewItems[0]).LinkedDialogueBlock) as DialogueNodeBlock).DialogueTextOptions[0]);
+
+					UIElementCollection uie = ((Grid)CurSceneCharacterDisplays[DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock)e.NewItems[0]).TimelineParent)].Item2.Content).Children;
+					ContentControl CC = null;
+					foreach (UIElement ccc in uie)
+					{
+						if (!(ccc is ContentControl)) continue;
+						if (((ContentControl)ccc).Name == ((TimeBlock)e.NewItems[0]).LinkedTextBoxName)
+						{
+							CC = ((ContentControl)ccc);
+						}
+					}
+					if (CC == null) return;
+					Grid g = (Grid)CC.Content;
+					foreach (UIElement c in g.Children)
+					{
+						if (c is TextBox)
+						{
+							((TextBox)c).Text = gtb.GetPropertyData("ContentText").ToString();
+						}
+					}
+					//gtb.GetProperty("CurrentDialogue").ToString();
+				}
+
+				//we need imcrement our node editor pointers
+				if (e.NewItems[0] is ChoiceTimeBlock)
+				{
+					//only check to make sure that we use this block, let the execution be handled by the selection changed event
+					DialogueEditor_NodeGraph.StartBlockExecution();
+					return;
+				}
+
+				if (DialogueEditor_NodeGraph.StartBlockExecution())
+				{
+					if (DialogueEditor_NodeGraph.ExecuteBlock())
+					{
+					}
+					else
+					{
+						if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
+							resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+						OutputLogSpliter.IsEnabled = true;
+						DialogueEditor_Timeline.PauseTimeline();
+					}
+				}
+				else
+				{
+					if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
+						resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+					OutputLogSpliter.IsEnabled = true;
+					DialogueEditor_Timeline.PauseTimeline();
+				}
+			}
+			else
+			{
+				Console.WriteLine("Removed Active Time block");
+			}
+
+			
+
+		}
+
+		private void UserChooseDialogueChoice(object sender, SelectionChangedEventArgs e)
+		{
+			//show the controls again.
+			for (int i = 0; i < CurSceneCharacterDisplays.Count; i++)
+			{
+				CurSceneCharacterDisplays[i].Item1.Visibility = Visibility.Visible;
+				CurSceneCharacterDisplays[i].Item2.Visibility = Visibility.Visible;
+			}
+			DialogueEditor_Grid.Children.Remove(sender as ListBox);
+			DialogueEditor_Grid.UpdateLayout(); //GC
+
+			DialogueEditor_NodeGraph.ChangeChoiceVar((sender as ListBox).SelectedIndex);
+
+			defLL = GetChoiceTimeBlocks_LL(DialogueEditor_NodeGraph.CurrentExecutionBlock, (sender as ListBox).SelectedIndex);
+			if (defLL is null) return;
+			DisplayTimeBlocksAfter_LL(defLL);
+
+			DialogueEditor_Timeline.UpdateLayout();
+			DialogueEditor_Timeline.ResumeTimeline();
+			if (DialogueEditor_NodeGraph.StartBlockExecution())
+			{
+				if (DialogueEditor_NodeGraph.ExecuteBlock())
+				{
+					DialogueEditor_NodeGraph.EndblockExecution();
+					DialogueEditor_NodeGraph.StartBlockExecution();
+
+					if (DialogueEditor_NodeGraph.CurrentExecutionBlock is NodeEditor.ExitBlockNode)
+					{
+						DialogueEditor_NodeGraph.EndblockExecution();
+						DialogueEditor_Timeline.PauseTimeline();
+					}
+				}
+			}
+			else
+			{
+				DialogueEditor_Timeline.PauseTimeline();
+				if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
+					resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+				OutputLogSpliter.IsEnabled = true;
+			}
+
+			//(sender as ListBox).SelectedIndex;
+			//throw new NotImplementedException();
+		}
+
+		private void NodeEditorCurrentErrorsOnCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			foreach (Exception ex in e.NewItems)
+			{
+				if (ex.Message == "Dialogue Scene Completed!")
+				{
+					EngineOutputLog.AddLogItem("Dialogue Scene Completed! :D");
+					EngineOutputLog.AddErrorLogItem(0, ex.Message, "BlockNodeEditor", false);
+				}
+				else if (ex.Message.Contains("Updated Runtime Var"))
+				{
+					EngineOutputLog.AddLogItem("Updated Global Runtime Var");
+					EngineOutputLog.AddErrorLogItem(0, ex.Message, "BlockNodeEditor", true);
+				}
+				else
+				{
+					EngineOutputLog.AddErrorLogItem(-1, ex.Message, "BlockNodeEditor", false);
+					EngineOutputLog.AddLogItem("Dialogue Error Found! Check Error Log for details.");
+
+				}
+			}
+		}
+
+		public void ChangeSpriteIMG(ContentControl CC, String newimg)
+		{
+
+		}
+
+		/// <summary>
+		/// more testing methods. I use this one to add a sprite to the screen.
+		/// Test1 button
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void TestingAddingCharacterpictersdia(object sender, RoutedEventArgs e)
+		{
+			Sprite s = new Sprite("new sprite", "/AmethystEngine;component/images/Ame_icon_small.png",0 , 0, 400, 400);
+			CurActiveDialogueScene.Characters[0].DialogueSprites.Add(s);
+		}
+		/// <summary>
+		/// Used to change the ui and image manually . TESTING.
+		/// Test2 button
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void Test2Dia_Click(object sender, RoutedEventArgs e)
+		{
+			DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL.First.Value.TrackSpritePath = "/AmethystEngine;component/images/Ame_icon_small.png";
+			DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL.First.Value.Trackname = "DefaultImage";
+			DialogueEditor_Timeline.GetTimelines()[0].timeBlocksLL.First.Value.CurrentDialogue = "Yo my dude!";
+		}
+
+		/// <summary>
+		/// Clicking on a timeblock will recieve the properties of said object.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void DialogueEditor_Timeline_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+		{
+			Console.WriteLine("Clicked on Timeline");
+
+			if (sender is TimeBlock)
+			{
+				TimeBlock tb = (TimeBlock)sender;
+				PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
+
+			}
+			else if (sender is Timeline)
+			{
+				Timeline tl = (Timeline)sender;
+				PropGrid LB = ((PropGrid)(ObjectProperties_Control.Template.FindName("Properties_Grid", ObjectProperties_Control)));
+			}
+			else Console.WriteLine("Unsupported type"); 
+
+		}
+
+		public object CreateDialogueBlockForTimeline(object Timeblock, bool bChoices)
+		{
+			int i = DialogueEditor_Timeline.GetTimelinePosition(DialogueEditor_Timeline.selectedTimeline, null);
+			DialogueNodeBlock dialogueNode = new DialogueNodeBlock(CurActiveDialogueScene.Characters[i].Name);
+			DialogueEditor_NodeGraph.AddDialogueBlockToGraph(dialogueNode, CurActiveDialogueScene.Characters[i].Name, Timeblock);
+
+			dialogueNode.bChoice = bChoices;
+			if (bChoices)
+			{
+				(dialogueNode.LinkedTimeBlock as TimeBlock).Trackname = "choice";
+				dialogueNode.Header = "Dialogue Choice";
+			}
+			else
+				(dialogueNode.LinkedTimeBlock as TimeBlock).Trackname = CurActiveDialogueScene.Characters[i].Name;
+
+			//TODO: This needs to be changed for the word choice.
+
+			//Character
+			return dialogueNode;
+		}
+
+		public object CreateTimeBlockForDialogue(object DialogueBlock)
+		{
+			int i = DialogueEditor_Timeline.GetTimelinePosition(DialogueEditor_Timeline.selectedTimeline, null);
+			TimeBlock timeBlock = new TimeBlock(DialogueEditor_Timeline.GetTimelines()[0], 0);
+			timeBlock.Trackname = (DialogueBlock as DialogueNodeBlock)?.Header;
+
+			//DialogueEditor_NodeGraph.AddDialogueBlockToGraph(timeBlock, CurActiveDialogueScene.Characters[i].Name, DialogueBlock);
+			(DialogueBlock as DialogueNodeBlock).LinkedTimeBlock = timeBlock;
+			timeBlock.LinkedDialogueBlock = (DialogueBlock as DialogueNodeBlock);
+			//Character
+			return timeBlock;
+		}
+
+		private void ViewOutputLog_Click(object sender, RoutedEventArgs e)
+		{
+			if (sender is MenuItem mi)
+			{
+				if (!mi.IsChecked) //hide it
+				{
+					resizeGrid.RowDefinitions.Last().Height = new GridLength(1);
+					OutputLogSpliter.IsEnabled = false;
+				}
+				else //show it
+				{
+					resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
+					OutputLogSpliter.IsEnabled = true;
+				}
+
+			}
+		}
+
+		private LinkedList<TimeBlock> GetDefaultTimeBlocks_LL()
+		{
+			LinkedList<TimeBlock> retLL = new LinkedList<TimeBlock>();
+			BaseNodeBlock currentBlock = DialogueEditor_NodeGraph.StartExecutionBlock;
+			AddTimeBlocksTillExit(ref retLL, currentBlock);
+			
+			return retLL;
+		}
+
+		private LinkedList<TimeBlock> GetChoiceTimeBlocks_LL(BaseNodeBlock currentBlock, int choice)
+		{
+			if (currentBlock.OutputNodes[choice].ConnectedNodes[0] != null &&
+			    currentBlock.OutputNodes[choice].ConnectedNodes[0].ParentBlock is ExitBlockNode) return null;
+				LinkedList<TimeBlock> retLL = new LinkedList<TimeBlock>();
+			//clear the timeblocks
+			DialogueEditor_Timeline.DeleteTimeBlocksAfter();
+
+			try
+			{
+				//choose path and change pointer
+				currentBlock = currentBlock.OutputNodes[choice].ConnectedNodes[0].ParentBlock;
+
+				//add until exit is found.
+				AddTimeBlocksTillExit(ref retLL, currentBlock);
+			}
+			catch
+			{ return retLL;}
+
+			return retLL;
+		}
+
+		private void AddTimeBlocksTillExit(ref LinkedList<TimeBlock> output, BaseNodeBlock currentBlock)
+		{
+			//add until exit is found.
+			try
+			{
+				while (!(currentBlock is ExitBlockNode))
+				{
+					if (currentBlock is StartBlockNode start)
+					{
+						currentBlock = start.ExitNode.ConnectedNodes[0].ParentBlock;
+					}
+					else if (currentBlock is DialogueNodeBlock dialogue)
+					{
+						if (!output.Contains(dialogue.LinkedTimeBlock as TimeBlock))
+							output.AddLast(dialogue.LinkedTimeBlock as TimeBlock);
+						currentBlock = dialogue.OutputNodes[0].ConnectedNodes[0].ParentBlock;
+					}
+					else if (currentBlock is SetConstantNodeBlock setConstant)
+					{
+						currentBlock = setConstant.ExitNode.ConnectedNodes[0].ParentBlock;
+					}
+					else if (currentBlock is ConditionalNodeBlock conditional)
+					{
+						currentBlock = conditional.TrueOutput.ConnectedNodes[0].ParentBlock;
+					}
+					else
+					{
+						currentBlock = currentBlock.OutputNodes[0].ConnectedNodes[0].ParentBlock;
+					}
+				}
+			}
+			catch
+			{
+				Console.WriteLine("Error Adding blocks to LL while traversing to exit");
+				return;
+			}
+		}
+
+		private void DisplayTimeBlocks_LL(LinkedList<TimeBlock> desiredLL)
+		{
+			DialogueEditor_Timeline.DeleteAllTimeBlocks();
+			List<String> chars =new List<string>();
+			foreach (SceneCharacter character in CurActiveDialogueScene.Characters)
+			{
+				chars.Add(character.Name);
+			}
+			DialogueEditor_Timeline.AddTimeblock_LL(desiredLL, chars);
+		}
+
+		private void DisplayTimeBlocksAfter_LL(LinkedList<TimeBlock> desiredLL)
+		{
+			List<String> chars = new List<string>();
+			foreach (SceneCharacter character in CurActiveDialogueScene.Characters)
+			{
+				chars.Add(character.Name);
+			}
+			DialogueEditor_Timeline.AddTimeblock_LL(desiredLL, chars, false);
+
+			foreach (Timeline timeline in DialogueEditor_Timeline.GetTimelines())
+			{
+				if (timeline.TimelineisNull_flag)
+				{ timeline.ActiveBlock = timeline.timeBlocksLL.First; }
+				else if (timeline.ActiveBlock != null)
+					timeline.ActiveBlock = timeline.ActiveBlock.Next;
+				else if (timeline.ActiveBlock == null)
+					timeline.ActiveBlock = timeline.timeBlocksLL.First;
+				timeline.TimelineisNull_flag = false;
+			}
+
+		}
+
+		private void LoadTimelineWithSelectedPath(object selectedblock)
+		{
+			if (!(selectedblock is BaseNodeBlock)) return;
+			DialogueEditor_Timeline.DeleteAllTimeBlocks(); //delete all timeline data
+
+			//next up use the current block and build the new list from that.
+			BaseNodeBlock tempblock = selectedblock as BaseNodeBlock;
+			LinkedList<TimeBlock> timeBlocks = new LinkedList<TimeBlock>();
+
+			AddTimeblocksTillStart(ref timeBlocks, tempblock);
+			AddTimeBlocksTillExit(ref timeBlocks, tempblock);
+
+			DisplayTimeBlocks_LL(timeBlocks);
+		}
+
+		private void AddTimeblocksTillStart(ref LinkedList<TimeBlock> output, BaseNodeBlock tempblock)
+		{
+			try
+			{ 
+				while (!(tempblock is StartBlockNode))
+				{
+					//back track and add.
+					if (tempblock is ExitBlockNode exit)
+					{
+						tempblock = exit.EntryNode.ConnectedNodes[0].ParentBlock;
+					}
+					else if (tempblock is DialogueNodeBlock dialogue)
+					{
+						tempblock = dialogue.EntryNode.ConnectedNodes[0].ParentBlock;
+						output.AddFirst(dialogue.LinkedTimeBlock as TimeBlock);
+					}
+					else if (tempblock is SetConstantNodeBlock setConstant)
+					{
+						tempblock = setConstant.EntryNode.ConnectedNodes[0].ParentBlock;
+					}
+					else if (tempblock is ConditionalNodeBlock conditional)
+					{
+						tempblock = conditional.EntryNode.ConnectedNodes[0].ParentBlock;
+					}
+					else
+					{
+						tempblock = tempblock.InputNodes[0].ConnectedNodes[0].ParentBlock;
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+			}
+		}
+
+		private void SaveDialogueSceneAs_MI_Click(object sender, RoutedEventArgs e)
+		{
+			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
+			{
+				Title = "New Level File",
+				FileName = "", //default file name
+				Filter = "txt files (*.dials)|*.lvl|All files (*.*)|*.*",
+				FilterIndex = 2,
+				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Dialogue"),
+				RestoreDirectory = true
+			};
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+			Console.WriteLine(dlg.FileName);
+
+			//get the Params list of this scene
+			List<Tuple<String, object>> varDataList = new List<Tuple<string, object>>();
+			foreach (BlockNodeEditor.RuntimeVars rtVars in DialogueEditor_NodeGraph.TestingVars_list)
+			{
+				varDataList.Add(new Tuple<string, object>(rtVars.VarName, rtVars.OrginalVarData));
+			}
+
+			List<BaseNodeBlock> BlockNodes = new List<BaseNodeBlock>();
+			foreach (UIElement uie in DialogueEditor_NodeGraph.NodeCanvas.Children)
+			{
+				if (uie is BaseNodeBlock bn)
+				{
+					bn.LocX = Canvas.GetLeft(bn);
+					bn.LocY = Canvas.GetTop(bn);
+					BlockNodes.Add(bn);
+				}
+			}
+
+			CurActiveDialogueScene.ExportScene(
+				dlg.FileName, CurActiveDialogueScene.Characters.ToList(), CurActiveDialogueScene.DialogueBoxesFilePaths
+				, varDataList, BlockNodes);
+		}
+
+		private void OpenDialogueScene_MI_Click(object sender, RoutedEventArgs e)
+		{
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+			{
+				Title = "Open Dialogue File",
+				FileName = "", //default file name
+				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Dialogue"),
+				Filter = "Dialogue Scene files (*.dials)|*.dials",
+				FilterIndex = 2,
+				RestoreDirectory = true
+			};
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+			Console.WriteLine(dlg.FileName);
+			int charcnt = 0;
+			//DIALOGUE SCENE HOOKS
+			SetupDialogueSceneHooks();
+
+			List<Tuple<String, String, int, String ,String, int>> connectiList = new List<Tuple<string, String, int, String, string, int>>();
+
+			DialogueScene dia = DialogueScene.ImportScene(dlg.FileName, ref connectiList);
+			
+			foreach (Timeline tl in dia.Timelines)
+			{
+				tl.TrackImagePath = dia.Characters[charcnt++].DialogueSprites[0].ImgPathLocation;
+				DialogueEditor_Timeline.AddTimeline(tl);
+			}
+			//this is an import function so we need to remove the DEFAULT start and End Block.
+			//AND SET THE DialogueNodegraph.Start ref.
+			DialogueEditor_NodeGraph.NodeCanvas.Children.Clear();
+			foreach (BaseNodeBlock bn in dia.DialogueBlockNodes)
+			{
+				if (bn is StartBlockNode start)
+					DialogueEditor_NodeGraph.StartExecutionBlock = start;
+			}
+
+			//Add the variables to the scene
+			for (int i = 1; i < dia.DialogueSceneParams.Count; i++)
+			{
+				DialogueEditor_NodeGraph.bAddNew_Flag = true;
+				DialogueEditor_NodeGraph.AddRuntimeVar(dia.DialogueSceneParams[i]);
+			}
+
+			//If there are dialogue that have choices we need to set them.
+			SetUpAddedDialogueBlocks(dia);
+
+			//add characters to the editor objects section
+			CurActiveDialogueScene = dia;
+			Dialogue_CE_Tree.ItemsSource = CurActiveDialogueScene.Characters;
+			for (int i = 0; i < CurActiveDialogueScene.Characters.Count; i++)
+			{
+				CurActiveDialogueScene.DialogueBoxes.Add(GameUI.ImportGameUI(CurActiveDialogueScene.DialogueBoxesFilePaths[i]));
+				DialogueEditor_NodeGraph.SceneCharacters_list.Add(CurActiveDialogueScene.Characters[i].Name);
+			}
+
+			Console.WriteLine(Canvas.GetLeft(dia.DialogueBlockNodes[dia.DialogueBlockNodes.Count-1]));
+
+
+			DialogueEditor_NodeGraph.NodeCanvas.UpdateLayout();
+			//connect all the blocks that we just added.
+			foreach (Tuple<String, String, int, String , String, int> tup in connectiList)
+			{
+				try
+				{
+					BaseNodeBlock fromBlock = dia.DialogueBlockNodes.Find(x => x.Name == tup.Item1);
+					ConnectionNode fromBlockNode = GetFromConnectionNode(fromBlock, tup);
+
+
+					BaseNodeBlock toBlock = dia.DialogueBlockNodes.Find(x => x.Name == tup.Item4);
+					ConnectionNode toBlockNode = GetToConnectionNode(toBlock, tup);
+
+					DialogueEditor_NodeGraph.ConnectNodes(
+						fromBlockNode,
+						GetNodePosition(fromBlock, fromBlockNode),
+						toBlockNode,
+						GetNodePosition(toBlock, toBlockNode)
+					);
+				}
+				catch
+				{
+					Console.WriteLine("FAILED CONNECTION @ :\n" + tup.ToString());
+					continue;
+				}
+			}
+
+			charcnt = 0;
+			//Dialogue Boxes per character
+			foreach (GameUI gameUi in dia.DialogueBoxes)
+			{
+				OpenUIEdits.Add(gameUi);
+				ContentControl CC = DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false, CurActiveDialogueScene.Characters[charcnt].LinkedImageBox );
+
+				//(DialogueEditor_Grid.Children[DialogueEditor_Grid.Children.Count - 1] as ContentControl).HorizontalAlignment =
+				//	HorizontalAlignment.Right;
+				//(DialogueEditor_Grid.Children[DialogueEditor_Grid.Children.Count - 1] as ContentControl).VerticalAlignment= VerticalAlignment.Bottom;
+				//DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false);
+
+				//create the pointers to the content controls. which is what displays my images to the screen
+				CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
+
+				//Change the Display positon of the 
+				HorizontalAlignment hori = 0;
+				VerticalAlignment vert = 0;
+				if (CurActiveDialogueScene.Characters[charcnt].HorizontalAnchor == HorizontalAlignment.Left.ToString())
+				{
+					hori = HorizontalAlignment.Left;
+				}
+				else
+				{
+					hori = HorizontalAlignment.Right;
+				}
+				if (CurActiveDialogueScene.Characters[charcnt].VerticalAnchor == VerticalAlignment.Top.ToString())
+				{
+					vert = VerticalAlignment.Top;
+				}
+				else
+				{
+					vert = VerticalAlignment.Bottom;
+				}
+				ChangeDialogueUIAnchorPostion_Hook(hori, vert, charcnt);
+				DialogueEditor_NodeGraph.bAddNew_Flag = true;
+				charcnt++;
+			}
+		}
+
+		private ConnectionNode GetFromConnectionNode(BaseNodeBlock fromBlock, Tuple<String, String, int, String, String, int> tup)
+		{
+			ConnectionNode fromBlockNode = null;
+			if (fromBlock is StartBlockNode start)//|| fromBlock is ExitBlockNode)
+			{
+				fromBlockNode = start.ExitNode;
+			}
+			else if (fromBlock is BaseArithmeticBlock arth)
+			{
+				fromBlockNode = arth.OutValue;
+			}
+			else if (fromBlock is BaseLogicNodeBlock logi)
+			{
+				fromBlockNode = logi.Output;
+			}
+			else if (fromBlock is ConditionalNodeBlock condi)
+			{
+				fromBlockNode = (tup.Item3 == 0 ? condi.TrueOutput : condi.FalseOutput);
+			}
+			else if (fromBlock is SetConstantNodeBlock seti)
+			{
+				if (tup.Item2 == "Exit")
+					fromBlockNode = seti.ExitNode;
+				else fromBlockNode = seti.OutValue;
+			}
+			else if (fromBlock is GetConstantNodeBlock getvar)
+			{
+				fromBlockNode = getvar.output;
+			}
+			else if (fromBlock is DialogueNodeBlock dialogue)
+			{
+				fromBlockNode = dialogue.OutputNodes[tup.Item3];
+			}
+			return fromBlockNode;
+		}
+
+		private ConnectionNode GetToConnectionNode(BaseNodeBlock fromBlock, Tuple<String, String, int, String, String, int> tup)
+		{
+			ConnectionNode fromBlockNode = null;
+			if (fromBlock is ExitBlockNode exit)//|| fromBlock is ExitBlockNode)
+			{
+				fromBlockNode = exit.EntryNode;
+			}
+			else if (fromBlock is BaseArithmeticBlock arth)
+			{
+				fromBlockNode = arth.InputNodes[tup.Item6];
+			}
+			else if (fromBlock is BaseLogicNodeBlock logi)
+			{
+				fromBlockNode = logi.InputNodes[tup.Item6];
+			}
+			else if (fromBlock is ConditionalNodeBlock condi)
+			{
+				if (tup.Item5 == "Enter")
+					fromBlockNode = condi.EntryNode;
+				else fromBlockNode = condi.InputNodes[tup.Item6];
+			}
+			else if (fromBlock is SetConstantNodeBlock seti)
+			{
+				if (tup.Item5 == "Enter")
+					fromBlockNode = seti.EntryNode;
+				else fromBlockNode = seti.InputNodes[tup.Item6];
+			}
+			else if (fromBlock is DialogueNodeBlock dialogue)
+			{
+				if (tup.Item5 == "Enter")
+					fromBlockNode = dialogue.EntryNode;
+				else fromBlockNode = dialogue.InputNodes[tup.Item6];
+			}
+			return fromBlockNode;
+		}
+
+		private void SetUpAddedDialogueBlocks(DialogueScene dia)
+		{
+			//If there are dialogue that have choices we need to set them.
+			foreach (BaseNodeBlock bn in dia.DialogueBlockNodes)
+			{
+				//display the nodes.
+				Canvas.SetLeft(bn, bn.LocX);
+				Canvas.SetTop(bn, bn.LocY);
+
+				AllDialogueEditor_Grid.Visibility = Visibility.Visible;
+				bn.ApplyTemplate();
+				DialogueEditor_NodeGraph.AddToNodeEditor(bn);
+				bn.ApplyTemplate();
+				//var v = bn.FindResource("MainBorder");
+				if (bn is DialogueNodeBlock dialo)
+				{
+					//add outputs display wise
+					Button v = dialo.Template.FindName("AddOutputNode_BTN", dialo) as Button;
+					if (dialo.OutputNodes.Count > 1)
+					{
+						dialo.bChoice = true;
+						int i = 1;
+						int j = dialo.DialogueTextOptions.Count;
+						while (i++ < j)
+						{
+							DialogueEditor_NodeGraph.bAddNew_Flag = false;
+							DialogueEditor_NodeGraph.AddDialogueBlockOutput(v);
+							(dialo.LinkedTimeBlock as TimeBlock).Trackname = "choice";
+						}
+					}
+
+
+					//add Inputs display wise
+					Button b = dialo.Template.FindName("AddInputNode_BTN", dialo) as Button;
+					if (dialo.InputNodes.Count > 1)
+					{
+						dialo.bChoice = true;
+						int i = 1;
+						int j = dialo.InputNodes.Count;
+						while (i++ < j)
+						{
+							DialogueEditor_NodeGraph.bAddNew_Flag = false;
+							DialogueEditor_NodeGraph.AddDialogueInput(b);
+							(dialo.LinkedTimeBlock as TimeBlock).Trackname = "choice";
+						}
+					}
+				}
+				//CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
+			}
+		}
+
+		private Point GetNodePosition(BaseNodeBlock NodeBlock, ConnectionNode DesNode)
+		{
+			Point retPoint = new Point(0, 0);
+
+			if (NodeBlock is StartBlockNode || NodeBlock is ExitBlockNode)
+			{
+				if (NodeBlock.EntryNode == DesNode)
+				{
+					retPoint.X = Canvas.GetLeft(NodeBlock);
+					retPoint.Y = Canvas.GetTop(NodeBlock) + 30;
+				}
+				else if (NodeBlock.ExitNode == DesNode)
+				{
+					retPoint.X = Canvas.GetLeft(NodeBlock) + 75;
+					retPoint.Y = Canvas.GetTop(NodeBlock) + 30;
+				}
+			}
+			else if (NodeBlock is BaseArithmeticBlock || NodeBlock is BaseLogicNodeBlock
+			                                     || NodeBlock is ConditionalNodeBlock 
+			                                     || NodeBlock is SetConstantNodeBlock)
+			{
+				if (NodeBlock.EntryNode == DesNode)
+				{
+					retPoint.X = Canvas.GetLeft(NodeBlock);
+					retPoint.Y = Canvas.GetTop(NodeBlock) + 10;
+				}
+				else if(NodeBlock.ExitNode == DesNode)
+				{
+					retPoint.X = Canvas.GetLeft(NodeBlock) + 150;
+					retPoint.Y = Canvas.GetTop(NodeBlock) + 10;
+				}
+				else if (NodeBlock.InputNodes.FindIndex(x=> x == DesNode) >=0)
+				{
+					int idx = NodeBlock.InputNodes.FindIndex(x => x == DesNode);
+					retPoint.X = Canvas.GetLeft(NodeBlock);
+					retPoint.Y = 20 + Canvas.GetTop(NodeBlock) + ((idx * 30) + 15);
+				}
+				else if (NodeBlock.OutputNodes.FindIndex(x => x == DesNode) >= 0)
+				{
+					int idx = NodeBlock.OutputNodes.FindIndex(x => x == DesNode);
+					retPoint.X = 150 + Canvas.GetLeft(NodeBlock);
+					retPoint.Y = 20 + Canvas.GetTop(NodeBlock) + ((idx * 30) + 15);
+				}
+			}
+			else if (NodeBlock is GetConstantNodeBlock getvar)
+			{
+				if (getvar.output == DesNode)
+				{
+					retPoint.X = Canvas.GetLeft(NodeBlock) + 95;
+					retPoint.Y = Canvas.GetTop(NodeBlock) + 40;
+				}
+			}
+			else if (NodeBlock is DialogueNodeBlock)
+			{
+				//- I1=>20 + (40 * (i)) + 20
+				//- O1=>X = 15,Y = 20 + (40 * (i)) + 20
+				if (NodeBlock.EntryNode == DesNode)
+				{
+					retPoint.X = Canvas.GetLeft(NodeBlock);
+					retPoint.Y = Canvas.GetTop(NodeBlock) + 10;
+				}
+				else if (NodeBlock.InputNodes.FindIndex(x => x == DesNode) >= 0)
+				{
+					int idx = NodeBlock.InputNodes.FindIndex(x => x == DesNode);
+					retPoint.X = Canvas.GetLeft(NodeBlock);
+					retPoint.Y = 20 + Canvas.GetTop(NodeBlock) + ((idx * 40) + 20);
+				}
+				else if (NodeBlock.OutputNodes.FindIndex(x => x == DesNode) >= 0)
+				{
+					int idx = NodeBlock.OutputNodes.FindIndex(x => x == DesNode);
+					retPoint.X = 150 + Canvas.GetLeft(NodeBlock);
+					retPoint.Y = 20 + (NodeBlock.InputNodes.Count*40) + Canvas.GetTop(NodeBlock) + ((idx * 40) + 20);
+				}
+			}
+
+			Console.WriteLine(retPoint);
+			return retPoint;
+		}
+
+		private void SetupDialogueSceneHooks()
+		{
+			//DIALOGUE SCENE HOOKS
+			AllDialogueEditor_Grid.Visibility = Visibility.Visible;
+
+			DialogueEditor_Timeline.TimeBlockSync = DialogueHook;
+			DialogueEditor_Timeline.SelectionChanged_Hook = ShowTimelineSelectedProperties;
+			DialogueEditor_Timeline.ActiveTBblocks.CollectionChanged += ActiveTBblocks_CollectionChanged;
+			DialogueEditor_Timeline.OnCreateTimeblockHook += CreateDialogueBlockForTimeline;
+			DialogueEditor_Timeline.Reset_Hook += ResetExecution_Hook;
+			DialogueEditor_Timeline.ChangeUIPosition_Hook += ChangeDialogueUIAnchorPostion_Hook;
+
+			DialogueEditor_NodeGraph.CurrentErrors.CollectionChanged += NodeEditorCurrentErrorsOnCollectionChanged;
+			DialogueEditor_NodeGraph.SelectionChanged_Hook = ShowTimelineSelectedProperties;
+			DialogueEditor_NodeGraph.OnCreateTimeblockHook += CreateTimeBlockForDialogue;
+			DialogueEditor_NodeGraph.TimelineLoad_Hook += LoadTimelineWithSelectedPath;
+
+
+		}
 	}
 }
 
 //NOTES TO MY SELF
 /*
- * System.drawing.Image casuses memory leaks
+ * System.drawing.Image causes memory leaks
  * RenderTargetBitmap also causes memory leaks
  * 
  * REASON? They are not IDisposable

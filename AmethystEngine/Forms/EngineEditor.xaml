@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 				xmlns:pgrid ="clr-namespace:PropertyGridEditor;assembly=PropertyGridEditor"
+				xmlns:cpgrid="clr-namespace:CollapsedPropertyGrid;assembly=CollapsedPropertyGrid"
         xmlns:local="clr-namespace:AmethystEngine" 
 				xmlns:Bix="clr-namespace:BixBite;assembly=BixBite"
 				xmlns:BixRen="clr-namespace:BixBite.Rendering;assembly=BixBite"
@@ -11,10 +12,13 @@
 				xmlns:BixRes="clr-namespace:BixBite.Resources;assembly=BixBite"
 				xmlns:src="clr-namespace:AmethystEngine.Resources"
 				xmlns:WpfToolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
+				xmlns:BixChar="clr-namespace:BixBite.Characters;assembly=BixBite"
 				xmlns:DiagramDesigner="clr-namespace:DiagramDesigner" x:Class="AmethystEngine.Forms.EngineEditor"
 				xmlns:Tline="clr-namespace:TimelinePlayer;assembly=TimelinePlayer"
+				xmlns:ne="clr-namespace:NodeEditor;assembly=NodeEditor"
+				xmlns:ol="clr-namespace:OutputLog;assembly=OutputLog"
 				mc:Ignorable="d" Background="#FF0E0D0D"
-        Title="AmethystEngine" Height="1000" Width="1600" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
+        Title="AmethystEngine" Height="800" Width="1200" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
 
 
 	<Window.Resources>
@@ -89,6 +93,48 @@
 				</ComboBox>
 			</DataTemplate>
 
+			<ControlTemplate x:Key="DialogueEditorObjectExplorer_Template">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition/>
+						<ColumnDefinition Width="Auto" MinWidth="44"/>
+						<ColumnDefinition Width="Auto" MinWidth="292"/>
+					</Grid.ColumnDefinitions>
+
+					<Menu DockPanel.Dock="Top" Grid.Column="0" Background="Transparent" Foreground="White" VerticalAlignment="Top" Margin="0,4,0,3" Height="18">
+						<MenuItem Header="Dialogue Scene" Foreground="White">
+							<MenuItem x:Name="NewDialogueScene_MenuItem" Header="New Dialogue Scene" Foreground="Black" Click="NewDialogueScene_MenuItem_Click"/>
+							<MenuItem Header="Open Dialogue Scene" Foreground="Black" Click="OpenDialogueScene_MI_Click"/>
+							<MenuItem Header="Save Dialogue Scene" Foreground="Black"/>
+							<MenuItem Header="Save Dialogue Scene As" Foreground="Black" Click="SaveDialogueSceneAs_MI_Click" />
+						</MenuItem>
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="1" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Test" Click="DialogueEditorTesting_BTN"/>
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="2" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Test1" Click="TestingAddingCharacterpictersdia"/>
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="3" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Test 2" Click="Test2Dia_Click" />
+					</Menu>
+					<Menu DockPanel.Dock="Top" Grid.Column="4" Background="Transparent" Foreground="White" VerticalAlignment="Center" Height="18" >
+						<MenuItem Header="Move" />
+					</Menu>
+
+				</Grid>
+			</ControlTemplate>
 
 			<ControlTemplate x:Key="UIEditorObjectExplorer_Template">
 				<Grid>
@@ -270,21 +316,20 @@
 					</Grid.RowDefinitions>
 
 					<TextBlock Text="Add A Character" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,7,0,7"/>
-					<Button Content="+" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="106,5,0,5" Height="20" VerticalContentAlignment="Top" Width="20" RenderTransformOrigin="1.5,0.5"/>
+					<Button Content="+" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="106,5,0,5" Height="20" VerticalContentAlignment="Top" Width="20" RenderTransformOrigin="1.5,0.5" Click="AddCharacterToScene"/>
 
-					<TreeView Grid.Row="1" Background="#FF383838">
+					<TreeView x:Name="DialogueEditor_CE_TV" Grid.Row="1" Background="#FF383838">
 						<TreeView.Resources>
-							<HierarchicalDataTemplate DataType="{x:Type BixUI:GameUI}" ItemsSource="{Binding UIElements}">
+							<HierarchicalDataTemplate DataType="{x:Type BixChar:SceneCharacter}" ItemsSource="{Binding DialogueSprites}">
 								<StackPanel Orientation="Horizontal">
-									<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
-									<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="20" MaxHeight="15" />
-									<TextBlock Text="{Binding UIName}" Foreground="White" />
+									<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50" />
+									<TextBlock Text="{Binding Name}" Foreground="White" />
 								</StackPanel>
 							</HierarchicalDataTemplate>
-							<DataTemplate DataType="{x:Type BixUI:GameTextBlock}">
+							<DataTemplate DataType="{x:Type BixRen:Sprite}">
 								<StackPanel Orientation="Horizontal">
-									<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
-									<TextBlock Text="{Binding TBName}" Foreground="White" />
+									<Image Margin="0,0,5,0" Source="{Binding ImgPathLocation}" Width="50" Height="50"  />
+									<TextBlock Text="{Binding Name}" Foreground="White" />
 								</StackPanel>
 							</DataTemplate>
 						</TreeView.Resources>
@@ -431,6 +476,10 @@
 				</TreeView>
 			</ControlTemplate>
 
+			<ControlTemplate x:Key="DialogueEditorProperty_Template">
+				<cpgrid:CollapsedPropertyGrid x:Name="DialoguePropertyGrid" Margin="0,54,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  BorderBrush="#FF828790" Background="#FF383838"/>
+			</ControlTemplate>
+
 
 			<ControlTemplate x:Key="UIEditorProperty_Template">
 				<pgrid:PropGrid x:Name="UIPropertyGrid" Margin="0,54,0,0">
@@ -557,11 +606,7 @@
                   >
 
 					<StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" VerticalAlignment="Top">
-						<Image Height="50" Grid.Column="0" HorizontalAlignment="Center" Stretch="Fill" VerticalAlignment="Top" Width="50">
-							<Image.Source>
-								<BitmapImage UriSource="{Binding Thumbnail}"/>
-							</Image.Source>
-						</Image>
+						<Image Height="50" Grid.Column="0" HorizontalAlignment="Center" Stretch="Fill" VerticalAlignment="Top" Width="50" Source="{Binding Thumbnail}"/>
 						<TextBlock Text="{Binding Name}" Foreground="Black" HorizontalAlignment="Stretch" Height="auto" TextWrapping="Wrap" FontSize="10"/>
 					</StackPanel>
 				</Border>
@@ -671,6 +716,7 @@
 			<RowDefinition Height="25*" />
 			<RowDefinition Height="3" />
 			<RowDefinition Height="10*" />
+			<RowDefinition Height="1"/>
 		</Grid.RowDefinitions>
 		<GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter2" Background="#FF868686" ResizeDirection="Rows"/>
 		<!--I wanted a different color background.-->
@@ -722,6 +768,7 @@
 						<MenuItem Header="UI"  Foreground="Black" IsChecked="True" IsCheckable="True"/>
 						<MenuItem Header="Particle"  Foreground="Black" IsChecked="True" IsCheckable="True"/>
 						<Separator />
+						<MenuItem Header="Error/Output log"  Foreground="Black" IsChecked="False" IsCheckable="True" Click="ViewOutputLog_Click"/>
 					</MenuItem>
 				</Menu>
 				<Menu DockPanel.Dock="Top" Grid.Column="4" Background="Transparent" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0">
@@ -774,17 +821,17 @@
 			<Label x:Name="label4" Content="Properties" Foreground="White" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
 
-			<ContentControl x:Name="ObjectProperties_Control" Template="{DynamicResource UIEditorProperty_Template}" Grid.Column="2" Grid.ColumnSpan="2"/>
+			<ContentControl x:Name="ObjectProperties_Control" Template="{DynamicResource DialogueEditorProperty_Template}" Grid.Column="2" Grid.ColumnSpan="2"/>
 
 			<ContentControl x:Name="EditorToolBar_CC" Grid.Column="1" Height="25" VerticalAlignment="Top" Margin="10,4,123,0"
-											Template="{DynamicResource UIEditorObjectExplorer_Template}"/>
+											Template="{DynamicResource DialogueEditorObjectExplorer_Template}"/>
 
 			<!--This is the main editor window-->
 
 
 			<GridSplitter x:Name="gridSplitter" Grid.Column="1" HorizontalAlignment="Left"  VerticalAlignment="Stretch" Width="3"  Background="#FF868686" />
 			<GridSplitter x:Name="gridSplitter1" Grid.Column="2" HorizontalAlignment="Left"  VerticalAlignment="Stretch" Width="3"  Background="#FF868686"/>
-			<TabControl x:Name="EditorWindows_TC" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="White" Margin="10,30,5,6" BorderBrush="#FF3C3C3C" SelectionChanged="EditorWindows_TC_SelectionChanged">
+			<TabControl x:Name="EditorWindows_TC" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Black" Margin="10,30,5,6" BorderBrush="#FF3C3C3C" SelectionChanged="EditorWindows_TC_SelectionChanged">
 				<!--LEVEL EDITOR STARTS HERE-->
 				<TabItem Header="Level Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 					<Grid Background="#FF3C3C3C">
@@ -872,20 +919,21 @@
 					<Grid Background="Black" />
 				</TabItem>
 				<TabItem Header="Dialogue Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
-					<Grid Background="Black" >
+					<Grid x:Name="AllDialogueEditor_Grid" Background="Black" Visibility="Hidden" >
 
 						<Grid.RowDefinitions>
 							<RowDefinition Height="4*"/>
-							<RowDefinition Height=".5*"/>
+							<RowDefinition Height="20"/>
 							<RowDefinition Height="4*"/>
 						</Grid.RowDefinitions>
 
 						<Grid x:Name="DialogueEditor_Grid" Grid.Row="0" Grid.RowSpan="1">
 							<Grid.RowDefinitions>
 								<RowDefinition Height="4*"/>
+								<RowDefinition Height="3"/>
 								<RowDefinition Height="2*"/>
 							</Grid.RowDefinitions>
-							<Canvas Grid.Row="0" Grid.Column="0" x:Name="DialogueEditor_BackCanvas" IsHitTestVisible="True" ClipToBounds="True" >
+							<Canvas Grid.Row="0" Grid.Column="0" x:Name="DialogueEditor_BackCanvas" IsHitTestVisible="True" ClipToBounds="True" SizeChanged="DialogueEditor_BackCanvas_OnSizeChanged">
 								<Canvas.Background>
 									<VisualBrush x:Name="DialogueEditor_VB" TileMode="Tile" Stretch="Uniform" Viewport="0,0,40,40" ViewportUnits="Absolute" >
 										<VisualBrush.Visual>
@@ -895,41 +943,14 @@
 								</Canvas.Background>
 								<Canvas x:Name="DialogueEditore_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 							</Canvas>
-
-							<Tline:TimelinePlayer Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="Auto" Width="Auto">
+							<Tline:TimelinePlayer x:Name="DialogueEditor_Timeline" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="Auto" Width="Auto" PreviewMouseLeftButtonDown="DialogueEditor_Timeline_PreviewMouseLeftButtonDown" >
 
 							</Tline:TimelinePlayer>
-
-							<!--<ScrollViewer Grid.Row="1">
-								<Canvas>
-									<Canvas.Background>
-										<VisualBrush TileMode="Tile" Stretch="Uniform" Viewport="0,0,20,20" ViewportUnits="Absolute" >
-											<VisualBrush.Visual>
-												<Rectangle Width="20" Height="20" Fill="#FF292929" Stroke="Gray" StrokeThickness=".4" />
-											</VisualBrush.Visual>
-										</VisualBrush>
-									</Canvas.Background>
-								</Canvas>
-							</ScrollViewer>-->
-
+							<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Background="#FF444444" ResizeDirection="Rows"/>
 						</Grid>
+						<ne:BlockNodeEditor x:Name="DialogueEditor_NodeGraph" Grid.Row="2">
 
-						<Grid Name="DialogueNodeEditor_Grid" Grid.Row="2" Grid.RowSpan="1" Background="#FF212121">
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="2*"/>
-								<ColumnDefinition Width="7*"/>
-							</Grid.ColumnDefinitions>
-							<Canvas Grid.Row="0" Grid.Column="1" x:Name="DialogueNode_BackCanvas" IsHitTestVisible="True" ClipToBounds="True" >
-								<Canvas.Background>
-									<VisualBrush x:Name="DialogueNode_VB" TileMode="Tile" Stretch="Uniform" Viewport="0,0,40,40" ViewportUnits="Absolute" >
-										<VisualBrush.Visual>
-											<Rectangle Width="40" Height="40" Fill="Black" Stroke="Gray" StrokeThickness=".4" />
-										</VisualBrush.Visual>
-									</VisualBrush>
-								</Canvas.Background>
-								<Canvas x:Name="DialogueNode_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-							</Canvas>
-						</Grid>
+						</ne:BlockNodeEditor>
 						<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Background="#FF444444" ResizeDirection="Rows"/>
 					</Grid>
 				</TabItem>
@@ -981,6 +1002,8 @@
 
 			<Label x:Name="label1" Content="Content Explorer" Grid.Column="1" HorizontalAlignment="Left" Margin="41,0,0,0" VerticalAlignment="Top" Foreground="White"/>
 			<Button x:Name="ContentExplorerImport_BTN"  Content="Import" Grid.Column="1" HorizontalAlignment="Right" Width="50" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373" Click="ContentExplorerImport_BTN_Click"/>
+			<Button x:Name="ContentExplorerNewFolder_BTN"  Content="New Folder" Grid.Column="1" HorizontalAlignment="Right" Width="65" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373" Click="ContentExplorerImport_BTN_Click" Margin="0,0,103,0"/>
+			<Button x:Name="ContentExplorerNewFile_BTN"  Content="New File" Grid.Column="1" HorizontalAlignment="Right" Width="53" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373" Click="ContentExplorerImport_BTN_Click" Margin="0,0,50,0"/>
 
 
 			<GridSplitter x:Name="Cont_Scene_GS" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="3" Background="#FF868686"/>
@@ -1009,7 +1032,7 @@
 
 		<!--This takes care of GUI resizing with the custom window we created.-->
 		<Rectangle Stroke="{x:Null}" Fill="Transparent" VerticalAlignment="Top" Height="5" x:Name="top" Margin="4,0,5,0" />
-		<Rectangle Stroke="{x:Null}" Fill="Transparent" x:Name="bottom" Height="5" VerticalAlignment="Bottom" Margin="5,0,5,0" Grid.Row="3"/>
+		<Rectangle Stroke="{x:Null}" Fill="Transparent" x:Name="bottom" Height="10" VerticalAlignment="Bottom" Margin="5,0,5,0" Grid.Row="4"/>
 		<Rectangle Stroke="{x:Null}" Fill="Transparent" Grid.RowSpan="4" HorizontalAlignment="Left" Margin="0,5,0,5" Width="5" x:Name="left"/>
 		<Rectangle Stroke="{x:Null}" Fill="Transparent" Margin="0,5,0,5" Width="5" Grid.RowSpan="4" HorizontalAlignment="Right" x:Name="right" />
 		<Rectangle Stroke="{x:Null}" Fill="Transparent" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="4" Width="5" Height="5" x:Name="bottomLeft" />
@@ -1017,5 +1040,20 @@
 		<Rectangle Stroke="{x:Null}" Fill="Transparent" HorizontalAlignment="Right" Width="5" Height="5" VerticalAlignment="Top" x:Name="topRight" />
 		<Rectangle Stroke="{x:Null}" Fill="Transparent" HorizontalAlignment="Left" Width="6" VerticalAlignment="Top" Height="5" x:Name="topLeft" />
 
+		<!--This takes care of GUI resizing with the custom window we created.-->
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" VerticalAlignment="Top" Height="1" Margin="1,0,1,0" />
+		
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" Grid.RowSpan="4" HorizontalAlignment="Left" Width="1"/>
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" Width="1" Grid.RowSpan="4" HorizontalAlignment="Right"  />
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="4" Width="1" Height="1"/>
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" Grid.Row="4" VerticalAlignment="Bottom" Height="1" Width="1" HorizontalAlignment="Right" />
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" HorizontalAlignment="Right" Width="1" Height="1" VerticalAlignment="Top" />
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" HorizontalAlignment="Left" Width="1" VerticalAlignment="Top" Height="1"  />
+
+
+		<ol:OutputLog x:Name="EngineOutputLog" Grid.Row="4"></ol:OutputLog>
+
+		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" Height="1" VerticalAlignment="Bottom"  Margin="1,0,1,0" Grid.Row="4"/>
+		<GridSplitter x:Name="OutputLogSpliter" Grid.Row="3" Height="2" ResizeDirection="Rows" Background="#FF868686" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"></GridSplitter>
 	</Grid>
 </Window>

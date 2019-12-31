@@ -82,8 +82,8 @@ namespace AmethystEngine.Forms
 					{
 						foreach (GameEvent GE in ((Tuple<int[,], List<GameEvent>>)sl.LayerObjects).Item2)
 						{
-							if (!ProjectGameEvents.ContainsKey(GE.GetProperty("DelegateEventName").ToString()))
-								ProjectGameEvents.Add(GE.GetProperty("DelegateEventName").ToString(), GE);
+							if (!ProjectGameEvents.ContainsKey(GE.GetPropertyData("DelegateEventName").ToString()))
+								ProjectGameEvents.Add(GE.GetPropertyData("DelegateEventName").ToString(), GE);
 						}
 					}
 				}
@@ -117,10 +117,10 @@ namespace AmethystEngine.Forms
 		//load the Form the selected Gameevent data.
 		private void SetGameEventProperties(GameEvent curGameEvent)
 		{
-			EventName_TB.Text = curGameEvent.GetProperty("EventName").ToString();
+			EventName_TB.Text = curGameEvent.GetPropertyData("EventName").ToString();
 			int num = (int)curGameEvent.eventType; EventType_CB.SelectedItem = EventType_CB.Items[num]; 
-			EventGroup_TB.Text = curGameEvent.GetProperty("group").ToString();
-			EventDelegateName_TB.Text = curGameEvent.GetProperty("DelegateEventName").ToString();
+			EventGroup_TB.Text = curGameEvent.GetPropertyData("group").ToString();
+			EventDelegateName_TB.Text = curGameEvent.GetPropertyData("DelegateEventName").ToString();
 			//TODO: Add the inputs after the input section in the project settings is added.
 
 			if (curGameEvent.eventType == EventType.Cutscene || curGameEvent.eventType == EventType.DialougeScene
@@ -467,7 +467,7 @@ namespace AmethystEngine.Forms
 			{
 				//removes the gameevent itself.
 				GameEvent gameE = ((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].LayerObjects).Item2[GameEvents_LB.SelectedIndex];
-				int TileGoupNum = (int)gameE.GetProperty("group");
+				int TileGoupNum = (int)gameE.GetPropertyData("group");
 				((Tuple<int[,], List<GameEvent>>)CurrentLevel.Layers[Layernum[GameEventLayers_LB.SelectedIndex]].LayerObjects).Item2.RemoveAt(GameEvents_LB.SelectedIndex);
 
 				

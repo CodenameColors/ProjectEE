@@ -39,9 +39,12 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BixBite">
-      <HintPath>..\BixBite\bin\Debug\BixBite.dll</HintPath>
+    <Reference Include="CollapsedPropertyGrid">
+      <HintPath>Resources\CollapsedPropertyGrid.dll</HintPath>
     </Reference>
     <Reference Include="CustomColorPicker, Version=1.0.7142.29111, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -51,6 +54,12 @@
     <Reference Include="Microsoft.Build.Conversion.v4.0" />
     <Reference Include="Microsoft.Build.Engine" />
     <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="NodeEditor">
+      <HintPath>Resources\NodeEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="OutputLog">
+      <HintPath>Resources\OutputLog.dll</HintPath>
+    </Reference>
     <Reference Include="PropertyGridEditor, Version=1.1.0.4, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\PropertyGridEditor.dll</HintPath>
@@ -69,7 +78,8 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="TimelinePlayer">
+    <Reference Include="TimelinePlayer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\TimelinePlayer.dll</HintPath>
     </Reference>
     <Reference Include="UIAutomationProvider" />
@@ -83,8 +93,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Components\PropertyBag.cs" />
     <Compile Include="Components\Tools\Cuprite.cs" />
     <Compile Include="DesignerItemDecorator.cs" />
+    <Compile Include="Forms\AddCharacterForm.xaml.cs">
+      <DependentUpon>AddCharacterForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Forms\GameEventsSettings.xaml.cs">
       <DependentUpon>GameEventsSettings.xaml</DependentUpon>
     </Compile>
@@ -98,6 +112,10 @@
     <Compile Include="Resources\Adorners\SizeChrome.cs" />
     <Compile Include="Resources\ObservableStyleDictionary.cs" />
     <Compile Include="RotateThumb.cs" />
+    <Page Include="Forms\AddCharacterForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Forms\EngineEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -203,7 +221,6 @@
     <Resource Include="images\522019a1q4bjrol3.jpg" />
     <Resource Include="images\a50afebd-a3e7-42bb-9c0b-33d394d33334.gif" />
     <Resource Include="images\Ame_icon_small.png" />
-    <Resource Include="images\Can Frame.PNG" />
     <Resource Include="images\folder.png" />
     <Resource Include="images\smol megumin.jpg" />
     <Resource Include="images\winter.png" />
@@ -215,6 +232,21 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images\emma_colors_oc.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BixBite\BixBite.csproj">
+      <Project>{d50deef5-20be-4a57-b0f8-6cb460f71d82}</Project>
+      <Name>BixBite</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="favicon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ErrorDocs\List of ErrorCodes.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
