@@ -25,7 +25,10 @@ namespace ProjectE_E
 		Map C_map; //for map change testing
 		Player Player;
 		Camera camera;
+
 		private List<UIComponent> _uiComponents;
+		private GameUI TestGameUIFromEngine;
+
 		string MainLevelPath = "";
 		private Color _backgroundColour;
 
@@ -74,6 +77,8 @@ namespace ProjectE_E
 			map = new Map();
 			C_map = new Map();
 			Player = new Player();
+			TestGameUIFromEngine = GameUI.ImportGameUI("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\UI\\EE_Left.UI");
+
 			this.IsMouseVisible = true;
 			base.Initialize();
 		}
@@ -109,7 +114,7 @@ namespace ProjectE_E
 
 		//Tile.Content = this.Content;
 
-		Load_async();
+			Load_async();
 
 			Thread.Sleep(System.TimeSpan.FromMilliseconds(100));
 
@@ -189,45 +194,9 @@ namespace ProjectE_E
 				Exit();
 
 			Player.Update(gameTime);
+			CheckMapCollision(); //check collision of map tile for game events
 
-			//this is collision detection
-			//foreach (Tile tile in map.MapTiles)
-			for (int i = 0; i < map.MapTiles.Count; i++)
-			{
-				Player.Collision(map.MapTiles[i].Rectangle, map.Width, map.Height, map.MapTiles[i].EventGroup);
-				if (map.EventLUT.Count > 0 && map.MapTiles[i].EventGroup > 0 && (int)Player.Position.X / 40 == map.MapTiles[i].Rectangle.X / 40 && (int)Player.Position.Y / 40 == map.MapTiles[i].Rectangle.Y / 40)
-				{
-					var v = map.GetMapEvent(map.MapTiles[i].EventGroup);
-					if (v != null)
-					{
-						if (map.MapTiles[i].EventType == 1) // level transition
-						{
-							GameEvent g = map.MapEvents[map.MapTiles[i].EventGroup];
-							List<object> Prams = new List<object>
-						{
-							this.GraphicsDevice,
-							this.spriteBatch,
-							Player,
-							map,
-							g.datatoload.NewFileToLoad,
-							(int)g.datatoload.newx,
-							(int)g.datatoload.newy,
-							(int)g.datatoload.MoveTime
-						};
-
-							map.level = null;
-							map.MapEvents.Clear();
-							map.ClearEventLUT();
-							map.MapTiles.Clear();
-							v.Invoke(null, Prams.ToArray());
-
-							System.Console.WriteLine("M Change");
-							return;
-						}
-						
-					}
-				}
-			}
+			//move the camera to follow the player
 			if (map != null)
 			{
 				camera.Update(Player.Position, map.Width, map.Height);
@@ -270,6 +239,49 @@ namespace ProjectE_E
 			base.Update(gameTime);
 		}
 
+
+		private void CheckMapCollision()
+		{
+			//this is collision detection
+			//foreach (Tile tile in map.MapTiles)
+			for (int i = 0; i < map.MapTiles.Count; i++)
+			{
+				Player.Collision(map.MapTiles[i].Rectangle, map.Width, map.Height, map.MapTiles[i].EventGroup);
+				if (map.EventLUT.Count > 0 && map.MapTiles[i].EventGroup > 0 && (int)Player.Position.X / 40 == map.MapTiles[i].Rectangle.X / 40 && (int)Player.Position.Y / 40 == map.MapTiles[i].Rectangle.Y / 40)
+				{
+					var v = map.GetMapEvent(map.MapTiles[i].EventGroup);
+					if (v != null)
+					{
+						if (map.MapTiles[i].EventType == 1) // level transition
+						{
+							GameEvent g = map.MapEvents[map.MapTiles[i].EventGroup];
+							List<object> Prams = new List<object>
+							{
+								this.GraphicsDevice,
+								this.spriteBatch,
+								Player,
+								map,
+								g.datatoload.NewFileToLoad,
+								(int)g.datatoload.newx,
+								(int)g.datatoload.newy,
+								(int)g.datatoload.MoveTime
+							};
+
+							map.level = null;
+							map.MapEvents.Clear();
+							map.ClearEventLUT();
+							map.MapTiles.Clear();
+							v.Invoke(null, Prams.ToArray());
+
+							System.Console.WriteLine("M Change");
+							return;
+						}
+
+					}
+				}
+			}
+		}
+
       /// <summary>
       /// This is called when the game should draw itself.
       /// </summary>
@@ -277,9 +289,7 @@ namespace ProjectE_E
 		protected override void Draw(GameTime gameTime)
 		{
 			GraphicsDevice.Clear(_backgroundColour);
-
-
-
+			//applying the camera into the parameters is how i move the camera with the player.
 			spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform);
 			//spriteBatch.Draw(t2, new Vector2(0, 0));
 			if(map != null)
@@ -288,7 +298,7 @@ namespace ProjectE_E
 
 			foreach (UIComponent ui in _uiComponents)
 			{
-				ui.Draw(gameTime, spriteBatch);
+				ui.Draw(gameTime, spriteBatch); //draw UI to screen. BUT it doesn't handle events!
 			}
 
 			spriteBatch.End();

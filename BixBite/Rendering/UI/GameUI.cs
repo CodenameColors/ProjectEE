@@ -8,10 +8,12 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Xml;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace BixBite.Rendering.UI
 {
-	public class GameUI : IProperties
+	public class GameUI : UIComponent, IProperties
 	{
 		public delegate void PGridSync_Hook(String Key, object Property, System.Collections.Specialized.NotifyCollectionChangedAction action);
 		public PGridSync_Hook PGridSync = null;
@@ -322,6 +324,15 @@ namespace BixBite.Rendering.UI
 			return retGameUI;
 		}
 
+		public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override void Update(GameTime gameTime)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
 

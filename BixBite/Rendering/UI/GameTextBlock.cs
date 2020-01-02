@@ -1,17 +1,43 @@
 ﻿using BixBite.Resources;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace BixBite.Rendering.UI
 {
 	public class GameTextBlock : GameUI, IProperties
 	{
+
+
+		#region Fields
+
+		private SpriteFont _font;
+
+		private Texture2D _texture;
+
+		#endregion
+
+		#region Properties
+
+		public event EventHandler Click;
+
+		public Color PenColour { get; set; }
+
+		public Vector2 Position { get; set; }
+
+		public Rectangle Rectangle
+		{
+			get
+			{
+				return new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
+			}
+		}
+
+		public string Text { get; set; }
+
+		#endregion
+
 
 		public String TBName { get; set; } 
 
