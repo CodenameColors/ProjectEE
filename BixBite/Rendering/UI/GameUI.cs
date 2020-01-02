@@ -324,14 +324,22 @@ namespace BixBite.Rendering.UI
 			return retGameUI;
 		}
 
-		public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+		public virtual void SetUITexture()
 		{
 			throw new NotImplementedException();
 		}
 
+		public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+		{
+			foreach (GameUI gameUi in UIElements)
+			{
+				gameUi.Draw(gameTime, spriteBatch);
+			}
+		}
+
 		public override void Update(GameTime gameTime)
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 	}
 }

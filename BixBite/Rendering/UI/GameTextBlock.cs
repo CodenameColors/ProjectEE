@@ -12,9 +12,14 @@ namespace BixBite.Rendering.UI
 
 		#region Fields
 
-		private SpriteFont _font;
+		public SpriteFont _font;
 
-		private Texture2D _texture;
+		private String TexturePath
+		{
+			get { return GetPropertyData("Image").ToString(); }
+		}
+
+		private Texture2D _texture { get; set; }
 
 		#endregion
 
@@ -30,12 +35,20 @@ namespace BixBite.Rendering.UI
 		{
 			get
 			{
-				return new Rectangle((int)Position.X, (int)Position.Y, _texture.Width, _texture.Height);
+				return new Rectangle(
+					(int)Position.X + (int)GetPropertyData("Xoffset"),
+					(int)Position.Y + (int)GetPropertyData("YOffset"),
+					(int)GetPropertyData("Width"), (int)GetPropertyData("Height"));
 			}
 		}
 
-		public string Text { get; set; }
+		public string Text
+		{
+			get => GetPropertyData("ContentText").ToString();
+			set => SetProperty("ContentText", value);
+		}
 
+		public GraphicsDevice graphicsDevice;
 		#endregion
 
 
@@ -55,6 +68,10 @@ namespace BixBite.Rendering.UI
 			AddProperty("TextSpeed", 1.0);
 			AddProperty("TextTime", 1.0);//number of seconds to "type" the text to the screen
 			AddProperty("Image", "");
+
+
+			
+
 		}
 
 		public override void PropertyCallback(object sender, RoutedEventArgs e)
@@ -62,8 +79,37 @@ namespace BixBite.Rendering.UI
 
 		}
 
+		public override void SetUITexture()
+		{
+			using (var stream = new System.IO.FileStream(TexturePath, System.IO.FileMode.Open))
+			{
+				_texture = (Texture2D.FromStream(graphicsDevice, stream));
+			}
+		}
 
+		public override void Update(GameTime gameTime)
+		{
+			base.Update(gameTime);
+		}
 
+		public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+		{
+			PenColour = Color.White;
+			//Text = "test";
+			//base.Draw(gameTime, spriteBatch);
+			
 
+			if (_texture != null)
+				spriteBatch.Draw(_texture, Rectangle, Color.White);
+
+			if (!string.IsNullOrEmpty(Text))
+			{
+				var x = (Rectangle.X + (Rectangle.Width / 2)) - (_font.MeasureString(Text).X / 2);
+				var y = (Rectangle.Y + (Rectangle.Height / 2)) - (_font.MeasureString(Text).Y / 2);
+
+				spriteBatch.DrawString(_font, Text, new Vector2(x, y), Color.White);
+			}
+
+		}
 	}
 }

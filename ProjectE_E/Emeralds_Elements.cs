@@ -10,6 +10,7 @@ using System.Threading;
 using System.IO;
 using BixBite.Rendering.UI;
 using System;
+using System.Linq;
 
 namespace ProjectE_E
 {
@@ -77,7 +78,7 @@ namespace ProjectE_E
 			map = new Map();
 			C_map = new Map();
 			Player = new Player();
-			TestGameUIFromEngine = GameUI.ImportGameUI("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\UI\\EE_Left.UI");
+			TestGameUIFromEngine = GameUI.ImportGameUI("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\UI\\EE_right.UI");
 
 			this.IsMouseVisible = true;
 			base.Initialize();
@@ -151,8 +152,24 @@ namespace ProjectE_E
 				quitButton,
 			};
 
-			
 
+			foreach (GameUI gameUi in TestGameUIFromEngine.UIElements)
+			{
+				if (gameUi is GameTextBlock GTB)
+				{
+					GTB._font = Content.Load<SpriteFont>("Fonts/File");
+					GTB.Position = new Vector2(350, 400);
+					GTB.graphicsDevice = GraphicsDevice;
+					GTB.SetUITexture(); //set the current desired texture to be drawn on draw/update
+				}
+				else if (gameUi is GameIMG GIMG)
+				{
+					GIMG.Position = new Vector2(350, 450);
+					GIMG.graphicsDevice = GraphicsDevice;
+					GIMG.SetUITexture(); //set the current desired texture to be drawn on draw/update
+				}
+				_uiComponents.Add(gameUi);
+			}
 			// TODO: use this.Content to load your game content here
 
 			//C_map.level = Level.ImportLevel("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\Levels\\LevelChangeTestNew.lvl");
@@ -212,15 +229,10 @@ namespace ProjectE_E
 				camera.Update(Player.Position, 0, 0);
 			}
 			//}
-			//if (Keyboard.GetState().IsKeyDown(Keys.T)) {
-			//	foreach (SpriteLayer sl in map.level.Layers) {
-			//		if (sl.layerType == LayerType.GameEvent) {
-			//			map.FillDictLUT(((System.Tuple<int[,], List<GameEvent>>)sl.LayerObjects).Item2);
-			//		}
-			//		System.Console.WriteLine("T DOWN");
-			//	}
-			//	Player.SetPosition(0, 0);
-			//}
+			if (Keyboard.GetState().IsKeyDown(Keys.T))
+			{
+				(_uiComponents.Last() as GameTextBlock).Text = "What's sup FUCKERS";
+			}
 
 			//if (Keyboard.GetState().IsKeyDown(Keys.M))
 			//{
@@ -298,8 +310,10 @@ namespace ProjectE_E
 
 			foreach (UIComponent ui in _uiComponents)
 			{
-				ui.Draw(gameTime, spriteBatch); //draw UI to screen. BUT it doesn't handle events!
+				//ui.Draw(gameTime, spriteBatch); //draw UI to screen. BUT it doesn't handle events!
 			}
+
+			TestGameUIFromEngine.Draw(gameTime, spriteBatch);
 
 			spriteBatch.End();
 			base.Draw(gameTime);
