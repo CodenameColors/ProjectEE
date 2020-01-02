@@ -78,7 +78,7 @@ namespace ProjectE_E
 			map = new Map();
 			C_map = new Map();
 			Player = new Player();
-			TestGameUIFromEngine = GameUI.ImportGameUI("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\UI\\EE_right.UI");
+			TestGameUIFromEngine = GameUI.ImportGameUI("C:\\Users\\Antonio\\Documents\\CreateTest\\test2\\test2_Game\\Content\\UI\\Persona_work.UI");
 
 			this.IsMouseVisible = true;
 			base.Initialize();
@@ -310,10 +310,10 @@ namespace ProjectE_E
 
 			foreach (UIComponent ui in _uiComponents)
 			{
-				//ui.Draw(gameTime, spriteBatch); //draw UI to screen. BUT it doesn't handle events!
+				ui.Draw(gameTime, spriteBatch); //draw UI to screen. BUT it doesn't handle events!
 			}
 
-			TestGameUIFromEngine.Draw(gameTime, spriteBatch);
+			//TestGameUIFromEngine.Draw(gameTime, spriteBatch);
 
 			spriteBatch.End();
 			base.Draw(gameTime);

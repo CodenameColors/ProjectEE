@@ -5431,7 +5431,19 @@ namespace AmethystEngine.Forms
 			foreach (Timeline timeline in DialogueEditor_Timeline.GetTimelines())
 			{
 				if (timeline.TimelineisNull_flag)
-				{ timeline.ActiveBlock = timeline.timeBlocksLL.First; }
+				{
+					TimeBlock fir = desiredLL.FirstOrDefault(x => x.Trackname == timeline.TrackName);
+					LinkedListNode<TimeBlock> tbLL = timeline.timeBlocksLL.First;
+					while (tbLL != null)
+					{
+						if (tbLL.Value == fir)
+						{
+							timeline.ActiveBlock = tbLL;
+							break;
+						}
+						tbLL = tbLL.Next;
+					}
+				}
 				else if (timeline.ActiveBlock != null)
 					timeline.ActiveBlock = timeline.ActiveBlock.Next;
 				else if (timeline.ActiveBlock == null)
