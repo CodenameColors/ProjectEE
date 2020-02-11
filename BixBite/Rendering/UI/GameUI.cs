@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -21,6 +22,8 @@ namespace BixBite.Rendering.UI
 		public String UIName { get; set; }
 		protected ObservableCollection<Tuple<string, object>> Properties { get; set; }
 		public ObservableCollection<GameUI> UIElements { get; set; }
+		protected GraphicsDevice graphicsDevice;
+
 
 		public GameUI(String UIName, int Width, int Height, int Zindex, String BackgroundPath = "#00000000")
 		{
@@ -309,7 +312,7 @@ namespace BixBite.Rendering.UI
 							int xoffset = Int32.Parse(reader.GetAttribute("Xoffset"));
 							int yoffset = Int32.Parse(reader.GetAttribute("YOffset"));
 
-							GameIMG childUI = new GameIMG(Name, width, height, zindex, xoffset, yoffset, Image, Background);
+							GameIMG childUI = new GameIMG(Name, width, height, zindex, xoffset, yoffset, Image, null, Background);
 							retGameUI.AddUIElement(childUI);
 						}
 						//Buttons WIP still
@@ -340,6 +343,7 @@ namespace BixBite.Rendering.UI
 		public override void Update(GameTime gameTime)
 		{
 			//throw new NotImplementedException();
+			
 		}
 	}
 }

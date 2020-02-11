@@ -41,17 +41,18 @@ namespace BixBite.Rendering.UI
 			get => GetPropertyData("ContentText").ToString();
 			set => SetProperty("ContentText", value);
 		}
-		public GraphicsDevice graphicsDevice;
 		#endregion
-		public GameIMG(string UIName, int Width, int Height, int Zindex, int xoff, int yoff, String ImagePath = "", String BackgroundPath = "#00000000") : base(UIName, Width, Height, Zindex, BackgroundPath)
+		public GameIMG(string UIName, int Width, int Height, int Zindex, int xoff, int yoff, String ImagePath = "", GraphicsDevice graphicsDevice = null, String BackgroundPath = "#00000000") : base(UIName, Width, Height, Zindex, BackgroundPath)
 		{
 			AddProperty("Xoffset", xoff);
 			AddProperty("YOffset", yoff);
 			AddProperty("Image", ImagePath);
+			this.graphicsDevice = graphicsDevice;
 		}
 
 		public override void SetUITexture()
 		{
+			if(graphicsDevice == null) return;
 			using (var stream = new System.IO.FileStream(TexturePath, System.IO.FileMode.Open))
 			{
 				_texture = (Texture2D.FromStream(graphicsDevice, stream));
@@ -61,6 +62,11 @@ namespace BixBite.Rendering.UI
 		public override void Update(GameTime gameTime)
 		{
 			base.Update(gameTime);
+		}
+
+		public void SetGraphicsDeviceRef(GraphicsDevice g)
+		{
+			graphicsDevice = g;
 		}
 
 		public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)

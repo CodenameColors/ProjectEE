@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BixBite.Characters
+namespace BixBite.Combat
 {
-	public class Enemy : BaseCharacter
+	public abstract class Skills
 	{
+
 	}
 }

@@ -10,7 +10,10 @@ using System.Threading;
 using System.IO;
 using BixBite.Rendering.UI;
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
+using NodeEditor;
+using NodeEditor.Components;
 
 namespace ProjectE_E
 {
@@ -32,6 +35,18 @@ namespace ProjectE_E
 
 		string MainLevelPath = "";
 		private Color _backgroundColour;
+
+		private List<UIComponent> dialoguechoicebtns= new List<UIComponent>();
+
+		private DialogueNodeBlock curDiaBlock;
+
+		private DialogueNodeBlock diaTestBlock_1;
+		private DialogueNodeBlock diaTestBlock_2;
+		private DialogueNodeBlock diaTestBlock_3;
+
+		private DialogueNodeBlock diaTestBlock_choices1;
+
+		private bool _TestKeyDown = false;
 
 		public Emeralds_Elements()
 		{
@@ -78,7 +93,50 @@ namespace ProjectE_E
 			map = new Map();
 			C_map = new Map();
 			Player = new Player();
-			TestGameUIFromEngine = GameUI.ImportGameUI("C:\\Users\\Antonio\\Documents\\CreateTest\\test2\\test2_Game\\Content\\UI\\Persona_work.UI");
+			TestGameUIFromEngine = GameUI.ImportGameUI("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\UI\\EE_right.UI");
+
+			//Dialogue choice testing
+			diaTestBlock_choices1 = new DialogueNodeBlock("Emma", true);
+			diaTestBlock_choices1.DialogueTextOptions = new ObservableCollection<string>(){"Opition 1", "Opition 2", "Opition 3"};
+			diaTestBlock_choices1.OutputNodes.Add(new ConnectionNode(diaTestBlock_choices1, "OutputNode1", ECOnnectionType.Exit));
+			diaTestBlock_choices1.OutputNodes.Add(new ConnectionNode(diaTestBlock_choices1, "OutputNode2", ECOnnectionType.Exit));
+			diaTestBlock_choices1.OutputNodes.Add(new ConnectionNode(diaTestBlock_choices1, "OutputNode3", ECOnnectionType.Exit));
+
+			//dialogue block traversal testing
+			StartBlockNode start =new StartBlockNode();
+
+			diaTestBlock_1 = new DialogueNodeBlock("Emma", true);
+			diaTestBlock_1.DialogueTextOptions[0] = "Hello!";
+			curDiaBlock = diaTestBlock_1;
+
+			diaTestBlock_2 = new DialogueNodeBlock("Emma", true);
+			diaTestBlock_2.DialogueTextOptions[0] = "how are you?!";
+
+			diaTestBlock_3 = new DialogueNodeBlock("Emma", true);
+			diaTestBlock_3.DialogueTextOptions[0] = "Hey! are you there?!";
+
+			//create outputs and link them together.
+			start.ExitNode.ConnectedNodes.Add(diaTestBlock_1.EntryNode);
+			diaTestBlock_1.EntryNode.ConnectedNodes.Add(start.ExitNode);
+			diaTestBlock_1.OutputNodes.Add(new ConnectionNode(diaTestBlock_1, "OutputNode1", ECOnnectionType.Exit));
+			diaTestBlock_2.OutputNodes.Add(new ConnectionNode(diaTestBlock_1, "OutputNode1", ECOnnectionType.Exit));
+			diaTestBlock_3.OutputNodes.Add(new ConnectionNode(diaTestBlock_1, "OutputNode1", ECOnnectionType.Exit));
+
+			diaTestBlock_1.OutputNodes[0].ConnectedNodes.Add(diaTestBlock_2.EntryNode);
+			diaTestBlock_2.EntryNode.ConnectedNodes.Add(diaTestBlock_1.OutputNodes.First());
+
+			diaTestBlock_2.OutputNodes[0].ConnectedNodes.Add(diaTestBlock_3.EntryNode);
+			diaTestBlock_3.EntryNode.ConnectedNodes.Add(diaTestBlock_2.OutputNodes.First());
+
+			diaTestBlock_3.OutputNodes[0].ConnectedNodes.Add(diaTestBlock_choices1.EntryNode);
+			diaTestBlock_choices1.EntryNode.ConnectedNodes.Add(diaTestBlock_3.OutputNodes.First());
+
+
+			diaTestBlock_choices1.OutputNodes[0].ConnectedNodes.Add(diaTestBlock_1.EntryNode);
+			diaTestBlock_choices1.OutputNodes[1].ConnectedNodes.Add(diaTestBlock_2.EntryNode);
+			diaTestBlock_choices1.OutputNodes[2].ConnectedNodes.Add(diaTestBlock_3.EntryNode);
+
+
 
 			this.IsMouseVisible = true;
 			base.Initialize();
@@ -165,15 +223,16 @@ namespace ProjectE_E
 				else if (gameUi is GameIMG GIMG)
 				{
 					GIMG.Position = new Vector2(350, 450);
-					GIMG.graphicsDevice = GraphicsDevice;
+					GIMG.SetGraphicsDeviceRef(GraphicsDevice);
 					GIMG.SetUITexture(); //set the current desired texture to be drawn on draw/update
 				}
 				_uiComponents.Add(gameUi);
 			}
 			// TODO: use this.Content to load your game content here
 
-			//C_map.level = Level.ImportLevel("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\Levels\\LevelChangeTestNew.lvl");
+			((GameTextBlock)_uiComponents.First(x => x is GameTextBlock)).Text = diaTestBlock_1.DialogueTextOptions[0];
 
+			//C_map.level = Level.ImportLevel("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\Levels\\LevelChangeTestNew.lvl");
 		}
 
 		private void QuitButton_Click(object sender, System.EventArgs e)
@@ -231,7 +290,29 @@ namespace ProjectE_E
 			//}
 			if (Keyboard.GetState().IsKeyDown(Keys.T))
 			{
-				(_uiComponents.Last() as GameTextBlock).Text = "What's sup FUCKERS";
+
+				//(_uiComponents.Last() as GameTextBlock).Text = "What's sup FUCKERS";
+				//((GameTextBlock) _uiComponents.First(x=> x is GameTextBlock)).Text = "What's sup FUCKERS";
+
+				//if (curDiaBlock.OnStartNodeBlockExecution(ref curDiaBlock))
+				//{
+				//	if (curDiaBlock.NodeBlockExecution(ref curDiaBlock))
+				//	{
+				//		curDiaBlock.OnEndNodeBlockExecution(ref curDiaBlock);
+				//	}
+				//}
+
+				if(!(curDiaBlock.NextDialogueNodeBlock is null))
+					curDiaBlock = curDiaBlock.NextDialogueNodeBlock;
+
+
+				//if(diaTestBlock.OutputNodes.Count > 1)
+				if (curDiaBlock.DialogueTextOptions.Count> 1)
+					DisplayDialogueChoices(diaTestBlock_choices1, new Rectangle(0, 400, 500, 300), 20);
+				else
+					dialoguechoicebtns.Clear();
+					((GameTextBlock)_uiComponents.First(x => x is GameTextBlock)).Text = (curDiaBlock as DialogueNodeBlock)?.DialogueTextOptions[0];
+				Thread.Sleep(100);
 			}
 
 			//if (Keyboard.GetState().IsKeyDown(Keys.M))
@@ -247,10 +328,51 @@ namespace ProjectE_E
 			{
 				ui.Update(gameTime);
 			}
+			foreach (UIComponent ui in dialoguechoicebtns)
+			{
+				ui.Update(gameTime);
+			}
 
 			base.Update(gameTime);
 		}
 
+		/// <summary>
+		/// This method is here to display multiple dialogue choices to the screen for the user.
+		/// it uses the dialogue block properties inside to read and display said data.
+		/// </summary>
+		/// <param name="diablock"></param>
+		/// <param name="drawAreaRectangle"></param>
+		private void DisplayDialogueChoices(DialogueNodeBlock diablock, Rectangle drawAreaRectangle, int buttonspacing)
+		{
+			dialoguechoicebtns.Clear();
+			int numofchoices = diablock.DialogueTextOptions.Count;
+
+			//we are going to assume i want these dialogue choices to be displayed in the center
+			//create some buttons
+			for (int i = 0; i < numofchoices; i++)
+			{
+				GameButton tempbtn = new GameButton(
+					Content.Load<Texture2D>("Images/Button"), Content.Load<SpriteFont>("Fonts/File"))
+				{
+					Position = new Vector2(
+						drawAreaRectangle.X + (drawAreaRectangle.Width / 2),
+						drawAreaRectangle.Y + ((drawAreaRectangle.Height / 2)) + ((buttonspacing + 30) * i)),
+					Text = diablock.DialogueTextOptions[i]
+				};
+				tempbtn.Click += (object sender, EventArgs e) =>
+				{
+					((GameTextBlock)_uiComponents.First(x => x is GameTextBlock)).Text = (curDiaBlock as DialogueNodeBlock)?.DialogueTextOptions[dialoguechoicebtns.IndexOf(sender as GameButton)];
+					((GameIMG)_uiComponents.First(x => x is GameIMG)).SetProperty("Image", "C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\Images\\PC_girl\\listening_right.PNG");
+					((GameIMG)_uiComponents.First(x => x is GameIMG)).SetUITexture();
+					(curDiaBlock as DialogueNodeBlock).ChoiceVar = dialoguechoicebtns.IndexOf(sender as GameButton);
+					Console.WriteLine("Choose Option:{0}", dialoguechoicebtns.IndexOf(sender as GameButton));
+				};
+				dialoguechoicebtns.Add(tempbtn);
+				
+			}
+
+
+		}
 
 		private void CheckMapCollision()
 		{
@@ -306,9 +428,14 @@ namespace ProjectE_E
 			//spriteBatch.Draw(t2, new Vector2(0, 0));
 			if(map != null)
 				map.Draw(spriteBatch);
-			Player.Draw(spriteBatch);
+			Player.Draw(gameTime ,spriteBatch);
 
 			foreach (UIComponent ui in _uiComponents)
+			{
+				ui.Draw(gameTime, spriteBatch); //draw UI to screen. BUT it doesn't handle events!
+			}
+
+			foreach (UIComponent ui in dialoguechoicebtns)
 			{
 				ui.Draw(gameTime, spriteBatch); //draw UI to screen. BUT it doesn't handle events!
 			}

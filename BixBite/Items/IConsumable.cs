@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BixBite.Characters
+namespace BixBite.Items
 {
-	public class Enemy : BaseCharacter
+	interface IConsumable
 	{
 	}
 }

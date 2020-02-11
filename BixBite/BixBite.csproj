@@ -56,17 +56,28 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BixBiteTypes.cs" />
+    <Compile Include="Characters\BaseCharacter.cs" />
     <Compile Include="Characters\SceneCharacter.cs" />
     <Compile Include="Characters\Enemy.cs" />
     <Compile Include="Characters\NPC.cs" />
     <Compile Include="Characters\PartyMember.cs" />
     <Compile Include="Characters\Player.cs" />
+    <Compile Include="Combat\ICharacterStats.cs" />
+    <Compile Include="Combat\IStances.cs" />
+    <Compile Include="Combat\IWeakStrength.cs" />
+    <Compile Include="Combat\IWeapons.cs" />
+    <Compile Include="Combat\MagicSpells.cs" />
+    <Compile Include="Combat\PhysicalSkills.cs" />
+    <Compile Include="Combat\Skills.cs" />
     <Compile Include="DialogueScene.cs" />
     <Compile Include="Effects\ImageEffect.cs" />
     <Compile Include="GameEvent.cs" />
+    <Compile Include="Items\IConsumable.cs" />
+    <Compile Include="Items\ICraftable.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="Rendering\UI\GameButton.cs" />
     <Compile Include="Rendering\UI\GameIMG.cs" />
+    <Compile Include="Rendering\UI\GameProgressBar.cs" />
     <Compile Include="Rendering\UI\GameTextBlock.cs" />
     <Compile Include="Rendering\UI\GameUI.cs" />
     <Compile Include="Rendering\UI\GameSmartTextBox.cs" />

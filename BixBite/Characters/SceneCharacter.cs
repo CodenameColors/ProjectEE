@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace BixBite.Characters
 {
-	public class SceneCharacter
+	public class SceneCharacter : BaseCharacter
 	{
 		//Every Character has a name
 		public String Name { get; set; }
