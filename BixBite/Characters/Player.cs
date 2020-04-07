@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,15 +20,25 @@ namespace BixBite.Characters
 
 		public void Load(ContentManager Content)
 		{
-			 Texture = Content.Load<Texture2D>("Images/Player");
+			Texture = Content.Load<Texture2D>("Images/Player");
 		}
 
-		public void Update(GameTime gameTime)
+		public void LoadPlayerImage(ContentManager Content, String ContentPath)
+		{
+			Texture = Content.Load<Texture2D>(ContentPath);
+		}
+
+		public override void Update(GameTime gameTime)
 		{
 			Position += Velocity;
 			DrawPosRectangle = new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
 			Input(gameTime);
+			if (spriteAnimationSheet.SpriteAnimations.Count > 0)
+			{
+				
+				spriteAnimationSheet.Update(gameTime);
+			}
 
 			//UNCOMMENT FOR PLATFORMING
 			//if (Velocity.Y < 10)
@@ -38,10 +49,13 @@ namespace BixBite.Characters
 		private void Input(GameTime gameTime)
 		{
 			if (Keyboard.GetState().IsKeyDown(Keys.D))
-				Velocity.X = (float)gameTime.ElapsedGameTime.TotalMilliseconds / 3;
-
+			{
+				Velocity.X = (float) gameTime.ElapsedGameTime.TotalMilliseconds / 3;
+			}
 			else if (Keyboard.GetState().IsKeyDown(Keys.A))
-				Velocity.X = -(float)gameTime.ElapsedGameTime.TotalMilliseconds / 3;
+			{
+				Velocity.X = -(float) gameTime.ElapsedGameTime.TotalMilliseconds / 3;
+			}
 
 			else Velocity.X = 0f;
 

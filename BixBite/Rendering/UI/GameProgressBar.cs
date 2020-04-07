@@ -148,7 +148,6 @@ namespace BixBite.Rendering.UI
 		public static void CreateFilledRectangle(this Texture2D texture, int borderWidth, Color borderColor)
 		{
 			Color[] colors = new Color[texture.Width * texture.Height];
-
 			for (int x = 0 + borderWidth +1; x < texture.Width - borderWidth- borderWidth -1; x++)
 			{
 				for (int y = 0 + borderWidth +1; y < texture.Height - borderWidth-1; y++)

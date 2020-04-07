@@ -17,6 +17,9 @@ namespace BixBite.Characters
 		/// </summary>
 		private GameUI CombatStatsIndicator;
 
+		public Vector2 SpawnPosition = new Vector2();
+
+		public bool bIsDead { get; set; }
 		public int MaxHealth { get; set; }
 
 		private int _currentHealth;
@@ -31,7 +34,7 @@ namespace BixBite.Characters
 				}
 				if (value > MaxHealth)
 				{
-					CurrentHealth = MaxHealth;
+					_currentHealth = MaxHealth;
 					return;
 				}
 				_currentHealth = value;

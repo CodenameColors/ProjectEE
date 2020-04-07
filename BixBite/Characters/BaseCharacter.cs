@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BixBite.Rendering;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -6,16 +7,24 @@ namespace BixBite.Characters
 {
 	public class BaseCharacter
 	{
+		public SpriteSheet spriteAnimationSheet;
+
 		public Texture2D Texture;
 		public Vector2 Velocity = new Vector2();
+
+		public double ScaleX = 1;
+		public double ScaleY = 1;
+
+
 		public Rectangle DrawPosRectangle = new Rectangle();
+
 		public Vector2 Position = new Vector2();
 		public bool bHasJumped;
 		public int Zindex = 1;
 
 		public BaseCharacter()
 		{
-
+			spriteAnimationSheet = new SpriteSheet();
 		}
 
 
@@ -57,9 +66,16 @@ namespace BixBite.Characters
 
 		}
 
+		public virtual void Update(GameTime gameTime)
+		{
+			spriteAnimationSheet.Update(gameTime);
+		}
+
 		public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
 		{
 			spriteBatch.Draw(Texture, DrawPosRectangle, Color.White);
+			if(spriteAnimationSheet != null && spriteAnimationSheet.SpriteAnimations.Count != 0)
+				spriteAnimationSheet.Draw_Crop_Scale(spriteBatch, (int)Position.X, (int)Position.Y, (int)spriteAnimationSheet.CurrentAnimation.CurrentOffsetNodeData.Value.X, (int)spriteAnimationSheet.CurrentAnimation.CurrentOffsetNodeData.Value.Y, 174, 324, ScaleX, ScaleX );
 		}
 
 	}

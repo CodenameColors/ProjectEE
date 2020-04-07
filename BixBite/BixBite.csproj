@@ -75,6 +75,8 @@
     <Compile Include="Items\IConsumable.cs" />
     <Compile Include="Items\ICraftable.cs" />
     <Compile Include="Level.cs" />
+    <Compile Include="Rendering\SpriteAnimation.cs" />
+    <Compile Include="Rendering\SpriteSheet.cs" />
     <Compile Include="Rendering\UI\GameButton.cs" />
     <Compile Include="Rendering\UI\GameIMG.cs" />
     <Compile Include="Rendering\UI\GameProgressBar.cs" />
