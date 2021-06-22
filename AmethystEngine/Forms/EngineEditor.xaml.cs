@@ -7339,9 +7339,9 @@ namespace AmethystEngine.Forms
 									{
 										if (frame > AnimationSubLayerImages_List[i].Count)
 											continue;
-										(AnimationLayersPreview_Canvas_IC.Children[i + 1] as Image).Source = 
+										(AnimationLayersPreview_Canvas_IC.Children[i] as Image).Source = 
 											AnimationSubLayerImages_List[i][(int)frame-1];
-										(AnimationLayersPreview_Canvas_IC.Children[i + 1] as Image).Tag = frame.ToString();
+										(AnimationLayersPreview_Canvas_IC.Children[i] as Image).Tag = frame.ToString();
 									}
 
 
@@ -7895,6 +7895,11 @@ namespace AmethystEngine.Forms
 			else if (cb.SelectedIndex > 1)
 			{
 				//this is an actual sub layer, So we need to load all the possible Spritesheets to the screen
+				CurrentSubLayerSpriteSheets_LB.ItemsSource =
+					currentLayeredSpriteSheet.subLayerSpritesheets_Dict
+						[(cb.Items[cb.SelectedIndex] as ComboBoxItem).Content.ToString()].ToList();
+
+
 			}
 		}
 
@@ -7902,7 +7907,7 @@ namespace AmethystEngine.Forms
 		{
 			if (AddSubLayerName_TB.Text != "")
 			{
-				currentLayeredSpriteSheet.AddSubLayer(AddSubLayerName_TB.Text);
+				if(!currentLayeredSpriteSheet.AddSubLayer(AddSubLayerName_TB.Text)) return; //failed
 
 
 				AnimationSubLayer_CB.Items.Add(new ComboBoxItem(){Content = AddSubLayerName_TB.Text });
@@ -7914,6 +7919,7 @@ namespace AmethystEngine.Forms
 
 				AnimationSubLayerImages_List.Add(new List<CroppedBitmap>());
 
+				AddSubLayerName_TB.Text = "";
 				AnimationAddSubLayer_Grid.Visibility = Visibility.Hidden;
 				AnimationLayersSettings_Grid.Visibility = Visibility.Visible;
 			}
@@ -7921,7 +7927,12 @@ namespace AmethystEngine.Forms
 
 		private void AddSpriteSheetToSubLayer_BTN_Click(object sender, RoutedEventArgs e)
 		{
+			
+
 			if (AnimationSubLayer_CB.SelectedIndex < 1) return;
+
+			CurrentSubLayerSpriteSheets_LB.ItemsSource = null;
+
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
 			{
 				Title = "Open Animation State machine File",
@@ -7948,7 +7959,8 @@ namespace AmethystEngine.Forms
 			currentLayeredSpriteSheet.AddSpriteSheetToSubLayer(
 				currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[AnimationSubLayer_CB.SelectedIndex-2], retSheet);
 			
-			CurrentSubLayerSpriteSheets_LB.Items.Add(retSheet.SheetName);
+			CurrentSubLayerSpriteSheets_LB.ItemsSource =
+				currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Text].ToList();
 		}
 
 		private void CurrentSubLayerSpriteSheets_LB_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -7961,8 +7973,13 @@ namespace AmethystEngine.Forms
 						currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[AnimationSubLayer_CB.SelectedIndex - 2];
 
 					SpriteSheet spriteSheet = currentLayeredSpriteSheet.ActiveSubLayerSheet[name];
-					
-					CurrentSubLayerAnimStates_LB.ItemsSource  = spriteSheet.SpriteAnimations.Keys;
+					if (spriteSheet != null && (sender as ListBox).SelectedItem != null)
+					{
+						CurrentSubLayerAnimStates_LB.ItemsSource = spriteSheet.SpriteAnimations.Values;
+						currentLayeredSpriteSheet.ChangeActiveSheetString(AnimationSubLayer_CB.Text,
+							currentLayeredSpriteSheet.ActiveSubLayerSheet[AnimationSubLayer_CB.Text].SheetName,
+							((sender as ListBox).SelectedItem as SpriteSheet).SheetName);
+					}
 			}
 		}
 
@@ -7970,15 +7987,15 @@ namespace AmethystEngine.Forms
 		{
 			if (AnimationSubLayer_CB.SelectedIndex >= 2)
 			{
-				Image img = AnimationLayersPreview_Canvas_IC.Children[AnimationSubLayer_CB.SelectedIndex - 1] as Image;
+				Image img = AnimationLayersPreview_Canvas_IC.Children[AnimationSubLayer_CB.SelectedIndex - 2] as Image;
 				if (img != null)
 				{
 
 					String name =
-						currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[AnimationSubLayer_CB.SelectedIndex - 2];
+						currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Text][CurrentSubLayerSpriteSheets_LB.SelectedIndex].SheetName;
 
-					SpriteSheet spriteSheet = currentLayeredSpriteSheet.ActiveSubLayerSheet[name];
-					if(spriteSheet == null) return;
+					SpriteSheet spriteSheet = currentLayeredSpriteSheet.ActiveSubLayerSheet[AnimationSubLayer_CB.Text];
+					if(spriteSheet == null || (sender as ListBox).SelectedIndex == -1) return;
 					spriteSheet.ChangeAnimation((sender as ListBox).SelectedItem.ToString());
 
 					SpriteAnimation item = spriteSheet.CurrentAnimation;
