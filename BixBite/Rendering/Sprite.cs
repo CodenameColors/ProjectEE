@@ -8,15 +8,20 @@ using Microsoft.Xna.Framework.Graphics;
 using BixBite.Resources;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
+using System.Data.SqlTypes;
+using System.IO;
 
 namespace BixBite.Rendering
 {
 	public class Sprite : IProperties
 	{
-		public delegate void PGridSync_Hook(String Key, object Property, System.Collections.Specialized.NotifyCollectionChangedAction action);
+		public delegate void PGridSync_Hook(String Key, object Property,
+			System.Collections.Specialized.NotifyCollectionChangedAction action);
+
 		public PGridSync_Hook PGridSync = null;
 
 		public delegate void ChangePathLocation(String newpath);
+
 		ChangePathLocation OnChangePathLocation = null;
 
 		public String ImgPathLocation
@@ -29,6 +34,7 @@ namespace BixBite.Rendering
 					OnChangePathLocation(value);
 			}
 		}
+
 		private String imgpathlocation = "";
 		//public String Name { get; set; }
 		//public int Width, Height;
@@ -42,6 +48,7 @@ namespace BixBite.Rendering
 				{
 					return GetPropertyData("Name").ToString();
 				}
+
 				throw new NullReferenceException(); //doesn't exist
 			}
 			set
@@ -63,8 +70,9 @@ namespace BixBite.Rendering
 			{
 				if (Properties.Any(m => m.Item1 == "x"))
 				{
-					return (int)GetPropertyData("x");
+					return (int) GetPropertyData("x");
 				}
+
 				throw new NullReferenceException(); //doesn't exist
 			}
 			set
@@ -79,14 +87,16 @@ namespace BixBite.Rendering
 				}
 			}
 		}
+
 		public double Y
 		{
 			get
 			{
 				if (Properties.Any(m => m.Item1 == "y"))
 				{
-					return (int)GetPropertyData("y");
+					return (int) GetPropertyData("y");
 				}
+
 				throw new NullReferenceException(); //doesn't exist
 			}
 			set
@@ -101,14 +111,16 @@ namespace BixBite.Rendering
 				}
 			}
 		}
+
 		public double Width
 		{
 			get
 			{
 				if (Properties.Any(m => m.Item1 == "width"))
 				{
-					return (int)GetPropertyData("width");
+					return (int) GetPropertyData("width");
 				}
+
 				throw new NullReferenceException(); //doesn't exist
 			}
 			set
@@ -123,14 +135,16 @@ namespace BixBite.Rendering
 				}
 			}
 		}
+
 		public double Height
 		{
 			get
 			{
 				if (Properties.Any(m => m.Item1 == "height"))
 				{
-					return (int)GetPropertyData("EventName");
+					return (int) GetPropertyData("height");
 				}
+
 				throw new NullReferenceException(); //doesn't exist
 			}
 			set
@@ -146,21 +160,70 @@ namespace BixBite.Rendering
 			}
 		}
 
+		private float _Alpha = 1.0f;
+
+		public float Alpha
+		{
+			get => _Alpha;
+			set
+			{
+				_Alpha = value;
+			}
+		}
+
 		ObservableCollection<Tuple<String, object>> Properties { get; set; }
 
-		public Sprite(String Name, String imgLoc, int x, int y, int w, int h)
+		public Vector2 Screen_pos;
+
+		public Sprite()
 		{
 			Properties = new ObservableCollection<Tuple<string, object>>();
 			Properties.CollectionChanged += Properties_Changed;
 
+			AddProperty("Name", Name);
+			AddProperty("x", 0);
+			AddProperty("y", 0);
+			AddProperty("width", 0);
+			AddProperty("height", 0);
+
 			this.Name = Name;
-			this.imgpathlocation = imgLoc;
+
+		}
+
+
+		public Sprite(String Name, int x, int y, int w, int h)
+		{
+			Properties = new ObservableCollection<Tuple<string, object>>();
+			Properties.CollectionChanged += Properties_Changed;
+
+			
 
 			AddProperty("Name", Name);
 			AddProperty("x", x);
 			AddProperty("y", y);
 			AddProperty("width", w);
 			AddProperty("height", h);
+
+			this.Name = Name;
+
+		}
+
+		public Sprite(String Name, String imgLoc, int x, int y, int w, int h)
+		{
+			Properties = new ObservableCollection<Tuple<string, object>>();
+			Properties.CollectionChanged += Properties_Changed;
+
+
+			AddProperty("Name", Name);
+			AddProperty("x", x);
+			AddProperty("y", y);
+			AddProperty("width", w);
+			AddProperty("height", h);
+
+
+			this.Name = Name;
+			this.imgpathlocation = imgLoc;
+
 		}
 
 
@@ -310,21 +373,63 @@ namespace BixBite.Rendering
 		#endregion
 
 
-		//protected Texture2D text;
+		protected Texture2D text;
 
-		//public void setTexture(Texture2D text)
-		//{
-		//	this.text = text;
-		//}
-		//public Texture2D getTexture()
-		//{
-		//	return text;
-		//}
+		public void SetTexture(Texture2D text)
+		{
+			this.text = text;
+		}
 
-		//public void Draw(SpriteBatch sb)
-		//{
-		//	sb.Draw(text, Screen_pos);
-		//}
+		public void SetTexture(String TexturePath, GraphicsDevice graphicsDevice)
+		{
+			try
+			{
+				using (var stream = new System.IO.FileStream(TexturePath, FileMode.Open))
+				{
+					var texture = Texture2D.FromStream(graphicsDevice, stream);
+					this.text = Texture2D.FromStream(graphicsDevice, stream);
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("SPRITE CLASS: SetTexture Failure: {0}", ex.Message);
+			}
+		}
+
+		public Texture2D getTexture()
+		{
+			return text;
+		}
+
+		public void Draw(SpriteBatch sb)
+		{
+			sb.Draw(text, Screen_pos);
+		}
+
+		public virtual void Draw_Crop(SpriteBatch sb, int posx, int posy, int x, int y, int w, int h)
+		{
+			sb.Draw(text, new Vector2(posx, posy), new Rectangle(x, y, w, h), new Color(255, 255, 255, 255), 0.0f, new Vector2(0,0), new Vector2(1,1), SpriteEffects.None, 0   );
+		}
+
+		public virtual void Draw_Crop(SpriteBatch sb, int posx, int posy, int x, int y, int w, int h, float alpha)
+		{
+			sb.Draw(text, new Vector2(posx, posy), new Rectangle(x, y, w, h), Color.White * alpha, 0.0f, new Vector2(0, 0), new Vector2(1, 1), SpriteEffects.None, 0);
+			this.Alpha = alpha;
+		}
+
+
+		public virtual void Draw_Crop_Scale(SpriteBatch sb, int posx, int posy, int x, int y, int w, int h, double sx, double sy)
+		{
+			sb.Draw(text, new Vector2(posx, posy), new Rectangle(x, y, w, h), new Color(255,255,255,255) , 0.0f, new Vector2(0, 0), new Vector2((float)sx, (float)sy), SpriteEffects.None, 0);
+		}
+
+		public virtual void Draw_Crop_Scale(SpriteBatch sb, int posx, int posy, int x, int y, int w, int h, double sx, double sy, float alpha)
+		{
+			sb.Draw(text, new Vector2(posx, posy), new Rectangle(x, y, w, h), Color.White * alpha, 0.0f, new Vector2(0, 0), new Vector2((float)sx, (float)sy), SpriteEffects.None, 0);
+			this.Alpha = alpha;
+		}
+
+
 	}
 
 }

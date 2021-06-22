@@ -1,0 +1,353 @@
+﻿<Window x:Class="JobStanceAnalysis.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:JobStanceAnalysis"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d" Background="Black"
+        Title="MainWindow" Height="1000" Width="1200">
+<Window.Resources>
+	<ObjectDataProvider x:Key="EJobValues"
+	                    MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+		<ObjectDataProvider.MethodParameters>
+				<x:Type TypeName="local:EJob"/>
+		</ObjectDataProvider.MethodParameters>
+	</ObjectDataProvider>
+	<ObjectDataProvider x:Key="EStanceValues"
+	                    MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+		<ObjectDataProvider.MethodParameters>
+			<x:Type TypeName="local:EStanceType"/>
+		</ObjectDataProvider.MethodParameters>
+	</ObjectDataProvider>
+	<local:EnumToStringConverter x:Key="DefaultEnumToStringConverter"/>
+	</Window.Resources>
+	<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="30"/>
+				<RowDefinition Height="200"/>
+				<RowDefinition Height="*"/>
+			</Grid.RowDefinitions>
+
+			<StackPanel Orientation="Horizontal" Margin="10,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" >
+				<TextBlock Text="Job Name:" Foreground="White" Padding="0,0,0,0"/>
+				<ComboBox x:Name="JobName_CB" Width="200" Background="DimGray" ItemsSource="{Binding Source={StaticResource EJobValues}}"/>
+			</StackPanel>
+
+	    <StackPanel Orientation="Horizontal" Margin="300,10,10,0" HorizontalAlignment="Left" VerticalAlignment="Top"  >
+		    <TextBlock Text="Stance Left:" Foreground="White" Padding="0,0,10,0"/>
+			<ComboBox x:Name="StanceLeft_CB" Width="100" Background="DimGray"  ItemsSource="{Binding Source={StaticResource EStanceValues}}"/>
+	    </StackPanel>
+	    <StackPanel Orientation="Horizontal" Margin="500,10,10,0" HorizontalAlignment="Left" VerticalAlignment="Top" >
+		    <TextBlock Text="Stance Middle:" Foreground="White" Padding="0,0,10,0"/>
+			<ComboBox x:Name="StanceMiddle_CB" Width="100" Background="DimGray"  ItemsSource="{Binding Source={StaticResource EStanceValues}}"/>
+	    </StackPanel>
+	    <StackPanel Orientation="Horizontal" Margin="700,10,10,0" HorizontalAlignment="Left" VerticalAlignment="Top" >
+		    <TextBlock Text="Stance Right:" Foreground="White" Padding="0,0,10,0"/>
+			<ComboBox x:Name="StanceRight_CB" Width="100" Background="DimGray" ItemsSource="{Binding Source={StaticResource EStanceValues}}"/>
+	    </StackPanel>
+
+			<Button Background="DimGray" Content="Add" Width="100" Margin="936,8,156,4" Click="AddNewJob"/>
+			<Button Background="DimGray" Content="Run" Width="100" Margin="1050,8,0,4" Click="Testing_Button_Press"/>
+
+
+			<ListBox x:Name="Job_LB" Grid.Row="1" BorderThickness="2" BorderBrush="AliceBlue" ItemsSource="{Binding Jobs}" Background="Transparent" Margin="10">
+				<ListBox.ItemTemplate>
+					<DataTemplate>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="150"/>
+								<ColumnDefinition Width="150"/>
+								<ColumnDefinition Width="150"/>
+								<ColumnDefinition Width="150"/>
+								<ColumnDefinition Width="150"/>
+							</Grid.ColumnDefinitions>
+
+							<TextBlock Grid.Column="0" Foreground="White" Text="{Binding Name, Converter={StaticResource DefaultEnumToStringConverter}}" ></TextBlock>
+							<TextBlock Grid.Column="1" Foreground="White" Text="{Binding Stances[0]}" ></TextBlock>
+							<TextBlock Grid.Column="2" Foreground="White" Text="{Binding Stances[1]}" ></TextBlock>
+							<TextBlock Grid.Column="3" Foreground="White" Text="{Binding Stances[2]}" ></TextBlock>
+
+							<GridSplitter Grid.Column="0" Grid.ColumnSpan="1" Width="2" ResizeDirection="Columns" IsEnabled="False" Margin="-2,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+							</GridSplitter>
+
+					</Grid>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+
+			<TabControl Grid.Row="2" Background="Transparent" Margin="10">
+				<TabItem Header="match 2">
+				<Grid>
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Text="Number of Matches" Foreground="White" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" />
+						<TextBox x:Name="NumberOfMatches_2_TB" Width="100" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+						<TextBlock Text="Total Number of Combos" Foreground="White" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" />
+						<TextBox x:Name="NumberOfCombos_2_TB" Width="100" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+						<TextBlock Text="% of matches" Foreground="White" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" />
+						<TextBox x:Name="PercentOfMatches_2_TB" Width="100" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+					</StackPanel>
+
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Text="Job 1" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job 2" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job1 L" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job1 M" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job1 R" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job2 L" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job2 M" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job2 R" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+					</StackPanel>
+
+					<ListBox x:Name="Match2_LB" Grid.Row="1" BorderThickness="2" BorderBrush="AliceBlue" ItemsSource="{Binding JobCombosRecord_2}" Background="Transparent" Margin="10,80,10,10">
+						<ListBox.ItemTemplate>
+							<DataTemplate>
+							<Border BorderThickness="1">
+								<Border.Style>
+									<Style TargetType="Border">
+										<Style.Triggers>
+											<DataTrigger Binding="{Binding bIsMatch}" Value="False">
+												<Setter Property="BorderBrush" Value="Red"/>
+											</DataTrigger>
+											<DataTrigger Binding="{Binding bIsMatch}" Value="True">
+												<Setter Property="BorderBrush" Value="Green"/>
+											</DataTrigger>
+										</Style.Triggers>
+									</Style>
+								</Border.Style>
+								<Grid>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="300"/>
+									</Grid.ColumnDefinitions>
+
+									<TextBlock Grid.Column="0" Foreground="White" Text="{Binding JobCombos[0].Name, Converter={StaticResource DefaultEnumToStringConverter}}" ></TextBlock>
+									<TextBlock Grid.Column="1" Foreground="White" Text="{Binding JobCombos[1].Name, Converter={StaticResource DefaultEnumToStringConverter}}" ></TextBlock>
+									<TextBlock Grid.Column="2" Foreground="White" Text="{Binding JobCombos[0].Stances[0]}" ></TextBlock>
+									<TextBlock Grid.Column="3" Foreground="White" Text="{Binding JobCombos[0].Stances[1]}" ></TextBlock>
+									<TextBlock Grid.Column="4" Foreground="White" Text="{Binding JobCombos[0].Stances[2]}" ></TextBlock>
+									<TextBlock Grid.Column="5" Foreground="White" Text="{Binding JobCombos[1].Stances[0]}" ></TextBlock>
+									<TextBlock Grid.Column="6" Foreground="White" Text="{Binding JobCombos[1].Stances[1]}" ></TextBlock>
+									<TextBlock Grid.Column="7" Foreground="White" Text="{Binding JobCombos[1].Stances[2]}" ></TextBlock>
+									<TextBlock Grid.Column="8" Foreground="White" Text="{Binding MatchType}" ></TextBlock>
+
+									<GridSplitter Grid.Column="1" Grid.ColumnSpan="1" Width="2" ResizeDirection="Columns" IsEnabled="False" Margin="-2,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+									</GridSplitter>
+									<GridSplitter Grid.Column="4" Grid.ColumnSpan="1" Width="2" ResizeDirection="Columns" IsEnabled="False" Margin="-2,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+									</GridSplitter>
+									<GridSplitter Grid.Column="7" Grid.ColumnSpan="1" Width="2" ResizeDirection="Columns" IsEnabled="False" Margin="-2,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+									</GridSplitter>
+
+									</Grid>
+							</Border>
+						</DataTemplate>
+						</ListBox.ItemTemplate>
+					</ListBox>
+					</Grid>
+				</TabItem>
+				<TabItem Header="match 3">
+				<Grid>
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Text="Number of Matches" Foreground="White" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" />
+						<TextBox x:Name="NumberOfMatches_3_TB" Width="100" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+						<TextBlock Text="Total Number of Combos" Foreground="White" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" />
+						<TextBox x:Name="NumberOfCombos_3_TB" Width="100" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+						<TextBlock Text="% of matches" Foreground="White" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" />
+						<TextBox x:Name="PercentOfMatches_3_TB" Width="100" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+					</StackPanel>
+
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Text="Job 1" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job 2" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job 3" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job1 L" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job1 M" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job1 R" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job2 L" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job2 M" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job2 R" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job3 L" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job3 M" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job3 R" Foreground="White" Margin="0,50,0,0" Width="100" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+					</StackPanel>
+
+					<ListBox x:Name="Match3_LB" Grid.Row="1" BorderThickness="2" BorderBrush="AliceBlue" ItemsSource="{Binding JobCombosRecords_3}" Background="Transparent" Margin="10,80,10,10">
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<Border BorderThickness="1">
+								<Border.Style>
+									<Style TargetType="Border">
+										<Style.Triggers>
+											<DataTrigger Binding="{Binding bIsMatch}" Value="False">
+												<Setter Property="BorderBrush" Value="Red"/>
+											</DataTrigger>
+											<DataTrigger Binding="{Binding bIsMatch}" Value="True">
+												<Setter Property="BorderBrush" Value="Green"/>
+											</DataTrigger>
+										</Style.Triggers>
+									</Style>
+								</Border.Style>
+								<Grid>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="100"/>
+										<ColumnDefinition Width="300"/>
+									</Grid.ColumnDefinitions>
+
+									<TextBlock Grid.Column="0" Foreground="White" Text="{Binding JobCombos[0].Name, Converter={StaticResource DefaultEnumToStringConverter}}" ></TextBlock>
+									<TextBlock Grid.Column="1" Foreground="White" Text="{Binding JobCombos[1].Name, Converter={StaticResource DefaultEnumToStringConverter}}" ></TextBlock>
+									<TextBlock Grid.Column="2" Foreground="White" Text="{Binding JobCombos[2].Name, Converter={StaticResource DefaultEnumToStringConverter}}" ></TextBlock>
+									<TextBlock Grid.Column="3" Foreground="White" Text="{Binding JobCombos[0].Stances[0]}" ></TextBlock>
+									<TextBlock Grid.Column="4" Foreground="White" Text="{Binding JobCombos[0].Stances[1]}" ></TextBlock>
+									<TextBlock Grid.Column="5" Foreground="White" Text="{Binding JobCombos[0].Stances[2]}" ></TextBlock>
+									<TextBlock Grid.Column="6" Foreground="White" Text="{Binding JobCombos[1].Stances[0]}" ></TextBlock>
+									<TextBlock Grid.Column="7" Foreground="White" Text="{Binding JobCombos[1].Stances[1]}" ></TextBlock>
+									<TextBlock Grid.Column="8" Foreground="White" Text="{Binding JobCombos[1].Stances[2]}" ></TextBlock>
+									<TextBlock Grid.Column="9" Foreground="White" Text="{Binding JobCombos[2].Stances[0]}" ></TextBlock>
+									<TextBlock Grid.Column="10" Foreground="White" Text="{Binding JobCombos[2].Stances[1]}" ></TextBlock>
+									<TextBlock Grid.Column="11" Foreground="White" Text="{Binding JobCombos[2].Stances[2]}" ></TextBlock>
+									<TextBlock Grid.Column="12" Foreground="White" Text="{Binding MatchType}" ></TextBlock>
+									
+									
+									<GridSplitter Grid.Column="2" Grid.ColumnSpan="1" Width="2" ResizeDirection="Columns" IsEnabled="False" Margin="-2,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+									</GridSplitter>
+									<GridSplitter Grid.Column="5" Grid.ColumnSpan="1" Width="2" ResizeDirection="Columns" IsEnabled="False" Margin="-2,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+									</GridSplitter>
+									<GridSplitter Grid.Column="8" Grid.ColumnSpan="1" Width="2" ResizeDirection="Columns" IsEnabled="False" Margin="-2,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+									</GridSplitter>
+									<GridSplitter Grid.Column="11" Grid.ColumnSpan="1" Width="2" ResizeDirection="Columns" IsEnabled="False" Margin="-2,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+									</GridSplitter>
+								</Grid>
+							</Border>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+					</Grid>
+			</TabItem>
+				<TabItem Header="match 4">
+				<Grid>
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Text="Number of Matches" Foreground="White" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" />
+						<TextBox x:Name="NumberOfMatches_4_TB" Width="100" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+						<TextBlock Text="Total Number of Combos" Foreground="White" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" />
+						<TextBox x:Name="NumberOfCombos_4_TB" Width="100" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+						<TextBlock Text="% of matches" Foreground="White" Margin="10" HorizontalAlignment="Left" VerticalAlignment="Top" />
+						<TextBox x:Name="PercentOfMatches_4_TB" Width="100" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+					</StackPanel>
+
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Text="Job 1" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job 2" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job 3" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job 4" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job1 L" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job1 M" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job1 R" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job2 L" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job2 M" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job2 R" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job3 L" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job3 M" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job3 R" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job4 L" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job4 M" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+						<TextBlock Text="Job4 R" Foreground="White" Margin="0,50,0,0" Width="80" HorizontalAlignment="Left" TextAlignment="Center" VerticalAlignment="Top"/>
+					</StackPanel>
+
+					<ListBox x:Name="Match4_LB" Grid.Row="1" BorderThickness="2" BorderBrush="AliceBlue" ItemsSource="{Binding JobCombosRecords_4}" Background="Transparent" Margin="10,80,10,10">
+					<ListBox.ItemTemplate>
+						<DataTemplate>
+							<Border BorderThickness="1">
+								<Border.Style>
+									<Style TargetType="Border">
+										<Style.Triggers>
+											<DataTrigger Binding="{Binding bIsMatch}" Value="False">
+												<Setter Property="BorderBrush" Value="Red"/>
+											</DataTrigger>
+											<DataTrigger Binding="{Binding bIsMatch}" Value="True">
+												<Setter Property="BorderBrush" Value="Green"/>
+											</DataTrigger>
+										</Style.Triggers>
+									</Style>
+								</Border.Style>
+								<Grid>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="80"/>
+										<ColumnDefinition Width="300"/>
+									</Grid.ColumnDefinitions>
+
+									<TextBlock Grid.Column="0" Foreground="White" Text="{Binding JobCombos[0].Name, Converter={StaticResource DefaultEnumToStringConverter}}" ></TextBlock>
+									<TextBlock Grid.Column="1" Foreground="White" Text="{Binding JobCombos[1].Name, Converter={StaticResource DefaultEnumToStringConverter}}" ></TextBlock>
+									<TextBlock Grid.Column="2" Foreground="White" Text="{Binding JobCombos[2].Name, Converter={StaticResource DefaultEnumToStringConverter}}" ></TextBlock>
+									<TextBlock Grid.Column="3" Foreground="White" Text="{Binding JobCombos[3].Name, Converter={StaticResource DefaultEnumToStringConverter}}" ></TextBlock>
+									<TextBlock Grid.Column="4" Foreground="White" Text="{Binding JobCombos[0].Stances[0]}" ></TextBlock>
+									<TextBlock Grid.Column="5" Foreground="White" Text="{Binding JobCombos[0].Stances[1]}" ></TextBlock>
+									<TextBlock Grid.Column="6" Foreground="White" Text="{Binding JobCombos[0].Stances[2]}" ></TextBlock>
+									<TextBlock Grid.Column="7" Foreground="White" Text="{Binding JobCombos[1].Stances[0]}" ></TextBlock>
+									<TextBlock Grid.Column="8" Foreground="White" Text="{Binding JobCombos[1].Stances[1]}" ></TextBlock>
+									<TextBlock Grid.Column="9" Foreground="White" Text="{Binding JobCombos[1].Stances[2]}" ></TextBlock>
+									<TextBlock Grid.Column="10" Foreground="White" Text="{Binding JobCombos[2].Stances[0]}" ></TextBlock>
+									<TextBlock Grid.Column="11" Foreground="White" Text="{Binding JobCombos[2].Stances[1]}" ></TextBlock>
+									<TextBlock Grid.Column="12" Foreground="White" Text="{Binding JobCombos[2].Stances[2]}" ></TextBlock>
+									<TextBlock Grid.Column="13" Foreground="White" Text="{Binding JobCombos[3].Stances[0]}" ></TextBlock>
+									<TextBlock Grid.Column="14" Foreground="White" Text="{Binding JobCombos[3].Stances[1]}" ></TextBlock>
+									<TextBlock Grid.Column="15" Foreground="White" Text="{Binding JobCombos[3].Stances[2]}" ></TextBlock>
+									<TextBlock Grid.Column="16" Foreground="White" Text="{Binding MatchType}" ></TextBlock>
+
+									<GridSplitter Grid.Column="3" Grid.ColumnSpan="1" Width="2" ResizeDirection="Columns" IsEnabled="False" Margin="-2,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+									</GridSplitter>
+									<GridSplitter Grid.Column="6" Grid.ColumnSpan="1" Width="2" ResizeDirection="Columns" IsEnabled="False" Margin="-2,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+									</GridSplitter>
+									<GridSplitter Grid.Column="9" Grid.ColumnSpan="1" Width="2" ResizeDirection="Columns" IsEnabled="False" Margin="-2,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+										</GridSplitter>
+									<GridSplitter Grid.Column="12" Grid.ColumnSpan="1" Width="2" ResizeDirection="Columns" IsEnabled="False" Margin="-2,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+									</GridSplitter>
+									<GridSplitter Grid.Column="15" Grid.ColumnSpan="1" Width="2" ResizeDirection="Columns" IsEnabled="False" Margin="-2,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+									</GridSplitter>
+									<GridSplitter Grid.Column="18" Grid.ColumnSpan="1" Width="2" ResizeDirection="Columns" IsEnabled="False" Margin="-2,0,10,0" HorizontalAlignment="Right" VerticalAlignment="Stretch">
+									</GridSplitter>
+
+
+									</Grid>
+							</Border>
+						</DataTemplate>
+					</ListBox.ItemTemplate>
+				</ListBox>
+				</Grid>
+				</TabItem>
+		</TabControl>
+
+	</Grid>
+</Window>

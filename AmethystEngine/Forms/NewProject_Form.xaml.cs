@@ -94,9 +94,10 @@ namespace AmethystEngine.Forms
 			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Config");
 			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Dialogue");
 
-			String pathString = System.Environment.CurrentDirectory + "\\rpj.txt";
+			String pathString = String.Format("{0}/AmethystEngine/{1}", Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
+				"rpj.txt");
 
-      if (!System.IO.File.Exists(pathString))
+			if (!System.IO.File.Exists(pathString))
       {
         System.IO.File.AppendAllText(pathString, String.Format("{0}{1}{2}", path + "\\" + pname + "\\", pname, ".gem\n"));
       }

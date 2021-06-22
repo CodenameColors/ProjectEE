@@ -41,7 +41,9 @@ namespace AmethystEngine.Forms
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-      String pathString = System.Environment.CurrentDirectory + "\\rpj.txt";
+      //String pathString = System.Environment.CurrentDirectory + "\\rpj.txt";
+      String pathString = String.Format("{0}/AmethystEngine/{1}", Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
+	      "rpj.txt");
       List<String> EditedOutputList = new List<string>();
       if (!System.IO.File.Exists(pathString))
       {
@@ -196,10 +198,12 @@ namespace AmethystEngine.Forms
 			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Config");
 			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Dialogue");
 			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\UI");
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Animations");
 
-			String pathString = System.Environment.CurrentDirectory + "\\rpj.txt";
+			String pathString = String.Format("{0}/AmethystEngine/{1}", Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
+				"rpj.txt");
 
-      if (!System.IO.File.Exists(pathString))
+			if (!System.IO.File.Exists(pathString))
       {
         System.IO.File.AppendAllText(pathString, String.Format("{0}{1}{2}", path + "\\" + pname + "\\", pname, ".gem\n"));
       }
@@ -239,9 +243,12 @@ namespace AmethystEngine.Forms
 
     public static void CreateGameFiles(String projloc)
     {
-      File.WriteAllBytes(Environment.CurrentDirectory + "\\temp", Properties.Resources.Bmg);
-      ZipFile.ExtractToDirectory(Environment.CurrentDirectory + "\\temp", projloc);
-      File.Delete(Environment.CurrentDirectory + "\\temp");
+			String AppData = String.Format("{0}/AmethystEngine/", Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData));
+
+
+			File.WriteAllBytes(AppData + "\\temp", Properties.Resources.Bmg);
+      ZipFile.ExtractToDirectory(AppData + "\\temp", projloc);
+      File.Delete(AppData + "\\temp");
     }
 
     #endregion
@@ -256,8 +263,9 @@ namespace AmethystEngine.Forms
 
         //drop the project from the file.
         TFiles.RemoveAt(RecentProj_LB.SelectedIndex);
-        String pathString = System.Environment.CurrentDirectory + "\\rpj.txt";
-        if (!System.IO.File.Exists(pathString))
+        String pathString = String.Format("{0}/AmethystEngine/{1}", Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
+	        "rpj.txt");
+				if (!System.IO.File.Exists(pathString))
         {
           System.IO.File.WriteAllLines(pathString, TFiles.ToArray());
         }

@@ -1,0 +1,159 @@
+﻿<Window x:Class="AmethystEngine.Forms.AddEditAnimationStateMachine"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AmethystEngine.Forms"
+        mc:Ignorable="d" WindowStyle="None" Background="#FF0E0D0D"
+				Loaded="AddEditAnimationStateMachine_OnLoaded"
+        Title="Add Or Edit a State in the Current Animation State Machine" Height="350" Width="800">
+
+	<Window.Resources>
+
+
+
+
+	</Window.Resources>
+	<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="30"/>
+				<RowDefinition/>
+			</Grid.RowDefinitions>
+		<Grid Grid.Row="0" Background="#FF484848" MouseLeftButtonDown="LBind_DragMove">
+			<Grid>
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+				</Grid.ColumnDefinitions>
+				<Image Height="30" HorizontalAlignment="Left" Margin="3,0,0,0" x:Name="AmeIcon_im" Stretch="None" VerticalAlignment="Top" Width="30"  OpacityMask="Black" Source="/AmethystEngine;component/images/Ame_icon_small.png" />
+				<Label Content="Amethyst Engine"  Padding="40,7,0,0" Foreground="White" Grid.Column="0"/>
+
+				<Label x:Name="ProjectName_LBL" Content="Add Or Edit a State in the Current Animation State Machine" Foreground="White" Grid.Column="7" HorizontalAlignment="Center"/>
+				<Button Content="X" Background="Transparent" BorderBrush="Transparent" Foreground="White" HorizontalAlignment="Center" Grid.Column="11" Width="20" Click="LBind_close" />
+			</Grid>
+		</Grid>
+
+		<Grid Grid.Row="1" x:Name="AddEditToStateMachine_Grid" Background="#FF3C3C3C">
+
+				<Grid.RowDefinitions>
+					<RowDefinition Height="10"/>
+					<RowDefinition Height="20"/>
+					<RowDefinition Height="20"/>
+					<RowDefinition Height="10"/>
+					<RowDefinition Height="*"/>
+				</Grid.RowDefinitions>
+
+			<TextBlock x:Name="EditingIndicator_TB" Grid.Row="1"  Text="EDITING:" Foreground="White" FontWeight="Bold" Margin="10,0,0,0"/>
+			<TextBlock x:Name="AddingIndicator_TB" Grid.Row="1"  Text="ADDING to:" Foreground="White" FontWeight="Bold" Margin="10,0, 0,0"/>
+			<TextBox x:Name="CurrentActiveAnimationName_TB" Grid.Row="1" Grid.Column="0" IsReadOnly="True"
+				         Foreground="White" Background="#FF484848" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Margin="100,2,10,2" />
+			<TextBlock Grid.Row="2"  Text="Please Note you are still using the same Sprite Sheet PNG as first imported!" Foreground="DarkGray" FontWeight="Normal" FontStyle="Italic" Margin="10,0, 0,0"/>
+
+			<Grid Grid.Row="5" >
+				<Grid.RowDefinitions>
+					<RowDefinition Height="20"/>
+					<RowDefinition Height="20"/>
+					<RowDefinition Height="20"/>
+					<RowDefinition Height="20"/>
+					<RowDefinition Height="2"/>
+					<RowDefinition Height="2"/>
+					<RowDefinition Height="100"/>
+					<RowDefinition Height="20"/>
+					<RowDefinition Height="20"/>
+					<RowDefinition Height="30"/>
+				</Grid.RowDefinitions>
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="80"/>
+					<ColumnDefinition Width="100"/>
+					<ColumnDefinition Width="90"/>
+					<ColumnDefinition Width="100"/>
+					<ColumnDefinition Width="90"/>
+					<ColumnDefinition Width="20"/>
+					<ColumnDefinition Width="0"/>
+					<ColumnDefinition Width="60"/>
+					<ColumnDefinition Width="0"/>
+					<ColumnDefinition Width="60"/>
+					<ColumnDefinition Width="5"/>
+					<ColumnDefinition Width="60"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+
+				<!--#region headers-->
+				<TextBlock Grid.Row="0" Grid.Column="0" Foreground="White" HorizontalAlignment="Right" Margin="5,0,5,0" Text="State Name:"/>
+				<TextBlock Grid.Row="1" Grid.Column="0" Foreground="White" HorizontalAlignment="Right" Margin="5,0,5,0" Text="Start X:"/>
+				<TextBlock Grid.Row="2" Grid.Column="0" Foreground="White" HorizontalAlignment="Right" Margin="5,0,5,0" Text="Start Y:"/>
+				<TextBlock Grid.Row="3" Grid.Column="0" Foreground="White" HorizontalAlignment="Right" Margin="5,0,5,0" Text="# of Frames:"/>
+				<TextBlock Grid.Row="1" Grid.Column="2" Foreground="White" HorizontalAlignment="Right" Margin="5,0,5,0" Text="Frame Width:"/>
+				<TextBlock Grid.Row="2" Grid.Column="2" Foreground="White" HorizontalAlignment="Right" Margin="0,0,5,0" Text="Frame Height:"/>
+				<TextBlock Grid.Row="0" Grid.Column="4" Foreground="White" HorizontalAlignment="Right" Margin="0,0,5,0" Text="Default State?:"/>
+				<TextBlock Grid.Row="2" Grid.Column="2" Foreground="White" HorizontalAlignment="Right" Margin="0,0,5,0" Text="Frame Height:"/>
+				<TextBlock Grid.Row="3" Grid.Column="2" Foreground="White" HorizontalAlignment="Right" Margin="0,0,5,0" Text="FPS:"/>
+				<TextBlock Grid.Row="0" Grid.Column="4" Foreground="White" HorizontalAlignment="Right" Margin="0,0,5,0" Text="Default State?:"/>
+				<TextBlock Grid.Row="7" Grid.Column="1" Foreground="White" HorizontalAlignment="Center" Margin="0,0,5,0" Text="1st Frame:"/>
+				<TextBlock Grid.Row="7" Grid.Column="3" Foreground="White" HorizontalAlignment="Center" Margin="0,0,5,0" Text="End Fame:"/>
+				<TextBlock Grid.Row="6" Grid.Column="12" Foreground="White" HorizontalAlignment="Right" Margin="0,0,5,0" Text="Frame"/>
+				<TextBlock Grid.Row="6" Grid.Column="12" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,50,5,0" Text="DeltaT"/>
+				<!--#endregion headers-->
+
+				<!--#region Input Textboxes-->
+				<TextBox x:Name="StateName_TB" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+													         Foreground="White" Background="#FF484848" />
+				<TextBox x:Name="StateStartX_TB" Grid.Row="1" Grid.Column="1" Foreground="White" Text="{Binding Path=StartX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+				         Background="#FF484848" KeyUp="RefreshFrameRange_TB_KeydDown"/>
+				<TextBox x:Name="StateStartY_TB" Grid.Row="2" Grid.Column="1" Foreground="White" Text="{Binding Path=StartY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+				         Background="#FF484848" KeyUp="RefreshFrameRange_TB_KeydDown" />
+				<TextBox x:Name="StateNumOfFrames_TB" Grid.Row="3" Grid.Column="1" Foreground="White" Text="{Binding Path=FrameCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+				         Background="#FF484848" KeyUp="RefreshFrameRange_TB_KeydDown" />
+				<TextBox x:Name="StateFrameWidth" Grid.Row="1" Grid.Column="3" Foreground="White" Text="{Binding Path=FrameWidth, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+				         Background="#FF484848" KeyUp="RefreshFrameRange_TB_KeydDown" />
+				<TextBox x:Name="StateFrameHeight_TB" Grid.Row="2" Grid.Column="3" Foreground="White" Text="{Binding Path=FrameHeight, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+				         Background="#FF484848" KeyUp="RefreshFrameRange_TB_KeydDown" />
+				<TextBox x:Name="StateFPS_TB" Grid.Row="3" Grid.Column="3" Foreground="White" Text="{Binding Path=FPS, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+				         Background="#FF484848" />
+				<TextBox x:Name="CurrentFrame_TB" IsReadOnly="True" Width="50" Grid.Row="6" Grid.Column="12" Text="1" Margin="30,20,2,0" Foreground="White"
+													         Background="#FF484848" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+				<TextBox x:Name="CurrentDeltaTime_TB" IsReadOnly="True" Width="50" Grid.Row="6" Grid.Column="12" Text="1" Margin="30,70,2,0" Foreground="Gray"
+													         Background="#FF484848" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+
+				<!--#endregion Input Textboxes-->
+				<CheckBox Grid.Row="1" Grid.Column="4" HorizontalAlignment="Center" IsChecked="{Binding Path=.bIsDefaultState, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+				          Click="ChangedDefaultState_VB_Click"/>
+				<Image x:Name="FirstFrame_IMG" Grid.Row="6" Grid.RowSpan="1" Grid.Column="1" Height="100" Source="/AmethystEngine;component/images/Ame_icon_small.png"  >
+				</Image>
+				<Image x:Name="LastFrame_IMG" Grid.Row="6" Grid.Column="3" Height="100" Source="/AmethystEngine;component/images/Ame_icon_small.png"  >
+				</Image>
+				<Image x:Name="PreviewAnim_IMG" Grid.Row="6" Grid.Column="5" Grid.ColumnSpan="10" Width=" 100" Height="100" HorizontalAlignment="Left" Source="/AmethystEngine;component/images/Ame_icon_small.png"  >
+				</Image>
+
+				<CheckBox x:Name="PreviewAnim_CB" Grid.Row="7" Grid.Column="6" Grid.ColumnSpan="4" Foreground="White" VerticalAlignment="Center" Content="Preview?"
+				          Click="PreviewAnim_CB_OnChecked"/>
+
+				<GridSplitter Grid.Row="5" Grid.ColumnSpan="100" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsEnabled="False" x:Name="gridSplitter2" Background="#FF868686" ResizeDirection="Rows"/>
+
+				<TextBlock Grid.Row="8" Grid.Column="0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,5,0" Text="Status Log:"/>
+				<TextBox x:Name="AE_ImportStatusLog_TB" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="10"  
+				         Foreground="White" Background="#FF484848" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Margin="80,0,0,0" />
+
+				<Button x:Name="FinishAndClose_BTN" Grid.Row="8" Grid.Column="11" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="10,0,10,0"  Content="Add To StateMachine!"
+				        Click="AddToStateMachine_BTN_Click"/>
+
+
+			</Grid>
+
+		</Grid>
+
+
+	</Grid>
+</Window>

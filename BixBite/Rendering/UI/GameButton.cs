@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BixBite.Rendering.UI;
+using BixBite.Resources;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -50,7 +52,7 @@ namespace BixBite.Rendering.UI
 
 		#region Methods
 
-		public GameButton(Texture2D texture, SpriteFont font)
+		public GameButton(Texture2D texture, SpriteFont font) : base()
 		{
 			_texture = texture;
 

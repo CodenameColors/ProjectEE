@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28307.438
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "itemCreation", "itemCreation\itemCreation.csproj", "{2BAA20D8-68EC-4ACE-8765-6B513FA39A8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectE_E", "ProjectE_E\ProjectE_E.csproj", "{EF66E055-5B8B-4990-BBE8-A890F12189F6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonogameEngineTesting", "ProjectE_E\MonogameEngineTesting.csproj", "{EF66E055-5B8B-4990-BBE8-A890F12189F6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BixBite", "BixBite\BixBite.csproj", "{D50DEEF5-20BE-4A57-B0F8-6CB460F71D82}"
 EndProject

@@ -10,6 +10,12 @@ namespace BixBite.Rendering.UI
 {
 	public abstract class UIComponent
 	{
+		public bool bCanDraw { get; set; }
+
+		public virtual bool bIsActive { get; set; }
+
+		public Vector2 Position;
+
 		public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
 
 		public abstract void Update(GameTime gameTime);

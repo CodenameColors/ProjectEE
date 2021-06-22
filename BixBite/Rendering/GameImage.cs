@@ -18,7 +18,7 @@ namespace BixBite.Rendering
 		//public bool IsActive;
 
 
-		//public Vector2 Position, Scale;
+		//public Vector2 BarPosition, Scale;
 		//[XmlIgnore]
 		//public Texture2D Texture;
 		//Vector2 origin;
@@ -35,7 +35,7 @@ namespace BixBite.Rendering
 		//public Image()
 		//{
 		//	FontName = "Orbitron";
-		//	Position = Vector2.Zero;
+		//	BarPosition = Vector2.Zero;
 		//	Scale = Vector2.One;
 		//	Path = Effect = Text = String.Empty;
 		//	Text = "memes";
@@ -90,7 +90,7 @@ namespace BixBite.Rendering
 		//	}
 		//	dims.X += SpriteFont.MeasureString(Text).X;
 
-		//	if (SourceRect == Rectangle.Empty) { SourceRect = new Rectangle((int)Position.X, (int)Position.Y, (int)dims.X, (int)dims.Y); }
+		//	if (SourceRect == Rectangle.Empty) { SourceRect = new Rectangle((int)BarPosition.X, (int)BarPosition.Y, (int)dims.X, (int)dims.Y); }
 
 		//	//set render target and then render with it
 		//	RenderTarget = new RenderTarget2D(ScreenManager.Instance.GraphicsDevice, (int)dims.X, (int)dims.Y);
@@ -142,13 +142,13 @@ namespace BixBite.Rendering
 		//	origin = new Vector2(SourceRect.Width / 2, SourceRect.Height / 2);
 		//	if (Texture != null)
 		//	{
-		//		spriteBatch.Draw(Texture, Position + origin, SourceRect, Color.White * Alpha, 0.0f, origin, Scale, SpriteEffects.None, 0.0f);
+		//		spriteBatch.Draw(Texture, BarPosition + origin, SourceRect, Color.White * Alpha, 0.0f, origin, Scale, SpriteEffects.None, 0.0f);
 		//	}
 		//	else
 		//	{
 		//		content = new ContentManager(ScreenManager.Instance.Content.ServiceProvider, "Content");
 		//		if (Path != String.Empty) { Texture = content.Load<Texture2D>(Path); }
-		//		spriteBatch.Draw(Texture, Position + origin, SourceRect, Color.White * Alpha, 0.0f, origin, Scale, SpriteEffects.None, 0.0f);
+		//		spriteBatch.Draw(Texture, BarPosition + origin, SourceRect, Color.White * Alpha, 0.0f, origin, Scale, SpriteEffects.None, 0.0f);
 		//		//testing remove this later
 		//		Alpha = 1.0f;
 		//	}
