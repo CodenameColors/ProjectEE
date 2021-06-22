@@ -6,3 +6,6 @@ DialogueEditor
 -1 = Timeblocks sprite image wasn't set.
 -2 = Timeblocks linked textbox wasn't set.
 -3 = New Dialogue Scene hasn't been created yet.
+-4 = New Animation Machine hasn't been created or opened yet!
+-5 = Frame Entered Exceeds Max Frame Count!
+-6 = Frame Entered cannot be negative!

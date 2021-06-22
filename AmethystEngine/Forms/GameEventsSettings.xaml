@@ -89,9 +89,9 @@
 
 							<Label Content="Event Data:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,166,0,0" FontWeight="Bold"/>
 							<TextBox x:Name="EventNewPosX_TB" Width="70" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="193,227,0,0" KeyDown="EventNewPosX_TB_KeyDown" />
-							<Label Content="New Position of Player (x):" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,226,0,0" FontWeight="Thin"/>
+							<Label Content="New BarPosition of Player (x):" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,226,0,0" FontWeight="Thin"/>
 							<TextBox x:Name="EventNewPosY_TB" Width="70" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="193,258,0,0" KeyDown="EventNewPosY_TB_KeyDown" />
-							<Label Content="New Position of Player (y):" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,257,0,0" FontWeight="Thin"/>
+							<Label Content="New BarPosition of Player (y):" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,257,0,0" FontWeight="Thin"/>
 							<TextBox x:Name="EventMoveTime_TB" Width="117" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="146,289,0,0" KeyDown="EventMoveTime_TB_KeyDown" />
 							<Label Content="Movement Time:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,288,0,0" FontWeight="Thin"/>
 							<ComboBox x:Name="FileToLoad_CB" Width="214" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="123,196,0,0" >
@@ -135,9 +135,9 @@
 						<Grid HorizontalAlignment="Left" VerticalAlignment="Top">
 							<Label Content="Event Data:" Grid.Column="1" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,166,0,0" FontWeight="Bold"/>
 							<TextBox x:Name="AddEventNewPosX_TB" Width="70" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="193,227,0,0" />
-							<Label Content="New Position of Player (x):" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,226,0,0" FontWeight="Thin"/>
+							<Label Content="New BarPosition of Player (x):" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,226,0,0" FontWeight="Thin"/>
 							<TextBox x:Name="AddEventNewPosY_TB" Width="70" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="193,258,0,0" />
-							<Label Content="New Position of Player (y):" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,257,0,0" FontWeight="Thin"/>
+							<Label Content="New BarPosition of Player (y):" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,257,0,0" FontWeight="Thin"/>
 							<TextBox x:Name="AddEventMoveTime_TB" Width="117" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="146,289,0,0" />
 							<Label Content="Movement Time:" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="49,288,0,0" FontWeight="Thin"/>
 							<ComboBox x:Name="AddFileToLoad_CB" Width="214" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="123,196,0,0" />

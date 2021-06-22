@@ -14,10 +14,10 @@ namespace BixBite.Rendering.UI
 		private Texture2D borderTexture2D;
 		private int borderwidth = 0;
 
-		private Texture2D barTexture2D;
-		private Color barColor;
+		protected Texture2D barTexture2D;
+		protected Color barColor;
 
-		private int _maxStatNum;
+	
 		private int currentStatNum;
 		public int CurrentStatNum
 		{
@@ -31,14 +31,25 @@ namespace BixBite.Rendering.UI
 		private int xoff;
 		private int yoff;
 
+		private int _maxWidth;
+		private int _width;
+		protected int _sourceWidth;
+		private int _maxHeight;
+		private int _height;
+
 		public GameProgressBar(String UIName, int Width, int Height, int Zindex, int xoff, int yoff, bool LeftToRight, GraphicsDevice graphicsDevice ,String BackgroundPath = "#00000000") :
 			base(UIName, Width, Height, Zindex, BackgroundPath)
 		{
 			this.xrelorigin = xoff;
 			this.yrelorigin = yoff;
 			this.bLeftToRight = LeftToRight;
-			_maxStatNum = Width;
-			currentStatNum = _maxStatNum;
+			_maxWidth = Width;
+			currentStatNum = _maxWidth;
+
+			this._height = Height;
+			this._maxHeight = Height;
+			this._width = Width;
+
 			this.graphicsDevice = graphicsDevice;
 		}
 
@@ -65,37 +76,43 @@ namespace BixBite.Rendering.UI
 			Utilities.CreateFilledRectangle(barTexture2D, borderwidth, color);
 			currentStatNum = barTexture2D.Width;
 			if(!bLeftToRight)
-				xoff += (int)(_maxStatNum - CurrentStatNum);
+				xoff += (int)(_maxWidth - CurrentStatNum);
 			
 		}
 
 		public void IncrementBar(int value)
 		{
 			currentStatNum += value;
-			if (currentStatNum > _maxStatNum){ currentStatNum = _maxStatNum; return;}
-			SetBarTexture(currentStatNum/(double)_maxStatNum, barColor);
+			if (currentStatNum > _maxWidth){ currentStatNum = _maxWidth; return;}
+			SetBarTexture(currentStatNum/(double)_maxWidth, barColor);
 			if (!bLeftToRight)
-				xoff = (int) (_maxStatNum - barTexture2D.Width);
+				xoff = (int) (_maxWidth - barTexture2D.Width);
 
 		}
 		public void decrementBar(int value)
 		{
 			currentStatNum -= value;
 			if (currentStatNum <= 0) {currentStatNum = 1; return;}
-			SetBarTexture(currentStatNum / (double)_maxStatNum, barColor);
+			SetBarTexture(currentStatNum / (double)_maxWidth, barColor);
 			if (!bLeftToRight)
-				xoff = (int) (_maxStatNum - currentStatNum);
+				xoff = (int) (_maxWidth - currentStatNum);
 			
+		}
+
+		public void SetBarWidth(float percent)
+		{
+			this._width = (int) (_maxWidth * percent);
+			this._sourceWidth = (int) (barTexture2D.Width * percent);
 		}
 
 		public void SetBarLength(int value)
 		{
-			if (value <= _maxStatNum)
+			if (value <= _maxWidth)
 			{
 				currentStatNum = value;
-				SetBarTexture(currentStatNum / (double)_maxStatNum, barColor);
+				SetBarTexture(currentStatNum / (double)_maxWidth, barColor);
 				if (!bLeftToRight)
-					xoff = (int) (_maxStatNum - currentStatNum);
+					xoff = (int) (_maxWidth - currentStatNum);
 			}
 		}
 
@@ -110,9 +127,10 @@ namespace BixBite.Rendering.UI
 			if(borderTexture2D != null)
 				spriteBatch.Draw(borderTexture2D, new Vector2(xrelorigin, yrelorigin), Color.White);
 			if (barTexture2D != null)
-				spriteBatch.Draw(barTexture2D, new Rectangle(xrelorigin + xoff, yrelorigin + yoff, barTexture2D.Width, barTexture2D.Height), Color.White);
+				spriteBatch.Draw(barTexture2D, new Rectangle(xrelorigin, yrelorigin , _width, _maxHeight), 
+					new Rectangle(0,0, _sourceWidth, barTexture2D.Height), Color.White);
 
-			//spriteBatch.End();
+			//spriteBatch.End();B
 		}
 	}
 

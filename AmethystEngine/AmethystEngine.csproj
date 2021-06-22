@@ -103,6 +103,9 @@
     <Compile Include="Forms\AddCharacterForm.xaml.cs">
       <DependentUpon>AddCharacterForm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Forms\AddEditAnimationStateMachine.xaml.cs">
+      <DependentUpon>AddEditAnimationStateMachine.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Forms\GameEventsSettings.xaml.cs">
       <DependentUpon>GameEventsSettings.xaml</DependentUpon>
     </Compile>
@@ -117,6 +120,10 @@
     <Compile Include="Resources\ObservableStyleDictionary.cs" />
     <Compile Include="RotateThumb.cs" />
     <Page Include="Forms\AddCharacterForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Forms\AddEditAnimationStateMachine.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

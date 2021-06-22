@@ -20,7 +20,7 @@ namespace BixBite
 		public PGridSync_Hook PGridSync = null;
 
 		/// <summary>
-		/// Item1: TileSetName Item2: TileSet Image Location Item3: TileWidth Item4:TileHeight
+		/// LayerName: TileSetName SpriteSheetName: TileSet Image Location Item3: TileWidth Item4:TileHeight
 		/// </summary>
 		public List<Tuple<String, String, int, int>> TileSet = new List<Tuple<string, string, int, int>>();
 		public List<Tuple<String, String>> sprites = new  List<Tuple<string, string>>();

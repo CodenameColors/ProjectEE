@@ -1,4 +1,5 @@
-﻿using BixBite.Resources;
+﻿
+using BixBite.Resources;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,6 +24,18 @@ namespace BixBite.Rendering.UI
 		protected ObservableCollection<Tuple<string, object>> Properties { get; set; }
 		public ObservableCollection<GameUI> UIElements { get; set; }
 		protected GraphicsDevice graphicsDevice;
+
+		public float ZIndex
+		{
+			get
+			{
+				if (GetProperty("Zindex") != null)
+				{
+					return ((int) GetProperty("Zindex").Item2) / 100f;
+				}
+				return -1.0f;
+			}
+		}
 
 
 		public GameUI(String UIName, int Width, int Height, int Zindex, String BackgroundPath = "#00000000")

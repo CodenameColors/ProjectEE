@@ -142,7 +142,7 @@ namespace BixBite.Rendering
 			{
 				if (Properties.Any(m => m.Item1 == "height"))
 				{
-					return (int) GetPropertyData("EventName");
+					return (int) GetPropertyData("height");
 				}
 
 				throw new NullReferenceException(); //doesn't exist
@@ -160,12 +160,51 @@ namespace BixBite.Rendering
 			}
 		}
 
+		private float _Alpha = 1.0f;
+
+		public float Alpha
+		{
+			get => _Alpha;
+			set
+			{
+				_Alpha = value;
+			}
+		}
+
 		ObservableCollection<Tuple<String, object>> Properties { get; set; }
 
 		public Vector2 Screen_pos;
 
 		public Sprite()
 		{
+			Properties = new ObservableCollection<Tuple<string, object>>();
+			Properties.CollectionChanged += Properties_Changed;
+
+			AddProperty("Name", Name);
+			AddProperty("x", 0);
+			AddProperty("y", 0);
+			AddProperty("width", 0);
+			AddProperty("height", 0);
+
+			this.Name = Name;
+
+		}
+
+
+		public Sprite(String Name, int x, int y, int w, int h)
+		{
+			Properties = new ObservableCollection<Tuple<string, object>>();
+			Properties.CollectionChanged += Properties_Changed;
+
+			
+
+			AddProperty("Name", Name);
+			AddProperty("x", x);
+			AddProperty("y", y);
+			AddProperty("width", w);
+			AddProperty("height", h);
+
+			this.Name = Name;
 
 		}
 
@@ -174,14 +213,17 @@ namespace BixBite.Rendering
 			Properties = new ObservableCollection<Tuple<string, object>>();
 			Properties.CollectionChanged += Properties_Changed;
 
-			this.Name = Name;
-			this.imgpathlocation = imgLoc;
 
 			AddProperty("Name", Name);
 			AddProperty("x", x);
 			AddProperty("y", y);
 			AddProperty("width", w);
 			AddProperty("height", h);
+
+
+			this.Name = Name;
+			this.imgpathlocation = imgLoc;
+
 		}
 
 
@@ -366,12 +408,25 @@ namespace BixBite.Rendering
 
 		public virtual void Draw_Crop(SpriteBatch sb, int posx, int posy, int x, int y, int w, int h)
 		{
-			sb.Draw(text, new Vector2(posx, posy), new Rectangle(x, y, w, h), Color.White, 0.0f, new Vector2(0,0), new Vector2(1,1), SpriteEffects.None, 0   );
+			sb.Draw(text, new Vector2(posx, posy), new Rectangle(x, y, w, h), new Color(255, 255, 255, 255), 0.0f, new Vector2(0,0), new Vector2(1,1), SpriteEffects.None, 0   );
 		}
+
+		public virtual void Draw_Crop(SpriteBatch sb, int posx, int posy, int x, int y, int w, int h, float alpha)
+		{
+			sb.Draw(text, new Vector2(posx, posy), new Rectangle(x, y, w, h), Color.White * alpha, 0.0f, new Vector2(0, 0), new Vector2(1, 1), SpriteEffects.None, 0);
+			this.Alpha = alpha;
+		}
+
 
 		public virtual void Draw_Crop_Scale(SpriteBatch sb, int posx, int posy, int x, int y, int w, int h, double sx, double sy)
 		{
-			sb.Draw(text, new Vector2(posx, posy), new Rectangle(x, y, w, h), Color.White, 0.0f, new Vector2(0, 0), new Vector2((float)sx, (float)sy), SpriteEffects.None, 0);
+			sb.Draw(text, new Vector2(posx, posy), new Rectangle(x, y, w, h), new Color(255,255,255,255) , 0.0f, new Vector2(0, 0), new Vector2((float)sx, (float)sy), SpriteEffects.None, 0);
+		}
+
+		public virtual void Draw_Crop_Scale(SpriteBatch sb, int posx, int posy, int x, int y, int w, int h, double sx, double sy, float alpha)
+		{
+			sb.Draw(text, new Vector2(posx, posy), new Rectangle(x, y, w, h), Color.White * alpha, 0.0f, new Vector2(0, 0), new Vector2((float)sx, (float)sy), SpriteEffects.None, 0);
+			this.Alpha = alpha;
 		}
 
 

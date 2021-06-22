@@ -1,10 +1,12 @@
 ﻿using BixBite.Resources;
 using System;
 using System.Collections.Generic;
+using System.Deployment.Internal;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BixBite.Rendering.UI
@@ -22,8 +24,6 @@ namespace BixBite.Rendering.UI
 		#endregion
 
 		#region Properties
-
-		public Vector2 Position { get; set; }
 
 		public Rectangle Rectangle
 		{
@@ -48,14 +48,42 @@ namespace BixBite.Rendering.UI
 			AddProperty("YOffset", yoff);
 			AddProperty("Image", ImagePath);
 			this.graphicsDevice = graphicsDevice;
+			if(graphicsDevice != null && ImagePath != "")
+				SetUITexture();
+		}
+
+		public Texture2D GetUiTexture2D()
+		{
+			return _texture;
 		}
 
 		public override void SetUITexture()
 		{
-			if(graphicsDevice == null) return;
+
+			if (graphicsDevice == null) return;
+
 			using (var stream = new System.IO.FileStream(TexturePath, System.IO.FileMode.Open))
 			{
 				_texture = (Texture2D.FromStream(graphicsDevice, stream));
+			}
+
+		}
+
+		public void SetUITexture(bool bUsePipeline = false, Texture2D text = null)
+		{
+			
+			if(graphicsDevice == null && text == null) return;
+
+			if (!bUsePipeline)
+			{
+				using (var stream = new System.IO.FileStream(TexturePath, System.IO.FileMode.Open))
+				{
+					_texture = (Texture2D.FromStream(graphicsDevice, stream));
+				}
+			}
+			else
+			{
+				_texture = text;
 			}
 		}
 

@@ -13,7 +13,7 @@ namespace ProjectE_E
         [STAThread]
         static void Main()
         {
-            using (var game = new Emeralds_Elements())
+            using (var game = new EngineTester())
                 game.Run();
         }
     }

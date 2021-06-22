@@ -3,38 +3,50 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BixBite.Combat;
+using BixBite.Combat.Equipables;
 using Microsoft.Xna.Framework;
 
 namespace BixBite.Characters
 {
-	public class Enemy : BaseCharacter
+	public class Enemy : enemy
 	{
-		public Vector2 SpawnPosition = new Vector2();
 
-		public bool bIsDead { get; set; }
-		public int MaxHealth { get; set; }
-
-		private int _currentHealth;
-		public int CurrentHealth
+		//Clothes
+		public Clothes HeadClothes
 		{
-			get => _currentHealth;
-			set
-			{
-				if (value < 0)
-				{
-					_currentHealth = 0;
-					return;
-				}
-				if (value > MaxHealth)
-				{
-					_currentHealth = MaxHealth;
-					return;
-				}
-				_currentHealth = value;
-				//if (CombatStatsIndicator.UIElements[1] is GameProgressBar gpb)
-				//	gpb.SetBarLength(_currentHealth);
-			}
+			get => (Clothes)Equipement[0];
+			set => Equipement[0] = value;
+		}
+		public Clothes BodyClothes
+		{
+			get => (Clothes)Equipement[1];
+			set => Equipement[1] = value;
+		}
+		public Clothes LegsClothes
+		{
+			get => (Clothes)Equipement[2];
+			set => Equipement[2] = value;
 		}
 
+
 	}
+
+
+	public class enemy : BattleEntity
+	{
+		#region Database Linking
+
+		public String Name { get; set; }
+
+		public int Size_Type { get; set; }
+		public int EXP { get; set; }
+		public int Rarity { get; set; }
+
+		public List<Items.Item> Drops = new List<Items.Item>();
+
+
+		#endregion
+	}
+
 }

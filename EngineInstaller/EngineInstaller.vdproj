@@ -21,6 +21,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_0BB8FD5B10B24548987EF76A33E33951"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_119B7E94D635692BB4F4F46E0943AB30"
         "OwnerKey" = "8:_C254142091404E4E8ABE3CCAE57E7024"
         "MsmSig" = "8:_UNDEFINED"
@@ -39,26 +45,80 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_3F206B8ED163CD27BE232FC9980A0368"
+        "OwnerKey" = "8:_C254142091404E4E8ABE3CCAE57E7024"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3F206B8ED163CD27BE232FC9980A0368"
+        "OwnerKey" = "8:_35F86103E3DF58CE73E799A9A0C7FAC3"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3FFC23AEC008E7CE1E4868EF5868A8F7"
         "OwnerKey" = "8:_26BE5BA52E81583DCCE697DC12693B7F"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_4EB191BDE6860CE49377AB56FACE2D72"
-        "OwnerKey" = "8:_35F86103E3DF58CE73E799A9A0C7FAC3"
+        "MsmKey" = "8:_554F5DBF7E5EA4785290AE9744420213"
+        "OwnerKey" = "8:_67716D87EB22B5C41F2611F3E833C263"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_4EB191BDE6860CE49377AB56FACE2D72"
+        "MsmKey" = "8:_554F5DBF7E5EA4785290AE9744420213"
+        "OwnerKey" = "8:_033BCDEFDD6F488787BCB568A9DD9E85"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_554F5DBF7E5EA4785290AE9744420213"
         "OwnerKey" = "8:_C254142091404E4E8ABE3CCAE57E7024"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_67716D87EB22B5C41F2611F3E833C263"
+        "OwnerKey" = "8:_C6D72B1EF461D2BAC92126862EC1056B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_67716D87EB22B5C41F2611F3E833C263"
         "OwnerKey" = "8:_C254142091404E4E8ABE3CCAE57E7024"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_69AA6EA033A34C1085A8FF08DA1A4365"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6EC11853CA2D8CBF8AFCC1B5A442D7BC"
+        "OwnerKey" = "8:_C254142091404E4E8ABE3CCAE57E7024"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6EC11853CA2D8CBF8AFCC1B5A442D7BC"
+        "OwnerKey" = "8:_35F86103E3DF58CE73E799A9A0C7FAC3"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_707C8D3FD9890FA7BACA7EF3FD895396"
+        "OwnerKey" = "8:_C254142091404E4E8ABE3CCAE57E7024"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_BB196EA192074826BC0AE5E666A7E47D"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -75,26 +135,20 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_C6EBD8403FCD40D4B84902BBB261C129"
-        "OwnerKey" = "8:_UNDEFINED"
+        "MsmKey" = "8:_C6D72B1EF461D2BAC92126862EC1056B"
+        "OwnerKey" = "8:_C254142091404E4E8ABE3CCAE57E7024"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_26BE5BA52E81583DCCE697DC12693B7F"
+        "MsmKey" = "8:_CF32D426B42E6F4123565BBB37071798"
+        "OwnerKey" = "8:_C254142091404E4E8ABE3CCAE57E7024"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_033BCDEFDD6F488787BCB568A9DD9E85"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_3FFC23AEC008E7CE1E4868EF5868A8F7"
+        "MsmKey" = "8:_CF32D426B42E6F4123565BBB37071798"
+        "OwnerKey" = "8:_35F86103E3DF58CE73E799A9A0C7FAC3"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -106,13 +160,37 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_033BCDEFDD6F488787BCB568A9DD9E85"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_35F86103E3DF58CE73E799A9A0C7FAC3"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_4EB191BDE6860CE49377AB56FACE2D72"
+        "OwnerKey" = "8:_3F206B8ED163CD27BE232FC9980A0368"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_707C8D3FD9890FA7BACA7EF3FD895396"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_CF32D426B42E6F4123565BBB37071798"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_C6D72B1EF461D2BAC92126862EC1056B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -124,7 +202,31 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_554F5DBF7E5EA4785290AE9744420213"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_119B7E94D635692BB4F4F46E0943AB30"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_26BE5BA52E81583DCCE697DC12693B7F"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_3FFC23AEC008E7CE1E4868EF5868A8F7"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_6EC11853CA2D8CBF8AFCC1B5A442D7BC"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -145,6 +247,22 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.6.1"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.6.1 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.6.1"
+                    }
+                }
+            }
         }
         "Release"
         {
@@ -161,6 +279,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
     }
     "Deployable"
@@ -194,7 +320,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:PropertyGridEditor, Version=1.1.0.3, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:PropertyGridEditor, Version=1.1.1.8, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_033BCDEFDD6F488787BCB568A9DD9E85"
@@ -207,6 +333,26 @@
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_DA16845609534746A5E52C471503591F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0BB8FD5B10B24548987EF76A33E33951"
+            {
+            "SourcePath" = "8:..\\AmethystEngine\\Resources\\rpj.txt"
+            "TargetName" = "8:rpj.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_8579D16074134348BA80E9EFE7673A36"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -287,7 +433,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:BixBite, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:BixBite, Version=1.0.1.9, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_35F86103E3DF58CE73E799A9A0C7FAC3"
@@ -297,6 +443,37 @@
                     }
                 }
             "SourcePath" = "8:BixBite.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_DA16845609534746A5E52C471503591F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_3F206B8ED163CD27BE232FC9980A0368"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:TimelinePlayer, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_3F206B8ED163CD27BE232FC9980A0368"
+                    {
+                    "Name" = "8:TimelinePlayer.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:TimelinePlayer.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_DA16845609534746A5E52C471503591F"
@@ -345,14 +522,96 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4EB191BDE6860CE49377AB56FACE2D72"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_554F5DBF7E5EA4785290AE9744420213"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:CustomColorPicker, Version=1.0.7142.36104, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_554F5DBF7E5EA4785290AE9744420213"
+                    {
+                    "Name" = "8:CustomColorPicker.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:CustomColorPicker.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_DA16845609534746A5E52C471503591F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_67716D87EB22B5C41F2611F3E833C263"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:PropertyGridEditor, Version=1.1.1.8, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_67716D87EB22B5C41F2611F3E833C263"
+                    {
+                    "Name" = "8:PropertyGridEditor.DLL"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:PropertyGridEditor.DLL"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_DA16845609534746A5E52C471503591F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_69AA6EA033A34C1085A8FF08DA1A4365"
+            {
+            "SourcePath" = "8:..\\AmethystEngine\\favicon.ico"
+            "TargetName" = "8:favicon.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_DA16845609534746A5E52C471503591F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_6EC11853CA2D8CBF8AFCC1B5A442D7BC"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:MonoGame.Framework, Version=3.7.1.189, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_4EB191BDE6860CE49377AB56FACE2D72"
+                    "_6EC11853CA2D8CBF8AFCC1B5A442D7BC"
                     {
                     "Name" = "8:MonoGame.Framework.dll"
                     "Attributes" = "3:512"
@@ -376,20 +635,20 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_67716D87EB22B5C41F2611F3E833C263"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_707C8D3FD9890FA7BACA7EF3FD895396"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:PropertyGridEditor, Version=1.1.0.3, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:OutputLog, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_67716D87EB22B5C41F2611F3E833C263"
+                    "_707C8D3FD9890FA7BACA7EF3FD895396"
                     {
-                    "Name" = "8:PropertyGridEditor.dll"
+                    "Name" = "8:OutputLog.dll"
                     "Attributes" = "3:512"
                     }
                 }
-            "SourcePath" = "8:PropertyGridEditor.dll"
+            "SourcePath" = "8:OutputLog.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_DA16845609534746A5E52C471503591F"
@@ -405,6 +664,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BB196EA192074826BC0AE5E666A7E47D"
+            {
+            "SourcePath" = "8:..\\AmethystEngine\\favicon.ico"
+            "TargetName" = "8:favicon.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_ED938A406CCC4F28877EA001B05373B8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C08936EC52FE4FA69DFFF7FEE85D0C87"
@@ -427,10 +706,21 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C6EBD8403FCD40D4B84902BBB261C129"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_C6D72B1EF461D2BAC92126862EC1056B"
             {
-            "SourcePath" = "8:..\\AmethystEngine\\bin\\Debug\\rpj.txt"
-            "TargetName" = "8:rpj.txt"
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:CollapsedPropertyGrid, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_C6D72B1EF461D2BAC92126862EC1056B"
+                    {
+                    "Name" = "8:CollapsedPropertyGrid.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:CollapsedPropertyGrid.dll"
+            "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_DA16845609534746A5E52C471503591F"
             "Condition" = "8:"
@@ -444,7 +734,38 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_CF32D426B42E6F4123565BBB37071798"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:NodeEditor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_CF32D426B42E6F4123565BBB37071798"
+                    {
+                    "Name" = "8:NodeEditor.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:NodeEditor.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_DA16845609534746A5E52C471503591F"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
         }
@@ -453,6 +774,28 @@
         }
         "Folder"
         {
+            "{1525181F-901A-416C-8A58-119130FE478E}:_7912CE25F08F45C18B04235778A8983E"
+            {
+            "Name" = "8:#1915"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:AppDataFolder"
+                "Folders"
+                {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_8579D16074134348BA80E9EFE7673A36"
+                    {
+                    "Name" = "8:AmethystEngine"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_7D9C6BBEA7A64DFABCB0B1967F9169F9"
+                        "Folders"
+                        {
+                        }
+                    }
+                }
+            }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_DA16845609534746A5E52C471503591F"
             {
             "DefaultLocation" = "8:[ProgramFilesFolder][Manufacturer]\\[ProductName]"
@@ -461,6 +804,17 @@
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Property" = "8:TARGETDIR"
+                "Folders"
+                {
+                }
+            }
+            "{1525181F-901A-416C-8A58-119130FE478E}:_ED938A406CCC4F28877EA001B05373B8"
+            {
+            "Name" = "8:#1921"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:StartMenuFolder"
                 "Folders"
                 {
                 }
@@ -502,22 +856,22 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:EngineInstaller"
-        "ProductCode" = "8:{E2D256D5-DF6F-40F8-87E1-4D7CDB88399C}"
-        "PackageCode" = "8:{C4761F7D-8076-4529-9990-551FB1371990}"
+        "ProductName" = "8:Amethyst Engine"
+        "ProductCode" = "8:{CB2BB856-83D2-4192-AE1F-E7E427998A70}"
+        "PackageCode" = "8:{14ED860E-2931-4472-A171-18B415E36F9A}"
         "UpgradeCode" = "8:{72BCCB8F-A2F8-4318-9823-F99C6912DB1D}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.0"
-        "Manufacturer" = "8:Default Company Name"
+        "ProductVersion" = "8:1.0.1"
+        "Manufacturer" = "8:ShyCatStudios"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:EngineInstaller"
+        "Title" = "8:Amethyst Engine"
         "Subject" = "8:"
-        "ARPCONTACT" = "8:Default Company Name"
+        "ARPCONTACT" = "8:CodenameColors"
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:"
         "ARPURLINFOABOUT" = "8:"
@@ -624,6 +978,20 @@
         }
         "Shortcut"
         {
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_CDDB3A438FF44DF4A9B5ABA6BBFC92BB"
+            {
+            "Name" = "8:Amethyst Engine"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_C254142091404E4E8ABE3CCAE57E7024"
+            "Folder" = "8:_ED938A406CCC4F28877EA001B05373B8"
+            "WorkingFolder" = "8:_DA16845609534746A5E52C471503591F"
+            "Icon" = "8:_BB196EA192074826BC0AE5E666A7E47D"
+            "Feature" = "8:"
+            }
         }
         "UserInterface"
         {
