@@ -77,10 +77,12 @@ namespace BixBite.Rendering.Animation
 			}
 		}
 
-		public void AddSubLayer(String layerName)
+		public bool AddSubLayer(String layerName)
 		{
+			if(subLayerSpritesheets_Dict.ContainsKey(layerName)) return false;
 			subLayerSpritesheets_Dict.Add(layerName, new List<SpriteSheet>());
 			ActiveSubLayerSheet.Add(layerName, null);
+			return true;
 		}
 
 		/// <summary>
