@@ -7391,9 +7391,116 @@ namespace AmethystEngine.Forms
 		}
 
 
+		private void OpenLayeredSpriteSheetFile_MI_Click( object sender, RoutedEventArgs e)
+		{
+			SceneExplorer_TreeView.ItemsSource = null;
+			Animation_CE_Tree.ItemsSource = null;
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+			{
+				Title = "Open Layered Animation State machine File",
+				FileName = "", //default file name
+				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Animations"),
+				Filter = "Layered Animation State Machine files (*.lanim)|*.lanim",
+				RestoreDirectory = true
+			};
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+
+			Console.WriteLine(dlg.FileName);
+			LayeredSpriteSheet ret =  LayeredSpriteSheet.ImportlayeredAnimationSheet(dlg.FileName);
+
+			//Now that we have a layed sheet imported let's add all that data to the screen
+			currentLayeredSpriteSheet = ret;
+
+			Console.WriteLine(AnimationSubLayer_CB.Items.Count);
+			for(int i = AnimationSubLayer_CB.Items.Count-1; i >= 2; i--)
+			{
+				AnimationSubLayer_CB.Items.RemoveAt(i)
+;			}
+			AnimationLayersPreview_Canvas_IC.Children.Clear();
+			for (int i = 0; i < ret.subLayerSpritesheets_Dict.Keys.Count; i++)
+			{
+				AnimationSubLayer_CB.Items.Add(ret.subLayerSpritesheets_Dict.Keys.ToList()[i]);
+				//we have added the layer Data wise, but not display wise don't forget
+				Image img = new Image() { Tag = "1" };
+				Grid.SetZIndex(img, currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Count);
+				AnimationLayersPreview_Canvas_IC.Children.Add(img);
+				AnimationSubLayerImages_List.Add(new List<CroppedBitmap>());
+
+				if (i == 0) AnimationSubLayer_CB.SelectedIndex = 2;
+			}
+
+			if (AnimationSubLayer_CB.SelectedIndex == 2) {
+				CurrentSubLayerSpriteSheets_LB.ItemsSource = ret.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Items[2].ToString()];
+
+
+			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.Count > 0)
+				{
+					CurrentSubLayerAnimStates_LB.ItemsSource =
+						currentLayeredSpriteSheet.subLayerSpritesheets_Dict[currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[0]]
+						.ToList();
+				}
+			}
+
+			//at this point we need to make sure the user can access the actual animations and change them
+			//at will
+			CurrentActiveSpriteSheet = ret.BaseLayer;
+			ActiveSpriteSheets.Add(CurrentActiveSpriteSheet);
+			SceneExplorer_TreeView.ItemsSource = ActiveSpriteSheets;
+			Animation_CE_Tree.ItemsSource = CurrentActiveSpriteSheet.SpriteAnimations.Values;
+
+			Animation_CE_Tree.UpdateLayout();
+			SceneExplorer_TreeView.UpdateLayout();
+
+			//Set up the PNG This will allow it to NOT be locked
+			BitmapImage bmi = new BitmapImage();
+			bmi.BeginInit();
+			bmi.CacheOption = BitmapCacheOption.OnLoad;
+			bmi.UriSource = new Uri(CurrentActiveSpriteSheet.ImgPathLocation, UriKind.Absolute);
+			bmi.EndInit();
+			CurrentSpriteSheet_Image = bmi;
+
+			//Set up the first frame thumbnails for animation states
+			int count = 0;
+			foreach (var spriteanim in CurrentActiveSpriteSheet.SpriteAnimations.Values)
+			{
+				if (count == 1)
+				{
+					//CurrentBaseLayerAnimation_Img.Source = crop;
+
+					CurrentActiveAnimationName_TB.Text = spriteanim.Name;
+					CurrentActiveAnimationFPS_TB.Text = spriteanim.FPS.ToString();
+					CurrentActiveAnimationCurrentFrame_TB.Text = "1";
+					CurrentBaseLayerAnimation_Img.Tag = 1;
+					CurrentlySelectedAnimation = spriteanim;
+
+				}
+			}
+
+			AE_NewAnimSM_MainGrid.Visibility = Visibility.Hidden;
+			AE_CurrentAnimSM_Grid.Visibility = Visibility.Visible;
+
+			if (!AnimationSelected_Stopwatch.IsRunning)
+				AnimationSelected_Stopwatch.Start();
+
+
+			
+		}
+
 
 		private void OpenSpriteSheetFile_MI_Click(object sender, RoutedEventArgs e)
 		{
+
+			CurrentSubLayerSpriteSheets_LB.ItemsSource = null;
 			SceneExplorer_TreeView.ItemsSource = null;
 			Animation_CE_Tree.ItemsSource = null;
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
@@ -7892,7 +7999,7 @@ namespace AmethystEngine.Forms
 				AnimationAddSubLayer_Grid.Visibility = Visibility.Visible;
 				AnimationLayersSettings_Grid.Visibility = Visibility.Hidden;
 			}
-			else if (cb.SelectedIndex > 1)
+			else if (cb.SelectedIndex > 1&& cb.Items[cb.SelectedIndex]as ComboBoxItem != null)
 			{
 				//this is an actual sub layer, So we need to load all the possible Spritesheets to the screen
 				CurrentSubLayerSpriteSheets_LB.ItemsSource =

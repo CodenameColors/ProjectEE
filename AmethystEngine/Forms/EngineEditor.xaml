@@ -124,6 +124,7 @@
 						<MenuItem Header="Sprite Sheet" Foreground="White">
 							<MenuItem x:Name="NewSpriteSheetMachine_MenuItem" Header="New Sprite Sheet Machine" Foreground="Black" Click="NewSpriteSheetMachine_MenuItem_OnClick"/>
 							<MenuItem Header="Open Sprite sheet Machine file" Foreground="Black" Click="OpenSpriteSheetFile_MI_Click"/>
+							<MenuItem Header="Open Layered Sprite sheet file" Foreground="Black" Click="OpenLayeredSpriteSheetFile_MI_Click"/>
 							<MenuItem x:Name="SaveSpriteSheet_MI" Header="Save Sprite sheet Machine file" Foreground="Black"/>
 							<MenuItem x:Name="SaveSpriteSheetAs_MI" Header="Save Sprite sheet Machine file As" Foreground="Black" Click="SaveSpriteSheetFileAs_MI_Click" />
 						</MenuItem>
@@ -1580,7 +1581,7 @@
 								</ListBox.ItemTemplate>
 							</ListBox>
 
-							<TextBlock Grid.Row="8" Grid.Column="0" Text="Animation States for this Sub layer:" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0"/>
+							<TextBlock Grid.Row="8" Grid.Column="0" Text="Animation Events for this Sub layer:" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,0,0,0"/>
 							<ListBox x:Name="CurrentSubLayerStateChanges_LB" Grid.Row="9" Foreground="White" Margin="5"
 							         BorderThickness="2" BorderBrush="#FF868686" Background="Transparent">
 							</ListBox>
