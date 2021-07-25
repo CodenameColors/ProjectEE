@@ -7737,8 +7737,8 @@ namespace AmethystEngine.Forms
 			AnimationChangeEvents_Properties_Tree.ItemsSource = null;
 			AnimationAudioEvents_Properties_Tree.ItemsSource = null;
 
-			AnimationChangeEvents_Properties_Tree.ItemsSource = CurrentlySelectedAnimation.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent); ;
-			AnimationAudioEvents_Properties_Tree.ItemsSource = CurrentlySelectedAnimation.GetAnimationEvents().FindAll(x => x is AudioEvent); ;
+			AnimationChangeEvents_Properties_Tree.ItemsSource = CurrentlySelectedAnimation.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent); 
+			AnimationAudioEvents_Properties_Tree.ItemsSource = CurrentlySelectedAnimation.GetAnimationEvents().FindAll(x => x is AudioEvent); 
 
 		}
 
@@ -8144,7 +8144,7 @@ namespace AmethystEngine.Forms
 						currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Text][CurrentSubLayerSpriteSheets_LB.SelectedIndex].SheetName;
 
 					SpriteSheet spriteSheet = currentLayeredSpriteSheet.ActiveSubLayerSheet[AnimationSubLayer_CB.Text];
-					if(spriteSheet == null || (sender as ListBox).SelectedIndex == -1) return;
+					if (spriteSheet == null || (sender as ListBox).SelectedIndex == -1) return;
 					spriteSheet.ChangeAnimation(((sender as ListBox).SelectedItem as SpriteAnimation).Name);
 
 					SpriteAnimation item = spriteSheet.CurrentAnimation;
@@ -8175,15 +8175,14 @@ namespace AmethystEngine.Forms
 								width2, item.FrameHeight))));
 					}
 					AnimationSubLayerImages_List[AnimationSubLayer_CB.SelectedIndex - 2] = templist;
+
+					//Now we need to set the animation events to the screen
+					CurrentSubLayerStateChanges_TV.ItemsSource =
+						currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()]
+						.ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].SpriteAnimations_List[CurrentSubLayerAnimStates_LB.SelectedIndex]
+						.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent);
 				}
 			}
-
-			//Now we need to set the animation events to the screen
-			CurrentSubLayerStateChanges_TV.ItemsSource =
-				currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()]
-				.ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].SpriteAnimations_List[CurrentSubLayerAnimStates_LB.SelectedIndex]
-				.GetAnimationEvents();
-
 		}
 
 
@@ -8193,7 +8192,7 @@ namespace AmethystEngine.Forms
 			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].
 	ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex] == null) return;
 			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].
-				ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].CurrentAnimation != null) return;
+				ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].CurrentAnimation == null) return;
 
 
 			SpriteAnimation spriteAnimation = currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].
