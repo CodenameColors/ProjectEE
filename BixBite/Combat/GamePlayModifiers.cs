@@ -193,7 +193,7 @@ namespace BixBite.Combat
 	#endregion
 
 	//Some of these are ints because of bit wise enumeration
-	public class ModifierData
+	public class ModifierData	
 	{
 		public String Id { get; set; }
 		public int? Chance_Modifiers { get; set; }
@@ -231,9 +231,9 @@ namespace BixBite.Combat
 
 	}
 
-	public class GamePlayTrait
+	public class GamePlayTrait :GameplayModifier
 	{
-		public ModifierData TraitData { get; set; }
+		public override ModifierData ModifierData { get; set; }
 
 		public GamePlayTrait()
 		{
@@ -243,11 +243,14 @@ namespace BixBite.Combat
 		
 	}
 
-	public class GamePlayEffect
+	public class GamePlayEffect : GameplayModifier
 	{
-		public ModifierData EffectData { get; set; }
+		public override ModifierData ModifierData { get; set; }
 	}
 
-
+	public class GameplayModifier
+	{
+		public virtual ModifierData ModifierData { get; set; }
+	}
 	
 }
