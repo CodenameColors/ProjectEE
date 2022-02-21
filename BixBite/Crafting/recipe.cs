@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BixBite.Combat;
 
 namespace BixBite.Crafting
 {
@@ -27,15 +28,26 @@ namespace BixBite.Crafting
 		#region property
 
 		public String Name { get; set; }
-		public int CreationType { get; set; }
-		public String ImagePath { get; set; }
-		public int RequiredLevel { get; set; }
-		public int QualityThreshold { get; set; }
-		public float TimeToMake { get; set; }
+		public String ImagePath = "";
 
-		public int BaseStats_FK { get; set; }
+		public int Creation_Type { get; set; }
+		public int Required_Quality { get; set; }
+		public int Required_Level { get; set; }
+		public float Hours_To_Make { get; set; }
 
-		public CraftingHelpers.MagicTypeValues MaxPoints = new CraftingHelpers.MagicTypeValues();
+		public int Use_Count { get; set; }
+		public int Rating { get; set; }
+		public int Quality { get; set; }
+		public int Size { get; set; }
+
+		public int Max_Elemental_FK { get; set; }
+		public int Weakness_Strength_FK { get; set; }
+		public int Stats_FK { get; set; }
+
+		public BaseStats stats = new BaseStats();
+		public weaknesses_strengths WeaknessesStrengths = new weaknesses_strengths();
+
+		public CraftingHelpers.Max_Elemental_Points MaxPoints = new CraftingHelpers.Max_Elemental_Points();
 		public CraftingHelpers.PossibleCraftingRewards PossibleRewards = new CraftingHelpers.PossibleCraftingRewards();
 		//this is the rewards that are possible when you are creating this recipe
 		public List<CraftingHelpers.RecipeIngredient> RequiredIngredients = new List<CraftingHelpers.RecipeIngredient>();
@@ -49,5 +61,37 @@ namespace BixBite.Crafting
 
 	public class Recipes : Recipe
 	{ }
+
+	public class Recipe_Rewards
+	{
+
+		//public int ID { get; set; }
+
+		public String Req_Recipe { get; set; }
+		public String Modifier_ID { get; set; }
+
+		public int Magic_Type { get; set; }
+		public int Point_Threshold { get; set; }
+	}
+
+	public class RecipeReward : Recipe_Rewards
+	{
+
+	}
+
+	public class Recipe_Ingredients
+	{
+		public String Req_Recipe { get; set; }
+		public String Type { get; set; }
+		public String Value { get; set; }
+
+	}
+
+	public class Recipe_Ingredient : Recipe_Ingredients
+	{
+
+	}
+
+
 
 }

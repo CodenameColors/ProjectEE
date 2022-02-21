@@ -13,8 +13,10 @@ namespace BixBite.Crafting
 		/// <summary>
 		/// Keeps track of the number of cells PER Magic Type that this puzzle piece contains
 		/// </summary>
-		public class MagicTypeValues
+		public class Max_Elemental_Points
 		{
+			public int ID { get; set; }
+
 			public int Fire { get; set; }
 			public int Ice { get; set; }
 			public int Earth { get; set; }
@@ -99,6 +101,7 @@ namespace BixBite.Crafting
 
 		public class RecipeIngredient : Tuple<object, int>
 		{
+
 			public RecipeIngredient(object requiredIngredient, int numberOf)
 					: base(requiredIngredient, numberOf)
 			{
@@ -127,7 +130,7 @@ namespace BixBite.Crafting
 				List<Reward_Requirement> retList = new List<Reward_Requirement>();
 				retList = base.FindAll(x => desiredMagicType == x.EMagicType);
 				if (retList.Count == 0)
-					return null;
+					return new List<Reward_Requirement>(0);
 				else
 					return retList;
 			}
@@ -143,8 +146,8 @@ namespace BixBite.Crafting
 			}
 
 			public EMagicType EMagicType { get { return this.Item1; } }
-			public int RequiredPoints { get { return this.Item2; } }
-			public GameplayModifier GameModifier { get { return this.Item3; } }
+			public int PointThreshold { get { return this.Item2; } }
+			public GameplayModifier ModifierID { get { return this.Item3; } }
 
 		}
 
