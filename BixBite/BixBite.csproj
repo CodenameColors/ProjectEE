@@ -105,9 +105,9 @@
     <Compile Include="Rendering\UI\GameListBoxCustom.cs" />
     <Compile Include="Rendering\UI\GameListBoxItem.cs" />
     <Compile Include="Rendering\UI\GameProgressBar.cs" />
+    <Compile Include="Rendering\UI\GameSmartTextBox.cs" />
     <Compile Include="Rendering\UI\GameTextBlock.cs" />
     <Compile Include="Rendering\UI\GameUI.cs" />
-    <Compile Include="Rendering\UI\GameSmartTextBox.cs" />
     <Compile Include="Rendering\UI\Image\BaseImage.cs" />
     <Compile Include="Rendering\UI\Image\EngineImage.cs" />
     <Compile Include="Rendering\UI\Image\GameImage.cs" />

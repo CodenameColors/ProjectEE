@@ -7,13 +7,11 @@ using System.Threading.Tasks;
 
 namespace BixBite.Crafting
 {
+
 	public class CraftingHelpers
 	{
 
-		/// <summary>
-		/// Keeps track of the number of cells PER Magic Type that this puzzle piece contains
-		/// </summary>
-		public class Max_Elemental_Points
+		public class ElementalPoints
 		{
 			public int ID { get; set; }
 
@@ -94,22 +92,33 @@ namespace BixBite.Crafting
 			public String ToString()
 			{
 				return String.Format("internal Cell Count Structure values \n Fire: {0}\nIce: {1}\nEarth: {2}\nWater: {3}\nLightning: {4}" +
-					"\nExplosive: {5}\nShadow: {6} Luminous: {7}", Fire, Ice, Earth, Water, Lightning, Explosive, Shadow, Luminous);
+				                     "\nExplosive: {5}\nShadow: {6} Luminous: {7}", Fire, Ice, Earth, Water, Lightning, Explosive, Shadow, Luminous);
 			}
+
 
 		}
 
-		public class RecipeIngredient : Tuple<object, int>
+		/// <summary>
+		/// This is here mainly for the database binding stuff
+		/// </summary>
+		public class Max_Elemental_Points : ElementalPoints
 		{
 
-			public RecipeIngredient(object requiredIngredient, int numberOf)
-					: base(requiredIngredient, numberOf)
+			
+		}
+
+		public class RecipeIngredient : Tuple<object, int, String>
+		{
+
+			public RecipeIngredient(object requiredIngredient, int numberOf, String type)
+					: base(requiredIngredient, numberOf, type)
 			{
 
 			}
 
 			public object Ingredient { get { return this.Item1; } }
 			public int NumberOfIngredient { get { return this.Item2; } }
+			public String IngredientType { get { return this.Item3; } }
 
 		}
 

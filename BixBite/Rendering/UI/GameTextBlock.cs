@@ -8,8 +8,6 @@ namespace BixBite.Rendering.UI
 {
 	public class GameTextBlock : GameUI, IProperties
 	{
-
-
 		#region Fields
 
 		public SpriteFont _font;
@@ -20,6 +18,7 @@ namespace BixBite.Rendering.UI
 		}
 
 		private Texture2D _texture { get; set; }
+		private float _scale => float.Parse(GetPropertyData("FontSize").ToString()) / 12.0f;
 
 		#endregion
 
@@ -50,6 +49,13 @@ namespace BixBite.Rendering.UI
 			set => SetProperty("ContentText", value);
 		}
 
+		public float Rotation
+		{
+			get => float.Parse( GetPropertyData("Rotation").ToString());
+			set => SetProperty("Rotation", value);
+		}
+
+
 		public GraphicsDevice graphicsDevice;
 		#endregion
 
@@ -70,6 +76,8 @@ namespace BixBite.Rendering.UI
 			AddProperty("TextSpeed", 1.0);
 			AddProperty("TextTime", 1.0);//number of seconds to "type" the text to the screen
 			AddProperty("Image", "");
+			AddProperty("Rotation", 0.0f);
+
 
 		}
 
@@ -115,7 +123,11 @@ namespace BixBite.Rendering.UI
 				else
 					y = Rectangle.Y;
 
-				spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour);
+				if (_scale == 1.0f && Rotation == 0.0f)
+					spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour);
+				else
+					spriteBatch.DrawString(_font, Text, new Vector2(x, y), PenColour, Rotation, Vector2.Zero, 
+						new Vector2(_scale, _scale ), SpriteEffects.None,0);
 				
 			}
 

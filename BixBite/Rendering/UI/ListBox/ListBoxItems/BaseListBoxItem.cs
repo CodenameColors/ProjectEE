@@ -48,7 +48,7 @@ namespace BixBite.Rendering.UI.ListBox.ListBoxItems
 			this.ParentListBox = parentListBox;
 
 			AddProperty("bBorder", border);
-			AddProperty("bIsSelected", bCanSelect);
+			AddProperty("bCanSelect", bCanSelect);
 			AddProperty("bIsSelected", false);
 
 		}

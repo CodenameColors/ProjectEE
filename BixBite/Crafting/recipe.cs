@@ -15,6 +15,8 @@ namespace BixBite.Crafting
 		METALIC = 2,
 		CRYSTAL = 4,
 		PLASTICS = 8,
+		Burnable = 16,
+		Liquid = 32,
 
 	}
 
