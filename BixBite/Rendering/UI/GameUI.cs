@@ -190,7 +190,7 @@ namespace BixBite.Rendering.UI
 
 		#endregion
 
-		public ObservableCollection<GameUI> GetUIelements()
+		public ObservableCollection<GameUI> GetUIelemCollectionents()
 		{
 			return UIElements;
 		}

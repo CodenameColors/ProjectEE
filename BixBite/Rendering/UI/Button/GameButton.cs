@@ -51,6 +51,14 @@ namespace BixBite.Rendering.UI.Button
 			}
 		}
 
+
+		public float Rotation
+		{
+			get => float.Parse(GetPropertyData("Rotation").ToString());
+			set => SetProperty("Rotation", value);
+		}
+
+
 		/// <summary>
 		/// Where this Button is drawn on the screen.  XPos, YPos, Width, Height
 		/// </summary>
@@ -73,6 +81,9 @@ namespace BixBite.Rendering.UI.Button
 			Texture2D texture, SpriteFont font, Color color )
 			: base(UIName, xPos, yPos, width, height, zindex, bBorder, xOff, yOff, buttonText, backColor, backImage)
 		{
+			AddProperty("Rotation", 0.0f);
+
+
 			_texture = texture;
 			_font = font;
 			TextColor = color;
@@ -93,25 +104,6 @@ namespace BixBite.Rendering.UI.Button
 		{
 			paramList.Insert(0, this);
 			this._paramList = paramList;
-		}
-
-		public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
-		{
-			if (!bIsActive) return;
-			var colour = Color.White;
-
-			if (_isHovering)
-				colour = Color.Gray;
-
-			spriteBatch.Draw(_texture, DrawRectangle, colour);
-
-			if (!string.IsNullOrEmpty(ButtonText))
-			{
-				var x = (XPos + (Width / 2)) - (_font.MeasureString(ButtonText).X / 2);
-				var y = (YPos + (Height / 2)) - (_font.MeasureString(ButtonText).Y / 2);
-
-				spriteBatch.DrawString(_font, ButtonText, new Vector2(x, y), TextColor);
-			}
 		}
 
 		public void Update(GameTime gameTime)
@@ -139,6 +131,35 @@ namespace BixBite.Rendering.UI.Button
 				}
 			}
 		}
+
+		public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+		{
+			if (!bIsActive) return;
+			var colour = Color.White;
+
+			if (_isHovering)
+				colour = Color.Gray;
+
+			if (Rotation == 0.0f)
+				spriteBatch.Draw(_texture, DrawRectangle, colour);
+			else
+				spriteBatch.Draw(_texture, Position, DrawRectangle, colour, Rotation,
+					Vector2.Zero, Vector2.One , SpriteEffects.None, 1);
+			
+
+			if (!string.IsNullOrEmpty(ButtonText))
+			{
+				var x = (XPos + (Width / 2)) - (_font.MeasureString(ButtonText).X / 2);
+				var y = (YPos + (Height / 2)) - (_font.MeasureString(ButtonText).Y / 2);
+
+				if(Rotation == 0.0f)
+					spriteBatch.DrawString(_font, ButtonText, new Vector2(x, y), TextColor);
+				else
+					spriteBatch.DrawString(_font, ButtonText, new Vector2(x, y), colour, Rotation,
+						Vector2.Zero, Vector2.One, SpriteEffects.None, 1);
+			}
+		}
+
 		#endregion
 
 	}

@@ -82,6 +82,8 @@
     <Compile Include="Combat\MagicSpell.cs" />
     <Compile Include="Combat\PhysicalSkill.cs" />
     <Compile Include="Combat\Skill.cs" />
+    <Compile Include="Crafting\CraftingHelpers.cs" />
+    <Compile Include="Crafting\Recipe.cs" />
     <Compile Include="DialogueScene.cs" />
     <Compile Include="Effects\ImageEffect.cs" />
     <Compile Include="GameEvent.cs" />
@@ -103,9 +105,9 @@
     <Compile Include="Rendering\UI\GameListBoxCustom.cs" />
     <Compile Include="Rendering\UI\GameListBoxItem.cs" />
     <Compile Include="Rendering\UI\GameProgressBar.cs" />
+    <Compile Include="Rendering\UI\GameSmartTextBox.cs" />
     <Compile Include="Rendering\UI\GameTextBlock.cs" />
     <Compile Include="Rendering\UI\GameUI.cs" />
-    <Compile Include="Rendering\UI\GameSmartTextBox.cs" />
     <Compile Include="Rendering\UI\Image\BaseImage.cs" />
     <Compile Include="Rendering\UI\Image\EngineImage.cs" />
     <Compile Include="Rendering\UI\Image\GameImage.cs" />

@@ -475,7 +475,7 @@ namespace BixBite.Rendering.UI.ListBox
 			if (Keyboard.GetState().IsKeyDown(SelectionKey) && _prevKeyboardState.IsKeyUp(SelectionKey))
 			{
 				//Selection.
-				if (SelectRequest_Hook != null && Items.Count > 0)
+				if (SelectRequest_Hook != null && Items.Count >= 0)
 				{
 					if (Items[SelectedIndex].bCanSelect)
 						SelectRequest_Hook(SelectedIndex);

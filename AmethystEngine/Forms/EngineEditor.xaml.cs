@@ -7391,9 +7391,116 @@ namespace AmethystEngine.Forms
 		}
 
 
+		private void OpenLayeredSpriteSheetFile_MI_Click( object sender, RoutedEventArgs e)
+		{
+			SceneExplorer_TreeView.ItemsSource = null;
+			Animation_CE_Tree.ItemsSource = null;
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+			{
+				Title = "Open Layered Animation State machine File",
+				FileName = "", //default file name
+				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Animations"),
+				Filter = "Layered Animation State Machine files (*.lanim)|*.lanim",
+				RestoreDirectory = true
+			};
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+
+			Console.WriteLine(dlg.FileName);
+			LayeredSpriteSheet ret =  LayeredSpriteSheet.ImportlayeredAnimationSheet(dlg.FileName);
+
+			//Now that we have a layed sheet imported let's add all that data to the screen
+			currentLayeredSpriteSheet = ret;
+
+			Console.WriteLine(AnimationSubLayer_CB.Items.Count);
+			for(int i = AnimationSubLayer_CB.Items.Count-1; i >= 2; i--)
+			{
+				AnimationSubLayer_CB.Items.RemoveAt(i)
+;			}
+			AnimationLayersPreview_Canvas_IC.Children.Clear();
+			for (int i = 0; i < ret.subLayerSpritesheets_Dict.Keys.Count; i++)
+			{
+				AnimationSubLayer_CB.Items.Add(ret.subLayerSpritesheets_Dict.Keys.ToList()[i]);
+				//we have added the layer Data wise, but not display wise don't forget
+				Image img = new Image() { Tag = "1" };
+				Grid.SetZIndex(img, currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Count);
+				AnimationLayersPreview_Canvas_IC.Children.Add(img);
+				AnimationSubLayerImages_List.Add(new List<CroppedBitmap>());
+
+				if (i == 0) AnimationSubLayer_CB.SelectedIndex = 2;
+			}
+
+			if (AnimationSubLayer_CB.SelectedIndex == 2) {
+				CurrentSubLayerSpriteSheets_LB.ItemsSource = ret.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Items[2].ToString()];
+
+
+			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.Count > 0)
+				{
+					CurrentSubLayerAnimStates_LB.ItemsSource =
+						currentLayeredSpriteSheet.subLayerSpritesheets_Dict[currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[0]]
+						.ToList();
+				}
+			}
+
+			//at this point we need to make sure the user can access the actual animations and change them
+			//at will
+			CurrentActiveSpriteSheet = ret.BaseLayer;
+			ActiveSpriteSheets.Add(CurrentActiveSpriteSheet);
+			SceneExplorer_TreeView.ItemsSource = ActiveSpriteSheets;
+			Animation_CE_Tree.ItemsSource = CurrentActiveSpriteSheet.SpriteAnimations.Values;
+
+			Animation_CE_Tree.UpdateLayout();
+			SceneExplorer_TreeView.UpdateLayout();
+
+			//Set up the PNG This will allow it to NOT be locked
+			BitmapImage bmi = new BitmapImage();
+			bmi.BeginInit();
+			bmi.CacheOption = BitmapCacheOption.OnLoad;
+			bmi.UriSource = new Uri(CurrentActiveSpriteSheet.ImgPathLocation, UriKind.Absolute);
+			bmi.EndInit();
+			CurrentSpriteSheet_Image = bmi;
+
+			//Set up the first frame thumbnails for animation states
+			int count = 0;
+			foreach (var spriteanim in CurrentActiveSpriteSheet.SpriteAnimations.Values)
+			{
+				if (count == 1)
+				{
+					//CurrentBaseLayerAnimation_Img.Source = crop;
+
+					CurrentActiveAnimationName_TB.Text = spriteanim.Name;
+					CurrentActiveAnimationFPS_TB.Text = spriteanim.FPS.ToString();
+					CurrentActiveAnimationCurrentFrame_TB.Text = "1";
+					CurrentBaseLayerAnimation_Img.Tag = 1;
+					CurrentlySelectedAnimation = spriteanim;
+
+				}
+			}
+
+			AE_NewAnimSM_MainGrid.Visibility = Visibility.Hidden;
+			AE_CurrentAnimSM_Grid.Visibility = Visibility.Visible;
+
+			if (!AnimationSelected_Stopwatch.IsRunning)
+				AnimationSelected_Stopwatch.Start();
+
+
+			
+		}
+
 
 		private void OpenSpriteSheetFile_MI_Click(object sender, RoutedEventArgs e)
 		{
+
+			CurrentSubLayerSpriteSheets_LB.ItemsSource = null;
 			SceneExplorer_TreeView.ItemsSource = null;
 			Animation_CE_Tree.ItemsSource = null;
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
@@ -7630,8 +7737,8 @@ namespace AmethystEngine.Forms
 			AnimationChangeEvents_Properties_Tree.ItemsSource = null;
 			AnimationAudioEvents_Properties_Tree.ItemsSource = null;
 
-			AnimationChangeEvents_Properties_Tree.ItemsSource = CurrentlySelectedAnimation.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent); ;
-			AnimationAudioEvents_Properties_Tree.ItemsSource = CurrentlySelectedAnimation.GetAnimationEvents().FindAll(x => x is AudioEvent); ;
+			AnimationChangeEvents_Properties_Tree.ItemsSource = CurrentlySelectedAnimation.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent); 
+			AnimationAudioEvents_Properties_Tree.ItemsSource = CurrentlySelectedAnimation.GetAnimationEvents().FindAll(x => x is AudioEvent); 
 
 		}
 
@@ -7823,6 +7930,50 @@ namespace AmethystEngine.Forms
 
 		}
 
+		private void AnimationPreviewThumbnail_SubLayer_EVENT_Image_Enter(object sender, MouseEventArgs e)
+		{
+			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].
+				ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].ImgPathLocation == null) return;
+			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].
+				ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].SpriteAnimations.TryGetValue(((sender as Grid).DataContext as ChangeAnimationEvent).ToAnimationName,
+				out SpriteAnimation animval))
+			{
+
+				String imgpath = currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].
+				ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].ImgPathLocation;
+
+				//CurrentAnimPreviewImages_CE 
+				CurrentAnimPreviewImages_CE.Clear();
+
+				//Now that we know which Animation we are in let's Preload the Frames to avoid uneeded GC every couple frames
+				for (int i = 0; i < animval.FrameCount; i++)
+				{
+					//this eyesore will catch bad sprite sheets.So it doesn't go out of bounds....
+					int width2 =
+						(int)(animval.StartXPos +
+							((animval.FrameCount) * animval.FrameWidth) > CurrentSpriteSheet_Image.Width
+								? CurrentSpriteSheet_Image.Width - ((animval.StartXPos + ((animval.FrameCount - 1) * animval.FrameWidth))) : animval.FrameWidth);
+				
+					BitmapImage bmi = new BitmapImage();
+					bmi.BeginInit();
+					bmi.CacheOption = BitmapCacheOption.OnLoad;
+					bmi.UriSource = new Uri(imgpath, UriKind.Absolute);
+					bmi.EndInit();
+
+					CurrentAnimPreviewImages_CE.Add(
+						(new CroppedBitmap(bmi, new Int32Rect(
+							animval.StartXPos + (i * animval.FrameWidth),
+							animval.StartYPos,
+							width2, animval.FrameHeight))));
+				}
+
+				PreviewAnimUI_Image_PTR = (sender as Grid).Children[0] as Image;
+				PreviewAnimUI_Image_PTR.Tag = 1;
+				Animation_CE_Preview_Stopwatch.Start();
+				PreviewAnim_Data_PTR = (SpriteAnimation)animval;
+			}
+		}
+
 
 		private void AnimationPreviewThumbnail_EVENT_Image_Enter(object sender, MouseEventArgs e)
 		{
@@ -7892,7 +8043,7 @@ namespace AmethystEngine.Forms
 				AnimationAddSubLayer_Grid.Visibility = Visibility.Visible;
 				AnimationLayersSettings_Grid.Visibility = Visibility.Hidden;
 			}
-			else if (cb.SelectedIndex > 1)
+			else if (cb.SelectedIndex > 1&& cb.Items[cb.SelectedIndex]as ComboBoxItem != null)
 			{
 				//this is an actual sub layer, So we need to load all the possible Spritesheets to the screen
 				CurrentSubLayerSpriteSheets_LB.ItemsSource =
@@ -7967,8 +8118,6 @@ namespace AmethystEngine.Forms
 		{
 			if (AnimationSubLayer_CB.SelectedIndex >= 2)
 			{
-				
-
 					String name =
 						currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[AnimationSubLayer_CB.SelectedIndex - 2];
 
@@ -7995,8 +8144,8 @@ namespace AmethystEngine.Forms
 						currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Text][CurrentSubLayerSpriteSheets_LB.SelectedIndex].SheetName;
 
 					SpriteSheet spriteSheet = currentLayeredSpriteSheet.ActiveSubLayerSheet[AnimationSubLayer_CB.Text];
-					if(spriteSheet == null || (sender as ListBox).SelectedIndex == -1) return;
-					spriteSheet.ChangeAnimation((sender as ListBox).SelectedItem.ToString());
+					if (spriteSheet == null || (sender as ListBox).SelectedIndex == -1) return;
+					spriteSheet.ChangeAnimation(((sender as ListBox).SelectedItem as SpriteAnimation).Name);
 
 					SpriteAnimation item = spriteSheet.CurrentAnimation;
 
@@ -8026,9 +8175,38 @@ namespace AmethystEngine.Forms
 								width2, item.FrameHeight))));
 					}
 					AnimationSubLayerImages_List[AnimationSubLayer_CB.SelectedIndex - 2] = templist;
+
+					//Now we need to set the animation events to the screen
+					CurrentSubLayerStateChanges_TV.ItemsSource =
+						currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()]
+						.ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].SpriteAnimations_List[CurrentSubLayerAnimStates_LB.SelectedIndex]
+						.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent);
 				}
 			}
 		}
+
+
+
+		public void AddEventToSubLayerAnimation_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].
+	ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex] == null) return;
+			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].
+				ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].CurrentAnimation == null) return;
+
+
+			SpriteAnimation spriteAnimation = currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].
+			ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].CurrentAnimation;
+
+			//if (CurrentlySelectedAnimation == null || CurrentActiveSpriteSheet == null) return;
+
+			CurrentSubLayerStateChanges_TV.ItemsSource = null;
+			spriteAnimation.AddAnimationEvents(
+				new ChangeAnimationEvent(spriteAnimation.Name, "NONE", true));
+			CurrentSubLayerStateChanges_TV.ItemsSource =
+				spriteAnimation.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent);
+		}
+
 
 	}
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -31,10 +32,16 @@ namespace BixBite.Rendering.Animation
 
 
 		#region Fields
-		
+		private String _name = "";
 		#endregion
 
 		#region Properties
+
+		public String Name
+		{
+			get => _name;
+			set => _name = value;
+		}
 
 		//This MUST be set at all times!
 		public SpriteSheet BaseLayer = null;
@@ -50,8 +57,15 @@ namespace BixBite.Rendering.Animation
 		/// Returns the SpriteSheet if given the right key
 		/// </summary>
 		public Dictionary<String, SpriteSheet> ActiveSubLayerSheet = new Dictionary<String, SpriteSheet>();
+		public List<ChangeLayeredAnimationEvent> AnimationEvents = new List<ChangeLayeredAnimationEvent>();
 
 		#endregion
+
+		public LayeredSpriteSheet()
+		{
+
+		}
+
 
 		public LayeredSpriteSheet(SpriteSheet baselayer)
 		{
@@ -122,6 +136,143 @@ namespace BixBite.Rendering.Animation
 			}
 			return false;
 		}
+		#region File Import and Export
+
+
+		public static LayeredSpriteSheet ImportlayeredAnimationSheet(String filePath)
+		{
+			LayeredSpriteSheet retLayeredSpriteSheet = new LayeredSpriteSheet();
+
+			//It's that time again... import parsing.
+
+			XmlReaderSettings settings = new XmlReaderSettings
+			{
+				//Async = true
+			};
+
+			using (XmlReader reader = XmlReader.Create(filePath, settings))
+			{
+				while (reader.Read()) //Read until you can't
+				{
+					//skip to a SpriteSheet node
+					while (reader.Name != "LayeredSpriteSheets")
+						reader.Read();
+					if (reader.NodeType == XmlNodeType.Element)
+					{
+						//Get the name of the sheet.
+						retLayeredSpriteSheet.Name = reader.GetAttribute("SheetName");
+
+						//Now we need to find the BaseSheet
+						while (reader.Name != "BaseSheet")
+							reader.Read();
+
+						//By this point we should have the base sheet. So let's make that.
+						String baseFilePath = reader.GetAttribute("File");
+						retLayeredSpriteSheet.BaseLayer = SpriteSheet.ImportSpriteSheet(baseFilePath);
+
+
+						//Now we need to find the SubLayers
+						while (reader.Name != "SubLayers")
+							reader.Read();
+
+						//Now we need to read ALL the sub layers
+						do
+						{
+							reader.Read();
+
+							if (reader.Name == "SubLayer" && reader.NodeType == XmlNodeType.Element)
+							{
+								String tempSubLayerName = reader.GetAttribute("LayerName");
+								retLayeredSpriteSheet.AddSubLayer(tempSubLayerName);
+								do
+								{
+									reader.Read();
+
+									if (reader.Name == "SpriteSheet" && reader.NodeType == XmlNodeType.Element)
+									{
+										//Add the possible Sprite sheet to the desired layer
+										retLayeredSpriteSheet.AddSpriteSheetToSubLayer(tempSubLayerName,
+											SpriteSheet.ImportSpriteSheet(reader.GetAttribute("File")));
+									}
+								} while (reader.Name.Trim() != "SubLayer");
+							}
+						} while (reader.Name.Trim() != "SubLayers");
+
+						//at this point we need to set up the animation change events
+						while (reader.Name != "AnimationStates")
+							reader.Read();
+
+						do
+						{
+							reader.Read();
+
+							if (reader.Name == "AnimationState" && reader.NodeType == XmlNodeType.Element)
+							{
+								//If you are here you have found a new animation. So create one to fill with data.
+								String animName = (reader.GetAttribute("Name"));
+								int startx = int.Parse(reader.GetAttribute("StartX"));
+								int starty = int.Parse(reader.GetAttribute("StartY"));
+								int numframes = int.Parse(reader.GetAttribute("NumOfFrames"));
+								int fwidth = int.Parse(reader.GetAttribute("FrameWidth"));
+								int fheight = int.Parse(reader.GetAttribute("FrameHeight"));
+								int fps = int.Parse(reader.GetAttribute("FPS"));
+								bool isDefault = bool.Parse(reader.GetAttribute("isDefault"));
+
+								SpriteAnimation tempAnimation = new SpriteAnimation(retLayeredSpriteSheet.BaseLayer, animName,
+									new Vector2(startx, starty), fwidth, fheight, numframes, fps)
+								{
+
+								};
+								//now we need to fill in all the offset/frame position data.
+								for (int i = 0; i < numframes; i++)
+								{
+									tempAnimation.AddFramePosition(new Vector2(startx + (fwidth * i), starty));
+								}
+
+								tempAnimation.ResetAnimation(); //set the first position/pointer.
+								tempAnimation.bIsDefualt = isDefault;
+
+								//Skip to the AnimationStates node
+								while (reader.Name != "Events")
+									reader.Read();
+
+								do
+								{
+									reader.Read();
+									if (reader.Name == "AllowedAnimName" && reader.NodeType == XmlNodeType.Element)
+									{
+										String toAnimName = reader.GetAttribute("Name");
+										String fromAnimName = tempAnimation.Name;
+										bool bfinishFirst = bool.Parse(reader.GetAttribute("bFinishFirst"));
+
+										AnimationEvent animationEvent = new ChangeAnimationEvent(fromAnimName, toAnimName, bfinishFirst);
+										tempAnimation.AddAnimationEvents(animationEvent);
+
+										//Layered Animation Shprite Sheets has too keep track of all the different layer changes
+										do
+										{
+											reader.Read();
+
+											if (reader.Name == "SubLayerChange" && reader.NodeType == XmlNodeType.Element)
+											{
+												retLayeredSpriteSheet.AnimationEvents.Add(
+													new ChangeLayeredAnimationEvent(
+													reader.GetAttribute("LayerName"), reader.GetAttribute("RequestedAnimState")));
+											}
+										} while (reader.Name != "AllowedAnimName");
+
+									}
+								} while (reader.Name != "Events");
+							}
+						} while (reader.Name.Trim() != "AnimationStates");
+					}
+				}
+			}
+			return retLayeredSpriteSheet;
+		}
+
+		#endregion
+
 
 		/// <summary>
 		/// Returns ALL sheets on a given layer

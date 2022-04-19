@@ -29,6 +29,8 @@ namespace BixBite.Rendering.UI.TextBlock
 			get { return GetPropertyData("BackgroundImage").ToString(); }
 		}
 
+		private float _scale => float.Parse(GetPropertyData("FontSize").ToString()) / 12.0f;
+
 		#endregion
 
 		#region Properties
@@ -60,6 +62,13 @@ namespace BixBite.Rendering.UI.TextBlock
 			}
 		}
 
+		public float Rotation
+		{
+			get => float.Parse(GetPropertyData("Rotation").ToString());
+			set => SetProperty("Rotation", value);
+		}
+
+
 		#endregion
 
 		#region Contructors
@@ -69,6 +78,8 @@ namespace BixBite.Rendering.UI.TextBlock
 			Texture2D texture, Color textColor)
 			: base(UIName, xPos, yPos, width, height, zindex, border, xOff, yOff, text, textTime, backColor, backImage)
 		{
+			AddProperty("Rotation", 0.0f);
+			
 			_texture = texture;
 			_font = font;
 			TextColor = textColor;
@@ -119,8 +130,12 @@ namespace BixBite.Rendering.UI.TextBlock
 				else
 					y = DrawRectangle.Y;
 
-				spriteBatch.DrawString(_font, Text, new Vector2(x, y), TextColor);
-
+				if (_scale == 1.0f && Rotation == 0.0f)
+					spriteBatch.DrawString(_font, Text, new Vector2(x, y), TextColor);
+				else
+					spriteBatch.DrawString(_font, Text, new Vector2(x, y), TextColor, Rotation, Vector2.Zero, 
+						new Vector2(_scale, _scale ), SpriteEffects.None,0);
+				
 			}
 
 			#endregion

@@ -34,6 +34,36 @@ namespace BixBite.Rendering.Animation
 		}
 	}
 
+	public class ChangeLayeredAnimationEvent : AnimationEvent
+	{
+
+		public bool bImmediate = true;
+
+		private String _fromAnimationName = String.Empty;
+
+		public String FromAnimationName
+		{
+			get => _fromAnimationName;
+			set => _fromAnimationName = value;
+		}
+		private String _toAnimationName = String.Empty;
+
+		public String ToAnimationName
+		{
+			get => _toAnimationName;
+			set => _toAnimationName = value;
+		}
+
+		public Dictionary<String, String> SubLayerAnimationChangeEvents = new Dictionary<string, String>();
+
+		public ChangeLayeredAnimationEvent(string FromName, string ToName)
+		{
+			this.FromAnimationName = FromName;
+			this.ToAnimationName = ToName;
+
+		}
+	}
+
 	public class ChangeAnimationEvent : AnimationEvent
 	{
 		private String _fromAnimationName = String.Empty;

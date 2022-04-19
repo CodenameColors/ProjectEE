@@ -70,7 +70,7 @@ namespace BixBite.Rendering.UI.TextBlock
 		/// </summary>
 		public String BackgroundColor
 		{
-			get => (GetPropertyData("BackgoundColor").ToString());
+			get => (GetPropertyData("BackgroundColor").ToString());
 			set => SetProperty("BackgroundColor", value);
 		}
 

@@ -184,7 +184,7 @@ namespace ProjectE_E
 			map.GenerateLevel(map.level, this.GraphicsDevice, spriteBatch);
 			
 
-			Player.Load(this.Content);
+			//Player.Load(this.Content);
 
 
 

@@ -18,12 +18,17 @@ namespace BixBite.Items
 
 	public class Item : Equipable
 	{
+
+
+		public bool bAllies { get; set; }
+
 		public int Elemental { get; set; }
-		public int Weapon_Type { get; set; }
-		public int Item_Type { get; set; }
 		public int AoE_W { get; set; }
 		public int AoE_H { get; set; }
-		public bool bAllies { get; set; }
+
+		public int Weapon_Type { get; set; }
+		public int Item_Type { get; set; }
+
 		public String Function_PTR { get; set; }
 
 
