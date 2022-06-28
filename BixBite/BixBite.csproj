@@ -88,6 +88,7 @@
     <Compile Include="Effects\ImageEffect.cs" />
     <Compile Include="GameEvent.cs" />
     <Compile Include="Combat\Equipables\Item.cs" />
+    <Compile Include="Inventory.cs" />
     <Compile Include="Level.cs" />
     <Compile Include="Rendering\Animation\AnimationEvent.cs" />
     <Compile Include="Rendering\Animation\LayeredSpriteSheet.cs" />
