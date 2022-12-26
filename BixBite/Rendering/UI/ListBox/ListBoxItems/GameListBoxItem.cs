@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BixBite.Rendering.UI.Checkbox;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -17,7 +18,7 @@ namespace BixBite.Rendering.UI.ListBox.ListBoxItems
 
 		#region Fields
 		private Vector2 HighLightedPosition;
-		private Texture2D _borderTexture;
+		protected Texture2D _borderTexture;
 
 		private Vector2 _position = new Vector2();
 		private Rectangle _drawRectangle = Rectangle.Empty;
@@ -39,7 +40,7 @@ namespace BixBite.Rendering.UI.ListBox.ListBoxItems
 		}
 
 		/// <summary>
-		/// Where this Button is drawn on the screen.  XPos, YPos, Width, Height
+		/// Where this listbox item drawn on the screen.  XPos, YPos, Width, Height
 		/// </summary>
 		public Rectangle DrawRectangle
 		{
@@ -118,22 +119,36 @@ namespace BixBite.Rendering.UI.ListBox.ListBoxItems
 					GPB.XPos = (int)vec.X;
 					GPB.YPos = (int)vec.Y;
 				}
+				else if (Controls[i] is GameCheckBox GCB)
+				{
+					GCB.XPos = (int)vec.X;
+					GCB.YPos = (int)vec.Y;
+				}
 
 			}
 
 		}
 
 		#region Monogame
+
 		public void Update(GameTime gameTime)
 		{
 			if (bIsActive)
 			{
 				//In here we need to think of the players input and render components as needed.
+				for (int i = 0; i < Controls.Count; i++)
+				{
+					if (Controls[i] is Button.GameButton but)
+					{
+						but.Update(gameTime);
+					}
+					else if (Controls[i] is GameCheckBox GCB)
+					{
+						GCB.Update(gameTime);
 
-
-
+					}
+				}
 			}
-
 		}
 
 		public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -164,7 +179,10 @@ namespace BixBite.Rendering.UI.ListBox.ListBoxItems
 				{
 					GPB.Draw(gameTime, spriteBatch);
 				}
-
+				else if (Controls[i] is GameCheckBox GCB)
+				{
+					GCB.Draw(gameTime, spriteBatch);
+				}
 
 			}
 		}

@@ -31,4 +31,11 @@ namespace BixBite.Combat.Equipables
 		public List<Skill> ClothesSkills = new List<Skill>();
 
 	}
+
+
+	public class Created_Clothes : Created_Equipable
+	{
+
+	}
+
 }

@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BixBite.Combat;
 using BixBite.Items;
 
 namespace BixBite.Characters
@@ -24,10 +25,11 @@ namespace BixBite.Characters
 		#endregion
 
 		#region Properties
-		public List<Item> Inventory_Main = new List<Item>();
+		public List<CreatedItem> InventoryCreatedItems = new List<CreatedItem>();
+
 		public List<PartyMember> AllPartyMembers = new List<PartyMember>();
 		public List<PartyMember> ActivePartyMembers = new List<PartyMember>();
-		
+
 		#endregion
 
 		#region Delegates
@@ -36,10 +38,10 @@ namespace BixBite.Characters
 
 		#region Constructors
 
-		public Player()
-		{
-			Position = new Vector2(100, 100);
-		}
+		//public Player()
+		//{
+		//	Position = new Vector2(100, 100);
+		//}
 		#endregion
 
 
@@ -116,7 +118,6 @@ namespace BixBite.Characters
 
 		}
 		#endregion
-
 	}
 
 	/// <summary>
@@ -124,7 +125,6 @@ namespace BixBite.Characters
 	/// </summary>
 	public class player : BattleEntity
 	{
-
 		public String ID { get; set; }
 
 		//Social Stats.
@@ -134,14 +134,13 @@ namespace BixBite.Characters
 		public int Popularity { get; set; }
 		public int NiceGuy { get; set; }
 
+		public UInt16 AlchemyLevel { get; set; }
+
 		//Combat Essence Trackers
 		public int Essence { get; set; }
 		public int Max_Essence { get; set; }
 		public int Essence_Portion { get; set; }
 		public int Max_Essence_Portion { get; set; }
-		
-
 	}
-
 
 }

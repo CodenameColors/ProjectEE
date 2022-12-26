@@ -72,8 +72,8 @@ namespace BixBite.Rendering.UI.ListBox
 							if (reader.Name == "Item")
 							{
 								Vector2 pos = new Vector2(int.Parse(reader.GetAttribute("PosX")), int.Parse(reader.GetAttribute("PosY")));
-								Items[counter].XPos = (int)pos.X;
-								Items[counter].YPos = (int)pos.Y;
+								Items[counter].XPos = (int)pos.X + XPos;
+								Items[counter].YPos = (int)pos.Y + YPos;
 								//Items[i].AbsolutePosition += this.BarPosition;
 
 								if (counter++ < MaxDisplayedItems)

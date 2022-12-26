@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BixBite.Rendering.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -17,27 +18,27 @@ namespace BixBite.Rendering.UI.ListBox
 
 		#region Fields
 		//Keys
-		private Keys IncrementKey;
-		private Keys DecrementKey;
-		private Keys PageIncrementKey;
-		private Keys PageDecrementKey;
+		protected Keys IncrementKey;
+		protected Keys DecrementKey;
+		protected Keys PageIncrementKey;
+		protected Keys PageDecrementKey;
 
-		private Keys SelectionKey;
-		private Keys BackKey;
+		protected Keys SelectionKey;
+		protected Keys BackKey;
 
-		private int _listBoxRenderPointer;
-		private int _keyDownHeldFrames;
-		private int _holdDownFrameLimit;
+		protected int _listBoxRenderPointer;
+		protected int _keyDownHeldFrames;
+		protected int _holdDownFrameLimit;
 
-		private Vector2 _position = new Vector2();
+		protected Vector2 _position = new Vector2();
 
-		private Rectangle _drawRectangle = Rectangle.Empty;
-		private Rectangle _highlightRectangle = Rectangle.Empty;
+		protected Rectangle _drawRectangle = Rectangle.Empty;
+		protected Rectangle _highlightRectangle = Rectangle.Empty;
 
-		private Texture2D _borderTexture;
-		private Texture2D _highlightedTexture;
+		protected Texture2D _borderTexture;
+		protected Texture2D _highlightedTexture;
 
-		private KeyboardState _prevKeyboardState;
+		protected KeyboardState _prevKeyboardState;
 
 		protected List<Vector2> _itemPositions_List = new List<Vector2>();
 		private List<Vector2> _highLightedPositions_List = new List<Vector2>();
@@ -134,7 +135,7 @@ namespace BixBite.Rendering.UI.ListBox
 		public void SetBorder(int borderwidth, Color color)
 		{
 			_borderTexture = new Texture2D(_graphicsDevice, Width, Height);
-			ProgressBar.Utilities.CreateBorder(_borderTexture, borderwidth, color);
+			_borderTexture.CreateBorder(borderwidth, color);
 			this.BorderWidth = borderwidth;
 		}
 
@@ -151,7 +152,7 @@ namespace BixBite.Rendering.UI.ListBox
 
 		}
 
-		public void SetActiveStatus(bool newact)
+		public void SetAllActiveStatuses(bool newact)
 		{
 			this.bIsActive = newact;
 			foreach (ListBoxItems.GameListBoxItem lbi in Items)
@@ -389,91 +390,108 @@ namespace BixBite.Rendering.UI.ListBox
 			YPos = (int)newpos.Y;
 		}
 
-		#endregion
-
-		#region Monogame
-		public void Update(GameTime gameTime)
+		protected bool IsIncrementThroughList(Keys incrementKey, Keys pageIncrementKey)
 		{
-			if (bIsActive)
+			bool retBool = false;
+			// Can we increment one at a time?
+			if (Keyboard.GetState().IsKeyDown(incrementKey) && _prevKeyboardState.IsKeyUp(incrementKey))
 			{
-				//Increment/Decrement one at a time.
-				if (Keyboard.GetState().IsKeyDown(DecrementKey) && _prevKeyboardState.IsKeyUp(DecrementKey))
-				{
-					//Move up
-					this.DecrementSelectedIndex();
-					_keyDownHeldFrames = 0; //reset timer.
-				}
-				else
-				{
-					if (_keyDownHeldFrames > _holdDownFrameLimit && Keyboard.GetState().IsKeyDown(DecrementKey))
-					{
-						_keyDownHeldFrames = 0; //reset timer.
-						this.DecrementSelectedIndex();
-					}
-
-					_keyDownHeldFrames++;
-				}
-
-				if (Keyboard.GetState().IsKeyDown(IncrementKey) && _prevKeyboardState.IsKeyUp(IncrementKey))
-				{
-					//Move Down
-					this.IncrementSelectedIndex();
-					_keyDownHeldFrames = 0; //reset timer.
-
-				}
-				else
-				{
-					if (_keyDownHeldFrames > _holdDownFrameLimit && Keyboard.GetState().IsKeyDown(IncrementKey))
-					{
-
-						_keyDownHeldFrames = 0; //reset timer.
-						this.IncrementSelectedIndex();
-					}
-
-					_keyDownHeldFrames++;
-				}
-			}
-
-			//Increment/Decrement One PAGE at a time.
-			if (Keyboard.GetState().IsKeyDown(PageDecrementKey) && _prevKeyboardState.IsKeyUp(PageDecrementKey))
-			{
-				//Move up
-				this.PageDecrementSelectedIndex();
+				//Move Down
+				this.IncrementSelectedIndex();
 				_keyDownHeldFrames = 0; //reset timer.
+				retBool = true;
 			}
 			else
 			{
-				if (_keyDownHeldFrames > _holdDownFrameLimit && Keyboard.GetState().IsKeyDown(PageDecrementKey))
+				if (_keyDownHeldFrames > _holdDownFrameLimit && Keyboard.GetState().IsKeyDown(incrementKey))
 				{
+
 					_keyDownHeldFrames = 0; //reset timer.
-					this.PageDecrementSelectedIndex();
+					this.IncrementSelectedIndex();
+					retBool = true;
 				}
 
 				_keyDownHeldFrames++;
 			}
 
-			if (Keyboard.GetState().IsKeyDown(PageIncrementKey) && _prevKeyboardState.IsKeyUp(PageIncrementKey))
+			// Can we increment through a page.
+			if (Keyboard.GetState().IsKeyDown(pageIncrementKey) && _prevKeyboardState.IsKeyUp(pageIncrementKey))
 			{
 				//Move Down
 				this.PageIncrementSelectedIndex();
 				_keyDownHeldFrames = 0; //reset timer.
+				retBool = true;
 
 			}
 			else
 			{
-				if (_keyDownHeldFrames > _holdDownFrameLimit && Keyboard.GetState().IsKeyDown(PageIncrementKey))
+				if (_keyDownHeldFrames > _holdDownFrameLimit && Keyboard.GetState().IsKeyDown(pageIncrementKey))
 				{
 
 					_keyDownHeldFrames = 0; //reset timer.
 					this.PageIncrementSelectedIndex();
+					retBool = true;
 				}
 
 				_keyDownHeldFrames++;
 			}
 
-			//SELECTED REQUEST
-			if (Keyboard.GetState().IsKeyDown(SelectionKey) && _prevKeyboardState.IsKeyUp(SelectionKey))
+			return retBool;
+		}
+
+		protected bool IsDecrementThroughList(Keys decrementKey, Keys pageDecrementKey)
+		{
+			bool retBool = false;
+			//Increment/Decrement one at a time.
+			if (Keyboard.GetState().IsKeyDown(decrementKey) && _prevKeyboardState.IsKeyUp(decrementKey))
 			{
+				//Move up
+				this.DecrementSelectedIndex();
+				_keyDownHeldFrames = 0; //reset timer.
+				retBool = true;
+			}
+			else
+			{
+				if (_keyDownHeldFrames > _holdDownFrameLimit && Keyboard.GetState().IsKeyDown(decrementKey))
+				{
+					_keyDownHeldFrames = 0; //reset timer.
+					this.DecrementSelectedIndex();
+					retBool = true;
+				}
+
+				_keyDownHeldFrames++;
+			}
+
+			//Increment/Decrement One PAGE at a time.
+			if (Keyboard.GetState().IsKeyDown(pageDecrementKey) && _prevKeyboardState.IsKeyUp(pageDecrementKey))
+			{
+				//Move up
+				this.PageDecrementSelectedIndex();
+				_keyDownHeldFrames = 0; //reset timer.
+				retBool = true;
+			}
+			else
+			{
+				if (_keyDownHeldFrames > _holdDownFrameLimit && Keyboard.GetState().IsKeyDown(pageDecrementKey))
+				{
+					_keyDownHeldFrames = 0; //reset timer.
+					this.PageDecrementSelectedIndex();
+					retBool = true;
+				}
+
+				_keyDownHeldFrames++;
+			}
+
+			return retBool;
+		}
+
+		protected virtual bool IsSelectInList(Keys selectKey)
+		{
+			bool retBool = false;
+			//SELECTED REQUEST
+			if (Keyboard.GetState().IsKeyDown(selectKey) && _prevKeyboardState.IsKeyUp(selectKey))
+			{
+				retBool = true;
 				//Selection.
 				if (SelectRequest_Hook != null && Items.Count >= 0)
 				{
@@ -481,18 +499,63 @@ namespace BixBite.Rendering.UI.ListBox
 						SelectRequest_Hook(SelectedIndex);
 				}
 			}
+			return retBool;
+		}
 
-
+		protected virtual bool IsBackInList(Keys bacKey)
+		{
+			bool retBool = false;
 			//BACK REQUEST
-			if (Keyboard.GetState().IsKeyDown(BackKey) && _prevKeyboardState.IsKeyUp(BackKey))
+			if (Keyboard.GetState().IsKeyDown(bacKey) && _prevKeyboardState.IsKeyUp(bacKey))
 			{
 				//Back.
 				this.bIsActive = false;
+				retBool = true;
 			}
+			return retBool;
+		}
 
+		#endregion
 
+		#region Monogame
 
-			_prevKeyboardState = Keyboard.GetState();
+		public void Update(GameTime gameTime)
+		{
+			if (bIsActive)
+			{
+
+				if (IsIncrementThroughList(IncrementKey, PageIncrementKey))
+				{
+					
+				}
+				else if (IsDecrementThroughList(DecrementKey, PageDecrementKey))
+				{
+
+				}
+				else if (IsSelectInList(SelectionKey))
+				{
+
+				}
+				else if (IsBackInList(BackKey))
+				{
+
+				}
+
+				
+				// why... past me... fucking why...
+				// This calculates the limit so we don't update list box items off the screen.
+				int limit = (Items.Count < MaxDisplayedItems
+					? Items.Count
+					: (Items.Count - 1 - _listBoxRenderPointer < MaxDisplayedItems
+						? Items.Count - _listBoxRenderPointer
+						: MaxDisplayedItems));
+				for (int i = 0; i < limit; i++)
+				{
+					(Items[i + _listBoxRenderPointer] as ListBoxItems.GameListBoxItem)?.Update(gameTime);
+				}
+
+				_prevKeyboardState = Keyboard.GetState();
+			}
 		}
 
 		public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -512,7 +575,10 @@ namespace BixBite.Rendering.UI.ListBox
 					: MaxDisplayedItems));
 			for (int i = 0; i < limit; i++)
 			{
-				(Items[i + _listBoxRenderPointer] as ListBoxItems.GameListBoxItem)?.Draw(gameTime, spriteBatch);
+				if((Items[i + _listBoxRenderPointer] is ListBoxItems.GameListBoxItem listItem))
+					listItem?.Draw(gameTime, spriteBatch);
+				if ((Items[i + _listBoxRenderPointer] is ListBoxItems.GameListBoxItemSelectable selectableListItem))
+					selectableListItem?.Draw(gameTime, spriteBatch);
 			}
 
 			//We need to draw all the internal Components inside the listbox. make sure to draw this ABOVE

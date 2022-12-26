@@ -32,10 +32,15 @@ namespace BixBite.Combat
 		public int Weapon_Type { get; set; }
 
 		public List<Skill> WeaponSkills = new List<Skill>();
-
+		public String Function_PTR { get; set; }
 	}
 
 	public class Weapons : Weapon
+	{
+
+	}
+
+	public class Created_Weapon : Created_Equipable
 	{
 
 	}

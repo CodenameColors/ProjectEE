@@ -1,24 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BixBite.Resources;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
-namespace BixBite.Rendering.UI.Button
+namespace BixBite.Rendering.UI.Checkbox
 {
-	public class BaseButtonUI : BaseUI
+	public class BaseCheckBoxUI : BaseUI
 	{
 
 		#region Fields
-		protected bool _isHovering;
+		protected bool _isHoveringBox;
 		#endregion
 
 		#region Properties
-		public bool bClicked { get; private set; }
+		public bool bChecked { get; private set; }
 
 		public int XOffset
 		{
@@ -32,10 +28,10 @@ namespace BixBite.Rendering.UI.Button
 			set => SetProperty("YOffset", value);
 		}
 
-		public string ButtonText
+		public string CheckBoxContentText
 		{
-			get => GetPropertyData("ButtonText").ToString();
-			set => SetProperty("ButtonText", value);
+			get => GetPropertyData("CheckBoxContentText").ToString();
+			set => SetProperty("CheckBoxContentText", value);
 		}
 
 		public bool bBorder
@@ -55,7 +51,7 @@ namespace BixBite.Rendering.UI.Button
 			get => int.Parse(GetPropertyData("FontSize").ToString());
 			set => SetProperty("FontSize", value);
 		}
-		
+
 
 
 		/// <summary>
@@ -66,7 +62,7 @@ namespace BixBite.Rendering.UI.Button
 			get => (GetPropertyData("BackgoundColor").ToString());
 			set => SetProperty("BackgroundColor", value);
 		}
-		
+
 		//Relative path from engine project
 		public String BackgroundImage
 		{
@@ -75,31 +71,25 @@ namespace BixBite.Rendering.UI.Button
 		}
 
 		#endregion
-
-		#region Contructors
-		public BaseButtonUI(string UIName, int xPos, int yPos, int width, int height, int zindex, bool bBorder,
-			int xOff, int yOff, String buttonText, String backColor, String backImage ) 
-			: base(UIName, xPos, yPos, width, height, zindex)
+		public BaseCheckBoxUI(string UIName, int xPos, int yPos, int xOff, int yOff, int width, int height, int zindex, bool bBorder,
+													String checkBoxContentText, String backColor, String backImage) : 
+			base(UIName, xPos, yPos, width, height, zindex)
 		{
-			AddProperty("XOffset", xOff);
-			AddProperty("YOffset", yOff);
-			AddProperty("ButtonText", buttonText);
+			{
+				AddProperty("XOffset", xOff);
+				AddProperty("YOffset", yOff);
+				AddProperty("CheckBoxContentText", checkBoxContentText);
 
-			AddProperty("FontName", "Ariel");
-			AddProperty("FontSize", 24);
-			AddProperty("FontColor", "Black");
-			AddProperty("FontStyle", "Normal");
+				AddProperty("FontName", "Ariel");
+				AddProperty("FontSize", 24);
+				AddProperty("FontColor", "Black");
+				AddProperty("FontStyle", "Normal");
 
-			AddProperty("bBorder", bBorder);
-			AddProperty("BackgroundColor", backColor);
-			AddProperty("BackgroundImage", backImage);
+				AddProperty("bBorder", bBorder);
+				AddProperty("BackgroundColor", backColor);
+				AddProperty("BackgroundImage", backImage);
+			}
+
 		}
-		#endregion
-
-		#region Methods
-
-
-		#endregion
-
 	}
 }

@@ -32,4 +32,9 @@ namespace BixBite.Combat.Equipables
 
 	}
 
+	public class Created_Accessory : Created_Equipable
+	{
+
+	}
+
 }
