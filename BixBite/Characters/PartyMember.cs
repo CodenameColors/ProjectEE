@@ -9,6 +9,14 @@ using System.Windows.Media;
 using BixBite.Combat;
 using BixBite.Combat.Equipables;
 using BixBite.Rendering.UI;
+using BixBite.Rendering.UI.Button;
+using BixBite.Rendering.UI.Checkbox;
+using BixBite.Rendering.UI.Image;
+using BixBite.Rendering.UI.ListBox;
+using BixBite.Rendering.UI.ListBox.ListBoxItems;
+using BixBite.Rendering.UI.ProgressBar;
+using BixBite.Rendering.UI.TabControl;
+using BixBite.Rendering.UI.TextBlock;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
@@ -77,7 +85,7 @@ namespace BixBite.Characters
 		/// <summary>
 		/// This is the health, mana, etc indicator for this character.
 		/// </summary>
-		private GameUI CombatStatsIndicator;
+		private BaseUI CombatStatsIndicator;
 
 		public bool bIsDead { get; set; }
 
@@ -173,7 +181,7 @@ namespace BixBite.Characters
 		/// <param name="CombatIcon"></param>
 		/// <param name="healthBar"></param>
 		/// <param name="manaBar"></param>
-		public PartyMember(GameUI BaseCombatUI, Texture2D CombatIcon, GameProgressBar healthBar, GameProgressBar manaBar)
+		public PartyMember(BaseUI BaseCombatUI, Texture2D CombatIcon, GameProgressBar healthBar, GameProgressBar manaBar)
 		{
 			//Create the UI
 
@@ -200,7 +208,7 @@ namespace BixBite.Characters
 		/// <param name="CombatIcon"></param>
 		/// <param name="healthBar"></param>
 		/// <param name="manaBar"></param>
-		public void LoadPartyMemberUIData(GameUI BaseCombatUI, Texture2D CombatIcon, GameProgressBar healthBar,
+		public void LoadPartyMemberUIData(BaseUI BaseCombatUI, Texture2D CombatIcon, GameProgressBar healthBar,
 			GameProgressBar manaBar)
 		{
 			//Create the UI
@@ -217,10 +225,58 @@ namespace BixBite.Characters
 			CombatStatsIndicator = BaseCombatUI;
 		}
 
+		private void DrawCombatStatsUI(GameTime gameTime ,SpriteBatch spriteBatch)
+		{
+			foreach (var uiElement in CombatStatsIndicator.UIElements)
+			{
+				switch (uiElement)
+				{
+					case GameButton gameButton:
+						gameButton.Draw(gameTime, spriteBatch);
+						break;
+					case GameCheckBox gameCheckBox:
+						gameCheckBox.Draw(gameTime, spriteBatch);
+						break;
+					case GameImage gameImage:
+						gameImage.Draw(gameTime, spriteBatch);
+						break;
+					case GameCustomListBox gameCustomListBox:
+						gameCustomListBox.Draw(gameTime, spriteBatch);
+						break;
+					case GameMultiSelectionListbox gameMultiSelectionListbox:
+						gameMultiSelectionListbox.Draw(gameTime, spriteBatch);
+						break;
+					case GameListBoxItemSelectable gameListBoxItemSelectable:
+						gameListBoxItemSelectable.Draw(gameTime, spriteBatch);
+						break;
+					case GameListBoxItem gameListBoxItem:
+						gameListBoxItem.Draw(gameTime, spriteBatch);
+						break;
+					case GameCustomProgressBar gameCustomProgressBar:
+						gameCustomProgressBar.Draw(gameTime, spriteBatch);
+						break;
+					case GameProgressBar gameProgressBar:
+						gameProgressBar.Draw(gameTime, spriteBatch);
+						break;
+					case GameTabControl gameTabControl:
+						gameTabControl.Draw(gameTime, spriteBatch);
+						break;
+					case GameTextBlock gameTextBlock:
+						gameTextBlock.Draw(gameTime, spriteBatch);
+						break;
+					default:
+						throw new ArgumentOutOfRangeException(nameof(uiElement));
+				}
+			}
+		}
+
 		public override void Draw(GameTime gameTime ,SpriteBatch spriteBatch)
 		{
 			base.Draw( gameTime ,spriteBatch);
-			CombatStatsIndicator?.Draw(gameTime, spriteBatch);
+
+			//CombatStatsIndicator?.Draw(gameTime, spriteBatch);
+			DrawCombatStatsUI(gameTime, spriteBatch);
+
 			if (StanceIndicator_Texture2D != null)
 			{
 				spriteBatch.Draw(StanceIndicator_Texture2D, StanceIndicator_Rectangle, StanceIndicator_Color);
@@ -231,7 +287,7 @@ namespace BixBite.Characters
 
 		public Rectangle GetCharacterStatUILocation()
 		{
-			return (CombatStatsIndicator.UIElements[0] as GameIMG).Rectangle;
+			return (CombatStatsIndicator.UIElements[0] as GameImage).DrawRectangle;
 		}
 
 		public override string ToString()

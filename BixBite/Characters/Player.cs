@@ -117,6 +117,17 @@ namespace BixBite.Characters
 		{
 
 		}
+
+		/// <summary>
+		/// Basic Filter, give it the ID's and it returns all the objects of said IDs
+		/// </summary>
+		public List<CreatedItem> FilterInventory(int desiredID)
+		{
+			List<CreatedItem> retList = new List<CreatedItem>();
+			retList = InventoryCreatedItems.FindAll(x => x.ID == desiredID);
+			return retList;
+		}
+
 		#endregion
 	}
 

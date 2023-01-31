@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BixBite.Rendering.Helpers
 {
-	static class Utilities
+	static partial class Utilities
 		{
 			public static void CreateBorder(this Texture2D texture, int borderWidth, Color borderColor)
 			{

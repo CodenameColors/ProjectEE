@@ -48,7 +48,7 @@ namespace BixBite
 		//public List<Sprite> CharacterSprites = new List<Sprite>();
 
 		//each scene will also contain multiple different GameUI (Dialogue Boxes)
-		public List<GameUI> DialogueBoxes = new List<GameUI>();
+		public List<BaseUI> DialogueBoxes = new List<BaseUI>();
 		public List<String> DialogueBoxesFilePaths = new List<string>();
 		/// <summary>
 		/// Dialogue scenes have internal parameters that are used for this scene ALONE.

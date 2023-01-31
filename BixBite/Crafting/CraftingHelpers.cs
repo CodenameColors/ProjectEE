@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BixBite.Crafting.HexGrid;
 
 namespace BixBite.Crafting
 {
-
 	public class CraftingHelpers
 	{
 
@@ -23,6 +23,33 @@ namespace BixBite.Crafting
 			public int Explosive { get; set; }
 			public int Shadow { get; set; }
 			public int Luminous { get; set; }
+
+			public void AddExistingStruct(ref CraftingHelpers.ElementalPoints changingStruct,
+				CraftingHelpers.ElementalPoints operandStruct)
+			{
+				changingStruct.Fire 		  += operandStruct.Fire;	
+				changingStruct.Ice 			  += operandStruct.Ice;	
+				changingStruct.Earth  		+= operandStruct.Earth;	
+				changingStruct.Water  		+= operandStruct.Water;	
+				changingStruct.Lightning	+= operandStruct.Lightning;	
+				changingStruct.Explosive	+= operandStruct.Explosive;	
+				changingStruct.Shadow 		+= operandStruct.Shadow;	
+				changingStruct.Luminous		+= operandStruct.Luminous;	
+			}
+
+			public void RemoveExistingStruct(ref CraftingHelpers.ElementalPoints changingStruct,
+				CraftingHelpers.ElementalPoints operandStruct)
+			{
+				changingStruct.Fire 		  -= operandStruct.Fire;	
+				changingStruct.Ice 			  -= operandStruct.Ice;	
+				changingStruct.Earth  		-= operandStruct.Earth;	
+				changingStruct.Water  		-= operandStruct.Water;	
+				changingStruct.Lightning	-= operandStruct.Lightning;	
+				changingStruct.Explosive	-= operandStruct.Explosive;	
+				changingStruct.Shadow 		-= operandStruct.Shadow;	
+				changingStruct.Luminous		-= operandStruct.Luminous;	
+			}
+
 
 			public int GetValueFromMagicType(EMagicType desiredMagicType)
 			{
@@ -92,7 +119,7 @@ namespace BixBite.Crafting
 			public String ToString()
 			{
 				return String.Format("internal Cell Count Structure values \n Fire: {0}\nIce: {1}\nEarth: {2}\nWater: {3}\nLightning: {4}" +
-				                     "\nExplosive: {5}\nShadow: {6} Luminous: {7}", Fire, Ice, Earth, Water, Lightning, Explosive, Shadow, Luminous);
+														 "\nExplosive: {5}\nShadow: {6} Luminous: {7}", Fire, Ice, Earth, Water, Lightning, Explosive, Shadow, Luminous);
 			}
 
 
@@ -104,7 +131,7 @@ namespace BixBite.Crafting
 		public class Max_Elemental_Points : ElementalPoints
 		{
 
-			
+
 		}
 
 		public class RecipeIngredient : Tuple<object, int, String>
@@ -160,8 +187,19 @@ namespace BixBite.Crafting
 
 		}
 
+
+		public class RotationQueuePair<T1, T2>
+		{
+			public PuzzlePieceHexCell PuzzlePieceHexCell { get; set; }
+			//public PuzzlePieceHexCell ParentConnectionCell { get; set; }
+			public int ConnDirection{ get; set; }
+
+		}
+
 	}
 
-
 }
+
+
+	
 

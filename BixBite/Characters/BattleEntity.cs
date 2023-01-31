@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BixBite.Combat;
 using BixBite.Combat.Equipables;
 using BixBite.Rendering.UI;
+using BixBite.Rendering.UI.ProgressBar;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -72,7 +73,7 @@ namespace BixBite.Characters
 		/// <summary>
 		/// This is the health, mana, etc indicator for this character.
 		/// </summary>
-		private GameUI CombatStatsIndicator;
+		private BaseUI CombatStatsIndicator;
 
 		public bool bIsDead { get; set; }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BixBite.Input
 {
-	class InputController
+	public class InputController
 	{
 	}
 }

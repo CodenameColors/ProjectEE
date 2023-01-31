@@ -11,6 +11,7 @@ namespace BixBite.Rendering.UI.TabControl
 
 		#region Fields
 		protected int _hoverTabIndex;
+		protected int _selectedTabIndex;
 		protected Dictionary<int, BaseUI> _UIComponents_Dict = new Dictionary<int, BaseUI>();
 		#endregion
 

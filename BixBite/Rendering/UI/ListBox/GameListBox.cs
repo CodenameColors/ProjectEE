@@ -132,6 +132,11 @@ namespace BixBite.Rendering.UI.ListBox
 
 		#region Methods
 
+		public void SetActiveStatus(bool state)
+		{
+			this.bIsActive = state;
+		}
+
 		public void SetBorder(int borderwidth, Color color)
 		{
 			_borderTexture = new Texture2D(_graphicsDevice, Width, Height);
@@ -587,7 +592,6 @@ namespace BixBite.Rendering.UI.ListBox
 
 		}
 		#endregion
-
 
 	}
 }

@@ -26,6 +26,7 @@ namespace BixBite.Rendering.UI.ListBox.ListBoxItems
 
 		#region Properties
 		public Vector2 RelOriginPosition;
+		public object LinkedDataObject;
 		//public Vector2 AbsolutePosition;
 
 
@@ -59,11 +60,14 @@ namespace BixBite.Rendering.UI.ListBox.ListBoxItems
 		#region Contructors
 
 		public GameListBoxItem(BaseListBox parentListBox, string UIName, int xPos, int yPos, int width, int height,
-			int zindex, bool border, bool bCanSelect, Texture2D borderTexture = null)
+			int zindex, bool border, bool bCanSelect, Texture2D borderTexture = null, object linkedDataObject = null)
 			: base(parentListBox, UIName, xPos, yPos, width, height, zindex, border, bCanSelect)
 		{
 
 			this._borderTexture = borderTexture;
+
+			if (linkedDataObject != null)
+				this.LinkedDataObject = linkedDataObject;
 
 		}
 

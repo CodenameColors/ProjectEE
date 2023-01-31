@@ -38,7 +38,7 @@ namespace BixBite.Rendering.UI.ListBox.ListBoxItems
 
 		public GameListBoxItemSelectable(BaseListBox parentListBox, string UIName, int xPos, int yPos, int xSelectedPos, int ySelectedPos,
 		int width, int height, int selectedWidth, int selectedHeight, int zindex, bool border, bool bCanSelect,
-			Texture2D selectedTexture2D = null, Texture2D borderTexture = null) : base(parentListBox, UIName, xPos, yPos, width, height, zindex, border, bCanSelect, borderTexture)
+			Texture2D selectedTexture2D = null, Texture2D borderTexture = null, object linkedDataObject = null) : base(parentListBox, UIName, xPos, yPos, width, height, zindex, border, bCanSelect, borderTexture, linkedDataObject)
 		{
 			_selectionTexture = selectedTexture2D;
 

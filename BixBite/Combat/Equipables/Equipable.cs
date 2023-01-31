@@ -45,6 +45,8 @@ namespace BixBite.Combat
 		public bool bDamage { get; set; }
 		public int Weight { get; set; }
 		public int Rarity { get; set; }
+		public int Creation_Type {get; set;}
+
 
 		//Foreign Keys
 		public int Stats_FK { get; set; }

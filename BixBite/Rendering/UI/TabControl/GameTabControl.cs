@@ -37,9 +37,8 @@ namespace BixBite.Rendering.UI.TabControl
 		private List<Texture2D> _tabImages = new List<Texture2D>();
 		private List<Rectangle> _tabDrawRectangles = new List<Rectangle>();
 		private List<String> _tabDrawString = new List<String>();
-		private  List<bool> _bIsTabHovering = new List<bool>();
+		private List<bool> _bIsTabHovering = new List<bool>();
 
-		private int _selectedTabIndex = -1;
 		private Dictionary<BaseUI, int> _uiComponentDictionary = new Dictionary<BaseUI, int>();
 		#endregion
 
@@ -131,9 +130,29 @@ namespace BixBite.Rendering.UI.TabControl
 			_uiComponentDictionary.Add(ui, tabNum);
 		}
 
+		public int GetMaxTabCount()
+		{
+			return _tabDrawRectangles.Count;
+		}
+
+		public int GetSelectedTabIndex()
+		{
+			return _selectedTabIndex;
+		}
+
 		public void ChangeSelectedTab(int selectedIndex)
 		{
 			_selectedTabIndex = selectedIndex;
+		}
+
+		public List<BaseUI> GetAllUIElements()
+		{
+			return _uiComponentDictionary.Keys.ToList();
+		}
+
+		public List<KeyValuePair<BaseUI, int>> GetUIElementsOnTab(int tabIndex)
+		{
+			return _uiComponentDictionary.Where(x => x.Value == tabIndex).ToList();
 		}
 
 		public void Update(GameTime gameTime)
