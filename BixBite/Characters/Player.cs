@@ -21,10 +21,15 @@ namespace BixBite.Characters
 		#endregion
 
 		#region Fields
-
+		private static Lazy<Player> player = new Lazy<Player>(() => new Player());
 		#endregion
 
 		#region Properties
+		public static Player Instance
+		{
+			get => player.Value;
+		}
+
 		public List<CreatedItem> InventoryCreatedItems = new List<CreatedItem>();
 
 		public List<PartyMember> AllPartyMembers = new List<PartyMember>();
