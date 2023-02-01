@@ -58,8 +58,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="NodeEditor">
-      <HintPath>Resources\NodeEditor.dll</HintPath>
+    <Reference Include="NodeEditor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Visual Studio 2019\Projects\MyWPFControls\NodeEditor\bin\Debug\NodeEditor.dll</HintPath>
     </Reference>
     <Reference Include="OutputLog">
       <HintPath>Resources\OutputLog.dll</HintPath>
@@ -82,9 +83,9 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="TimelinePlayer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="TimelinePlayer, Version=1.0.4.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Resources\TimelinePlayer.dll</HintPath>
+      <HintPath>..\..\..\Visual Studio 2019\Projects\MyWPFControls\TimelinePlayer\bin\Debug\TimelinePlayer.dll</HintPath>
     </Reference>
     <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase" />
