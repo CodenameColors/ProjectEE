@@ -6356,7 +6356,7 @@ namespace AmethystEngine.Forms
 			Console.WriteLine(dlg.FileName);
 			int charcnt = 0;
 			//DIALOGUE SCENE HOOKS
-			SetupDialogueSceneHooks();
+			SetupDialogueSceneHooks(); 
 
 			List<Tuple<String, String, int, String, String, int>> connectiList =
 				new List<Tuple<string, String, int, String, string, int>>();
