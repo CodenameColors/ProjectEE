@@ -24,13 +24,19 @@ using BixBite.Rendering.UI;
 using System.Threading;
 using TimelinePlayer.Components;
 using BixBite.Characters;
+using BixBite.NodeEditor;
+using BixBite.NodeEditor.Arithmetic;
+using BixBite.NodeEditor.Logic;
 using BixBite.Rendering.Animation;
+using BixBite.Rendering.UI.Button;
+using BixBite.Rendering.UI.TextBlock;
 using Microsoft.Xna.Framework;
 using NodeEditor;
 using NodeEditor.Components;
 using NodeEditor.Components.Arithmetic;
 using NodeEditor.Components.Logic;
 using Color = System.Windows.Media.Color;
+using GameImage = BixBite.Rendering.UI.Image.GameImage;
 using Point = System.Windows.Point;
 using Rectangle = System.Windows.Shapes.Rectangle;
 
@@ -301,10 +307,10 @@ namespace AmethystEngine.Forms
 
 		ContentControl SelectedUIControl;
 
-		//Dictionary<String, GameUI> OpenUIEdits = new Dictionary<string, GameUI>();
-		public ObservableCollection<GameUI> OpenUIEdits { get; set; }
-		GameUI SelectedUI;
-		Dictionary<String, GameUI> CurrentUIDictionary = new Dictionary<String, GameUI>();
+		//Dictionary<String, BaseUI> OpenUIEdits = new Dictionary<string, BaseUI>();
+		public ObservableCollection<BaseUI> OpenUIEdits { get; set; }
+		BaseUI SelectedUI;
+		Dictionary<String, BaseUI> CurrentUIDictionary = new Dictionary<String, BaseUI>();
 
 		#endregion
 
@@ -316,7 +322,7 @@ namespace AmethystEngine.Forms
 		DialogueScene CurActiveDialogueScene;
 		TreeView Dialogue_CE_Tree;
 
-		List<Tuple<ContentControl, ContentControl>> CurSceneCharacterDisplays =
+		List<Tuple<ContentControl, ContentControl>> CurSceneEntityDisplays =
 			new List<Tuple<ContentControl, ContentControl>>();
 
 		CollapsedPropertyGrid.CollapsedPropertyGrid CPGrid = new CollapsedPropertyGrid.CollapsedPropertyGrid();
@@ -386,7 +392,7 @@ namespace AmethystEngine.Forms
 				(TreeView) SceneExplorer_Control.Template.FindName("LESceneExplorer_TreeView", SceneExplorer_Control);
 
 			OpenLevels = new ObservableCollection<Level>();
-			OpenUIEdits = new ObservableCollection<GameUI>();
+			OpenUIEdits = new ObservableCollection<BaseUI>();
 
 			LoadMainLevel(ProjectFilePath);
 
@@ -3952,10 +3958,13 @@ namespace AmethystEngine.Forms
 					if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "Zindex")
 					{
 						TextBox TB = new TextBox();
-						TB.KeyDown += GameUI_ZIndex_Changed;
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
-							TB,
-							o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
+						TB.KeyDown += BaseUI_ZIndex_Changed;
+
+						// TODO: FIX PROP GRID CALLBACKS
+
+						//LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
+						//	TB,
+						//	o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
 					}
 					else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] ==
 					         "ShowBorder")
@@ -4006,9 +4015,12 @@ namespace AmethystEngine.Forms
 					{
 						TextBox TB = new TextBox();
 						TB.KeyDown += UIPropertyCallback;
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
-							TB,
-							o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
+
+						// TODO: FIX PROP GRID CALLBACKS
+
+						//LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
+						//	TB,
+						//	o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
 					}
 
 					i++;
@@ -4127,7 +4139,8 @@ namespace AmethystEngine.Forms
 
 			CC.Name = name;
 			UIEditor_Canvas.Children.Add(CC);
-			CurrentUIDictionary.Add(name, new GameTextBlock(name, 50, 50, 0, 0, 1));
+			CurrentUIDictionary.Add(name, new GameTextBlock(name, 0,0,50, 50, 1,false, 0, 0, "",
+				0.0f, "", "", null, null, Microsoft.Xna.Framework.Color.Black));
 			OpenUIEdits[0].AddUIElement(CurrentUIDictionary.Values.Last()); //TODO: use the selection Treeview
 		}
 
@@ -4136,7 +4149,7 @@ namespace AmethystEngine.Forms
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void UIEditoGameIMG_BTN_Click(object sender, RoutedEventArgs e)
+		private void UIEditoGameImage_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			ContentControl CC = ((ContentControl) this.TryFindResource("MoveableControls_Template"));
 			CC.HorizontalAlignment = HorizontalAlignment.Center;
@@ -4166,7 +4179,7 @@ namespace AmethystEngine.Forms
 
 			CC.Name = name;
 			UIEditor_Canvas.Children.Add(CC);
-			CurrentUIDictionary.Add(name, new GameIMG(name, 50, 50, 1, 0, 0));
+			CurrentUIDictionary.Add(name, new GameImage(name, 50, 50, 1, 0, 0));
 			OpenUIEdits[0].AddUIElement(CurrentUIDictionary.Values.Last()); //TODO: use the selection Treeview
 		}
 
@@ -4273,7 +4286,7 @@ namespace AmethystEngine.Forms
 				((Image) ((Grid) SelectedUIControl.Content).Children[2]).Source =
 					new BitmapImage(((EditorObject) ((ComboBox) sender).SelectedValue).Thumbnail);
 
-			if (SelectedUI is GameIMG)
+			if (SelectedUI is GameImage)
 			{
 				SelectedUI.SetProperty("Image", ((EditorObject) ((ComboBox) sender).SelectedValue).Thumbnail.AbsolutePath);
 			}
@@ -4351,7 +4364,7 @@ namespace AmethystEngine.Forms
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void GameUI_ZIndex_Changed(object sender, KeyEventArgs e)
+		private void BaseUI_ZIndex_Changed(object sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Enter)
 			{
@@ -4408,7 +4421,7 @@ namespace AmethystEngine.Forms
 		}
 
 		/// <summary>
-		/// This method is here for when the user clicks and drags a GameUI object to move.
+		/// This method is here for when the user clicks and drags a BaseUI object to move.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
@@ -4420,7 +4433,7 @@ namespace AmethystEngine.Forms
 				Console.WriteLine("Moved UI CC");
 				if (((TabItem) EditorWindows_TC.SelectedItem).Header.ToString().Contains("UI"))
 				{
-					if (SelectedBaseUIControl != null && (SelectedUI is GameTextBlock || SelectedUI is GameIMG))
+					if (SelectedBaseUIControl != null && (SelectedUI is GameTextBlock || SelectedUI is GameImage))
 					{
 						Vector RelOrigin = new Vector((int) Canvas.GetLeft(SelectedBaseUIControl),
 							(int) Canvas.GetTop(SelectedBaseUIControl));
@@ -4462,7 +4475,7 @@ namespace AmethystEngine.Forms
 			CC.Tag = "Border";
 			Canvas.SetZIndex(CC, 0);
 
-			OpenUIEdits.Add(new GameUI("NewUITool", 50, 50, 1));
+			OpenUIEdits.Add(new BaseUI("NewUITool", 50, 50, 1));
 			SelectedUI = OpenUIEdits.Last();
 			CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
 
@@ -4548,7 +4561,7 @@ namespace AmethystEngine.Forms
 
 			Console.WriteLine(dlg.FileName);
 
-			GameUI g = GameUI.ImportGameUI(dlg.FileName);
+			BaseUI g = BaseUI.ImportBaseUI(dlg.FileName);
 			OpenUIEdits.Add(g);
 
 			ControlTemplate cc = (ControlTemplate) this.Resources["UIEditorSceneExplorer_Template"];
@@ -4612,7 +4625,7 @@ namespace AmethystEngine.Forms
 		/// <para/>
 		/// FALSE = ONLY ONE Content control will be drawn. Base UI is editable in size, and position. Children are editable via properties
 		/// </param>
-		public ContentControl DrawUIToScreen(Canvas CurrentEditorCanvas, Canvas CurrentEditorCanvas_Back, GameUI gameUI,
+		public ContentControl DrawUIToScreen(Canvas CurrentEditorCanvas, Canvas CurrentEditorCanvas_Back, BaseUI gameUI,
 			bool bcomps, String DesiredImageName_CC)
 		{
 			//set the position and the size of the Base UI
@@ -4649,7 +4662,7 @@ namespace AmethystEngine.Forms
 			if (bcomps)
 			{
 				//create all the child UI elements as editable content controls
-				foreach (GameUI childUI in gameUI.UIElements)
+				foreach (BaseUI childUI in gameUI.UIElements)
 				{
 					#region DefaultProperties
 
@@ -4718,7 +4731,7 @@ namespace AmethystEngine.Forms
 						((Grid) CUI.Content).Children.Add(tb);
 
 					}
-					else if (childUI is GameIMG)
+					else if (childUI is GameImage)
 					{
 						CUI.Tag = "IMAGE";
 
@@ -4746,7 +4759,7 @@ namespace AmethystEngine.Forms
 			else //all as one
 			{
 				//create all the child UI elements as editable content controls
-				foreach (GameUI childUI in gameUI.UIElements)
+				foreach (BaseUI childUI in gameUI.UIElements)
 				{
 					#region DefaultProperties
 
@@ -4823,7 +4836,7 @@ namespace AmethystEngine.Forms
 						CUI.BorderThickness = new Thickness(0);
 						((Grid) BaseUI.Content).Children.Add(CUI);
 					}
-					else if (childUI is GameIMG)
+					else if (childUI is GameImage)
 					{
 						CUI.Tag = "IMAGE";
 
@@ -4869,24 +4882,24 @@ namespace AmethystEngine.Forms
 		/// <para/>
 		/// FALSE = ONLY ONE Content control will be drawn. Base UI is editable in size, and position. Children are editable via properties
 		/// </param>
-		public void DrawUIToScreen(Canvas CurrentEditorCanvas, Canvas CurrentEditorCanvas_Back, GameUI gameUI, bool bcomps)
+		public void DrawUIToScreen(Canvas CurrentEditorCanvas, Canvas CurrentEditorCanvas_Back, BaseUI gameUI, bool bcomps)
 		{
 			//set the position and the size of the Base UI
-			ContentControl BaseUI = ((ContentControl) this.TryFindResource("MoveableControls_Template"));
+			ContentControl baseUi_CC = ((ContentControl) this.TryFindResource("MoveableControls_Template"));
 
-			BaseUI.Width = Int32.Parse(gameUI.GetPropertyData("Width").ToString());
-			BaseUI.Height = Int32.Parse(gameUI.GetPropertyData("Height").ToString());
-			BaseUI.BorderBrush = (((bool) gameUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
-			BaseUI.BorderThickness = new Thickness(0);
-			BaseUI.Tag = "Border";
-			BaseUI.Name = gameUI.UIName;
+			baseUi_CC.Width = Int32.Parse(gameUI.GetPropertyData("Width").ToString());
+			baseUi_CC.Height = Int32.Parse(gameUI.GetPropertyData("Height").ToString());
+			baseUi_CC.BorderBrush = (((bool) gameUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+			baseUi_CC.BorderThickness = new Thickness(0);
+			baseUi_CC.Tag = "Border";
+			baseUi_CC.Name = gameUI.UIName;
 			//};
-			BaseUI.Content = new Grid()
+			baseUi_CC.Content = new Grid()
 			{
 				HorizontalAlignment = HorizontalAlignment.Stretch,
 				VerticalAlignment = VerticalAlignment.Stretch,
 			};
-			((Grid) BaseUI.Content).Children.Add(new Border()
+			((Grid) baseUi_CC.Content).Children.Add(new Border()
 			{
 				BorderThickness = new Thickness(2),
 				BorderBrush = (((bool) gameUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent)
@@ -4895,16 +4908,16 @@ namespace AmethystEngine.Forms
 			//get the middle!
 			Point mid = new Point(CurrentEditorCanvas_Back.ActualWidth / 2, CurrentEditorCanvas_Back.ActualHeight / 2);
 			//get the true center point. Since origin is top left.
-			mid.X -= BaseUI.Width / 2;
-			mid.Y -= BaseUI.Height / 2;
-			Canvas.SetLeft(BaseUI, mid.X);
-			Canvas.SetTop(BaseUI, mid.Y);
+			mid.X -= baseUi_CC.Width / 2;
+			mid.Y -= baseUi_CC.Height / 2;
+			Canvas.SetLeft(baseUi_CC, mid.X);
+			Canvas.SetTop(baseUi_CC, mid.Y);
 
 			//which drawing type?
 			if (bcomps)
 			{
 				//create all the child UI elements as editable content controls
-				foreach (GameUI childUI in gameUI.UIElements)
+				foreach (BaseUI childUI in gameUI.UIElements)
 				{
 					#region DefaultProperties
 
@@ -4973,7 +4986,7 @@ namespace AmethystEngine.Forms
 						((Grid) CUI.Content).Children.Add(tb);
 
 					}
-					else if (childUI is GameIMG)
+					else if (childUI is GameImage)
 					{
 						CUI.Tag = "IMAGE";
 
@@ -5001,7 +5014,7 @@ namespace AmethystEngine.Forms
 			else //all as one
 			{
 				//create all the child UI elements as editable content controls
-				foreach (GameUI childUI in gameUI.UIElements)
+				foreach (BaseUI childUI in gameUI.UIElements)
 				{
 					#region DefaultProperties
 
@@ -5076,9 +5089,9 @@ namespace AmethystEngine.Forms
 						CUI.VerticalAlignment = VerticalAlignment.Top;
 						CUI.HorizontalAlignment = HorizontalAlignment.Left;
 						CUI.BorderThickness = new Thickness(0);
-						((Grid) BaseUI.Content).Children.Add(CUI);
+						((Grid) baseUi_CC.Content).Children.Add(CUI);
 					}
-					else if (childUI is GameIMG)
+					else if (childUI is GameImage)
 					{
 						CUI.Tag = "IMAGE";
 
@@ -5097,7 +5110,7 @@ namespace AmethystEngine.Forms
 						CUI.VerticalAlignment = VerticalAlignment.Top;
 						CUI.HorizontalAlignment = HorizontalAlignment.Left;
 						((Grid) CUI.Content).Children.Add(img);
-						((Grid) BaseUI.Content).Children.Add(CUI);
+						((Grid) baseUi_CC.Content).Children.Add(CUI);
 					}
 					else if (childUI is GameButton)
 					{
@@ -5106,9 +5119,9 @@ namespace AmethystEngine.Forms
 				}
 			}
 
-			SelectedBaseUIControl = BaseUI;
+			SelectedBaseUIControl = baseUi_CC;
 			SelectedUI = OpenUIEdits.Last();
-			CurrentEditorCanvas.Children.Add(BaseUI);
+			CurrentEditorCanvas.Children.Add(baseUi_CC);
 		}
 
 		/// <summary>
@@ -5130,67 +5143,67 @@ namespace AmethystEngine.Forms
 		{
 			double gridw = DialogueEditor_BackCanvas.ActualWidth;
 			double gridh = DialogueEditor_BackCanvas.ActualHeight;
-//CurSceneCharacterDisplays[timelineind].SpriteSheetName
+//CurSceneEntityDisplays[timelineind].SpriteSheetName
 
 			if (hori == HorizontalAlignment.Left && vert == VerticalAlignment.Top)
 			{
-				Canvas.SetLeft(CurSceneCharacterDisplays[timelineind].Item2, 0);
-				Canvas.SetTop(CurSceneCharacterDisplays[timelineind].Item2, 0);
+				Canvas.SetLeft(CurSceneEntityDisplays[timelineind].Item2, 0);
+				Canvas.SetTop(CurSceneEntityDisplays[timelineind].Item2, 0);
 
-				CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Left;
-				CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Top;
+				CurSceneEntityDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Left;
+				CurSceneEntityDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Top;
 
 				//for file data
 				CurActiveDialogueScene.Characters[timelineind].HorizontalAnchor =
-					CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment.ToString();
+					CurSceneEntityDisplays[timelineind].Item2.HorizontalAlignment.ToString();
 				CurActiveDialogueScene.Characters[timelineind].VerticalAnchor =
-					CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment.ToString();
+					CurSceneEntityDisplays[timelineind].Item2.VerticalAlignment.ToString();
 			}
 			else if (hori == HorizontalAlignment.Right && vert == VerticalAlignment.Top)
 			{
-				Canvas.SetLeft(CurSceneCharacterDisplays[timelineind].Item2,
-					gridw - CurSceneCharacterDisplays[timelineind].Item2.Width);
-				Canvas.SetTop(CurSceneCharacterDisplays[timelineind].Item2, 0);
+				Canvas.SetLeft(CurSceneEntityDisplays[timelineind].Item2,
+					gridw - CurSceneEntityDisplays[timelineind].Item2.Width);
+				Canvas.SetTop(CurSceneEntityDisplays[timelineind].Item2, 0);
 
-				CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Right;
-				CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Top;
+				CurSceneEntityDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Right;
+				CurSceneEntityDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Top;
 
 				//for file data
 				CurActiveDialogueScene.Characters[timelineind].HorizontalAnchor =
-					CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment.ToString();
+					CurSceneEntityDisplays[timelineind].Item2.HorizontalAlignment.ToString();
 				CurActiveDialogueScene.Characters[timelineind].VerticalAnchor =
-					CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment.ToString();
+					CurSceneEntityDisplays[timelineind].Item2.VerticalAlignment.ToString();
 			}
 			else if (hori == HorizontalAlignment.Left && vert == VerticalAlignment.Bottom)
 			{
-				Canvas.SetLeft(CurSceneCharacterDisplays[timelineind].Item2, 0);
-				Canvas.SetTop(CurSceneCharacterDisplays[timelineind].Item2,
-					gridh - CurSceneCharacterDisplays[timelineind].Item2.Height);
+				Canvas.SetLeft(CurSceneEntityDisplays[timelineind].Item2, 0);
+				Canvas.SetTop(CurSceneEntityDisplays[timelineind].Item2,
+					gridh - CurSceneEntityDisplays[timelineind].Item2.Height);
 
-				CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Left;
-				CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Bottom;
+				CurSceneEntityDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Left;
+				CurSceneEntityDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Bottom;
 
 				//for file data
 				CurActiveDialogueScene.Characters[timelineind].HorizontalAnchor =
-					CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment.ToString();
+					CurSceneEntityDisplays[timelineind].Item2.HorizontalAlignment.ToString();
 				CurActiveDialogueScene.Characters[timelineind].VerticalAnchor =
-					CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment.ToString();
+					CurSceneEntityDisplays[timelineind].Item2.VerticalAlignment.ToString();
 			}
 			else if (hori == HorizontalAlignment.Right && vert == VerticalAlignment.Bottom)
 			{
-				Canvas.SetLeft(CurSceneCharacterDisplays[timelineind].Item2,
-					gridw - CurSceneCharacterDisplays[timelineind].Item2.Width);
-				Canvas.SetTop(CurSceneCharacterDisplays[timelineind].Item2,
-					gridh - CurSceneCharacterDisplays[timelineind].Item2.Height);
+				Canvas.SetLeft(CurSceneEntityDisplays[timelineind].Item2,
+					gridw - CurSceneEntityDisplays[timelineind].Item2.Width);
+				Canvas.SetTop(CurSceneEntityDisplays[timelineind].Item2,
+					gridh - CurSceneEntityDisplays[timelineind].Item2.Height);
 
-				CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Right;
-				CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Bottom;
+				CurSceneEntityDisplays[timelineind].Item2.HorizontalAlignment = HorizontalAlignment.Right;
+				CurSceneEntityDisplays[timelineind].Item2.VerticalAlignment = VerticalAlignment.Bottom;
 
 				//for file data
 				CurActiveDialogueScene.Characters[timelineind].HorizontalAnchor =
-					CurSceneCharacterDisplays[timelineind].Item2.HorizontalAlignment.ToString();
+					CurSceneEntityDisplays[timelineind].Item2.HorizontalAlignment.ToString();
 				CurActiveDialogueScene.Characters[timelineind].VerticalAnchor =
-					CurSceneCharacterDisplays[timelineind].Item2.VerticalAlignment.ToString();
+					CurSceneEntityDisplays[timelineind].Item2.VerticalAlignment.ToString();
 			}
 		}
 
@@ -5198,35 +5211,35 @@ namespace AmethystEngine.Forms
 		{
 			double gridw = DialogueEditor_BackCanvas.ActualWidth;
 			double gridh = DialogueEditor_BackCanvas.ActualHeight;
-			foreach (Tuple<ContentControl, ContentControl> GameUICC in CurSceneCharacterDisplays)
+			foreach (Tuple<ContentControl, ContentControl> BaseUICC in CurSceneEntityDisplays)
 			{
-				HorizontalAlignment hori = GameUICC.Item2.HorizontalAlignment;
-				VerticalAlignment vert = GameUICC.Item2.VerticalAlignment;
+				HorizontalAlignment hori = BaseUICC.Item2.HorizontalAlignment;
+				VerticalAlignment vert = BaseUICC.Item2.VerticalAlignment;
 
 
 				if (hori == HorizontalAlignment.Left && vert == VerticalAlignment.Top)
 				{
-					Canvas.SetLeft(GameUICC.Item2, 0);
-					Canvas.SetTop(GameUICC.Item2, 0);
+					Canvas.SetLeft(BaseUICC.Item2, 0);
+					Canvas.SetTop(BaseUICC.Item2, 0);
 				}
 				else if (hori == HorizontalAlignment.Right && vert == VerticalAlignment.Top)
 				{
-					Canvas.SetLeft(GameUICC.Item2,
-						gridw - GameUICC.Item2.ActualWidth);
-					Canvas.SetTop(GameUICC.Item2, 0);
+					Canvas.SetLeft(BaseUICC.Item2,
+						gridw - BaseUICC.Item2.ActualWidth);
+					Canvas.SetTop(BaseUICC.Item2, 0);
 				}
 				else if (hori == HorizontalAlignment.Left && vert == VerticalAlignment.Bottom)
 				{
-					Canvas.SetLeft(GameUICC.Item2, 0);
-					Canvas.SetTop(GameUICC.Item2,
-						gridh - GameUICC.Item2.ActualHeight);
+					Canvas.SetLeft(BaseUICC.Item2, 0);
+					Canvas.SetTop(BaseUICC.Item2,
+						gridh - BaseUICC.Item2.ActualHeight);
 				}
 				else if (hori == HorizontalAlignment.Right && vert == VerticalAlignment.Bottom)
 				{
-					Canvas.SetLeft(GameUICC.Item2,
-						gridw - GameUICC.Item2.ActualWidth);
-					Canvas.SetTop(GameUICC.Item2,
-						gridh - GameUICC.Item2.ActualHeight);
+					Canvas.SetLeft(BaseUICC.Item2,
+						gridw - BaseUICC.Item2.ActualWidth);
+					Canvas.SetTop(BaseUICC.Item2,
+						gridh - BaseUICC.Item2.ActualHeight);
 				}
 			}
 		}
@@ -5305,7 +5318,7 @@ namespace AmethystEngine.Forms
 					new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), durationime_TB));
 
 				int i = 0;
-				foreach (String s in (TimeB.LinkedDialogueBlock as DialogueNodeBlock)?.DialogueTextOptions)
+				foreach (String s in (TimeB.LinkedDialogueBlock as NodeEditor.Components.DialogueNodeBlock)?.DialogueTextOptions)
 				{
 					ComboBox CB = new ComboBox() {Height = 50, ItemTemplate = (DataTemplate) this.Resources["CBIMGItems"]};
 					CB.SelectionChanged += SetSpriteImagePath_Dia;
@@ -5341,7 +5354,7 @@ namespace AmethystEngine.Forms
 					ComboBox CB1 = new ComboBox() {Height = 50};
 					CB1.SelectionChanged += SetLinkedTBName;
 					List<String> ComboItems1 = new List<String>();
-					foreach (GameUI Gameui in CurActiveDialogueScene
+					foreach (BaseUI Gameui in CurActiveDialogueScene
 						.DialogueBoxes[DialogueEditor_Timeline.GetTimelinePosition(TimeB.TimelineParent)].UIElements)
 					{
 						if (Gameui is GameTextBlock)
@@ -5359,7 +5372,7 @@ namespace AmethystEngine.Forms
 					i++;
 				}
 			}
-			else if (sender is DialogueNodeBlock dialogueNodeBlock)
+			else if (sender is NodeEditor.Components.DialogueNodeBlock dialogueNodeBlock)
 			{
 				DialogueEditorSelectedControl = sender;
 				PropertyBag timeblockPropertyBag = new PropertyBag(sender);
@@ -5367,7 +5380,7 @@ namespace AmethystEngine.Forms
 				PropertyBag dialoguePropertyBag = new PropertyBag(sender);
 				dialoguePropertyBag.Name = "Dialogue Data";
 
-				TimeBlock TimeB = dialogueNodeBlock.LinkedTimeBlock as TimeBlock;
+				TimelinePlayer.Components.TimeBlock TimeB = dialogueNodeBlock.LinkedTimeBlock as TimelinePlayer.Components.TimeBlock;
 				if (TimeB == null) throw new NotImplementedException("The Linked TextBox has NOT been set!");
 
 				if (PropertyBags.Count > 0)
@@ -5441,7 +5454,7 @@ namespace AmethystEngine.Forms
 					ComboBox CB1 = new ComboBox() {Height = 50};
 					CB1.SelectionChanged += SetLinkedTBName;
 					List<String> ComboItems1 = new List<String>();
-					foreach (GameUI Gameui in CurActiveDialogueScene
+					foreach (BaseUI Gameui in CurActiveDialogueScene
 						.DialogueBoxes[DialogueEditor_Timeline.GetTimelinePosition(TimeB.TimelineParent)].UIElements)
 					{
 						if (Gameui is GameTextBlock)
@@ -5479,7 +5492,7 @@ namespace AmethystEngine.Forms
 					if (Int32.TryParse((sender as TextBox).Text, out int val))
 						timeBlock.Duration = val;
 				}
-				else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+				else if (DialogueEditorSelectedControl is NodeEditor.Components.DialogueNodeBlock dialogue)
 				{
 					if (Int32.TryParse((sender as TextBox).Text, out int val))
 						(dialogue.LinkedTimeBlock as TimeBlock).Duration = val;
@@ -5496,7 +5509,7 @@ namespace AmethystEngine.Forms
 					if (Int32.TryParse((sender as TextBox).Text, out int val))
 						timeBlock.StartTime = val;
 				}
-				else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+				else if (DialogueEditorSelectedControl is NodeEditor.Components.DialogueNodeBlock dialogue)
 				{
 					if (Int32.TryParse((sender as TextBox).Text, out int val))
 						(dialogue.LinkedTimeBlock as TimeBlock).StartTime = val;
@@ -5513,7 +5526,7 @@ namespace AmethystEngine.Forms
 					if (Int32.TryParse((sender as TextBox).Text, out int val))
 						timeBlock.EndTime = val;
 				}
-				else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+				else if (DialogueEditorSelectedControl is NodeEditor.Components.DialogueNodeBlock dialogue)
 				{
 					if (Int32.TryParse((sender as TextBox).Text, out int val))
 						(dialogue.LinkedTimeBlock as TimeBlock).EndTime = val;
@@ -5533,11 +5546,11 @@ namespace AmethystEngine.Forms
 			{
 				if (DialogueEditorSelectedControl is TimeBlock timeBlock)
 				{
-					(timeBlock.LinkedDialogueBlock as DialogueNodeBlock).DialogueTextOptions[(Grid.GetRow(sender as TextBox)) / 3]
+					(timeBlock.LinkedDialogueBlock as NodeEditor.Components.DialogueNodeBlock).DialogueTextOptions[(Grid.GetRow(sender as TextBox)) / 3]
 						= (sender as TextBox).Text; //set the dialogue data
 					timeBlock.CurrentDialogue = (sender as TextBox).Text; //set the timeblock data
 				}
-				else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+				else if (DialogueEditorSelectedControl is NodeEditor.Components.DialogueNodeBlock dialogue)
 				{
 					dialogue.DialogueTextOptions[(Grid.GetRow(sender as TextBox)) / 3] = (sender as TextBox).Text;
 					(dialogue.LinkedTimeBlock as TimeBlock).CurrentDialogue = (sender as TextBox).Text;
@@ -5573,7 +5586,7 @@ namespace AmethystEngine.Forms
 				//((TimeBlock)DialogueEditor_Timeline.SelectedControl).TrackSpritePath = (((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath);
 				//((TimeBlock)DialogueEditor_Timeline.SelectedControl).Trackname = (((EditorObject)((ComboBox)sender).SelectedValue).Name);
 			}
-			else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+			else if (DialogueEditorSelectedControl is NodeEditor.Components.DialogueNodeBlock dialogue)
 			{
 				(dialogue.LinkedTimeBlock as TimeBlock).TrackSpritePath =
 					(((EditorObject) ((ComboBox) sender).SelectedValue).Thumbnail.AbsolutePath);
@@ -5609,7 +5622,7 @@ namespace AmethystEngine.Forms
 				//
 				//((TimeBlock)sender).
 			}
-			else if (DialogueEditorSelectedControl is DialogueNodeBlock dialogue)
+			else if (DialogueEditorSelectedControl is NodeEditor.Components.DialogueNodeBlock dialogue)
 			{
 				(dialogue.LinkedTimeBlock as TimeBlock).LinkedTextBoxName = (sender as ComboBox).SelectedItem.ToString();
 			}
@@ -5620,7 +5633,7 @@ namespace AmethystEngine.Forms
 		/// This method right now will add a sprite, that is can be linked to change, and a UI object to the screen.
 		/// </summary>
 		/// <param name="c"></param>
-		public void AddCharacterHook(SceneCharacter c, GameUI gameUi, String GameFileUI, String LinkedTextboxName,
+		public void AddCharacterHook(SceneEntity c, BaseUI gameUi, String GameFileUI, String LinkedTextboxName,
 			String LinkedDialogueImage_Text = null)
 		{
 			CurActiveDialogueScene.Characters.Add(c);
@@ -5657,7 +5670,7 @@ namespace AmethystEngine.Forms
 				CurActiveDialogueScene.DialogueBoxesFilePaths.Add(GameFileUI);
 
 				//create the pointers to the content controls. which is what displays my images to the screen
-				CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
+				CurSceneEntityDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
 			}
 			else
 			{
@@ -5675,7 +5688,7 @@ namespace AmethystEngine.Forms
 				CurActiveDialogueScene.DialogueBoxesFilePaths.Add(GameFileUI);
 
 				//create the pointers to the content controls. which is what displays my images to the screen
-				CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
+				CurSceneEntityDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
 			}
 
 		}
@@ -5723,7 +5736,7 @@ namespace AmethystEngine.Forms
 
 			//CurActiveDialogueScene.Characters.Add(new Character() { Name = "Antonio" });
 
-			SceneCharacter c = new SceneCharacter(HorizontalAlignment.Left.ToString(), VerticalAlignment.Bottom.ToString());
+			SceneEntity c = new SceneEntity(HorizontalAlignment.Left.ToString(), VerticalAlignment.Bottom.ToString());
 			Window w = new AddCharacterForm(ProjectFilePath) {AddToScene = AddCharacterHook};
 			w.ShowDialog();
 
@@ -5778,11 +5791,11 @@ namespace AmethystEngine.Forms
 					//this means we need to display the choices to the user.
 
 					//first hide the current UI controls.
-					for (int i = 0; i < CurSceneCharacterDisplays.Count; i++)
+					for (int i = 0; i < CurSceneEntityDisplays.Count; i++)
 					{
-						CurSceneCharacterDisplays[i].Item1.Visibility = Visibility.Hidden;
-						CurSceneCharacterDisplays[i].Item2.Visibility = Visibility.Hidden;
-						Selector.SetIsSelected(CurSceneCharacterDisplays[i].Item2, false);
+						CurSceneEntityDisplays[i].Item1.Visibility = Visibility.Hidden;
+						CurSceneEntityDisplays[i].Item2.Visibility = Visibility.Hidden;
+						Selector.SetIsSelected(CurSceneEntityDisplays[i].Item2, false);
 					}
 
 					//FOR NOW display a list box of the options the user will choose from.
@@ -5790,7 +5803,7 @@ namespace AmethystEngine.Forms
 					ListBox lb = new ListBox();
 					lb.VerticalAlignment = VerticalAlignment.Bottom;
 					lb.HorizontalAlignment = HorizontalAlignment.Stretch;
-					foreach (String datachoices in (choiceTimeBlock.LinkedDialogueBlock as DialogueNodeBlock).DialogueTextOptions)
+					foreach (String datachoices in (choiceTimeBlock.LinkedDialogueBlock as NodeEditor.Components.DialogueNodeBlock).DialogueTextOptions)
 					{
 						lb.Items.Add(datachoices);
 					}
@@ -5807,7 +5820,7 @@ namespace AmethystEngine.Forms
 				{
 					try
 					{
-						((Image) ((Grid) CurSceneCharacterDisplays[
+						((Image) ((Grid) CurSceneEntityDisplays[
 										DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock) e.NewItems[0]).TimelineParent)].Item1
 									.Content)
 								.Children[2]).Source =
@@ -5831,7 +5844,7 @@ namespace AmethystEngine.Forms
 
 					//here we change the dialogue text itself
 
-					GameUI gtb = null;
+					BaseUI gtb = null;
 					try
 					{
 						gtb = CurActiveDialogueScene
@@ -5851,11 +5864,11 @@ namespace AmethystEngine.Forms
 					}
 
 					gtb.SetProperty("ContentText",
-						((((TimeBlock) e.NewItems[0]).LinkedDialogueBlock) as DialogueNodeBlock).DialogueTextOptions[0]);
+						((((TimeBlock) e.NewItems[0]).LinkedDialogueBlock) as NodeEditor.Components.DialogueNodeBlock).DialogueTextOptions[0]);
 
 					UIElementCollection uie =
-						((Grid) CurSceneCharacterDisplays[
-							DialogueEditor_Timeline.GetTimelinePosition(((TimeBlock) e.NewItems[0]).TimelineParent)].Item2.Content)
+						((Grid) CurSceneEntityDisplays[
+							DialogueEditor_Timeline.GetTimelinePosition(((TimelinePlayer.Components.TimeBlock) e.NewItems[0]).TimelineParent)].Item2.Content)
 						.Children;
 					ContentControl CC = null;
 					foreach (UIElement ccc in uie)
@@ -5921,10 +5934,10 @@ namespace AmethystEngine.Forms
 		private void UserChooseDialogueChoice(object sender, SelectionChangedEventArgs e)
 		{
 			//show the controls again.
-			for (int i = 0; i < CurSceneCharacterDisplays.Count; i++)
+			for (int i = 0; i < CurSceneEntityDisplays.Count; i++)
 			{
-				CurSceneCharacterDisplays[i].Item1.Visibility = Visibility.Visible;
-				CurSceneCharacterDisplays[i].Item2.Visibility = Visibility.Visible;
+				CurSceneEntityDisplays[i].Item1.Visibility = Visibility.Visible;
+				CurSceneEntityDisplays[i].Item2.Visibility = Visibility.Visible;
 			}
 
 			DialogueEditor_Grid.Children.Remove(sender as ListBox);
@@ -6048,7 +6061,7 @@ namespace AmethystEngine.Forms
 		public object CreateDialogueBlockForTimeline(object Timeblock, bool bChoices)
 		{
 			int i = DialogueEditor_Timeline.GetTimelinePosition(DialogueEditor_Timeline.selectedTimeline, null);
-			DialogueNodeBlock dialogueNode = new DialogueNodeBlock(CurActiveDialogueScene.Characters[i].Name);
+			NodeEditor.Components.DialogueNodeBlock dialogueNode = new NodeEditor.Components.DialogueNodeBlock(CurActiveDialogueScene.Characters[i].Name);
 			DialogueEditor_NodeGraph.AddDialogueBlockToGraph(dialogueNode, CurActiveDialogueScene.Characters[i].Name,
 				Timeblock);
 
@@ -6070,12 +6083,12 @@ namespace AmethystEngine.Forms
 		public object CreateTimeBlockForDialogue(object DialogueBlock)
 		{
 			int i = DialogueEditor_Timeline.GetTimelinePosition(DialogueEditor_Timeline.selectedTimeline, null);
-			TimeBlock timeBlock = new TimeBlock(DialogueEditor_Timeline.GetTimelines()[0], 0);
-			timeBlock.Trackname = (DialogueBlock as DialogueNodeBlock)?.Header;
+			TimelinePlayer.Components.TimeBlock timeBlock = new TimelinePlayer.Components.TimeBlock(DialogueEditor_Timeline.GetTimelines()[0], 0);
+			timeBlock.Trackname = (DialogueBlock as NodeEditor.Components.DialogueNodeBlock)?.Header;
 
 			//DialogueEditor_NodeGraph.AddDialogueBlockToGraph(timeBlock, CurActiveDialogueScene.Characters[i].Name, DialogueBlock);
-			(DialogueBlock as DialogueNodeBlock).LinkedTimeBlock = timeBlock;
-			timeBlock.LinkedDialogueBlock = (DialogueBlock as DialogueNodeBlock);
+			(DialogueBlock as NodeEditor.Components.DialogueNodeBlock).LinkedTimeBlock = timeBlock;
+			timeBlock.LinkedDialogueBlock = (DialogueBlock as NodeEditor.Components.DialogueNodeBlock);
 			//Character
 			return timeBlock;
 		}
@@ -6101,16 +6114,16 @@ namespace AmethystEngine.Forms
 		private LinkedList<TimeBlock> GetDefaultTimeBlocks_LL()
 		{
 			LinkedList<TimeBlock> retLL = new LinkedList<TimeBlock>();
-			BaseNodeBlock currentBlock = DialogueEditor_NodeGraph.StartExecutionBlock;
+			NodeEditor.Components.BaseNodeBlock currentBlock = DialogueEditor_NodeGraph.StartExecutionBlock;
 			AddTimeBlocksTillExit(ref retLL, currentBlock);
 
 			return retLL;
 		}
 
-		private LinkedList<TimeBlock> GetChoiceTimeBlocks_LL(BaseNodeBlock currentBlock, int choice)
+		private LinkedList<TimeBlock> GetChoiceTimeBlocks_LL(NodeEditor.Components.BaseNodeBlock currentBlock, int choice)
 		{
 			if (currentBlock.OutputNodes[choice].ConnectedNodes[0] != null &&
-			    currentBlock.OutputNodes[choice].ConnectedNodes[0].ParentBlock is ExitBlockNode) return null;
+			    currentBlock.OutputNodes[choice].ConnectedNodes[0].ParentBlock is NodeEditor.ExitBlockNode) return null;
 			LinkedList<TimeBlock> retLL = new LinkedList<TimeBlock>();
 			//clear the timeblocks
 			DialogueEditor_Timeline.DeleteTimeBlocksAfter();
@@ -6131,28 +6144,28 @@ namespace AmethystEngine.Forms
 			return retLL;
 		}
 
-		private void AddTimeBlocksTillExit(ref LinkedList<TimeBlock> output, BaseNodeBlock currentBlock)
+		private void AddTimeBlocksTillExit(ref LinkedList<TimeBlock> output, NodeEditor.Components.BaseNodeBlock currentBlock)
 		{
 			//add until exit is found.
 			try
 			{
-				while (!(currentBlock is ExitBlockNode))
+				while (!(currentBlock is NodeEditor.ExitBlockNode))
 				{
-					if (currentBlock is StartBlockNode start)
+					if (currentBlock is NodeEditor.StartBlockNode start)
 					{
 						currentBlock = start.ExitNode.ConnectedNodes[0].ParentBlock;
 					}
-					else if (currentBlock is DialogueNodeBlock dialogue)
+					else if (currentBlock is NodeEditor.Components.DialogueNodeBlock dialogue)
 					{
 						if (!output.Contains(dialogue.LinkedTimeBlock as TimeBlock))
 							output.AddLast(dialogue.LinkedTimeBlock as TimeBlock);
 						currentBlock = dialogue.OutputNodes[0].ConnectedNodes[0].ParentBlock;
 					}
-					else if (currentBlock is SetConstantNodeBlock setConstant)
+					else if (currentBlock is NodeEditor.Components.SetConstantNodeBlock setConstant)
 					{
 						currentBlock = setConstant.ExitNode.ConnectedNodes[0].ParentBlock;
 					}
-					else if (currentBlock is ConditionalNodeBlock conditional)
+					else if (currentBlock is NodeEditor.Components.ConditionalNodeBlock conditional)
 					{
 						currentBlock = conditional.TrueOutput.ConnectedNodes[0].ParentBlock;
 					}
@@ -6173,7 +6186,7 @@ namespace AmethystEngine.Forms
 		{
 			DialogueEditor_Timeline.DeleteAllTimeBlocks();
 			List<String> chars = new List<string>();
-			foreach (SceneCharacter character in CurActiveDialogueScene.Characters)
+			foreach (SceneEntity character in CurActiveDialogueScene.Characters)
 			{
 				chars.Add(character.Name);
 			}
@@ -6184,14 +6197,14 @@ namespace AmethystEngine.Forms
 		private void DisplayTimeBlocksAfter_LL(LinkedList<TimeBlock> desiredLL)
 		{
 			List<String> chars = new List<string>();
-			foreach (SceneCharacter character in CurActiveDialogueScene.Characters)
+			foreach (SceneEntity character in CurActiveDialogueScene.Characters)
 			{
 				chars.Add(character.Name);
 			}
 
 			DialogueEditor_Timeline.AddTimeblock_LL(desiredLL, chars, false);
 
-			foreach (Timeline timeline in DialogueEditor_Timeline.GetTimelines())
+			foreach (var timeline in DialogueEditor_Timeline.GetTimelines())
 			{
 				if (timeline.TimelineisNull_flag)
 				{
@@ -6220,11 +6233,11 @@ namespace AmethystEngine.Forms
 
 		private void LoadTimelineWithSelectedPath(object selectedblock)
 		{
-			if (!(selectedblock is BaseNodeBlock)) return;
+			if (!(selectedblock is NodeEditor.Components.BaseNodeBlock)) return;
 			DialogueEditor_Timeline.DeleteAllTimeBlocks(); //delete all timeline data
 
 			//next up use the current block and build the new list from that.
-			BaseNodeBlock tempblock = selectedblock as BaseNodeBlock;
+			NodeEditor.Components.BaseNodeBlock tempblock = selectedblock as NodeEditor.Components.BaseNodeBlock;
 			LinkedList<TimeBlock> timeBlocks = new LinkedList<TimeBlock>();
 
 			AddTimeblocksTillStart(ref timeBlocks, tempblock);
@@ -6233,27 +6246,27 @@ namespace AmethystEngine.Forms
 			DisplayTimeBlocks_LL(timeBlocks);
 		}
 
-		private void AddTimeblocksTillStart(ref LinkedList<TimeBlock> output, BaseNodeBlock tempblock)
+		private void AddTimeblocksTillStart(ref LinkedList<TimeBlock> output, NodeEditor.Components.BaseNodeBlock tempblock)
 		{
 			try
 			{
-				while (!(tempblock is StartBlockNode))
+				while (!(tempblock is NodeEditor.StartBlockNode))
 				{
 					//back track and add.
-					if (tempblock is ExitBlockNode exit)
+					if (tempblock is NodeEditor.ExitBlockNode exit)
 					{
 						tempblock = exit.EntryNode.ConnectedNodes[0].ParentBlock;
 					}
-					else if (tempblock is DialogueNodeBlock dialogue)
+					else if (tempblock is NodeEditor.Components.DialogueNodeBlock dialogue)
 					{
 						tempblock = dialogue.EntryNode.ConnectedNodes[0].ParentBlock;
 						output.AddFirst(dialogue.LinkedTimeBlock as TimeBlock);
 					}
-					else if (tempblock is SetConstantNodeBlock setConstant)
+					else if (tempblock is NodeEditor.Components.SetConstantNodeBlock setConstant)
 					{
 						tempblock = setConstant.EntryNode.ConnectedNodes[0].ParentBlock;
 					}
-					else if (tempblock is ConditionalNodeBlock conditional)
+					else if (tempblock is NodeEditor.Components.ConditionalNodeBlock conditional)
 					{
 						tempblock = conditional.EntryNode.ConnectedNodes[0].ParentBlock;
 					}
@@ -6296,15 +6309,15 @@ namespace AmethystEngine.Forms
 
 			//get the Params list of this scene
 			List<Tuple<String, object>> varDataList = new List<Tuple<string, object>>();
-			foreach (BlockNodeEditor.RuntimeVars rtVars in DialogueEditor_NodeGraph.TestingVars_list)
+			foreach ( BlockNodeEditor.RuntimeVars rtVars in DialogueEditor_NodeGraph.TestingVars_list)
 			{
 				varDataList.Add(new Tuple<string, object>(rtVars.VarName, rtVars.OrginalVarData));
 			}
 
-			List<BaseNodeBlock> BlockNodes = new List<BaseNodeBlock>();
+			List<NodeEditor.Components.BaseNodeBlock> BlockNodes = new List<NodeEditor.Components.BaseNodeBlock>();
 			foreach (UIElement uie in DialogueEditor_NodeGraph.NodeCanvas.Children)
 			{
-				if (uie is BaseNodeBlock bn)
+				if (uie is NodeEditor.Components.BaseNodeBlock bn)
 				{
 					bn.LocX = Canvas.GetLeft(bn);
 					bn.LocY = Canvas.GetTop(bn);
@@ -6359,10 +6372,10 @@ namespace AmethystEngine.Forms
 			//this is an import function so we need to remove the DEFAULT start and End Block.
 			//AND SET THE DialogueNodegraph.Start ref.
 			DialogueEditor_NodeGraph.NodeCanvas.Children.Clear();
-			foreach (BaseNodeBlock bn in dia.DialogueBlockNodes)
+			foreach (NodeEditor.Components.BaseNodeBlock bn in dia.DialogueBlockNodes)
 			{
-				if (bn is StartBlockNode start)
-					DialogueEditor_NodeGraph.StartExecutionBlock = start;
+				if (bn is NodeEditor.StartBlockNode )
+					DialogueEditor_NodeGraph.StartExecutionBlock = bn;
 			}
 
 			//Add the variables to the scene
@@ -6380,7 +6393,7 @@ namespace AmethystEngine.Forms
 			Dialogue_CE_Tree.ItemsSource = CurActiveDialogueScene.Characters;
 			for (int i = 0; i < CurActiveDialogueScene.Characters.Count; i++)
 			{
-				CurActiveDialogueScene.DialogueBoxes.Add(GameUI.ImportGameUI(CurActiveDialogueScene.DialogueBoxesFilePaths[i]));
+				CurActiveDialogueScene.DialogueBoxes.Add(BaseUI.ImportBaseUI(CurActiveDialogueScene.DialogueBoxesFilePaths[i]));
 				DialogueEditor_NodeGraph.SceneCharacters_list.Add(CurActiveDialogueScene.Characters[i].Name);
 			}
 
@@ -6393,12 +6406,12 @@ namespace AmethystEngine.Forms
 			{
 				try
 				{
-					BaseNodeBlock fromBlock = dia.DialogueBlockNodes.Find(x => x.Name == tup.Item1);
-					ConnectionNode fromBlockNode = GetFromConnectionNode(fromBlock, tup);
+					NodeEditor.Components.BaseNodeBlock fromBlock = dia.DialogueBlockNodes.Find(x => x.Name == tup.Item1);
+					NodeEditor.Components.ConnectionNode fromBlockNode = GetFromConnectionNode(fromBlock, tup);
 
 
-					BaseNodeBlock toBlock = dia.DialogueBlockNodes.Find(x => x.Name == tup.Item4);
-					ConnectionNode toBlockNode = GetToConnectionNode(toBlock, tup);
+					NodeEditor.Components.BaseNodeBlock toBlock = dia.DialogueBlockNodes.Find(x => x.Name == tup.Item4);
+					NodeEditor.Components.ConnectionNode toBlockNode = GetToConnectionNode(toBlock, tup);
 
 					DialogueEditor_NodeGraph.ConnectNodes(
 						fromBlockNode,
@@ -6416,7 +6429,7 @@ namespace AmethystEngine.Forms
 
 			charcnt = 0;
 			//Dialogue Boxes per character
-			foreach (GameUI gameUi in dia.DialogueBoxes)
+			foreach (BaseUI gameUi in dia.DialogueBoxes)
 			{
 				OpenUIEdits.Add(gameUi);
 				ContentControl CC = DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false,
@@ -6428,7 +6441,7 @@ namespace AmethystEngine.Forms
 				//DrawUIToScreen(DialogueEditore_Canvas, DialogueEditor_BackCanvas, OpenUIEdits.Last(), false);
 
 				//create the pointers to the content controls. which is what displays my images to the screen
-				CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
+				CurSceneEntityDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
 
 				//Change the Display positon of the 
 				HorizontalAlignment hori = 0;
@@ -6457,37 +6470,37 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-		private ConnectionNode GetFromConnectionNode(BaseNodeBlock fromBlock,
+		private NodeEditor.Components.ConnectionNode GetFromConnectionNode(NodeEditor.Components.BaseNodeBlock fromBlock,
 			Tuple<String, String, int, String, String, int> tup)
 		{
-			ConnectionNode fromBlockNode = null;
-			if (fromBlock is StartBlockNode start) //|| fromBlock is ExitBlockNode)
+			NodeEditor.Components.ConnectionNode fromBlockNode = null;
+			if (fromBlock is NodeEditor.StartBlockNode start) //|| fromBlock is ExitBlockNode)
 			{
 				fromBlockNode = start.ExitNode;
 			}
-			else if (fromBlock is BaseArithmeticBlock arth)
+			else if (fromBlock is NodeEditor.Components.Arithmetic.BaseArithmeticBlock arth)
 			{
 				fromBlockNode = arth.OutValue;
 			}
-			else if (fromBlock is BaseLogicNodeBlock logi)
+			else if (fromBlock is NodeEditor.Components.Logic.BaseLogicNodeBlock logi)
 			{
 				fromBlockNode = logi.Output;
 			}
-			else if (fromBlock is ConditionalNodeBlock condi)
+			else if (fromBlock is NodeEditor.Components.ConditionalNodeBlock condi)
 			{
 				fromBlockNode = (tup.Item3 == 0 ? condi.TrueOutput : condi.FalseOutput);
 			}
-			else if (fromBlock is SetConstantNodeBlock seti)
+			else if (fromBlock is NodeEditor.Components.SetConstantNodeBlock seti)
 			{
 				if (tup.Item2 == "Exit")
 					fromBlockNode = seti.ExitNode;
 				else fromBlockNode = seti.OutValue;
 			}
-			else if (fromBlock is GetConstantNodeBlock getvar)
+			else if (fromBlock is NodeEditor.Components.GetConstantNodeBlock getvar)
 			{
 				fromBlockNode = getvar.output;
 			}
-			else if (fromBlock is DialogueNodeBlock dialogue)
+			else if (fromBlock is NodeEditor.Components.DialogueNodeBlock dialogue)
 			{
 				fromBlockNode = dialogue.OutputNodes[tup.Item3];
 			}
@@ -6495,35 +6508,35 @@ namespace AmethystEngine.Forms
 			return fromBlockNode;
 		}
 
-		private ConnectionNode GetToConnectionNode(BaseNodeBlock fromBlock,
+		private NodeEditor.Components.ConnectionNode GetToConnectionNode(NodeEditor.Components.BaseNodeBlock fromBlock,
 			Tuple<String, String, int, String, String, int> tup)
 		{
-			ConnectionNode fromBlockNode = null;
-			if (fromBlock is ExitBlockNode exit) //|| fromBlock is ExitBlockNode)
+			NodeEditor.Components.ConnectionNode fromBlockNode = null;
+			if (fromBlock is NodeEditor.ExitBlockNode exit) //|| fromBlock is ExitBlockNode)
 			{
 				fromBlockNode = exit.EntryNode;
 			}
-			else if (fromBlock is BaseArithmeticBlock arth)
+			else if (fromBlock is NodeEditor.Components.Arithmetic.BaseArithmeticBlock arth)
 			{
 				fromBlockNode = arth.InputNodes[tup.Item6];
 			}
-			else if (fromBlock is BaseLogicNodeBlock logi)
+			else if (fromBlock is NodeEditor.Components.Logic.BaseLogicNodeBlock logi)
 			{
 				fromBlockNode = logi.InputNodes[tup.Item6];
 			}
-			else if (fromBlock is ConditionalNodeBlock condi)
+			else if (fromBlock is NodeEditor.Components.ConditionalNodeBlock condi)
 			{
 				if (tup.Item5 == "Enter")
 					fromBlockNode = condi.EntryNode;
 				else fromBlockNode = condi.InputNodes[tup.Item6];
 			}
-			else if (fromBlock is SetConstantNodeBlock seti)
+			else if (fromBlock is NodeEditor.Components.SetConstantNodeBlock seti)
 			{
 				if (tup.Item5 == "Enter")
 					fromBlockNode = seti.EntryNode;
 				else fromBlockNode = seti.InputNodes[tup.Item6];
 			}
-			else if (fromBlock is DialogueNodeBlock dialogue)
+			else if (fromBlock is NodeEditor.Components.DialogueNodeBlock dialogue)
 			{
 				if (tup.Item5 == "Enter")
 					fromBlockNode = dialogue.EntryNode;
@@ -6536,7 +6549,7 @@ namespace AmethystEngine.Forms
 		private void SetUpAddedDialogueBlocks(DialogueScene dia)
 		{
 			//If there are dialogue that have choices we need to set them.
-			foreach (BaseNodeBlock bn in dia.DialogueBlockNodes)
+			foreach (NodeEditor.Components.BaseNodeBlock bn in dia.DialogueBlockNodes)
 			{
 				//display the nodes.
 				Canvas.SetLeft(bn, bn.LocX);
@@ -6547,7 +6560,7 @@ namespace AmethystEngine.Forms
 				DialogueEditor_NodeGraph.AddToNodeEditor(bn);
 				bn.ApplyTemplate();
 				//var v = bn.FindResource("MainBorder");
-				if (bn is DialogueNodeBlock dialo)
+				if (bn is NodeEditor.Components.DialogueNodeBlock dialo)
 				{
 					//add outputs display wise
 					Button v = dialo.Template.FindName("AddOutputNode_BTN", dialo) as Button;
@@ -6581,15 +6594,15 @@ namespace AmethystEngine.Forms
 					}
 				}
 
-				//CurSceneCharacterDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
+				//CurSceneEntityDisplays.Add(new Tuple<ContentControl, ContentControl>(CC, SelectedBaseUIControl));
 			}
 		}
 
-		private Point GetNodePosition(BaseNodeBlock NodeBlock, ConnectionNode DesNode)
+		private Point GetNodePosition(NodeEditor.Components.BaseNodeBlock NodeBlock, NodeEditor.Components.ConnectionNode DesNode)
 		{
 			Point retPoint = new Point(0, 0);
 
-			if (NodeBlock is StartBlockNode || NodeBlock is ExitBlockNode)
+			if (NodeBlock is NodeEditor.StartBlockNode || NodeBlock is NodeEditor.ExitBlockNode)
 			{
 				if (NodeBlock.EntryNode == DesNode)
 				{
@@ -6602,9 +6615,9 @@ namespace AmethystEngine.Forms
 					retPoint.Y = Canvas.GetTop(NodeBlock) + 30;
 				}
 			}
-			else if (NodeBlock is BaseArithmeticBlock || NodeBlock is BaseLogicNodeBlock
-			                                          || NodeBlock is ConditionalNodeBlock
-			                                          || NodeBlock is SetConstantNodeBlock)
+			else if (NodeBlock is NodeEditor.Components.Arithmetic.BaseArithmeticBlock || NodeBlock is NodeEditor.Components.Logic.BaseLogicNodeBlock
+																								|| NodeBlock is NodeEditor.Components.ConditionalNodeBlock
+																								|| NodeBlock is NodeEditor.Components.SetConstantNodeBlock)
 			{
 				if (NodeBlock.EntryNode == DesNode)
 				{
@@ -6629,7 +6642,7 @@ namespace AmethystEngine.Forms
 					retPoint.Y = 20 + Canvas.GetTop(NodeBlock) + ((idx * 30) + 15);
 				}
 			}
-			else if (NodeBlock is GetConstantNodeBlock getvar)
+			else if (NodeBlock is NodeEditor.Components.GetConstantNodeBlock getvar)
 			{
 				if (getvar.output == DesNode)
 				{
@@ -6637,7 +6650,7 @@ namespace AmethystEngine.Forms
 					retPoint.Y = Canvas.GetTop(NodeBlock) + 40;
 				}
 			}
-			else if (NodeBlock is DialogueNodeBlock)
+			else if (NodeBlock is NodeEditor.Components.DialogueNodeBlock)
 			{
 				//- I1=>20 + (40 * (i)) + 20
 				//- O1=>X = 15,Y = 20 + (40 * (i)) + 20

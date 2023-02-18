@@ -102,7 +102,7 @@
 
 		<GridSplitter Grid.Row="4" HorizontalAlignment="Stretch" VerticalAlignment="Top" IsEnabled="False" Height="5" Background="#FF484848"></GridSplitter>
 		<TextBlock Grid.Row="4" Foreground="White" Text="import a game UI control that this character will use to display text!" Margin="10,6,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"></TextBlock>
-		<Button Content="Import" Grid.Row="4" Height="20" Width="75" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="370,6,0,0" Click="ImportGameUI_BTN_Click"></Button>
+		<Button Content="Import" Grid.Row="4" Height="20" Width="75" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="370,6,0,0" Click="ImportBaseUI_BTN_Click"></Button>
 		<Canvas Grid.Row="4" x:Name="Back_PreivewUI_Grid" Margin="0,27,200,0">
 			<Canvas.Background>
 				<VisualBrush x:Name="Canvas_grid" TileMode="Tile" Stretch="Uniform" Viewport="0,0,20,20" ViewportUnits="Absolute" >

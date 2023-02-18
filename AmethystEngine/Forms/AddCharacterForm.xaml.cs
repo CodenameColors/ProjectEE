@@ -17,6 +17,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using BixBite.Rendering.UI;
+using BixBite.Rendering.UI.Button;
+using BixBite.Rendering.UI.Image;
+using BixBite.Rendering.UI.TextBlock;
 
 namespace AmethystEngine.Forms
 {
@@ -25,10 +28,10 @@ namespace AmethystEngine.Forms
   /// </summary>
   public partial class AddCharacterForm : Window
   {
-		SceneCharacter _desiredSceneCharacter = new SceneCharacter(HorizontalAlignment.Left.ToString(), VerticalAlignment.Bottom.ToString());
-		private GameUI desiredGameUi;
+		SceneEntity _desiredSceneEntity = new SceneEntity(HorizontalAlignment.Left.ToString(), VerticalAlignment.Bottom.ToString());
+		private BaseUI desiredBaseUI;
 		ObservableCollection<EditorObject> Sprites = new ObservableCollection<EditorObject>();
-		public delegate void HooKfunction(SceneCharacter c, GameUI gameUi, String GameUIFIlePath, String LinkedTextboxName, String LinkedDialogueImage = null);
+		public delegate void HooKfunction(SceneEntity c, BaseUI BaseUI, String BaseUIFIlePath, String LinkedTextboxName, String LinkedDialogueImage = null);
 		public HooKfunction AddToScene;
 		private String ProjectFilePath ="";
 
@@ -118,7 +121,7 @@ namespace AmethystEngine.Forms
 		{
 			if(Key.Enter == e.Key)
 			{
-				_desiredSceneCharacter.Name = CharacterName_TB.Text;
+				_desiredSceneEntity.Name = CharacterName_TB.Text;
 			}
 		}
 
@@ -150,14 +153,14 @@ namespace AmethystEngine.Forms
 		{
 			bool bFail = false;
 			foreach(EditorObject eobj in Sprites)
-				_desiredSceneCharacter.DialogueSprites.Add(new BixBite.Rendering.Sprite(eobj.Name, eobj.Thumbnail.AbsolutePath,0,0,0,0));
-			if (_desiredSceneCharacter.Name == null) _desiredSceneCharacter.Name = CharacterName_TB.Text;
-			if (desiredGameUi == null )
+				_desiredSceneEntity.DialogueSprites.Add(new BixBite.Rendering.Sprite(eobj.Name, eobj.Thumbnail.AbsolutePath,0,0,0,0));
+			if (_desiredSceneEntity.Name == null) _desiredSceneEntity.Name = CharacterName_TB.Text;
+			if (desiredBaseUI == null )
 			{
-				OutputLog_TB.Text += "GameUI not imported!" + "\n";
+				OutputLog_TB.Text += "BaseUI not imported!" + "\n";
 				bFail = true;
 			}
-			if (_desiredSceneCharacter == null)
+			if (_desiredSceneEntity == null)
 			{
 				OutputLog_TB.Text += "Character not set!" + "\n";
 				bFail = true;
@@ -168,14 +171,14 @@ namespace AmethystEngine.Forms
 				bFail = true;
 			}
 			if (bFail) return;
-			if (AddToScene != null) AddToScene(_desiredSceneCharacter, desiredGameUi, CurrentUIFilePath,LinkedTextboxesChoice_CB.SelectedItem.ToString(), (LinkedImageBoxesChoice_CB.Text));
+			if (AddToScene != null) AddToScene(_desiredSceneEntity, desiredBaseUI, CurrentUIFilePath,LinkedTextboxesChoice_CB.SelectedItem.ToString(), (LinkedImageBoxesChoice_CB.Text));
 			this.Close();
 		}
 
-		private void ImportGameUI_BTN_Click(object sender, RoutedEventArgs e)
+		private void ImportBaseUI_BTN_Click(object sender, RoutedEventArgs e)
 		{
 
-			//add GameUI control.
+			//add BaseUI control.
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
 			{
 				Title = "Open UI File",
@@ -198,7 +201,7 @@ namespace AmethystEngine.Forms
 			else return; //invalid name
 			Console.WriteLine(dlg.FileName);
 
-			GameUI g = GameUI.ImportGameUI(dlg.FileName);
+			BaseUI g = BaseUI.ImportBaseUI(dlg.FileName);
 			CurrentUIFilePath = dlg.FileName;
 			PreivewUI_Grid.Children.Clear();
 			DrawUIToScreen(PreivewUI_Grid, Back_PreivewUI_Grid, g, false);
@@ -208,41 +211,41 @@ namespace AmethystEngine.Forms
 		/// method to draw a newly added/imported UI to the screen. Choose whether or not to breakdown the components for editing.
 		/// </summary>
 		/// <param name="CurrentEditorCanvas">Current Canvas that you will draw the UI too</param>
-		/// <param name="gameUI">The Custom created UI that you want to draw</param>
+		/// <param name="BaseUI">The Custom created UI that you want to draw</param>
 		/// <param name="bcomps">TRUE = multiple ContentControls will be drawn, and allowed to be edited 
 		/// <para/>
 		/// FALSE = ONLY ONE Content control will be drawn. Base UI is editable in size, and position. Children are editable via properties
 		/// </param>
-		public void DrawUIToScreen(Canvas CurrentEditorCanvas, Canvas CurrentEditorCanvas_Back, GameUI gameUI, bool bcomps)
+		public void DrawUIToScreen(Canvas CurrentEditorCanvas, Canvas CurrentEditorCanvas_Back, BaseUI baseUI, bool bcomps)
 		{
 			//set the position and the size of the Base UI
-			ContentControl BaseUI = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
+			ContentControl BaseUI_CC = ((ContentControl)this.TryFindResource("MoveableControls_Template"));
 
-			BaseUI.Width = Int32.Parse(gameUI.GetPropertyData("Width").ToString());
-			BaseUI.Height = Int32.Parse(gameUI.GetPropertyData("Height").ToString());
-			BaseUI.BorderBrush = (((bool)gameUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
-			BaseUI.BorderThickness = new Thickness(0);
-			BaseUI.Tag = "Border";
-			BaseUI.Name = gameUI.UIName;
+			BaseUI_CC.Width = Int32.Parse(baseUI.GetPropertyData("Width").ToString());
+			BaseUI_CC.Height = Int32.Parse(baseUI.GetPropertyData("Height").ToString());
+			BaseUI_CC.BorderBrush = (((bool)baseUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent);
+			BaseUI_CC.BorderThickness = new Thickness(0);
+			BaseUI_CC.Tag = "Border";
+			BaseUI_CC.Name = baseUI.UIName;
 			//};
-			BaseUI.Content = new Grid()
+			BaseUI_CC.Content = new Grid()
 			{
 				HorizontalAlignment = HorizontalAlignment.Stretch,
 				VerticalAlignment = VerticalAlignment.Stretch,
 			};
-			((Grid)BaseUI.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = (((bool)gameUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent) });
+			((Grid)BaseUI_CC.Content).Children.Add(new Border() { BorderThickness = new Thickness(2), BorderBrush = (((bool)baseUI.GetPropertyData("ShowBorder")) ? Brushes.Gray : Brushes.Transparent) });
 
 			//get the middle!
 			Point mid = new Point(CurrentEditorCanvas_Back.ActualWidth / 2, CurrentEditorCanvas_Back.ActualHeight / 2);
 			//get the true center point. Since origin is top left.
 			mid.X = 10; mid.Y = 10;
-			Canvas.SetLeft(BaseUI, mid.X); Canvas.SetTop(BaseUI, mid.Y);
+			Canvas.SetLeft(BaseUI_CC, mid.X); Canvas.SetTop(BaseUI_CC, mid.Y);
 
 			//which drawing type?
 			if (bcomps)
 			{
 				//create all the child UI elements as editable content controls
-				foreach (GameUI childUI in gameUI.UIElements)
+				foreach (BaseUI childUI in baseUI.UIElements)
 				{
 					#region DefaultProperties
 					//set the position and the size of the Base UI
@@ -304,7 +307,7 @@ namespace AmethystEngine.Forms
 						((Grid)CUI.Content).Children.Add(tb);
 
 					}
-					else if (childUI is GameIMG)
+					else if (childUI is GameImage)
 					{
 						CUI.Tag = "IMAGE";
 
@@ -327,7 +330,7 @@ namespace AmethystEngine.Forms
 			else //all as one
 			{
 				//create all the child UI elements as editable content controls
-				foreach (GameUI childUI in gameUI.UIElements)
+				foreach (BaseUI childUI in baseUI.UIElements)
 				{
 					#region DefaultProperties
 					//set the position and the size of the Base UI
@@ -394,13 +397,13 @@ namespace AmethystEngine.Forms
 						CUI.VerticalAlignment = VerticalAlignment.Top;
 						CUI.HorizontalAlignment = HorizontalAlignment.Left;
 						CUI.BorderThickness = new Thickness(0);
-						((Grid)BaseUI.Content).Children.Add(CUI);
+						((Grid)BaseUI_CC.Content).Children.Add(CUI);
 
 						//add to the choices 
 						LinkedTextboxesChoice_CB.Items.Add(childUI.UIName);
 						DialogueTextboxChoices_List.Add(tb);
 					}
-					else if (childUI is GameIMG)
+					else if (childUI is GameImage)
 					{
 						CUI.Tag = "IMAGE";
 
@@ -422,7 +425,7 @@ namespace AmethystEngine.Forms
 						CUI.HorizontalAlignment = HorizontalAlignment.Left;
 						bor.Child = img;
 						((Grid)CUI.Content).Children.Add(bor);
-						((Grid)BaseUI.Content).Children.Add(CUI);
+						((Grid)BaseUI_CC.Content).Children.Add(CUI);
 
 						//add to the choices 
 						LinkedImageBoxesChoice_CB.Items.Add(childUI.UIName);
@@ -436,8 +439,8 @@ namespace AmethystEngine.Forms
 				}
 			}
 
-			desiredGameUi = gameUI;
-		CurrentEditorCanvas.Children.Add(BaseUI);
+			desiredBaseUI = baseUI;
+		CurrentEditorCanvas.Children.Add(BaseUI_CC);
 		}
 
 		/// <summary>

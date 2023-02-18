@@ -28,6 +28,7 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>true</UseVSHostingProcess>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -38,6 +39,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>7.1</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
@@ -58,9 +60,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="NodeEditor, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Visual Studio 2019\Projects\MyWPFControls\NodeEditor\bin\Debug\NodeEditor.dll</HintPath>
+    <Reference Include="NodeEditor">
+      <HintPath>..\..\..\WorkFromHome\CANOpenMaster\CANOpenMaster\Resources\NodeEditor.dll</HintPath>
     </Reference>
     <Reference Include="OutputLog">
       <HintPath>Resources\OutputLog.dll</HintPath>
@@ -98,6 +99,167 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\Channel.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\ChannelGroup.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\ConeSettings3D.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\CoreSystem.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\DistanceFilter3D.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\FileLoader.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\FMODManager.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\FMOD\fmod.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\FMOD\fmod_dsp.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\FMOD\Studio\fmod_studio.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\I3DControl.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\IChannelControl.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\Listener3D.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\Occlusion3D.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\PlatformLoader\NativeLibraryLoader.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\PointerLinker.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\Sound.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\SoundGroup.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\Studio\Attributes3D.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\Studio\Bank.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\Studio\Bus.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\Studio\EventDescription.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\Studio\EventInstance.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\Studio\StudioSystem.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\Studio\VCA.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\VectorExtensions.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\BixBiteTypes.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Characters\BaseEntity.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Characters\BattleEntity.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Characters\Commander.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Characters\Enemy.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Characters\Grunt.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Characters\NPC.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Characters\PartyMember.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Characters\Player.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Characters\SceneEntity.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\CharacterStats.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\CombatActions.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\CombatDelegates\FollowUpAttacksDelegates.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\CombatDelegates\ItemDelegates.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\CombatDelegates\ModifierDelegates.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\CombatDelegates\SkillDelegates.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\CombatEnums.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\CombatHelpers.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\CombatSystem.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\Equipables\Accessory.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\Equipables\Clothes.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\Equipables\Equipable.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\Equipables\Item.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\Equipables\Weapons\MagicWeapon.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\Equipables\Weapons\RangedWeapons.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\Equipables\Weapons\Weapons.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\GamePlayModifiers.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\Job.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\MagicSpell.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\PhysicalSkill.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\Skill.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\Stances.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Combat\WeakStrength.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Crafting\CraftingHelpers.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Crafting\CraftingMinigame.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Crafting\HexGrid\HexCell.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Crafting\HexGrid\HexGrid2D.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Crafting\HexGrid\PuzzlePieceHexCell.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Crafting\PuzzlePiece.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Crafting\PuzzlePieceCreationHelper.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Crafting\Recipe.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Effects\ImageEffect.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\GameEvent.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Input\InputController.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Inventory.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Level.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\Arithmetic\AddBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\Arithmetic\BaseArithmeticBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\Arithmetic\DivisionBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\Arithmetic\ModuloBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\Arithmetic\MultiplyBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\Arithmetic\SubtractBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\BaseNodeBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\ConditionalNodeBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\ConnectionNode.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\ConstantNodeBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\DialogueNodeBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\ExitNodeBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\Logic\ANDBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\Logic\BaseLogicNodeBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\Logic\NOTBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\Logic\ORBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\NodeEditor\StartNodeBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Particles\HitSparkPEmitter.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Particles\Particle.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Particles\PBoxEmitter.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Particles\PEmitter.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Projectiles\projectile.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationEvent.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\LayeredSpriteSheet.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\SpriteAnimation.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\SpriteSheet.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Camera.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\GameImage.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Helpers\CircleUtillties.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Helpers\RectangleUtilities.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Map.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\SplashImage.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Sprite.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\SpriteLayer.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Tile.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\BaseUI.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\BaseUIComponent.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\Button\BaseButtonUI.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\Button\EngineButton.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\Button\GameButton.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\Checkbox\BaseCheckBoxUI.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\Checkbox\EngineCheckBox.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\Checkbox\GameCheckBox.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\Image\BaseImage.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\Image\EngineImage.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\Image\GameImage.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\ListBox\BaseListBox.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\ListBox\EngineCustomListBox.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\ListBox\EngineListBox.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\ListBox\GameCustomListBox.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\ListBox\GameListBox.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\ListBox\GameMultiSelectionListbox.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\ListBox\ListBoxItems\BaseListBoxItem.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\ListBox\ListBoxItems\EngineListBoxItem.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\ListBox\ListBoxItems\GameListBoxItem.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\ListBox\ListBoxItems\GameListBoxItemSelectable.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\ProgressBar\BaseProgressBar.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\ProgressBar\EngineCustomProgressBar.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\ProgressBar\EngineProgressBar.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\ProgressBar\GameCustomProgressBar.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\ProgressBar\GameProgressBar.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\TabControl\BaseTabControl.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\TabControl\EngineTabControl.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\TabControl\GameTabControl.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\TextBlock\BaseTextBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\TextBlock\EngineTextBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\UI\TextBlock\GameTextBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Resources\EE_Exceptions.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Resources\IProperties.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Resources\IStateMachineTraversal.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Resources\NodeEditorExceptions.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Resources\ObservableDictionary.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Resources\ObservablePropertyDictionary.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Resources\ObservableSortedDictionary.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Resources\Resources.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Resources\SQLite.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\SceneObject\GameObject.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\SceneObject\Prop.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\SceneObject\Spawner.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\SceneObject\Transistion.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\TileCollisionChecker.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\TimelinePlayer\ChoiceTimeBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\TimelinePlayer\TimeBlock.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\TimelinePlayer\Timeline.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Tweening\Tweening.cs" />
+    <Compile Include="Components\DialogueScene.cs" />
     <Compile Include="Components\PropertyBag.cs" />
     <Compile Include="Components\Tools\Cuprite.cs" />
     <Compile Include="DesignerItemDecorator.cs" />
@@ -220,6 +382,34 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Bmg.zip" />
     <Resource Include="BaseMonogame.zip" />
+    <None Include="Components\Bixbite_Windows_Build\bin\Debug\MonoGame.Framework.dll.config" />
+    <None Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x64\libfmod.so" />
+    <None Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x64\libfmod.so.11" />
+    <None Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x64\libfmod.so.11.8" />
+    <None Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x64\libfmodstudio.so" />
+    <None Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x64\libfmodstudio.so.11" />
+    <None Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x64\libfmodstudio.so.11.8" />
+    <None Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x86\libfmod.so" />
+    <None Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x86\libfmod.so.11" />
+    <None Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x86\libfmod.so.11.8" />
+    <None Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x86\libfmodstudio.so" />
+    <None Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x86\libfmodstudio.so.11" />
+    <None Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x86\libfmodstudio.so.11.8" />
+    <None Include="Components\Bixbite_Windows_Build\obj\Debug\BixBite.csproj.CopyComplete" />
+    <None Include="Components\Bixbite_Windows_Build\obj\Debug\BixBite.csproj.CoreCompileInputs.cache" />
+    <None Include="Components\Bixbite_Windows_Build\obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="Components\Bixbite_Windows_Build\Resources\FMOD\x64\libfmod.so" />
+    <None Include="Components\Bixbite_Windows_Build\Resources\FMOD\x64\libfmod.so.11" />
+    <None Include="Components\Bixbite_Windows_Build\Resources\FMOD\x64\libfmod.so.11.8" />
+    <None Include="Components\Bixbite_Windows_Build\Resources\FMOD\x64\libfmodstudio.so" />
+    <None Include="Components\Bixbite_Windows_Build\Resources\FMOD\x64\libfmodstudio.so.11" />
+    <None Include="Components\Bixbite_Windows_Build\Resources\FMOD\x64\libfmodstudio.so.11.8" />
+    <None Include="Components\Bixbite_Windows_Build\Resources\FMOD\x86\libfmod.so" />
+    <None Include="Components\Bixbite_Windows_Build\Resources\FMOD\x86\libfmod.so.11" />
+    <None Include="Components\Bixbite_Windows_Build\Resources\FMOD\x86\libfmod.so.11.8" />
+    <None Include="Components\Bixbite_Windows_Build\Resources\FMOD\x86\libfmodstudio.so" />
+    <None Include="Components\Bixbite_Windows_Build\Resources\FMOD\x86\libfmodstudio.so.11" />
+    <None Include="Components\Bixbite_Windows_Build\Resources\FMOD\x86\libfmodstudio.so.11.8" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -249,16 +439,36 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BixBite\BixBite.csproj">
-      <Project>{d50deef5-20be-4a57-b0f8-6cb460f71d82}</Project>
-      <Name>BixBite</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\ErrorDocs\List of ErrorCodes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Components\Bixbite_Windows_Build\bin\Release\" />
+    <Folder Include="Components\Bixbite_Windows_Build\obj\Debug\TempPE\" />
+    <Folder Include="Components\Bixbite_Windows_Build\Rendering\UI\Textbox\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\readme.txt" />
+    <Content Include="Components\Bixbite_Windows_Build\bin\Debug\BixBite.dll" />
+    <Content Include="Components\Bixbite_Windows_Build\bin\Debug\BixBite.pdb" />
+    <Content Include="Components\Bixbite_Windows_Build\bin\Debug\MonoGame.Framework.dll" />
+    <Content Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x64\fmod.dll" />
+    <Content Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x64\fmodstudio.dll" />
+    <Content Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x86\fmod.dll" />
+    <Content Include="Components\Bixbite_Windows_Build\bin\Debug\Resources\FMOD\x86\fmodstudio.dll" />
+    <Content Include="Components\Bixbite_Windows_Build\bin\Debug\SQLite.Interop.dll" />
+    <Content Include="Components\Bixbite_Windows_Build\bin\Debug\sqlite3.dll" />
+    <Content Include="Components\Bixbite_Windows_Build\bin\Debug\TimelinePlayer.dll" />
+    <Resource Include="Components\Bixbite_Windows_Build\obj\Debug\BixBite.csproj.FileListAbsolute.txt" />
+    <Content Include="Components\Bixbite_Windows_Build\obj\Debug\BixBite.dll" />
+    <Content Include="Components\Bixbite_Windows_Build\obj\Debug\BixBite.pdb" />
+    <Content Include="Components\Bixbite_Windows_Build\Resources\FMOD\x64\fmod.dll" />
+    <Content Include="Components\Bixbite_Windows_Build\Resources\FMOD\x64\fmodstudio.dll" />
+    <Content Include="Components\Bixbite_Windows_Build\Resources\FMOD\x86\fmod.dll" />
+    <Content Include="Components\Bixbite_Windows_Build\Resources\FMOD\x86\fmodstudio.dll" />
+    <Content Include="Components\Bixbite_Windows_Build\Resources\TimelinePlayer.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

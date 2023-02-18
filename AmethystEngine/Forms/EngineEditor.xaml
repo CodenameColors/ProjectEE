@@ -6,18 +6,21 @@
 				xmlns:pgrid ="clr-namespace:PropertyGridEditor;assembly=PropertyGridEditor"
 				xmlns:cpgrid="clr-namespace:CollapsedPropertyGrid;assembly=CollapsedPropertyGrid"
         xmlns:local="clr-namespace:AmethystEngine" 
-				xmlns:Bix="clr-namespace:BixBite;assembly=BixBite"
-				xmlns:BixRen="clr-namespace:BixBite.Rendering;assembly=BixBite"
-				xmlns:BixUI="clr-namespace:BixBite.Rendering.UI;assembly=BixBite"
-				xmlns:BixAnim="clr-namespace:BixBite.Rendering.Animation;assembly=BixBite"
-				xmlns:BixRes="clr-namespace:BixBite.Resources;assembly=BixBite"
+				xmlns:Bix="clr-namespace:BixBite"
+				xmlns:BixRen="clr-namespace:BixBite.Rendering"
+				xmlns:BixUI="clr-namespace:BixBite.Rendering.UI"
+				xmlns:BixAnim="clr-namespace:BixBite.Rendering.Animation"
+				xmlns:BixRes="clr-namespace:BixBite.Resources"
 				xmlns:src="clr-namespace:AmethystEngine.Resources"
 				xmlns:WpfToolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
-				xmlns:BixChar="clr-namespace:BixBite.Characters;assembly=BixBite"
+				xmlns:BixChar="clr-namespace:BixBite.Characters"
 				xmlns:DiagramDesigner="clr-namespace:DiagramDesigner" x:Class="AmethystEngine.Forms.EngineEditor"
 				xmlns:Tline="clr-namespace:TimelinePlayer;assembly=TimelinePlayer"
-				xmlns:ne="clr-namespace:NodeEditor;assembly=NodeEditor"
+				xmlns:ne="clr-namespace:BixBite.NodeEditor"
 				xmlns:ol="clr-namespace:OutputLog;assembly=OutputLog"
+				xmlns:nodeEditor="clr-namespace:NodeEditor;assembly=NodeEditor"
+				xmlns:timelinePlayer="clr-namespace:TimelinePlayer;assembly=TimelinePlayer"
+				xmlns:textBlock="clr-namespace:BixBite.Rendering.UI.TextBlock"
 				mc:Ignorable="d" Background="#FF0E0D0D"
         Title="AmethystEngine" Height="800" Width="1200" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
 
@@ -573,7 +576,7 @@
 
 					<TreeView x:Name="DialogueEditor_CE_TV" Grid.Row="1" Background="#FF383838">
 						<TreeView.Resources>
-							<HierarchicalDataTemplate DataType="{x:Type BixChar:SceneCharacter}" ItemsSource="{Binding DialogueSprites}">
+							<HierarchicalDataTemplate DataType="{x:Type BixChar:SceneEntity}" ItemsSource="{Binding DialogueSprites}">
 								<StackPanel Orientation="Horizontal">
 									<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50"
 									       />
@@ -605,7 +608,7 @@
 					</Grid.RowDefinitions>
 
 					<Button x:Name="UIEditoGameTB_BTN" Grid.Row="0" Content="Textbox" Click="UIEditoGameTB_BTN_Click"/>
-					<Button x:Name="UIEditoGameIMG_BTN" Grid.Row="1" Content="Image Box" Click="UIEditoGameIMG_BTN_Click"/>
+					<Button x:Name="UIEditoGameIMG_BTN" Grid.Row="1" Content="Image Box" Click="UIEditoGameImage_BTN_Click"/>
 					<Button x:Name="UIEditoGameBTN_BTN" Grid.Row="2" Content="Button"/>
 				</Grid>
 			</ControlTemplate>
@@ -712,14 +715,14 @@
 				<TreeView x:Name="UISceneExplorer_TreeView" Grid.Column="2" HorizontalAlignment="Stretch" Background="#FF2B2B2B" Margin="3,0,0,0" BorderBrush="Transparent" VerticalAlignment="Stretch" 
 								 SelectedItemChanged="UISceneExplorer_TreeView_SelectedItemChanged" Loaded="UISceneExplorer_TreeView_Loaded">
 					<TreeView.Resources>
-						<HierarchicalDataTemplate DataType="{x:Type BixUI:GameUI}" ItemsSource="{Binding UIElements}">
+						<HierarchicalDataTemplate DataType="{x:Type BixUI:BaseUI}" ItemsSource="{Binding UIElements}">
 							<StackPanel Orientation="Horizontal">
 								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
 								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="20" MaxHeight="15" />
 								<TextBlock Text="{Binding UIName}" Foreground="White" />
 							</StackPanel>
 						</HierarchicalDataTemplate>
-						<DataTemplate DataType="{x:Type BixUI:GameTextBlock}">
+						<DataTemplate DataType="{x:Type textBlock:GameTextBlock}">
 							<StackPanel Orientation="Horizontal">
 								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
 								<TextBlock Text="{Binding TBName}" Foreground="White" />
@@ -1699,14 +1702,14 @@
 								</Canvas.Background>
 								<Canvas x:Name="DialogueEditore_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 							</Canvas>
-							<Tline:TimelinePlayer x:Name="DialogueEditor_Timeline" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="Auto" Width="Auto" PreviewMouseLeftButtonDown="DialogueEditor_Timeline_PreviewMouseLeftButtonDown" >
+							<timelinePlayer:TimelinePlayer x:Name="DialogueEditor_Timeline" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="Auto" Width="Auto" PreviewMouseLeftButtonDown="DialogueEditor_Timeline_PreviewMouseLeftButtonDown" >
 
-							</Tline:TimelinePlayer>
+							</timelinePlayer:TimelinePlayer>
 							<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Background="#FF444444" ResizeDirection="Rows"/>
 						</Grid>
-						<ne:BlockNodeEditor x:Name="DialogueEditor_NodeGraph" Grid.Row="2">
+						<nodeEditor:BlockNodeEditor x:Name="DialogueEditor_NodeGraph" Grid.Row="2">
 
-						</ne:BlockNodeEditor>
+						</nodeEditor:BlockNodeEditor>
 						<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Background="#FF444444" ResizeDirection="Rows"/>
 					</Grid>
 				</TabItem>
