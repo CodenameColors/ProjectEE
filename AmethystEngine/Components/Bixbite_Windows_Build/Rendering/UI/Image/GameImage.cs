@@ -75,8 +75,8 @@ namespace BixBite.Rendering.UI.Image
 		/// <param name="ImagePath"></param>
 		/// <param name="graphicsDevice"></param>
 		/// <param name="BackgroundPath"></param>
-		public GameImage(string UIName, int Width, int Height, int Zindex, int xoff, int yoff, String ImagePath = "", GraphicsDevice graphicsDevice = null, String BackgroundPath = "#00000000") :
-			base(UIName, Width, Height, Zindex, xoff, yoff, ImagePath, graphicsDevice, BackgroundPath)
+		public GameImage(string UIName, int xPos, int yPos, int Width, int Height, int Zindex, int xoff, int yoff, String ImagePath = "", GraphicsDevice graphicsDevice = null, String BackgroundPath = "#00000000") :
+			base(UIName, xPos, yPos, Width, Height, Zindex, xoff, yoff, ImagePath, graphicsDevice, BackgroundPath)
 		{
 			AddProperty("Xoffset", xoff);
 			AddProperty("YOffset", yoff);

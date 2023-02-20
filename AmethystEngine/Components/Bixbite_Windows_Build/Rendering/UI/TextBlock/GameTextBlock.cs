@@ -68,6 +68,11 @@ namespace BixBite.Rendering.UI.TextBlock
 			set => SetProperty("Rotation", value);
 		}
 
+		public string Text
+		{
+			get => GetPropertyData("Text").ToString();
+			set => SetProperty("Text", value);
+		}
 
 		#endregion
 
@@ -79,7 +84,14 @@ namespace BixBite.Rendering.UI.TextBlock
 			: base(UIName, xPos, yPos, width, height, zindex, border, xOff, yOff, text, textTime, backColor, backImage)
 		{
 			AddProperty("Rotation", 0.0f);
-			
+			AddProperty("Text", Text);
+			AddProperty("Font", "Ariel");
+			AddProperty("FontSize", 24);
+			AddProperty("FontColor", "Black");
+			AddProperty("FontStyle", "Normal");
+			AddProperty("TextSpeed", 1.0);
+			AddProperty("TextTime", 1.0);//number of seconds to "type" the text to the screen
+
 			_texture = texture;
 			_font = font;
 			TextColor = textColor;

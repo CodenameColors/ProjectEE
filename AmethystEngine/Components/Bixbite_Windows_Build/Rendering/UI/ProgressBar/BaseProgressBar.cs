@@ -128,7 +128,7 @@ namespace BixBite.Rendering.UI.ProgressBar
 		#region Contructors
 		public BaseProgressBar(string UIName, int xPos, int yPos, int width, int height, int zindex, bool border, 
 			int borderWidth, int xOff, int yOff, int currentVal, int maxVal, bool bInverse, bool bHorizontal ) 
-			: base(UIName, xPos, yPos, width, height, zindex)
+			: base(UIName, xPos, yPos, xOff, yOff, width, height, zindex)
 		{
 
 			

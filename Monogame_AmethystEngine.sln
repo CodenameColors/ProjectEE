@@ -8,6 +8,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BixBite", "BixBite\BixBite.csproj", "{D50DEEF5-20BE-4A57-B0F8-6CB460F71D82}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AmethystEngine", "AmethystEngine\AmethystEngine.csproj", "{BCD504F8-6823-4816-A235-437271BFE14E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D50DEEF5-20BE-4A57-B0F8-6CB460F71D82} = {D50DEEF5-20BE-4A57-B0F8-6CB460F71D82}
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "EngineInstaller", "EngineInstaller\EngineInstaller.vdproj", "{1D1A2268-A386-4327-8465-2020EA687B65}"
 EndProject

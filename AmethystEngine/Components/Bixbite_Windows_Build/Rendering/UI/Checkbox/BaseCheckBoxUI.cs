@@ -73,7 +73,7 @@ namespace BixBite.Rendering.UI.Checkbox
 		#endregion
 		public BaseCheckBoxUI(string UIName, int xPos, int yPos, int xOff, int yOff, int width, int height, int zindex, bool bBorder,
 													String checkBoxContentText, String backColor, String backImage) : 
-			base(UIName, xPos, yPos, width, height, zindex)
+			base(UIName, xPos, yPos, xOff, yOff, width, height, zindex)
 		{
 			{
 				AddProperty("XOffset", xOff);

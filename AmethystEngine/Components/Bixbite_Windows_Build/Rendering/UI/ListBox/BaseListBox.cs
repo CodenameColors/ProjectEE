@@ -120,7 +120,7 @@ namespace BixBite.Rendering.UI.ListBox
 
 		public BaseListBox(string UIName, int xPos, int yPos, int width, int height, int zindex, bool border, int borderW, int spacing,
 		int xOff, int yOff, int innerW, int InnerH, int maxDisplayedItems, EPositionType positionType = EPositionType.Vertical) : 
-			base(UIName, xPos, yPos, width, height, zindex)
+			base(UIName, xPos, yPos, xOff, yOff, width, height, zindex)
 		{
 			AddProperty("XOffset", xOff);
 			AddProperty("YOffset", yOff);

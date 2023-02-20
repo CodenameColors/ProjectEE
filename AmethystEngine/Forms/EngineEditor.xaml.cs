@@ -3955,6 +3955,8 @@ namespace AmethystEngine.Forms
 				LB.ClearProperties();
 				foreach (object o in CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item2))
 				{
+					if (o is null)
+						continue;
 					if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "Zindex")
 					{
 						TextBox TB = new TextBox();
@@ -3962,9 +3964,13 @@ namespace AmethystEngine.Forms
 
 						// TODO: FIX PROP GRID CALLBACKS
 
-						//LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
-						//	TB,
-						//	o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
+							TB,
+							o.ToString(), (sender1, args) =>
+							{
+								Console.WriteLine("BROKEN CALLBACK :(");
+								PropertyCallbackTB(sender1, args, CurrentUIDictionary[SelectedUIControl.Name]);
+							}); //CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
 					}
 					else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] ==
 					         "ShowBorder")
@@ -4018,9 +4024,13 @@ namespace AmethystEngine.Forms
 
 						// TODO: FIX PROP GRID CALLBACKS
 
-						//LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
-						//	TB,
-						//	o.ToString(), CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
+						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
+							TB,
+							o.ToString(), (sender1, args) =>
+							{
+								Console.WriteLine("BROKEN CALLBACK :(");
+								PropertyCallbackTB(sender1, args, CurrentUIDictionary[SelectedUIControl.Name]);
+							}); //CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
 					}
 
 					i++;
@@ -4033,6 +4043,27 @@ namespace AmethystEngine.Forms
 				Selector.SetIsSelected(SelectedUIControl, true);
 			}
 		}
+
+		public virtual void PropertyCallbackTB(object sender, KeyEventArgs e, BaseUI baseUi)
+		{
+			if (e.Key == Key.Enter)
+			{
+				//base.PropertyCallback(sender, e);
+				Console.WriteLine("GAMETB UI CALLBACK");
+				Console.WriteLine(((TextBox)sender).Tag.ToString());
+
+				String Property = ((TextBox)sender).Tag.ToString();
+				if (baseUi.GetProperties().Any(m => m.Item1 == Property))
+				{
+					baseUi.SetProperty(Property, ((TextBox)sender).Text);
+					if (Property == "FontSize")
+					{
+						//((TextBox)sender).FontSize = Int32.Parse(((TextBox)sender).Text);
+					}
+				}
+			}
+		}
+
 
 		/// <summary>
 		/// This method is here when a movable image has been clicked and let go. (SPRITES)
@@ -4179,7 +4210,7 @@ namespace AmethystEngine.Forms
 
 			CC.Name = name;
 			UIEditor_Canvas.Children.Add(CC);
-			CurrentUIDictionary.Add(name, new GameImage(name, 50, 50, 1, 0, 0));
+			CurrentUIDictionary.Add(name, new GameImage(name, 0,0, 50, 50, 1, 0, 0));
 			OpenUIEdits[0].AddUIElement(CurrentUIDictionary.Values.Last()); //TODO: use the selection Treeview
 		}
 
@@ -4475,7 +4506,7 @@ namespace AmethystEngine.Forms
 			CC.Tag = "Border";
 			Canvas.SetZIndex(CC, 0);
 
-			OpenUIEdits.Add(new BaseUI("NewUITool", 50, 50, 1));
+			OpenUIEdits.Add(new BaseUI("NewUITool", 0,0,0,0, 50, 50, 1));
 			SelectedUI = OpenUIEdits.Last();
 			CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
 
@@ -4680,7 +4711,7 @@ namespace AmethystEngine.Forms
 						HorizontalAlignment = HorizontalAlignment.Stretch,
 						VerticalAlignment = VerticalAlignment.Stretch,
 						Background =
-							(SolidColorBrush) new BrushConverter().ConvertFromString(childUI.GetPropertyData("Background")
+							(SolidColorBrush) new BrushConverter().ConvertFromString(childUI.GetPropertyData("BackgroundColor")
 								.ToString()),
 						IsHitTestVisible = false,
 					};
@@ -4692,7 +4723,7 @@ namespace AmethystEngine.Forms
 					CUI.Name = childUI.UIName;
 					Canvas.SetLeft(CUI, mid.X + Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()));
 					Canvas.SetTop(CUI, mid.Y + Int32.Parse(childUI.GetPropertyData("YOffset").ToString()));
-					Canvas.SetZIndex(CUI, Int32.Parse(childUI.GetPropertyData("Zindex").ToString()));
+					Canvas.SetZIndex(CUI, Int32.Parse(childUI.GetPropertyData("ZIndex").ToString()));
 					CurrentEditorCanvas.Children.Add(CUI);
 
 					#endregion
@@ -4710,11 +4741,10 @@ namespace AmethystEngine.Forms
 						((Grid) CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() {Width = new GridLength(30)});
 						((Grid) CUI.Content).ShowGridLines = true;
 						InitimagesTBGrid(((Grid) CUI.Content));
-						SetTBBackgroundImage(((Grid) CUI.Content), childUI.GetPropertyData("Image").ToString());
 						//
 						TextBox tb = new TextBox()
 						{
-							Text = childUI.GetPropertyData("ContentText").ToString(),
+							Text = childUI.GetPropertyData("Text").ToString(),
 							Margin = new Thickness(2),
 							BorderThickness = new Thickness(0),
 							IsHitTestVisible = false,
@@ -4777,7 +4807,8 @@ namespace AmethystEngine.Forms
 						HorizontalAlignment = HorizontalAlignment.Stretch,
 						VerticalAlignment = VerticalAlignment.Stretch,
 						Background =
-							(SolidColorBrush) new BrushConverter().ConvertFromString(childUI.GetPropertyData("Background")
+							(SolidColorBrush) new BrushConverter().ConvertFromString(
+								(childUI.GetPropertyData("BackgroundColor") == null ? "#00000000" : childUI.GetPropertyData("BackgroundColor"))
 								.ToString()),
 						IsHitTestVisible = false,
 					};
@@ -4804,11 +4835,10 @@ namespace AmethystEngine.Forms
 						((Grid) CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { });
 						((Grid) CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() {Width = new GridLength(30)});
 						InitimagesTBGrid(((Grid) CUI.Content));
-						SetTBBackgroundImage(((Grid) CUI.Content), childUI.GetPropertyData("Image").ToString());
 						//
 						TextBox tb = new TextBox()
 						{
-							Text = childUI.GetPropertyData("ContentText").ToString(),
+							Text = childUI.GetPropertyData("Text").ToString(),
 							Margin = new Thickness(2),
 							BorderThickness = new Thickness(0),
 							IsHitTestVisible = false,
@@ -4935,7 +4965,8 @@ namespace AmethystEngine.Forms
 						HorizontalAlignment = HorizontalAlignment.Stretch,
 						VerticalAlignment = VerticalAlignment.Stretch,
 						Background =
-							(SolidColorBrush) new BrushConverter().ConvertFromString(childUI.GetPropertyData("Background")
+							(SolidColorBrush) new BrushConverter().ConvertFromString(
+								(childUI.GetPropertyData("BackgroundColor") == null ? "#00000000" : childUI.GetPropertyData("BackgroundColor"))
 								.ToString()),
 						IsHitTestVisible = false,
 					};
@@ -4947,7 +4978,7 @@ namespace AmethystEngine.Forms
 					CUI.Name = childUI.UIName;
 					Canvas.SetLeft(CUI, mid.X + Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()));
 					Canvas.SetTop(CUI, mid.Y + Int32.Parse(childUI.GetPropertyData("YOffset").ToString()));
-					Canvas.SetZIndex(CUI, Int32.Parse(childUI.GetPropertyData("Zindex").ToString()));
+					Canvas.SetZIndex(CUI, Int32.Parse(childUI.GetPropertyData("ZIndex").ToString()));
 					CurrentEditorCanvas.Children.Add(CUI);
 
 					#endregion
@@ -4965,11 +4996,10 @@ namespace AmethystEngine.Forms
 						((Grid) CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() {Width = new GridLength(30)});
 						((Grid) CUI.Content).ShowGridLines = true;
 						InitimagesTBGrid(((Grid) CUI.Content));
-						SetTBBackgroundImage(((Grid) CUI.Content), childUI.GetPropertyData("Image").ToString());
 						//
 						TextBox tb = new TextBox()
 						{
-							Text = childUI.GetPropertyData("ContentText").ToString(),
+							Text = childUI.GetPropertyData("Text").ToString(),
 							Margin = new Thickness(2),
 							BorderThickness = new Thickness(0),
 							IsHitTestVisible = false,
@@ -5032,7 +5062,7 @@ namespace AmethystEngine.Forms
 						HorizontalAlignment = HorizontalAlignment.Stretch,
 						VerticalAlignment = VerticalAlignment.Stretch,
 						Background =
-							(SolidColorBrush) new BrushConverter().ConvertFromString(childUI.GetPropertyData("Background")
+							(SolidColorBrush) new BrushConverter().ConvertFromString(childUI.GetPropertyData("BackgroundColor")
 								.ToString()),
 						IsHitTestVisible = false,
 					};
@@ -5063,7 +5093,7 @@ namespace AmethystEngine.Forms
 						//
 						TextBox tb = new TextBox()
 						{
-							Text = childUI.GetPropertyData("ContentText").ToString(),
+							Text = childUI.GetPropertyData("Text").ToString(),
 							Margin = new Thickness(2),
 							BorderThickness = new Thickness(0),
 							IsHitTestVisible = false,
@@ -5863,7 +5893,7 @@ namespace AmethystEngine.Forms
 						return;
 					}
 
-					gtb.SetProperty("ContentText",
+					gtb.SetProperty("Text",
 						((((TimeBlock) e.NewItems[0]).LinkedDialogueBlock) as NodeEditor.Components.DialogueNodeBlock).DialogueTextOptions[0]);
 
 					UIElementCollection uie =
@@ -5886,7 +5916,7 @@ namespace AmethystEngine.Forms
 					{
 						if (c is TextBox)
 						{
-							((TextBox) c).Text = gtb.GetPropertyData("ContentText").ToString();
+							((TextBox) c).Text = gtb.GetPropertyData("Text").ToString();
 						}
 					}
 

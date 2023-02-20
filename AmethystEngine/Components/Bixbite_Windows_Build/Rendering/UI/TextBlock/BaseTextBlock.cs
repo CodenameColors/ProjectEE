@@ -85,7 +85,7 @@ namespace BixBite.Rendering.UI.TextBlock
 
 		#region Contructors
 		public BaseTextBlock(string UIName, int xPos, int yPos, int width, int height, int zindex, bool border, int xOff, int yOff,
-			String text, float textTime, String backColor, String backImage ) : base(UIName, xPos, yPos, width, height, zindex)
+			String text, float textTime, String backColor, String backImage ) : base(UIName, xPos, yPos, xOff,yOff, width, height, zindex)
 		{
 			AddProperty("XOffset", xOff);
 			AddProperty("YOffset", yOff);
@@ -99,7 +99,6 @@ namespace BixBite.Rendering.UI.TextBlock
 
 			AddProperty("bBorder", border);
 			AddProperty("BackgroundColor", backColor);
-			AddProperty("BackgroundImage", backImage);
 
 		}
 		#endregion

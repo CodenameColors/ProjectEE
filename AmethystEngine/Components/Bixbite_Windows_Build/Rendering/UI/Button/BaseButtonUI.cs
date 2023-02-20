@@ -79,7 +79,7 @@ namespace BixBite.Rendering.UI.Button
 		#region Contructors
 		public BaseButtonUI(string UIName, int xPos, int yPos, int width, int height, int zindex, bool bBorder,
 			int xOff, int yOff, String buttonText, String backColor, String backImage ) 
-			: base(UIName, xPos, yPos, width, height, zindex)
+			: base(UIName, xPos, yPos, xOff, yOff, width, height, zindex)
 		{
 			AddProperty("XOffset", xOff);
 			AddProperty("YOffset", yOff);

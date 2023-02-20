@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using BixBite.NodeEditor.Logic;
 using BixBite.Resources;
-using NodeEditor.Components;
 
 namespace BixBite.NodeEditor
 {
@@ -183,11 +182,6 @@ namespace BixBite.NodeEditor
 		}
 
 		public virtual bool OnEndEvaluateInternalData()
-		{
-			throw new NotImplementedException();
-		}
-
-		public static implicit operator global::NodeEditor.Components.BaseNodeBlock(BaseNodeBlock v)
 		{
 			throw new NotImplementedException();
 		}

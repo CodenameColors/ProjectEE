@@ -69,7 +69,7 @@ namespace BixBite.Rendering.UI.Image
 
 		public BaseImage(string UIName, int xPos, int yPos, int width, int height, int zindex, bool border, 
 			int xOff, int yOff, String backImage, String backColor) : 
-			base(UIName, xPos, yPos, width, height, zindex)
+			base(UIName, xPos, yPos, xOff, yOff, width, height, zindex)
 		{
 			AddProperty("XOffset", xOff);
 			AddProperty("YOffset", yOff);
@@ -93,8 +93,8 @@ namespace BixBite.Rendering.UI.Image
 		/// <param name="ImagePath"></param>
 		/// <param name="graphicsDevice"></param>
 		/// <param name="BackgroundPath"></param>
-		public BaseImage(string UIName, int Width, int Height, int Zindex, int xoff, int yoff, String ImagePath = "", GraphicsDevice graphicsDevice = null, String BackgroundPath = "#00000000") :
-			base(UIName, Width, Height, Zindex, BackgroundPath)
+		public BaseImage(string UIName, int xPos, int yPos, int Width, int Height, int Zindex, int xoff, int yoff, String ImagePath = "", GraphicsDevice graphicsDevice = null, String BackgroundPath = "#00000000") :
+			base(UIName, xPos, yPos, xoff, yoff, Width, Height, Zindex, BackgroundPath)
 		{
 			AddProperty("Xoffset", xoff);
 			AddProperty("YOffset", yoff);

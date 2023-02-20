@@ -261,7 +261,7 @@ namespace AmethystEngine.Forms
 					{
 						HorizontalAlignment = HorizontalAlignment.Stretch,
 						VerticalAlignment = VerticalAlignment.Stretch,
-						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("Background").ToString()),
+						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("BackgroundColor").ToString()),
 						IsHitTestVisible = false,
 					};
 					((Grid)CUI.Content).Children.Add(new Border()
@@ -272,7 +272,7 @@ namespace AmethystEngine.Forms
 					CUI.Name = childUI.UIName;
 					Canvas.SetLeft(CUI, mid.X + Int32.Parse(childUI.GetPropertyData("Xoffset").ToString()));
 					Canvas.SetTop(CUI, mid.Y + Int32.Parse(childUI.GetPropertyData("YOffset").ToString()));
-					Canvas.SetZIndex(CUI, Int32.Parse(childUI.GetPropertyData("Zindex").ToString()));
+					Canvas.SetZIndex(CUI, Int32.Parse(childUI.GetPropertyData("ZIndex").ToString()));
 					CurrentEditorCanvas.Children.Add(CUI);
 					#endregion
 
@@ -293,7 +293,7 @@ namespace AmethystEngine.Forms
 						//
 						TextBox tb = new TextBox()
 						{
-							Text = childUI.GetPropertyData("ContentText").ToString(),
+							Text = childUI.GetPropertyData("Text").ToString(),
 							Margin = new Thickness(2),
 							BorderThickness = new Thickness(0),
 							IsHitTestVisible = false,
@@ -346,7 +346,7 @@ namespace AmethystEngine.Forms
 					{
 						HorizontalAlignment = HorizontalAlignment.Stretch,
 						VerticalAlignment = VerticalAlignment.Stretch,
-						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("Background").ToString()),
+						Background = (SolidColorBrush)new BrushConverter().ConvertFromString(childUI.GetPropertyData("BackgroundColor").ToString()),
 						IsHitTestVisible = false,
 					};
 					((Grid)CUI.Content).Children.Add(new Border()
@@ -370,11 +370,10 @@ namespace AmethystEngine.Forms
 						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { });
 						((Grid)CUI.Content).ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(30) });
 						InitimagesTBGrid(((Grid)CUI.Content));
-						SetTBBackgroundImage(((Grid)CUI.Content), childUI.GetPropertyData("Image").ToString());
 						//
 						TextBox tb = new TextBox()
 						{
-							Text = childUI.GetPropertyData("ContentText").ToString(),
+							Text = childUI.GetPropertyData("Text").ToString(),
 							Margin = new Thickness(2),
 							BorderThickness = new Thickness(0),
 							IsHitTestVisible = false,

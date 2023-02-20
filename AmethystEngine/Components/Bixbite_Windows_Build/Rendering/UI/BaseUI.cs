@@ -140,19 +140,22 @@ namespace BixBite.Rendering.UI
 
 		#region Contructors
 
-		public BaseUI(String UIName, int xPos, int yPos, int width, int height, int zindex)
+		public BaseUI(String UIName, int xPos, int yPos, int xoff, int yoff, int width, int height, int zindex)
 		{
 			Properties = new ObservableCollection<Tuple<string, object>>();
 			UIElements = new ObservableCollection<BaseUI>();
 			AddProperty("Name", UIName);
 			AddProperty("XPos", xPos);
 			AddProperty("YPos", yPos);
+			AddProperty("Xoffset", xoff);
+			AddProperty("YOffset", yoff);
 			AddProperty("Width", width);
 			AddProperty("Height", height);
 			AddProperty("ScaleX", 1.0f);
 			AddProperty("ScaleY", 1.0f);
 			AddProperty("ZIndex", zindex);
-		}
+			AddProperty("ShowBorder", true);
+		}	
 
 		/// <summary>
 		/// THIS CONSTRUCTOR IS HERE FOR AMETHYST ENGINE IMPORTATION ONLY
@@ -161,17 +164,22 @@ namespace BixBite.Rendering.UI
 		/// <param name="Width">Width of UI</param>
 		/// <param name="Height">Height of UI</param>
 		/// <param name="Zindex">ZIndex of UI</param>
-		public BaseUI(String UIName, int Width, int Height, int Zindex, String BackgroundPath = "#00000000")
+		public BaseUI(String UIName, int xPos, int yPos, int xOffsetPos, int yXOffsetPos, int Width, int Height, int Zindex, String BackgroundPath = "#00000000")
 		{
 			Properties = new ObservableCollection<Tuple<string, object>>();
 			UIElements = new ObservableCollection<BaseUI>();
-			this.UIName = UIName;
+			// this.UIName = UIName;
+			
 			AddProperty("Name", UIName);
+			AddProperty("XPos", xPos);
+			AddProperty("YPos", yPos);
 			AddProperty("Width", Width);
 			AddProperty("Height", Height);
-			AddProperty("Background", BackgroundPath);
+			AddProperty("Xoffset", xOffsetPos);
+			AddProperty("YOffset", yXOffsetPos);
+			AddProperty("BackgroundColor", BackgroundPath);
 			AddProperty("ShowBorder", true);
-			AddProperty("Zindex", Zindex);
+			AddProperty("ZIndex", Zindex);
 		}
 
 		#endregion
@@ -236,11 +244,15 @@ namespace BixBite.Rendering.UI
 				{
 					if(childUI is GameTextBlock)
 						writer.WriteStartElement(null, "GameTextBlock", null);
-					if (childUI is GameImage)
+					if (childUI is Image.GameImage)
 						writer.WriteStartElement(null, "GameIMG", null);
 					for (int i = 0; i < childUI.GetProperties().Count; i++)
 					{
-						writer.WriteAttributeString(null, childUI.GetProperties().Select(m => m.Item1).ToList()[i].ToString(), null, childUI.GetProperties().Select(m => m.Item2).ToList()[i].ToString());
+						if(childUI.GetProperties().Select(m => m.Item2).ToList()[i] != null)
+							writer.WriteAttributeString(null, childUI.GetProperties().Select(m => m.Item1).ToList()[i].ToString(), null, childUI.GetProperties().Select(m => m.Item2).ToList()[i].ToString());
+						else
+							writer.WriteAttributeString(null, childUI.GetProperties().Select(m => m.Item1).ToList()[i].ToString(), null, "null");
+
 					}
 					writer.WriteEndElement();//end child UI
 				}
@@ -268,8 +280,8 @@ namespace BixBite.Rendering.UI
 						reader.Read();
 
 					//by this time we should have found a Game UI node use this to create the ACUTAL object
-					retGameUI = new BaseUI(reader.GetAttribute("Name"), Int32.Parse(reader.GetAttribute("Width")), 
-						Int32.Parse(reader.GetAttribute("Height")), Int32.Parse(reader.GetAttribute("Zindex")));
+					retGameUI = new BaseUI(reader.GetAttribute("Name"), 0,0,0,0, Int32.Parse(reader.GetAttribute("Width")), 
+						Int32.Parse(reader.GetAttribute("Height")), Int32.Parse(reader.GetAttribute("ZIndex")));
 
 					//After creating the Initial BASE object get all the child UI objects!
 					while(reader.NodeType != XmlNodeType.EndElement && reader.Name != " GameUI" && reader.Read())
@@ -279,19 +291,18 @@ namespace BixBite.Rendering.UI
 						{
 							//get the attributes 
 							String Name = reader.GetAttribute("Name");
-							String Background = reader.GetAttribute("Background");
-							String ContentText = reader.GetAttribute("ContentText");
+							String Background = reader.GetAttribute("BackgroundColor");
+							String ContentText = reader.GetAttribute("Text");
 							bool showBorder = (reader.GetAttribute("ShowBorder") == "True" ? true : false);
 							int width = Int32.Parse(reader.GetAttribute("Width"));
 							int height = Int32.Parse(reader.GetAttribute("Height"));
-							int zindex = Int32.Parse(reader.GetAttribute("Zindex"));
+							int zindex = Int32.Parse(reader.GetAttribute("ZIndex"));
 							int xoffset = Int32.Parse(reader.GetAttribute("Xoffset"));
 							int yoffset = Int32.Parse(reader.GetAttribute("YOffset"));
 
 							GameTextBlock childUI = new GameTextBlock(Name,0,0 , width, height, zindex, false,
 								xoffset, yoffset, ContentText, 0.0f, Background, "", null,null, Color.Black);
 							childUI.SetProperty("ShowBorder", showBorder);
-							childUI.SetProperty("Image", reader.GetAttribute("Image"));
 							childUI.SetProperty("Font", reader.GetAttribute("Font"));
 							childUI.SetProperty("FontSize", Int32.Parse(reader.GetAttribute("FontSize")));
 							childUI.SetProperty("FontColor", reader.GetAttribute("FontColor"));
@@ -305,16 +316,17 @@ namespace BixBite.Rendering.UI
 						{
 							//get the attributes 
 							String Name = reader.GetAttribute("Name");
-							String Background = reader.GetAttribute("Background");
+							String Background = reader.GetAttribute("BackgroundColor");
 							String Image = reader.GetAttribute("Image");
 							bool showBorder = (reader.GetAttribute("ShowBorder") == "True" ? true : false);
 							int width = Int32.Parse(reader.GetAttribute("Width"));
 							int height = Int32.Parse(reader.GetAttribute("Height"));
-							int zindex = Int32.Parse(reader.GetAttribute("Zindex"));
+							int zindex = Int32.Parse(reader.GetAttribute("ZIndex"));
 							int xoffset = Int32.Parse(reader.GetAttribute("Xoffset"));
 							int yoffset = Int32.Parse(reader.GetAttribute("YOffset"));
 
-							Image.GameImage childUI = new Image.GameImage(Name, width, height, zindex, xoffset, yoffset, Image, null, Background);
+							// TODO: Give the file X and Y POS
+							Image.GameImage childUI = new Image.GameImage(Name, 0,0, width, height, zindex, xoffset, yoffset, Image, null, Background);
 							retGameUI.AddUIElement(childUI);
 						}
 						//Buttons WIP still

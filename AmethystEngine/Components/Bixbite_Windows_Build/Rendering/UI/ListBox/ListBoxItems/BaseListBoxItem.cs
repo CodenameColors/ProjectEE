@@ -43,7 +43,7 @@ namespace BixBite.Rendering.UI.ListBox.ListBoxItems
 
 		public BaseListBoxItem(BaseListBox parentListBox ,string UIName, int xPos, int yPos, int width, int height,
 			int zindex, bool border, bool bCanSelect)
-			: base(UIName, xPos, yPos, width, height, zindex)
+			: base(UIName, xPos, yPos, 0,0, width, height, zindex)
 		{
 			this.ParentListBox = parentListBox;
 
