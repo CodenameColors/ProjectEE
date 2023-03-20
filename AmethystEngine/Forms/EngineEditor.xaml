@@ -293,6 +293,38 @@
 				</Grid>
 			</ControlTemplate>
 
+			<ControlTemplate x:Key="SpritesheetEditorObjectExplorer_Template">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition/>
+						<ColumnDefinition Width="Auto" MinWidth="44"/>
+						<ColumnDefinition Width="Auto" MinWidth="292"/>
+					</Grid.ColumnDefinitions>
+
+					<Menu DockPanel.Dock="Top" Grid.Column="0" Background="Transparent" Foreground="White" VerticalAlignment="Top" Margin="0,4,0,3" Height="18">
+						<MenuItem Header="Spritesheet" Foreground="White">
+							<MenuItem x:Name="NewSpritesheet_MenuItem" Header="New Spritesheet" Foreground="Black" Click="NewSpriteSheetAs_MI_Click"/>
+							<MenuItem Header="Open Spritesheet Scene" Foreground="Black" Click="OpenSpritesheet_MI_Click"/>
+							<MenuItem Header="Save Spritesheet" Foreground="Black"  Click="SaveSpriteSheet_MI_Click"/>
+							<MenuItem Header="Save SpriteSheet As" Foreground="Black" Click="SaveSpriteSheetAs_MI_Click" />
+						</MenuItem>
+					</Menu>
+					
+				</Grid>
+			</ControlTemplate>
+
+
 			<ControlTemplate x:Key="DialogueEditorObjectExplorer_Template">
 				<Grid>
 					<Grid.ColumnDefinitions>
@@ -1108,7 +1140,7 @@
 			<ContentControl x:Name="ObjectProperties_Control" Template="{DynamicResource AnimationEditorProperties_Template}" Grid.Column="2" Grid.ColumnSpan="2"/>
 
 			<ContentControl x:Name="EditorToolBar_CC" Grid.Column="1" Height="25" VerticalAlignment="Top" Margin="10,4,123,0"
-											Template="{DynamicResource DialogueEditorObjectExplorer_Template}"/>
+											Template="{DynamicResource SpritesheetEditorObjectExplorer_Template}"/>
 
 			<!--This is the main editor window-->
 
@@ -1201,6 +1233,45 @@
 							</Canvas.Background>
 							<Canvas x:Name="LevelEditor_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
 						</Canvas>
+					</Grid>
+				</TabItem>
+				<TabItem Header="Spritesheet Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="20"/>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="20"/>
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="20"/>
+							<RowDefinition Height="*"/>
+							<RowDefinition Height="20"/>
+						</Grid.RowDefinitions>
+
+						<Grid Grid.Column="1" Grid.Row="1" x:Name="SE_NewSpritesheet_MainGrid" Background="#FF3C3C3C" Visibility="Visible">
+							<Grid.RowDefinitions>
+								<RowDefinition Height="*"/>
+							</Grid.RowDefinitions>
+
+
+							<Canvas Grid.Row="0" Grid.Column="0" x:Name="SpritesheetEditor_BackCanvas" IsHitTestVisible="True" ClipToBounds="True" 
+							        SizeChanged="SpritesheetEditor_BackCanvas_OnSizeChanged" MouseWheel="SpritesheetEditor_BackCanvas_OnMouseWheel"
+							        DragOver="SpritesheetEditor_BackCanvas_OnDragOver">
+								<Canvas.Background>
+									<VisualBrush x:Name="SpritesheetEditor_VB" TileMode="Tile" Stretch="Uniform" Viewport="0,0,40,40" ViewportUnits="Absolute" >
+										<VisualBrush.Visual>
+											<Rectangle Width="40" Height="40" Fill="Black" Stroke="Gray" StrokeThickness=".4" />
+										</VisualBrush.Visual>
+									</VisualBrush>
+								</Canvas.Background>
+								<Canvas x:Name="SpritesheetEditor_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+							</Canvas>
+						</Grid>
+						<TextBox x:Name="SpritesheetZoomFactor_TB" Grid.Row="2" Grid.Column="1" MinWidth="35" Width="35" Margin="70,2,0,2" 
+						         FontSize="10" Background="#FF4F4F4F" Foreground="White" BorderBrush="#00ABADB3" HorizontalAlignment="Left" Text="100% " VerticalAlignment="Stretch" />
+
+						<TextBlock Grid.Row="2" Grid.Column="1" Text="Zoom Level:" Foreground="White"/>
+
 					</Grid>
 				</TabItem>
 				<TabItem Header="Animation Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
@@ -1789,7 +1860,12 @@
 			<Button Content="&lt;---" Grid.Column="1" Height="23" HorizontalAlignment="Left" Margin="3,0,0,0" x:Name="DirectoryBack_BTN" VerticalAlignment="Top" Width="32" Foreground="White" Click="DirectoryBack_BTN_Click" BorderBrush="#00000000" Background="#00000000"/>
 		</Grid>
 
-		<!--This takes care of GUI resizing with the custom window we created.-->
+
+		<ol:OutputLog x:Name="EngineOutputLog" Grid.Row="4"></ol:OutputLog>
+		<GridSplitter x:Name="OutputLogSpliter" Grid.Row="3" Height="2" ResizeDirection="Rows" Background="#FF868686" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"></GridSplitter>
+
+
+<!--This takes care of GUI resizing with the custom window we created.-->
 		<Rectangle Stroke="{x:Null}" Fill="Transparent" VerticalAlignment="Top" Height="5" x:Name="top" Margin="4,0,5,0" />
 		<Rectangle Stroke="{x:Null}" Fill="Transparent" x:Name="bottom" Height="10" VerticalAlignment="Bottom" Margin="5,0,5,0" Grid.Row="4"/>
 		<Rectangle Stroke="{x:Null}" Fill="Transparent" Grid.RowSpan="4" HorizontalAlignment="Left" Margin="0,5,0,5" Width="5" x:Name="left"/>
@@ -1810,9 +1886,8 @@
 		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" HorizontalAlignment="Left" Width="1" VerticalAlignment="Top" Height="1"  />
 
 
-		<ol:OutputLog x:Name="EngineOutputLog" Grid.Row="4"></ol:OutputLog>
+		
 
 		<Rectangle Stroke="{x:Null}" Fill="MediumPurple" Height="1" VerticalAlignment="Bottom"  Margin="1,0,1,0" Grid.Row="4"/>
-		<GridSplitter x:Name="OutputLogSpliter" Grid.Row="3" Height="2" ResizeDirection="Rows" Background="#FF868686" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"></GridSplitter>
 	</Grid>
 </Window>

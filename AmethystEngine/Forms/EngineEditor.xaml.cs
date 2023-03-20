@@ -338,6 +338,14 @@ namespace AmethystEngine.Forms
 
 		#endregion
 
+		#region SpriteSheet Editor
+
+		public double SpritesheetEditorZoomLevel = 1;
+		int SpritesheetGridHeight = 32;
+		int SpritesheetGridWidth = 32;
+
+		#endregion
+
 		TreeView SceneExplorer_TreeView = new TreeView();
 		ListBox EditorObjects_LB = new ListBox();
 
@@ -898,6 +906,9 @@ namespace AmethystEngine.Forms
 				}
 
 
+			}
+			else if (((TabItem) EditorWindows_TC.SelectedItem).Header.ToString().Contains("Spritesheet"))
+			{
 			}
 			else if (((TabItem) EditorWindows_TC.SelectedItem).Header.ToString().Contains("Animation"))
 			{
@@ -1874,7 +1885,7 @@ namespace AmethystEngine.Forms
 								Canvas.SetTop(selectTool.SelectedTiles[i],
 									Canvas.GetTop(selectTool.SelectedTiles[i]) - selectTool.SelectedTiles[i].ActualWidth);
 							}
-
+							EditorObjectAnimationPreviewsList_Template
 							shiftpoints[2] = new Point((int) e.GetPosition(LevelEditor_BackCanvas).X,
 								(int) e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
 							break;
@@ -4072,7 +4083,7 @@ namespace AmethystEngine.Forms
 		/// <param name="e"></param>
 		private void ContentControl_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
 		{
-			if (CurrentTool == EditorTool.Select)
+			if (CurrentTool == EditorTool.Select && LESelectedSprite != null)
 			{
 				Point point = new Point(Canvas.GetLeft((ContentControl) sender), Canvas.GetTop((ContentControl) sender));
 				LESelectedSprite.SetProperty("x", (int) point.X);
@@ -8220,10 +8231,20 @@ namespace AmethystEngine.Forms
 					AnimationSubLayerImages_List[AnimationSubLayer_CB.SelectedIndex - 2] = templist;
 
 					//Now we need to set the animation events to the screen
-					CurrentSubLayerStateChanges_TV.ItemsSource =
-						currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()]
+
+					if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Text]
 						.ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].SpriteAnimations_List[CurrentSubLayerAnimStates_LB.SelectedIndex]
-						.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent);
+						.GetAnimationEvents()
+						.Count > 0)
+
+					{
+						CurrentSubLayerStateChanges_TV.ItemsSource =
+							currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Text]
+								.ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].SpriteAnimations_List[CurrentSubLayerAnimStates_LB.SelectedIndex]
+								.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent);
+					}
+
+					
 				}
 			}
 		}
@@ -8251,8 +8272,110 @@ namespace AmethystEngine.Forms
 		}
 
 
-	}
+		private void NewSpriteSheetAs_MI_Click(object sender, RoutedEventArgs e)
+		{
+			throw new NotImplementedException();
+		}
 
+		private void OpenSpritesheet_MI_Click(object sender, RoutedEventArgs e)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void SaveSpriteSheet_MI_Click(object sender, RoutedEventArgs e)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void SaveSpriteSheetAs_MI_Click(object sender, RoutedEventArgs e)
+		{
+			throw new NotImplementedException();
+		}
+
+		private void SpritesheetEditor_BackCanvas_OnSizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			// throw new NotImplementedException();
+		}
+
+		/// <summary>
+		/// handles mouse scroll events
+		/// Zooming is handled here.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void SpritesheetEditor_BackCanvas_OnMouseWheel(object sender, MouseWheelEventArgs e)
+		{
+			
+			Console.WriteLine("scroollll");
+
+
+				if (e.Delta > 0) //zoom in!
+				{
+				SpritesheetEditorZoomLevel += .2;
+					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel );
+					SpritesheetEditor_Canvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
+					Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
+					//TODO: resize selection rectangle
+				}
+				else //zoom out!
+				{
+				SpritesheetEditorZoomLevel -= .2;
+					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
+					SpritesheetEditor_Canvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
+					Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
+					//TODO: resize selection rectangle
+				}
+
+				if (SpritesheetEditorZoomLevel < .2)
+				{
+				SpritesheetEditorZoomLevel = .2;
+					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
+					SpritesheetEditor_Canvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
+					return;
+				} //do not allow this be 0 which in turn / by 0;
+
+				SpritesheetZoomFactor_TB.Text = String.Format("({0})%  ({1}x{1})", 100 * SpritesheetEditorZoomLevel , SpritesheetGridWidth * SpritesheetEditorZoomLevel );
+				ScaleSpriteSheetEditorCanvas();
+			
+		}
+
+		private void ScaleSpriteSheetEditorCanvas()
+		{
+			//Level TempLevel = CurrentLevel;
+			//if (TempLevel == null) return; //TODO: Remove after i make force select work on tree view.
+			//FullMapLEditor_Canvas.Width = (int)TempLevel.GetPropertyData("xCells") * 10;
+			//FullMapLEditor_Canvas.Height = (int)TempLevel.GetPropertyData("yCells") * 10;
+
+			//FullMapLEditor_VB.Viewport = new Rect(0, 0, 10, 10);
+
+			//int MainCurCellsX = (int)Math.Ceiling(LevelEditor_BackCanvas.RenderSize.Width / (40 * LEZoomLevel));
+			//int MainCurCellsY = (int)Math.Ceiling(LevelEditor_BackCanvas.RenderSize.Height / (40 * LEZoomLevel));
+
+			//double pastx, pasty = 0;
+			//pastx = Canvas.GetLeft(FullMapSelection_Rect);
+			//pasty = Canvas.GetTop(FullMapSelection_Rect);
+
+			//FullMapLEditor_Canvas.Children.Remove(FullMapSelection_Rect);
+			//FullMapSelection_Rect = new Rectangle()
+			//{
+			//	Width = MainCurCellsX * 10,
+			//	Height = MainCurCellsY * 10,
+			//	Stroke = Brushes.White,
+			//	StrokeThickness = 1,
+			//	Name = "SelectionRect"
+			//};
+			//Canvas.SetLeft(FullMapSelection_Rect, pastx);
+			//Canvas.SetTop(FullMapSelection_Rect, pasty);
+			//Canvas.SetZIndex(FullMapSelection_Rect, 100); //100 is the selection layer.
+
+			//FullMapLEditor_Canvas.Children.Add(FullMapSelection_Rect);
+		}
+
+		private void SpritesheetEditor_BackCanvas_OnDragOver(object sender, DragEventArgs e)
+		{
+			throw new NotImplementedException();
+		}
+	}
 }
 
 //NOTES TO MY SELF

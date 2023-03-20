@@ -251,7 +251,7 @@ namespace BixBite.Rendering.UI
 						if(childUI.GetProperties().Select(m => m.Item2).ToList()[i] != null)
 							writer.WriteAttributeString(null, childUI.GetProperties().Select(m => m.Item1).ToList()[i].ToString(), null, childUI.GetProperties().Select(m => m.Item2).ToList()[i].ToString());
 						else
-							writer.WriteAttributeString(null, childUI.GetProperties().Select(m => m.Item1).ToList()[i].ToString(), null, "null");
+							writer.WriteAttributeString(null, childUI.GetProperties().Select(m => m.Item1).ToList()[i].ToString(), null, "#00000000");
 
 					}
 					writer.WriteEndElement();//end child UI
