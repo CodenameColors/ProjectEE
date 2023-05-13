@@ -52,6 +52,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\CustomColorPicker.dll</HintPath>
     </Reference>
+    <Reference Include="ImageCropper">
+      <HintPath>..\..\..\Visual Studio 2019\Projects\MyWPFControls\CroppableImage\ImageCropper\bin\Debug\ImageCropper.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.Conversion.v4.0" />
     <Reference Include="Microsoft.Build.Engine" />
@@ -259,6 +262,7 @@
     <Compile Include="Components\Bixbite_Windows_Build\TimelinePlayer\TimeBlock.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\TimelinePlayer\Timeline.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Tweening\Tweening.cs" />
+    <Compile Include="Components\CanvasSpritesheet.cs" />
     <Compile Include="Components\DialogueScene.cs" />
     <Compile Include="Components\PropertyBag.cs" />
     <Compile Include="Components\Tools\Cuprite.cs" />

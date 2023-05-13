@@ -2,7 +2,6 @@
 using AmethystEngine.Components.Tools;
 using BixBite;
 using BixBite.Rendering;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,6 +21,8 @@ using BixBite.Resources;
 using PropertyGridEditor;
 using BixBite.Rendering.UI;
 using System.Threading;
+using System.Windows.Documents;
+using System.Windows.Forms;
 using TimelinePlayer.Components;
 using BixBite.Characters;
 using BixBite.NodeEditor;
@@ -30,15 +31,36 @@ using BixBite.NodeEditor.Logic;
 using BixBite.Rendering.Animation;
 using BixBite.Rendering.UI.Button;
 using BixBite.Rendering.UI.TextBlock;
+using CroppingImageLibrary.Services;
+using ImageCropper;
+using ImageCropper.Components;
 using Microsoft.Xna.Framework;
 using NodeEditor;
 using NodeEditor.Components;
 using NodeEditor.Components.Arithmetic;
 using NodeEditor.Components.Logic;
+using Button = System.Windows.Controls.Button;
+using CheckBox = System.Windows.Controls.CheckBox;
 using Color = System.Windows.Media.Color;
+using ComboBox = System.Windows.Controls.ComboBox;
+using ContextMenu = System.Windows.Controls.ContextMenu;
+using Control = System.Windows.Controls.Control;
+using Cursors = System.Windows.Input.Cursors;
+using DragEventArgs = System.Windows.DragEventArgs;
 using GameImage = BixBite.Rendering.UI.Image.GameImage;
+using HorizontalAlignment = System.Windows.HorizontalAlignment;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using Label = System.Windows.Controls.Label;
+using ListBox = System.Windows.Controls.ListBox;
+using MenuItem = System.Windows.Controls.MenuItem;
+using MessageBox = System.Windows.MessageBox;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Point = System.Windows.Point;
 using Rectangle = System.Windows.Shapes.Rectangle;
+using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
+using TabControl = System.Windows.Controls.TabControl;
+using TextBox = System.Windows.Controls.TextBox;
+using TreeView = System.Windows.Controls.TreeView;
 
 namespace AmethystEngine.Forms
 {
@@ -135,10 +157,12 @@ namespace AmethystEngine.Forms
 
 		#region Properties
 
+		TreeView SpriteSheet_CE_Tree;
 		ObservableCollection<SpriteSheet> ActiveSpriteSheets = new ObservableCollection<SpriteSheet>();
 		SpriteSheet CurrentActiveSpriteSheet;
 		SpriteAnimation CurrentlySelectedAnimation;
-
+		CanvasSpritesheet CurrentSelectedSpriteSheet = null;
+		ObservableCollection<CanvasSpritesheet> ActiveCanvasSpritesheets = new ObservableCollection<CanvasSpritesheet>();
 		LayeredSpriteSheet currentLayeredSpriteSheet;
 		//List<String> CurrentLayeredSpriteSheet_SubLayerNames = new List<string>();
 		//List<String> CurrentAnimationSubLayer_AnimStates = new List<string>();
@@ -147,6 +171,7 @@ namespace AmethystEngine.Forms
 
 		BitmapImage CurrentSpriteSheet_Image = new BitmapImage();
 		
+
 		
 		TreeView Animation_CE_Tree;
 		TreeView AnimationChangeEvents_Properties_Tree;
@@ -398,6 +423,10 @@ namespace AmethystEngine.Forms
 				(Rectangle) ContentLibrary_Control.Template.FindName("TileMapGrid_Rect", ContentLibrary_Control);
 			SceneExplorer_TreeView =
 				(TreeView) SceneExplorer_Control.Template.FindName("LESceneExplorer_TreeView", SceneExplorer_Control);
+			SpriteSheet_CE_Tree =
+					(TreeView)ContentLibrary_Control.Template.FindName("SpriteSheetEditor_CE_TV", ContentLibrary_Control);
+
+
 
 			OpenLevels = new ObservableCollection<Level>();
 			OpenUIEdits = new ObservableCollection<BaseUI>();
@@ -1885,7 +1914,7 @@ namespace AmethystEngine.Forms
 								Canvas.SetTop(selectTool.SelectedTiles[i],
 									Canvas.GetTop(selectTool.SelectedTiles[i]) - selectTool.SelectedTiles[i].ActualWidth);
 							}
-							EditorObjectAnimationPreviewsList_Template
+							//EditorObjectAnimationPreviewsList_Template
 							shiftpoints[2] = new Point((int) e.GetPosition(LevelEditor_BackCanvas).X,
 								(int) e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
 							break;
@@ -8306,31 +8335,44 @@ namespace AmethystEngine.Forms
 		private void SpritesheetEditor_BackCanvas_OnMouseWheel(object sender, MouseWheelEventArgs e)
 		{
 			
-			Console.WriteLine("scroollll");
+			Console.WriteLine("canvas scroollll to zoom");
 
 
 				if (e.Delta > 0) //zoom in!
 				{
-				SpritesheetEditorZoomLevel += .2;
+					SpritesheetEditorZoomLevel += .2;
 					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel );
 					SpritesheetEditor_Canvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
 					Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
+
+					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+					SpritesheetEditor_BackCanvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+					Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
+				
+
 					//TODO: resize selection rectangle
-				}
+			}
 				else //zoom out!
 				{
-				SpritesheetEditorZoomLevel -= .2;
+					SpritesheetEditorZoomLevel -= .2;
 					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
 					SpritesheetEditor_Canvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
 					Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
-					//TODO: resize selection rectangle
-				}
+
+					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+					SpritesheetEditor_BackCanvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+					Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
+				//TODO: resize selection rectangle
+			}
 
 				if (SpritesheetEditorZoomLevel < .2)
 				{
-				SpritesheetEditorZoomLevel = .2;
+					SpritesheetEditorZoomLevel = .2;
 					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
 					SpritesheetEditor_Canvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
+
+					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+					SpritesheetEditor_BackCanvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
 					return;
 				} //do not allow this be 0 which in turn / by 0;
 
@@ -8374,6 +8416,263 @@ namespace AmethystEngine.Forms
 		private void SpritesheetEditor_BackCanvas_OnDragOver(object sender, DragEventArgs e)
 		{
 			throw new NotImplementedException();
+		}
+
+		private void AddNewSpriteAnimation_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			// Step one find the content control
+			SpriteSheet_CE_Tree = (TreeView) ContentLibrary_Control.Template.FindName("SpriteSheetEditor_CE_TV", ContentLibrary_Control);
+
+			if(SpriteSheet_CE_Tree != null)
+			{
+				// When testing i don't have "starting screen for this so it's null. this will be removed later
+				if(CurrentSelectedSpriteSheet == null)
+				{
+					// FOR TESTING ONLY
+					CurrentSelectedSpriteSheet = new CanvasSpritesheet("Testing_Sheet", 1000, 1000);
+				}
+				// If for some dumbass reason i forgot to set it... then set it
+				if(SpriteSheet_CE_Tree.ItemsSource == null)
+				{
+					SpriteSheet_CE_Tree.ItemsSource = CurrentSelectedSpriteSheet.AllAnimationOnSheet;
+				}
+
+				SpriteSheet_CE_Tree.ItemsSource = null;
+
+				CurrentSelectedSpriteSheet.AllAnimationOnSheet.Add(new CanvasAnimation("Testing_Idle1"));
+				CurrentSelectedSpriteSheet.AllAnimationOnSheet.Last().CanvasFrames.Add(new CanvasImageProperties());
+
+				// SpriteSheet_CE_Tree.ItemsSource = CurrentSelectedSpriteSheet;
+				SpriteSheet_CE_Tree.ItemsSource = CurrentSelectedSpriteSheet.AllAnimationOnSheet;
+
+
+			}
+		}
+
+		private void Spritesheet_OE_Add_Frame_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			// We need to make sure we know where to add this.
+			Button btn = sender as Button;
+			if (btn != null)
+			{
+				// We need to play WPF games... aka find the template, and then with that find the acutal control (treeview)
+				ControlTemplate spriteSheeControlTemplate = (ControlTemplate)this.Resources["SpriteSheetObjects_Template"];
+				TreeView spritesheetTreeView = (TreeView)spriteSheeControlTemplate.FindName("SpriteSheetEditor_CE_TV", ContentLibrary_Control);
+				TreeViewItem tvi = FindParentTreeViewItem(btn);
+
+				// Get the actual index of the list from the BUTTON we pressed
+				int animationIndex = CurrentSelectedSpriteSheet.AllAnimationOnSheet.IndexOf((tvi.DataContext as CanvasAnimation)); // MAGIC BULLSHIT
+
+				if(animationIndex >= 0)
+				{
+					// Get a new image file
+					Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+					{
+						Title = "Import PNG File",
+						FileName = "", //default file name
+						Filter = "Image files (*.png)|*.png",
+						RestoreDirectory = true
+					};
+
+					Nullable<bool> result = dlg.ShowDialog();
+					// Process save file dialog box results
+					string filename = "";
+					if (result == true)
+					{
+						// Save document
+						filename = dlg.FileName;
+						// filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] {'/', '\\'}));
+					}
+					else return; //invalid name
+
+					Console.WriteLine(dlg.FileName);
+					BitmapImage _baseImage = new BitmapImage();
+					_baseImage.BeginInit();
+					_baseImage.UriSource = new Uri(filename, UriKind.Absolute);
+					_baseImage.EndInit();
+
+					//var adorn = new AdornerDecorator();
+					CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Add(
+						new CanvasImageProperties(filename, (int)_baseImage.Width, (int)_baseImage.Height));
+
+					//ImageCropper.CroppableImage croppable = new CroppableImage(SpritesheetEditor_Canvas);
+					//SpritesheetEditor_Canvas.Children.Add(croppable);
+
+					//croppable.SetImage(filename, true);
+
+					SpritesheetEditor_CropImage.SetImage(filename, true);
+					SpritesheetEditor_CropImage.Visibility = Visibility.Visible;
+
+					//DIALOGUE SCENE HOOKS
+				}
+			}
+		}
+
+		private void CreateSpritesheet_BTN_Click(object sender, RoutedEventArgs e)
+		{
+
+			// make sure there is valid creation data
+			if (SpritesheetName_TB.Text != "" && int.TryParse(SpritesheetWidth_TB.Text, out int width) 
+			                                  && int.TryParse(SpritesheetHeight_TB.Text, out int height))
+			{
+				SE_NewSpritesheet_MainGrid.Visibility = Visibility.Visible;
+				SpritesheetEditorMainGrid_Grid.Visibility = Visibility.Visible; 
+				SpritesheetEditorCreation_Grid.Visibility = Visibility.Hidden;
+
+				CurrentSelectedSpriteSheet = new CanvasSpritesheet(SpritesheetName_TB.Name, width, height);
+				ActiveCanvasSpritesheets.Add(CurrentSelectedSpriteSheet);
+
+
+				SpritesheetEditor_BackCanvas.Width = width;
+				SpritesheetEditor_BackCanvas.Height = height;
+			}
+		}
+
+
+		private TreeViewItem FindParentTreeViewItem(object child)
+		{
+			try
+			{
+				var parent = VisualTreeHelper.GetParent(child as DependencyObject);
+				while ((parent as TreeViewItem) == null)
+				{
+					parent = VisualTreeHelper.GetParent(parent);
+				}
+				return parent as TreeViewItem;
+			}
+			catch (Exception e)
+			{
+				//could not find a parent of type TreeViewItem
+				return null;
+			}
+		}
+
+		private int? GetTreeViewItemParentIndex(TreeViewItem Item, TreeView tree)
+		{
+			int index = 0;
+			foreach (var _item in tree.Items)
+			{
+				if (_item == Item.Parent)
+				{
+					return index;
+				}
+				index++;
+			}
+			return null;
+			//throw new Exception("No parent window detected");
+		}
+
+		/// <summary>
+		/// Returns true if we have clicke in the canvas
+		/// </summary>
+		/// <param name="canvas"></param>
+		/// <returns></returns>
+		private bool IsClickedOnImageFrame(Canvas canvas)
+		{
+
+			foreach (UIElement childImage in canvas.Children)
+			{
+				// Get the rectangle area for this image.
+				if (SpritesheetEditor_CropImage == childImage)
+				{
+					double left = Canvas.GetLeft(childImage);
+					double right = Canvas.GetRight(childImage);
+					double top = Canvas.GetTop(childImage);
+					double bottom = Canvas.GetBottom(childImage);
+
+					Rect rect = new Rect(new Point(left, top), new Size(right - left, bottom - top));
+					if (rect.Contains(Mouse.GetPosition(canvas)))
+						return true;
+				}
+			}
+			return false;
+		}
+
+		private void SpritesheetEditor_BackCanvas_OnMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			if (SpritesheetEditor_CropImage.Visibility == Visibility.Hidden || SpritesheetEditor_CropImage.ResizeService == null)
+				return;
+
+
+			Canvas c = sender as Canvas;
+			if (c != null)
+			{
+				if (IsClickedOnImageFrame(c))
+					return; // ignore unless we click on the canvas itself
+
+				// we need to transfer this image and properties to the canvas we are trying make the new image on
+				String path = SpritesheetEditor_CropImage.GetImagePath();
+				if (path != null)
+				{
+					Image image = new Image();
+					image.Source = new BitmapImage(new Uri(path));
+					image.Width = SpritesheetEditor_CropImage.Width;
+					image.Height = SpritesheetEditor_CropImage.Height;
+					image.MouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
+					image.MouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
+
+
+					SpritesheetEditor_Canvas.Children.Add(image);
+
+					double xPos = Canvas.GetLeft(SpritesheetEditor_CropImage);
+					double yPos = Canvas.GetTop(SpritesheetEditor_CropImage);
+					Canvas.SetLeft(image, xPos);
+					Canvas.SetTop(image, yPos);
+
+					// ClearAdorners(c);
+					SpritesheetEditor_CropImage.bHasFocus = false;
+					SpritesheetEditor_CropImage.Visibility = Visibility.Hidden;
+				}
+			}
+		}
+
+		private void LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB(object sender, MouseButtonEventArgs e)
+		{
+			Image img = sender as Image;
+			if(img != null)
+			{
+				//ImageCropper.CroppableImage croppable = new CroppableImage(SpritesheetEditor_Canvas);
+				//SpritesheetEditor_Canvas.Children.Add(croppable);
+
+				//croppable.SetImage(filename, true);
+				
+
+
+				string imagePath = ((BitmapImage)img.Source).UriSource.ToString();
+
+				// SpritesheetEditor_CropImage = new CroppableImage(img){bHasFocus = true};
+				SpritesheetEditor_CropImage.SetImage(imagePath, true);
+
+				SpritesheetEditor_CropImage.bHasFocus = true;
+				SpritesheetEditor_CropImage.Visibility = Visibility.Visible;
+
+				SpritesheetEditor_Canvas.Children.Remove(img);
+				SpritesheetEditor_Canvas.Children.Add(SpritesheetEditor_CropImage);
+
+
+				// Capture the mouse events to allow the child control to continue to receive them
+				(sender as UIElement).CaptureMouse();
+
+				// Handle the mouse down event on the child control here
+				// Make sure to set e.Handled = true to prevent the event from bubbling up to the parent control
+				e.Handled = true;
+
+			}
+
+
+		}
+
+		private void LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB(object sender, MouseButtonEventArgs e)
+		{
+			Image img = sender as Image;
+			if (img != null)
+			{
+				// Release the captured mouse events
+				img.ReleaseMouseCapture();
+
+			}
+
+
 		}
 	}
 }

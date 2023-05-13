@@ -14,13 +14,15 @@
 				xmlns:src="clr-namespace:AmethystEngine.Resources"
 				xmlns:WpfToolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
 				xmlns:BixChar="clr-namespace:BixBite.Characters"
-				xmlns:DiagramDesigner="clr-namespace:DiagramDesigner" x:Class="AmethystEngine.Forms.EngineEditor"
+				xmlns:comp="clr-namespace:AmethystEngine.Components"
+        xmlns:DiagramDesigner="clr-namespace:DiagramDesigner" x:Class="AmethystEngine.Forms.EngineEditor"
 				xmlns:Tline="clr-namespace:TimelinePlayer;assembly=TimelinePlayer"
 				xmlns:ne="clr-namespace:BixBite.NodeEditor"
 				xmlns:ol="clr-namespace:OutputLog;assembly=OutputLog"
 				xmlns:nodeEditor="clr-namespace:NodeEditor;assembly=NodeEditor"
 				xmlns:timelinePlayer="clr-namespace:TimelinePlayer;assembly=TimelinePlayer"
 				xmlns:textBlock="clr-namespace:BixBite.Rendering.UI.TextBlock"
+				xmlns:imagecropper="clr-namespace:ImageCropper;assembly=ImageCropper"
 				mc:Ignorable="d" Background="#FF0E0D0D"
         Title="AmethystEngine" Height="800" Width="1200" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
 
@@ -627,6 +629,88 @@
 				</Grid>
 			</ControlTemplate>
 
+			<ControlTemplate x:Key="SpriteSheetObjects_Template">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="30"/>
+						<RowDefinition Height="*"/>
+					</Grid.RowDefinitions>
+
+					<TextBlock Text="Add an Animation State" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,7,0,7"/>
+					<Button Content="+" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="106,5,5,5" Height="20" VerticalContentAlignment="Top" Width="20"
+					        RenderTransformOrigin="1.5,0.5" Click="AddNewSpriteAnimation_BTN_Click"/>
+
+					<TreeView x:Name="SpriteSheetEditor_CE_TV" Grid.Row="1" Background="#FF383838" 
+					          ItemsSource="{Binding SpritesheetAnimationDictionary}">
+						<TreeView.Resources>
+							<HierarchicalDataTemplate DataType="{x:Type comp:CanvasAnimation}" ItemsSource="{Binding Path=CanvasFrames}">
+								<Grid>
+									<Grid.RowDefinitions>
+										<RowDefinition Height="20"/>
+										<RowDefinition Height="20"/>
+									</Grid.RowDefinitions>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="40"/>
+										<ColumnDefinition Width="50"/>
+										<ColumnDefinition Width="20"/>
+										<ColumnDefinition Width="10"/>
+										<ColumnDefinition Width="40"/>
+										<ColumnDefinition Width="*"/>
+									</Grid.ColumnDefinitions>
+
+									<Image Grid.RowSpan="2" Grid.ColumnSpan="1" Grid.Column="0" Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50"/>
+									<TextBlock Grid.Row="0" Grid.ColumnSpan="10" Grid.Column="1"  Text="{Binding AnimName}" Foreground="White" />
+									<TextBlock Grid.Row="1" Grid.Column="1" Text="Frames:" Foreground="White" />
+									<TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding NumOfFrames}" Foreground="White" />
+									<Button Grid.Row="0" Grid.RowSpan="2" Grid.Column="4" Background="#FF383838" Foreground="White"
+									        Click="Spritesheet_OE_Add_Frame_BTN_Click">
+										<Button.Content>
+											<Grid>
+												<Grid.RowDefinitions>
+													<RowDefinition/>
+													<RowDefinition/>
+												</Grid.RowDefinitions>
+												<TextBlock Grid.Row="0" Text="Add" HorizontalAlignment="Center"/>
+												<TextBlock Grid.Row="1" Text="Frame" HorizontalAlignment="Center"/>
+											</Grid>
+										</Button.Content>
+									</Button>
+								</Grid>
+							</HierarchicalDataTemplate>
+							<DataTemplate DataType="{x:Type comp:CanvasImageProperties}">
+								<Grid>
+									<Grid.RowDefinitions>
+										<RowDefinition Height="20"/>
+										<RowDefinition Height="20"/>
+									</Grid.RowDefinitions>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="40"/>
+										<ColumnDefinition Width="10"/>
+										<ColumnDefinition Width="20"/>
+										<ColumnDefinition Width="10"/>
+										<ColumnDefinition Width="20"/>
+									</Grid.ColumnDefinitions>
+
+									<Image Grid.RowSpan="2" Grid.ColumnSpan="1" Grid.Column="0" Margin="0,0,5,0" 
+									       Source="{Binding ImageLocation}" MaxWidth="50" MaxHeight="50"/>
+									<!--<TextBlock Grid.Row="0" Grid.ColumnSpan="10" Grid.Column="1"  Text="{Binding ImageLocation}" Foreground="White" />-->
+									<TextBlock Grid.Row="0" Grid.Column="1" Text="x:" Foreground="White" />
+									<TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding X}" Foreground="White" />
+									<TextBlock Grid.Row="0" Grid.Column="3" Text="y:" Foreground="White" />
+									<TextBlock Grid.Row="0" Grid.Column="4" Text="{Binding Y}" Foreground="White" />
+									
+									<TextBlock Grid.Row="1" Grid.Column="1" Text="w:" Foreground="White" />
+									<TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding W}" Foreground="White" />
+									<TextBlock Grid.Row="1" Grid.Column="3" Text="h:" Foreground="White" />
+									<TextBlock Grid.Row="1" Grid.Column="4" Text="{Binding H}" Foreground="White" />
+
+								</Grid>
+							</DataTemplate>
+						</TreeView.Resources>
+					</TreeView>
+
+				</Grid>
+			</ControlTemplate>
 
 			<ControlTemplate x:Key="UIEditorObjects_Template" >
 				<Grid x:Name="LevelEditorTileMap_ToolBar_Grid" Background="#FF2B2B2B" VerticalAlignment="Stretch" Margin="5,4,10,8">
@@ -1126,8 +1210,9 @@
 			<Button x:Name="ContentLibaryImport_BTN" Width="15" Height="15" Margin="0,25,4,0" VerticalAlignment="Top" HorizontalAlignment="Right" Background="#FF484848" Foreground="White" VerticalContentAlignment="Center" Click="ImportToEditor" IsEnabled="False">
 				<TextBlock Text="+" Margin="0,0,1,2" VerticalAlignment="Center"/>
 			</Button>
+			
 			<ContentControl x:Name="ContentLibrary_Control" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
-               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" Margin="0,46,0,-1" Template="{DynamicResource DialogueEditorObjects_Template}">
+               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" Margin="0,46,0,-1" Template="{DynamicResource SpriteSheetObjects_Template}">
 				<Expander Header="Expander" Height="100" Width="100">
 					<Grid Background="#FFE5E5E5"/>
 				</Expander>
@@ -1237,41 +1322,74 @@
 				</TabItem>
 				<TabItem Header="Spritesheet Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="20"/>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="20"/>
-						</Grid.ColumnDefinitions>
-						<Grid.RowDefinitions>
-							<RowDefinition Height="20"/>
-							<RowDefinition Height="*"/>
-							<RowDefinition Height="20"/>
-						</Grid.RowDefinitions>
+						<Grid x:Name="SpritesheetEditorCreation_Grid" Visibility="Visible"  Background="#FF3C3C3C">
 
-						<Grid Grid.Column="1" Grid.Row="1" x:Name="SE_NewSpritesheet_MainGrid" Background="#FF3C3C3C" Visibility="Visible">
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="35"/>
+									<RowDefinition Height="35"/>
+									<RowDefinition Height="35"/>
+									<RowDefinition Height="35"/>
+									<RowDefinition Height="35"/>
+									<RowDefinition Height="35"/>
+									<RowDefinition Height="35"/>
+								</Grid.RowDefinitions>
+
+								<Label Grid.Row="0" Content="Sprite Sheet Name:" VerticalContentAlignment="Center" Foreground="White"/>
+								<TextBox x:Name="SpritesheetName_TB" Text="Sprite Sheet 1" Grid.Row="0" Width="315" Height="25" Margin="160,3,0,3" HorizontalAlignment="Left" Foreground="White" Background="#FF484848" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+
+								<Label Grid.Row="1" Content="Number of Horizontal Pixels:" VerticalContentAlignment="Center" Foreground="White" HorizontalAlignment="Left"/>
+								<TextBox x:Name="SpritesheetWidth_TB" Grid.Row="1" Text="1000" Width="88" Height="25" Margin="160,3,0,3" HorizontalAlignment="Left" Background="#FF484848" Foreground="White" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" RenderTransformOrigin="0.5,0.5" TextChanged="XCellsVal_TB_TextChanged"/>
+
+								<Label Grid.Row="2" Content="Number of Vertical Pixels:" VerticalContentAlignment="Center" Foreground="White" HorizontalAlignment="Left"/>
+								<TextBox x:Name="SpritesheetHeight_TB" Grid.Row="2" Text="1000" Width="88" Height="25" Margin="160,3,0,3" HorizontalAlignment="Left" Background="#FF484848" Foreground="White" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" TextChanged="YCellsVal_TB_TextChanged"/>
+
+								<Button x:Name="CreateSpritesheet_BTN" Grid.Row="3" Height="25" Content="Create Sprite Sheet" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,4,10,2" Background="#FF484848" Foreground="White" 
+								        Click="CreateSpritesheet_BTN_Click"/>
+							</Grid>
+
+						</Grid>
+						<Grid x:Name="SpritesheetEditorMainGrid_Grid" Visibility="Hidden">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="20"/>
+								<ColumnDefinition Width="*"/>
+								<ColumnDefinition Width="20"/>
+							</Grid.ColumnDefinitions>
 							<Grid.RowDefinitions>
+								<RowDefinition Height="20"/>
 								<RowDefinition Height="*"/>
+								<RowDefinition Height="20"/>
 							</Grid.RowDefinitions>
 
+							<Grid Grid.Column="1" Grid.Row="1" x:Name="SE_NewSpritesheet_MainGrid" Background="#FF3C3C3C" Visibility="Visible">
+								<Grid.RowDefinitions>
+									<RowDefinition Height="*"/>
+								</Grid.RowDefinitions>
 
-							<Canvas Grid.Row="0" Grid.Column="0" x:Name="SpritesheetEditor_BackCanvas" IsHitTestVisible="True" ClipToBounds="True" 
-							        SizeChanged="SpritesheetEditor_BackCanvas_OnSizeChanged" MouseWheel="SpritesheetEditor_BackCanvas_OnMouseWheel"
-							        DragOver="SpritesheetEditor_BackCanvas_OnDragOver">
-								<Canvas.Background>
-									<VisualBrush x:Name="SpritesheetEditor_VB" TileMode="Tile" Stretch="Uniform" Viewport="0,0,40,40" ViewportUnits="Absolute" >
-										<VisualBrush.Visual>
-											<Rectangle Width="40" Height="40" Fill="Black" Stroke="Gray" StrokeThickness=".4" />
-										</VisualBrush.Visual>
-									</VisualBrush>
-								</Canvas.Background>
-								<Canvas x:Name="SpritesheetEditor_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-							</Canvas>
-						</Grid>
-						<TextBox x:Name="SpritesheetZoomFactor_TB" Grid.Row="2" Grid.Column="1" MinWidth="35" Width="35" Margin="70,2,0,2" 
+								<Canvas Grid.Row="0" Grid.Column="0" x:Name="SpritesheetEditor_BackCanvas" IsHitTestVisible="True" ClipToBounds="True" 
+								        SizeChanged="SpritesheetEditor_BackCanvas_OnSizeChanged" MouseWheel="SpritesheetEditor_BackCanvas_OnMouseWheel"
+								        DragOver="SpritesheetEditor_BackCanvas_OnDragOver" MouseLeftButtonDown="SpritesheetEditor_BackCanvas_OnMouseDown">
+									
+										<Canvas.Background>
+										<VisualBrush x:Name="SpritesheetEditor_VB" TileMode="Tile" Stretch="Uniform" Viewport="0,0,40,40" ViewportUnits="Absolute" >
+											<VisualBrush.Visual>
+												<Rectangle Width="40" Height="40" Fill="Black" Stroke="Gray" StrokeThickness=".4" />
+											</VisualBrush.Visual>
+										</VisualBrush>
+									</Canvas.Background>
+
+									<Canvas x:Name="SpritesheetEditor_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+										<imagecropper:CroppableImage x:Name="SpritesheetEditor_CropImage" Visibility="Visible"
+										                             Canvas.Left="0" Canvas.Top="0"/>
+									</Canvas>
+								</Canvas>
+							</Grid>
+							<TextBox x:Name="SpritesheetZoomFactor_TB" Grid.Row="2" Grid.Column="1" MinWidth="35" Width="35" Margin="70,2,0,2" 
 						         FontSize="10" Background="#FF4F4F4F" Foreground="White" BorderBrush="#00ABADB3" HorizontalAlignment="Left" Text="100% " VerticalAlignment="Stretch" />
 
-						<TextBlock Grid.Row="2" Grid.Column="1" Text="Zoom Level:" Foreground="White"/>
+							<TextBlock Grid.Row="2" Grid.Column="1" Text="Zoom Level:" Foreground="White"/>
 
+						</Grid>
 					</Grid>
 				</TabItem>
 				<TabItem Header="Animation Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
