@@ -8647,7 +8647,8 @@ namespace AmethystEngine.Forms
 				SpritesheetEditor_CropImage.Visibility = Visibility.Visible;
 
 				SpritesheetEditor_Canvas.Children.Remove(img);
-				SpritesheetEditor_Canvas.Children.Add(SpritesheetEditor_CropImage);
+				if(!SpritesheetEditor_Canvas.Children.Contains(SpritesheetEditor_CropImage))
+					SpritesheetEditor_Canvas.Children.Add(SpritesheetEditor_CropImage);
 
 
 				// Capture the mouse events to allow the child control to continue to receive them
