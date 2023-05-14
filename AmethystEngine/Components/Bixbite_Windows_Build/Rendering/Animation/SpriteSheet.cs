@@ -12,7 +12,6 @@ using System.Windows.Controls.Primitives;
 using System.Xml;
 using BixBite.Rendering.Animation;
 using BixBite.Resources;
-using DrWPF.Windows.Data;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -62,7 +61,7 @@ namespace BixBite.Rendering
 			set => _isActive = value;
 		}
 
-		public ObservableDictionary<String, SpriteAnimation> SpriteAnimations = new ObservableDictionary<string, SpriteAnimation>();
+		public Dictionary<String, SpriteAnimation> SpriteAnimations = new Dictionary<string, SpriteAnimation>();
 		public SpriteAnimation CurrentAnimation = null; //= new SpriteAnimation();
 
 		#endregion

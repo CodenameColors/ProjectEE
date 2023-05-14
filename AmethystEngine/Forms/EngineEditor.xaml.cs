@@ -8495,12 +8495,43 @@ namespace AmethystEngine.Forms
 					CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Add(
 						new CanvasImageProperties(filename, (int)_baseImage.Width, (int)_baseImage.Height));
 
+					// we need to check if we are already using the croppable control
+					if (SpritesheetEditor_CropImage.ResizeService != null)
+					{
+
+						// we need to transfer this image and properties to the canvas we are trying make the new image on
+						String path = SpritesheetEditor_CropImage.GetImagePath();
+						if (path != null)
+						{
+							Image image = new Image();
+							image.Source = new BitmapImage(new Uri(path));
+							image.Width = SpritesheetEditor_CropImage.Width;
+							image.Height = SpritesheetEditor_CropImage.Height;
+							image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
+							image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
+
+
+							SpritesheetEditor_Canvas.Children.Add(image);
+
+							double xPos = Canvas.GetLeft(SpritesheetEditor_CropImage);
+							double yPos = Canvas.GetTop(SpritesheetEditor_CropImage);
+							Canvas.SetLeft(image, xPos);
+							Canvas.SetTop(image, yPos);
+
+							// ClearAdorners(c);
+							SpritesheetEditor_CropImage.bHasFocus = false;
+							SpritesheetEditor_CropImage.Visibility = Visibility.Hidden;
+						}
+
+					}
+
 					//ImageCropper.CroppableImage croppable = new CroppableImage(SpritesheetEditor_Canvas);
 					//SpritesheetEditor_Canvas.Children.Add(croppable);
 
 					//croppable.SetImage(filename, true);
 
 					SpritesheetEditor_CropImage.SetImage(filename, true);
+					SpritesheetEditor_CropImage.bHasFocus = true;
 					SpritesheetEditor_CropImage.Visibility = Visibility.Visible;
 
 					//DIALOGUE SCENE HOOKS
@@ -8605,11 +8636,24 @@ namespace AmethystEngine.Forms
 				if (path != null)
 				{
 					Image image = new Image();
-					image.Source = new BitmapImage(new Uri(path));
+
+					// Have we cropped the craoppable image yet?
+					if (SpritesheetEditor_CropImage.GetCroppedBitmap() != null)
+					{
+						image.Source = SpritesheetEditor_CropImage.GetCroppedBitmap();
+					}
+					else
+					{
+						image.Source = new BitmapImage(new Uri(path));
+					}
+
+					image.Stretch = Stretch.Fill;
 					image.Width = SpritesheetEditor_CropImage.Width;
+					image.MaxWidth = SpritesheetEditor_CropImage.Width;
 					image.Height = SpritesheetEditor_CropImage.Height;
-					image.MouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
-					image.MouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
+					image.MaxHeight = SpritesheetEditor_CropImage.Height;
+					image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
+					image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
 
 					SpritesheetEditor_Canvas.Children.Add(image);
@@ -8628,28 +8672,53 @@ namespace AmethystEngine.Forms
 
 		private void LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB(object sender, MouseButtonEventArgs e)
 		{
+			// DO NOT DO ANYTHING if we have a cropper open already
+			if (SpritesheetEditor_CropImage.ResizeService != null)
+			{
+				return;
+			}
+
 			Image img = sender as Image;
 			if(img != null)
 			{
-				//ImageCropper.CroppableImage croppable = new CroppableImage(SpritesheetEditor_Canvas);
-				//SpritesheetEditor_Canvas.Children.Add(croppable);
+				string imagePath = ((img.Source as CroppedBitmap)?.Source as CroppedBitmap)?.Source.ToString();
+				if (imagePath != null)
+				{
+					SpritesheetEditor_CropImage.SetImage(imagePath, true, (img.Source as CroppedBitmap).SourceRect);
+				}
+				else
+				{
+					if (((img.Source as CroppedBitmap)?.Source != null))
+					{
+						imagePath = (img.Source as CroppedBitmap)?.Source.ToString();
+					}
+					else
+					{
+						imagePath = ((BitmapImage)img.Source).UriSource.ToString();
+						SpritesheetEditor_CropImage.SetImage(imagePath, true);
+					}
+				}
 
-				//croppable.SetImage(filename, true);
-				
-
-
-				string imagePath = ((BitmapImage)img.Source).UriSource.ToString();
 
 				// SpritesheetEditor_CropImage = new CroppableImage(img){bHasFocus = true};
-				SpritesheetEditor_CropImage.SetImage(imagePath, true);
+				//SpritesheetEditor_CropImage.SetImage(imagePath, true);
 
 				SpritesheetEditor_CropImage.bHasFocus = true;
 				SpritesheetEditor_CropImage.Visibility = Visibility.Visible;
 
+				// Get the image loaction, and set that to the cropper location
+				Canvas.SetLeft(SpritesheetEditor_CropImage, Canvas.GetLeft(img));
+				Canvas.SetTop(SpritesheetEditor_CropImage, Canvas.GetTop(img));
+
+				// We need to set the cropper to the new image size
+				SpritesheetEditor_CropImage.MaxHeight = img.Height;
+				SpritesheetEditor_CropImage.Height = img.Height;
+				SpritesheetEditor_CropImage.MaxWidth = img.Width;
+				SpritesheetEditor_CropImage.Width = img.Width;
+
 				SpritesheetEditor_Canvas.Children.Remove(img);
 				if(!SpritesheetEditor_Canvas.Children.Contains(SpritesheetEditor_CropImage))
 					SpritesheetEditor_Canvas.Children.Add(SpritesheetEditor_CropImage);
-
 
 				// Capture the mouse events to allow the child control to continue to receive them
 				(sender as UIElement).CaptureMouse();
