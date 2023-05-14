@@ -164,6 +164,7 @@ namespace AmethystEngine.Forms
 		CanvasSpritesheet CurrentSelectedSpriteSheet = null;
 		ObservableCollection<CanvasSpritesheet> ActiveCanvasSpritesheets = new ObservableCollection<CanvasSpritesheet>();
 		LayeredSpriteSheet currentLayeredSpriteSheet;
+		CanvasImageProperties currentSelectedCanvasFrame = null;
 		//List<String> CurrentLayeredSpriteSheet_SubLayerNames = new List<string>();
 		//List<String> CurrentAnimationSubLayer_AnimStates = new List<string>();
 		//List<String> CurrentAnimationSubLayer_AnimStates = new List<string>();
@@ -8308,12 +8309,108 @@ namespace AmethystEngine.Forms
 
 		private void OpenSpritesheet_MI_Click(object sender, RoutedEventArgs e)
 		{
-			throw new NotImplementedException();
+			// Get a new image file
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+			{
+				Title = "Import Sprite Sheet File",
+				FileName = "", //default file name
+				Filter = "Sprite Sheet files (*.spritesheet)|*.spritesheet",
+				RestoreDirectory = true
+			};
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				// filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] {'/', '\\'}));
+			}
+			else return; //invalid name
+
+			Console.WriteLine(dlg.FileName);
+
+			CurrentSelectedSpriteSheet = CanvasSpritesheet.ImportSpriteSheet(dlg.FileName);
+
+			if (CurrentSelectedSpriteSheet != null)
+			{
+				var imageControls = SpritesheetEditor_Canvas.Children.OfType<Image>().ToList();
+
+				// Remove all Image controls from the Canvas
+				SpriteSheet_CE_Tree.ItemsSource = null;
+				foreach (var imageControl in imageControls)
+				{
+					SpritesheetEditor_Canvas.Children.Remove(imageControl);
+				}
+				// Set the Item Source for the Content Editor
+				SpriteSheet_CE_Tree.ItemsSource = CurrentSelectedSpriteSheet.AllAnimationOnSheet;
+
+				foreach (CanvasAnimation canvasAnimation in CurrentSelectedSpriteSheet.AllAnimationOnSheet)
+				{
+					foreach (CanvasImageProperties frame in canvasAnimation.CanvasFrames)
+					{
+						Image image = new Image();
+						BitmapImage bitmap = new BitmapImage(new Uri(frame.ImageLocation));
+						CroppedBitmap croppedBitmap = new CroppedBitmap(bitmap, new Int32Rect(0,0, (int)bitmap.Width, (int)bitmap.Height));
+						image.Source = croppedBitmap;
+						image.Width = frame.W;
+						image.Height = frame.H;
+						image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
+						image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
+
+						SpritesheetEditor_Canvas.Children.Add(image);
+
+						Canvas.SetLeft(image, frame.X);
+						Canvas.SetTop(image, frame.Y);
+					}
+				}
+
+			}
 		}
 
 		private void SaveSpriteSheet_MI_Click(object sender, RoutedEventArgs e)
 		{
-			throw new NotImplementedException();
+
+			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
+			{
+				Title = "Save Spritesheet",
+				FileName = "", //default file name
+				Filter = "Sprite Sheet (*.spritesheet)|*.spritesheet|All files (*.*)|*.*",
+				FilterIndex = 2,
+				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Animations"),
+				RestoreDirectory = true
+			};
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+
+			Console.WriteLine(dlg.FileName);
+
+			Console.WriteLine("Saving Spritesheet");
+
+			CanvasSpritesheet.ExportSpriteSheet(CurrentSelectedSpriteSheet, dlg.FileName.Replace(".spritesheet",""));
+
+			// Render the canvas and its child elements onto a RenderTargetBitmap
+			var renderTargetBitmap = new RenderTargetBitmap((int)CurrentSelectedSpriteSheet.Width, (int)CurrentSelectedSpriteSheet.Height, 96, 96, PixelFormats.Pbgra32);
+			renderTargetBitmap.Render(SpritesheetEditor_Canvas);
+
+			// Create a PngBitmapEncoder and add the RenderTargetBitmap to it
+			var pngEncoder = new PngBitmapEncoder();
+			pngEncoder.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
+
+			// Save the PngBitmapEncoder to a file or stream
+			var fileStream = new FileStream(String.Format("{0}.png", dlg.FileName.Replace(".spritesheet", "")), FileMode.Create);
+			pngEncoder.Save(fileStream);
+			fileStream.Close();
 		}
 
 		private void SaveSpriteSheetAs_MI_Click(object sender, RoutedEventArgs e)
@@ -8440,7 +8537,6 @@ namespace AmethystEngine.Forms
 				SpriteSheet_CE_Tree.ItemsSource = null;
 
 				CurrentSelectedSpriteSheet.AllAnimationOnSheet.Add(new CanvasAnimation("Testing_Idle1"));
-				CurrentSelectedSpriteSheet.AllAnimationOnSheet.Last().CanvasFrames.Add(new CanvasImageProperties());
 
 				// SpriteSheet_CE_Tree.ItemsSource = CurrentSelectedSpriteSheet;
 				SpriteSheet_CE_Tree.ItemsSource = CurrentSelectedSpriteSheet.AllAnimationOnSheet;
@@ -8495,6 +8591,8 @@ namespace AmethystEngine.Forms
 					CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Add(
 						new CanvasImageProperties(filename, (int)_baseImage.Width, (int)_baseImage.Height));
 
+					currentSelectedCanvasFrame = CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last();
+
 					// we need to check if we are already using the croppable control
 					if (SpritesheetEditor_CropImage.ResizeService != null)
 					{
@@ -8525,7 +8623,7 @@ namespace AmethystEngine.Forms
 
 					}
 
-					//ImageCropper.CroppableImage croppable = new CroppableImage(SpritesheetEditor_Canvas);
+
 					//SpritesheetEditor_Canvas.Children.Add(croppable);
 
 					//croppable.SetImage(filename, true);
@@ -8533,10 +8631,20 @@ namespace AmethystEngine.Forms
 					SpritesheetEditor_CropImage.SetImage(filename, true);
 					SpritesheetEditor_CropImage.bHasFocus = true;
 					SpritesheetEditor_CropImage.Visibility = Visibility.Visible;
-
+					if(SpritesheetEditor_CropImage.updateSizeLocation_Hook == null)
+						SpritesheetEditor_CropImage.updateSizeLocation_Hook += UpdateSizeLocationHook_FrameInfo;
 					//DIALOGUE SCENE HOOKS
 				}
 			}
+		}
+
+		private void UpdateSizeLocationHook_FrameInfo(double x, double y, double w, double h)
+		{
+			currentSelectedCanvasFrame.X = (int)(x / SpritesheetEditorZoomLevel);
+			currentSelectedCanvasFrame.Y = (int)(y / SpritesheetEditorZoomLevel);
+			currentSelectedCanvasFrame.W = (int)(w / SpritesheetEditorZoomLevel);
+			currentSelectedCanvasFrame.H = (int)(h/ SpritesheetEditorZoomLevel);
+
 		}
 
 		private void CreateSpritesheet_BTN_Click(object sender, RoutedEventArgs e)
@@ -8670,6 +8778,52 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		private String GetCroppedImagePath(Image img)
+		{
+			string imagePath = null;
+			if (img != null)
+			{
+				imagePath = ((img.Source as CroppedBitmap)?.Source as CroppedBitmap)?.Source.ToString();
+				if (imagePath != null)
+				{
+
+				}
+				else
+				{
+					if (((img.Source as CroppedBitmap)?.Source != null))
+					{
+						imagePath = (img.Source as CroppedBitmap)?.Source.ToString();
+					}
+					else
+					{
+						imagePath = ((BitmapImage) img.Source).UriSource.ToString();
+					}
+				}
+			}
+			return imagePath;
+		}
+
+		public CanvasImageProperties CompareImagePathToCanvasImagePath(Image img)
+		{
+			string imagePath = GetCroppedImagePath(img);
+			String path1 = new Uri(imagePath).LocalPath;
+
+			// Let's find out what SpriteAnimation this image belongs too!
+			foreach (CanvasAnimation spriteAntimation in CurrentSelectedSpriteSheet.AllAnimationOnSheet)
+			{
+				foreach (CanvasImageProperties frame in spriteAntimation.CanvasFrames)
+				{
+					String path2 = Path.GetFullPath(frame.ImageLocation);
+
+					if (string.Equals(path1, path2, StringComparison.OrdinalIgnoreCase))
+					{
+						return frame;
+					}
+				}
+			}
+			return null;
+		}
+
 		private void LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB(object sender, MouseButtonEventArgs e)
 		{
 			// DO NOT DO ANYTHING if we have a cropper open already
@@ -8679,7 +8833,7 @@ namespace AmethystEngine.Forms
 			}
 
 			Image img = sender as Image;
-			if(img != null)
+			if (img != null)
 			{
 				string imagePath = ((img.Source as CroppedBitmap)?.Source as CroppedBitmap)?.Source.ToString();
 				if (imagePath != null)
@@ -8691,6 +8845,8 @@ namespace AmethystEngine.Forms
 					if (((img.Source as CroppedBitmap)?.Source != null))
 					{
 						imagePath = (img.Source as CroppedBitmap)?.Source.ToString();
+						SpritesheetEditor_CropImage.SetImage(imagePath, true);
+
 					}
 					else
 					{
@@ -8717,11 +8873,15 @@ namespace AmethystEngine.Forms
 				SpritesheetEditor_CropImage.Width = img.Width;
 
 				SpritesheetEditor_Canvas.Children.Remove(img);
-				if(!SpritesheetEditor_Canvas.Children.Contains(SpritesheetEditor_CropImage))
+				if (!SpritesheetEditor_Canvas.Children.Contains(SpritesheetEditor_CropImage))
 					SpritesheetEditor_Canvas.Children.Add(SpritesheetEditor_CropImage);
 
-				// Capture the mouse events to allow the child control to continue to receive them
-				(sender as UIElement).CaptureMouse();
+				// Create a new MouseEventArgs
+				var args = new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
+				{
+					RoutedEvent = UIElement.MouseLeftButtonDownEvent // Set the RoutedEvent property
+				};
+				SpritesheetEditor_CropImage.RaiseEvent(args);
 
 				// Handle the mouse down event on the child control here
 				// Make sure to set e.Handled = true to prevent the event from bubbling up to the parent control
@@ -8731,6 +8891,82 @@ namespace AmethystEngine.Forms
 
 
 		}
+
+		//private void LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB(object sender, MouseButtonEventArgs e)
+		//{
+		//	// DO NOT DO ANYTHING if we have a cropper open already
+		//	if (SpritesheetEditor_CropImage.ResizeService != null)
+		//	{
+		//		return;
+		//	}
+
+		//	Image img = sender as Image;
+		//	if(img != null)
+		//	{
+		//		CanvasImageProperties frame = CompareImagePathToCanvasImagePath(img);
+		//		if (frame != null)
+		//		{
+		//			// We have found the linked image frame!
+		//			frame.X = (int)Canvas.GetLeft(img);
+		//			frame.Y = (int)Canvas.GetTop(img);
+		//			frame.W = (int)img.Width;
+		//			frame.H = (int)img.Height;
+		//		}
+
+		//		string imagePath = ((img.Source as CroppedBitmap)?.Source as CroppedBitmap)?.Source.ToString();
+		//		if (imagePath != null)
+		//		{
+		//			SpritesheetEditor_CropImage.SetImage(imagePath, true, (img.Source as CroppedBitmap).SourceRect);
+		//		}
+		//		else
+		//		{
+		//			if (((img.Source as CroppedBitmap)?.Source != null))
+		//			{
+		//				imagePath = (img.Source as CroppedBitmap)?.Source.ToString();
+		//			}
+		//			else
+		//			{
+		//				imagePath = ((BitmapImage)img.Source).UriSource.ToString();
+		//				SpritesheetEditor_CropImage.SetImage(imagePath, true);
+		//			}
+		//		}
+
+		//		SpritesheetEditor_CropImage.bHasFocus = true;
+		//		SpritesheetEditor_CropImage.Visibility = Visibility.Visible;
+
+		//		// Get the image loaction, and set that to the cropper location
+		//		Canvas.SetLeft(SpritesheetEditor_CropImage, Canvas.GetLeft(img));
+		//		Canvas.SetTop(SpritesheetEditor_CropImage, Canvas.GetTop(img));
+
+		//		// We need to set the cropper to the new image size
+		//		SpritesheetEditor_CropImage.MaxHeight = img.Height;
+		//		SpritesheetEditor_CropImage.Height = img.Height;
+		//		SpritesheetEditor_CropImage.MaxWidth = img.Width;
+		//		SpritesheetEditor_CropImage.Width = img.Width;
+
+		//		SpritesheetEditor_Canvas.Children.Remove(img);
+		//		if(!SpritesheetEditor_Canvas.Children.Contains(SpritesheetEditor_CropImage))
+		//			SpritesheetEditor_Canvas.Children.Add(SpritesheetEditor_CropImage);
+
+		//		// Capture the mouse events to allow the child control to continue to receive them
+		//		(sender as UIElement).CaptureMouse();
+		//		SpritesheetEditor_CropImage.CaptureMouse();
+
+		//		// Create a new MouseEventArgs
+		//		var args = new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
+		//		{
+		//			RoutedEvent = UIElement.MouseLeftButtonDownEvent // Set the RoutedEvent property
+		//		};
+		//		SpritesheetEditor_CropImage.RaiseEvent(args);
+
+		//		// Handle the mouse down event on the child control here
+		//		// Make sure to set e.Handled = true to prevent the event from bubbling up to the parent control
+		//		e.Handled = true;
+
+		//	}
+
+
+		//}
 
 		private void LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB(object sender, MouseButtonEventArgs e)
 		{
