@@ -8279,7 +8279,7 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-
+		 
 
 		public void AddEventToSubLayerAnimation_BTN_Click(object sender, RoutedEventArgs e)
 		{
