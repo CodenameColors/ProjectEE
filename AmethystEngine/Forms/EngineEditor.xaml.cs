@@ -6814,16 +6814,15 @@ namespace AmethystEngine.Forms
 			foreach (CanvasAnimation canvasAnimation in tempCanvasSpritesheet.AllAnimationOnSheet)
 			{
 				CurrentActiveSpriteSheet.SpriteAnimations.Add( canvasAnimation.AnimName,
-					new SpriteAnimation(CurrentActiveSpriteSheet, canvasAnimation.AnimName, 
-						new Vector2(canvasAnimation.CanvasFrames.First().X, canvasAnimation.CanvasFrames.First().Y),
-						canvasAnimation.CanvasFrames.First().W, canvasAnimation.CanvasFrames.First().H, 
+					new SpriteAnimation(CurrentActiveSpriteSheet, canvasAnimation.AnimName,
 						canvasAnimation.CanvasFrames.Count, 0)); // Default to 0, because this NEEDS to be set by the user on firt attempt
 
 				// Add the frame positions
 				foreach (CanvasImageProperties canvasImageProperties in canvasAnimation.CanvasFrames)
 				{
-					CurrentActiveSpriteSheet.SpriteAnimations.Last().Value.FramePositions.AddLast(
-						new LinkedListNode<Vector2>(new Vector2(canvasImageProperties.X, canvasImageProperties.Y)));
+					CurrentActiveSpriteSheet.SpriteAnimations.Last().Value.FrameDrawRects.AddLast(
+						new LinkedListNode<Rect>(new Rect(canvasImageProperties.X, canvasImageProperties.Y,
+							canvasImageProperties.W, canvasImageProperties.H)));
 				}
 				
 			}
@@ -6871,6 +6870,8 @@ namespace AmethystEngine.Forms
 								for (int i = 0; i < AE_NewAnimStates_IC.Items.Count; i++)
 								{
 									SpriteAnimation currentSpriteAnimation = CurrentActiveSpriteSheet.SpriteAnimations.Values.ToList()[i];
+									if (currentSpriteAnimation.CurrentFrameRect == null)
+										currentSpriteAnimation.CurrentFrameRect = currentSpriteAnimation.FrameDrawRects.First;
 									Dispatcher.Invoke(() =>
 									{
 										ContentPresenter c =
@@ -6884,9 +6885,7 @@ namespace AmethystEngine.Forms
 										if ((cb as CheckBox).IsChecked == true)
 										{
 
-											if (currentSpriteAnimation.StartXPos >= 0 && currentSpriteAnimation.StartYPos >= 0 &&
-													currentSpriteAnimation.FrameWidth > 0 && currentSpriteAnimation.FrameHeight > 0 &&
-													currentSpriteAnimation.FrameCount > 0 && currentSpriteAnimation.FPS > 0)
+											if (currentSpriteAnimation.FrameCount > 0 && currentSpriteAnimation.FPS > 0)
 											{
 												int framenum = (int.Parse((v as TextBox).Text));
 
@@ -6894,12 +6893,15 @@ namespace AmethystEngine.Forms
 														DT)
 												{
 													framenum++;
+													currentSpriteAnimation.CurrentFrameRect = currentSpriteAnimation.CurrentFrameRect.Next;
 													DT = 0; //we need to reset the timer.
 												}
 
 												if (framenum > currentSpriteAnimation.FrameCount)
 												{
 													framenum = 1;
+													currentSpriteAnimation.CurrentFrameRect = currentSpriteAnimation.FrameDrawRects.First;
+
 												}
 
 												(v as TextBox).Text = framenum.ToString();
@@ -6910,19 +6912,19 @@ namespace AmethystEngine.Forms
 
 												BitmapImage bmp = bmi;
 
-												int width2 =
-													(int)(currentSpriteAnimation.StartXPos +
-														((currentSpriteAnimation.FrameCount) * currentSpriteAnimation.FrameWidth) > bmp.Width
-															? bmp.Width - ((currentSpriteAnimation.StartXPos +
-																							((currentSpriteAnimation.FrameCount - 1) *
-																							 currentSpriteAnimation.FrameWidth)))
-															: currentSpriteAnimation.FrameWidth);
+												//int width2 =
+												//	(int)(currentSpriteAnimation.StartXPos +
+												//		((currentSpriteAnimation.FrameCount) * currentSpriteAnimation.FrameWidth) > bmp.Width
+												//			? bmp.Width - ((currentSpriteAnimation.StartXPos +
+												//											((currentSpriteAnimation.FrameCount - 1) *
+												//											 currentSpriteAnimation.FrameWidth)))
+												//			: currentSpriteAnimation.FrameWidth);
 
 
 												var crop = new CroppedBitmap(bmp, new Int32Rect(
-													currentSpriteAnimation.StartXPos + ((framenum - 1) * currentSpriteAnimation.FrameWidth),
-													currentSpriteAnimation.StartYPos,
-													width2, currentSpriteAnimation.FrameHeight));
+													(int)currentSpriteAnimation.CurrentFrameRect.Value.X,
+													(int)currentSpriteAnimation.CurrentFrameRect.Value.Y,
+													(int)currentSpriteAnimation.CurrentFrameRect.Value.Width, (int)currentSpriteAnimation.CurrentFrameRect.Value.Height));
 												// using BitmapImage version to prove its created successfully
 												(vimg as Image).Source = crop;
 
@@ -6943,7 +6945,7 @@ namespace AmethystEngine.Forms
 						}
 						catch (Exception ex)
 						{
-							Console.WriteLine("Thread mismatch");
+							//Console.WriteLine("Thread mismatch");
 						}
 					}
 				});
@@ -6966,8 +6968,7 @@ namespace AmethystEngine.Forms
 			//AE_NewAnimStates_IC.Items.Add(new object());
 
 			SpriteAnimation tempAnimation = new SpriteAnimation(CurrentActiveSpriteSheet,
-				"Anim " + AE_NewAnimStates_IC.Items.Count,
-				new Vector2(0, 0), 0, 0, 0, 0);
+				"Anim " + AE_NewAnimStates_IC.Items.Count, 0, 0);
 			CurrentActiveSpriteSheet.SpriteAnimations.Add(tempAnimation.Name, tempAnimation);
 			AE_NewAnimStates_IC.ItemsSource = CurrentActiveSpriteSheet.SpriteAnimations.Values.ToList();
 
@@ -6988,9 +6989,7 @@ namespace AmethystEngine.Forms
 					.DataContext);
 				SpriteAnimation currentSpriteAnimation = CurrentActiveSpriteSheet.SpriteAnimations.Values.ToList()[index];
 				//Make sure the data is correct before doing crops
-				if (currentSpriteAnimation.StartXPos >= 0 && currentSpriteAnimation.StartYPos >= 0 &&
-				    currentSpriteAnimation.FrameWidth > 0 && currentSpriteAnimation.FrameHeight > 0 &&
-				    currentSpriteAnimation.FrameCount > 0)
+				if (currentSpriteAnimation.FrameCount > 0)
 				{
 					ContentPresenter c =
 						((ContentPresenter) AE_NewAnimStates_IC.ItemContainerGenerator.ContainerFromIndex(index));
@@ -7002,28 +7001,28 @@ namespace AmethystEngine.Forms
 					bmi.UriSource = new Uri(NewAnimimationStatemachineLocation, UriKind.Absolute);
 					bmi.EndInit();
 
-					var crop = new CroppedBitmap(bmi, new Int32Rect(currentSpriteAnimation.StartXPos,
-						currentSpriteAnimation.StartYPos,
-						currentSpriteAnimation.FrameWidth, currentSpriteAnimation.FrameHeight));
+					var crop = new CroppedBitmap(bmi, new Int32Rect((int)currentSpriteAnimation.CurrentFrameRect.Value.X,
+						(int)currentSpriteAnimation.CurrentFrameRect.Value.Y,
+						(int)currentSpriteAnimation.CurrentFrameRect.Value.Width, (int)currentSpriteAnimation.CurrentFrameRect.Value.Height));
 					// using BitmapImage version to prove its created successfully
 					(v as Image).Source = crop;
 
 					var v2 = c.ContentTemplate.FindName("LastFrame_IMG", c);
 
-					int width2 =
-						(int) (currentSpriteAnimation.StartXPos +
-							((currentSpriteAnimation.FrameCount) * currentSpriteAnimation.FrameWidth) > bmi.Width
-								? bmi.Width - ((currentSpriteAnimation.StartXPos +
-								                ((currentSpriteAnimation.FrameCount - 1) * currentSpriteAnimation.FrameWidth)))
-								: currentSpriteAnimation.FrameWidth);
+					//int width2 =
+					//	(int) (currentSpriteAnimation.StartXPos +
+					//		((currentSpriteAnimation.FrameCount) * currentSpriteAnimation.FrameWidth) > bmi.Width
+					//			? bmi.Width - ((currentSpriteAnimation.StartXPos +
+					//			                ((currentSpriteAnimation.FrameCount - 1) * currentSpriteAnimation.FrameWidth)))
+					//			: currentSpriteAnimation.FrameWidth);
 
 					var crop2 = new CroppedBitmap(bmi,
 						new Int32Rect(
-							currentSpriteAnimation.StartXPos +
-							((currentSpriteAnimation.FrameCount - 1) * currentSpriteAnimation.FrameWidth),
-							currentSpriteAnimation.StartYPos,
-							width2,
-							currentSpriteAnimation.FrameHeight));
+							(int)currentSpriteAnimation.CurrentFrameRect.Value.X,
+							(int)currentSpriteAnimation.CurrentFrameRect.Value.Y,
+							(int)currentSpriteAnimation.CurrentFrameRect.Value.Width,
+							(int)currentSpriteAnimation.CurrentFrameRect.Value.Height
+							));
 					(v2 as Image).Source = crop2;
 
 
@@ -7033,14 +7032,14 @@ namespace AmethystEngine.Forms
 			}
 			catch (ArgumentException ae )
 			{
-				
+				// We shouldn't get here anymore because of the sprite sheet editor
 
-				if(bmi.Width < CurrentActiveSpriteSheet.SpriteAnimations_List[index].FrameWidth * CurrentActiveSpriteSheet.SpriteAnimations_List[index].FrameCount)
-					AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Desired Width of animation EXCEEDS the max width of given sprite sheet PNG";
-				else if (bmi.Height < CurrentActiveSpriteSheet.SpriteAnimations_List[index].FrameHeight )
-					AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Desired Height of animation EXCEEDS the max width of given sprite sheet PNG";
-				else
-					AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Invalid Parameters resetting Text box input";
+				//if(bmi.Width < CurrentActiveSpriteSheet.SpriteAnimations_List[index].FrameWidth * CurrentActiveSpriteSheet.SpriteAnimations_List[index].FrameCount)
+				//	AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Desired Width of animation EXCEEDS the max width of given sprite sheet PNG";
+				//else if (bmi.Height < CurrentActiveSpriteSheet.SpriteAnimations_List[index].FrameHeight )
+				//	AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Desired Height of animation EXCEEDS the max width of given sprite sheet PNG";
+				//else
+				AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Invalid Parameters resetting Text box input";
 				(sender as TextBox).Text = "0";
 			}
 		}
@@ -7082,10 +7081,6 @@ namespace AmethystEngine.Forms
 				bwidth = bheight = bframecount = bFPS = bName = true; //annoying but simple fix for instant weirdness
 			foreach (SpriteAnimation anim in CurrentActiveSpriteSheet.SpriteAnimations.Values)
 			{
-				if (anim.StartXPos < 0) bstartX &= false;
-				if (anim.StartYPos < 0) bstartY &= false;
-				if (anim.FrameWidth <= 0) bwidth &= false;
-				if (anim.FrameHeight <= 0) bheight &= false;
 				if (anim.FrameCount <= 0) bframecount &= false;
 				if (anim.FPS <= 0) bFPS &= false;
 				if (anim.bIsDefaultState) numOfDefault++;
@@ -7134,11 +7129,16 @@ namespace AmethystEngine.Forms
 			int count = 0; 
 			foreach (var spriteanim in tempsSpriteAnimations)
 			{
-				spriteanim.FramePositions.Clear();
+				spriteanim.FrameDrawRects.Clear();
 				for (int i = 0; i < spriteanim.FrameCount; i++)
 				{
-					spriteanim.FramePositions.AddLast(new Vector2((i * spriteanim.FrameWidth) + spriteanim.StartXPos,
-						spriteanim.StartYPos));
+					spriteanim.FrameDrawRects.AddLast(new Rect(
+						(int)spriteanim.CurrentFrameRect.Value.X,
+						(int)spriteanim.CurrentFrameRect.Value.Y,
+						(int)spriteanim.CurrentFrameRect.Value.Width,
+						(int)spriteanim.CurrentFrameRect.Value.Height
+						)
+					);
 
 				}
 
@@ -7156,9 +7156,12 @@ namespace AmethystEngine.Forms
 				var v  = FindElementByName<Image>((vv as TreeViewItem), "Thumbnail");
 
 				
-				var crop = new CroppedBitmap(bmi, new Int32Rect(spriteanim.StartXPos,
-					spriteanim.StartYPos,
-					spriteanim.FrameWidth, spriteanim.FrameHeight));
+				var crop = new CroppedBitmap(bmi, new Int32Rect(
+					(int)spriteanim.CurrentFrameRect.Value.X,
+					(int)spriteanim.CurrentFrameRect.Value.Y,
+					(int)spriteanim.CurrentFrameRect.Value.Width,
+					(int)spriteanim.CurrentFrameRect.Value.Height
+					));
 				// using BitmapImage version to prove its created successfully
 				(v as Image).Source = crop;
 
@@ -7308,17 +7311,19 @@ namespace AmethystEngine.Forms
 				for (int i = 0; i < spriteanim.FrameCount; i++)
 				{
 					//this eyesore will catch bad sprite sheets.So it doesn't go out of bounds....
-					int width2 =
-						(int)(spriteanim.StartXPos +
-							((spriteanim.FrameCount) * spriteanim.FrameWidth) > CurrentSpriteSheet_Image.Width
-								? CurrentSpriteSheet_Image.Width - ((spriteanim.StartXPos + ((spriteanim.FrameCount - 1) * spriteanim.FrameWidth))) : spriteanim.FrameWidth);
+					//int width2 =
+					//	(int)(spriteanim.StartXPos +
+					//		((spriteanim.FrameCount) * spriteanim.FrameWidth) > CurrentSpriteSheet_Image.Width
+					//			? CurrentSpriteSheet_Image.Width - ((spriteanim.StartXPos + ((spriteanim.FrameCount - 1) * spriteanim.FrameWidth))) : spriteanim.FrameWidth);
 
 
 					CurrentAnimPreviewImages_CE.Add(
 						(new CroppedBitmap(CurrentSpriteSheet_Image, new Int32Rect(
-							spriteanim.StartXPos + (i * spriteanim.FrameWidth),
-							spriteanim.StartYPos,
-							width2, spriteanim.FrameHeight))));
+							(int)spriteanim.CurrentFrameRect.Value.X,
+							(int)spriteanim.CurrentFrameRect.Value.Y,
+							(int)spriteanim.CurrentFrameRect.Value.Width,
+							(int)spriteanim.CurrentFrameRect.Value.Height
+							))));
 					}
 				}
 
@@ -7820,17 +7825,19 @@ namespace AmethystEngine.Forms
 				for (int i = 0; i < item.FrameCount; i++)
 				{
 					//this eyesore will catch bad sprite sheets.So it doesn't go out of bounds....
-					int width2 =
-						(int)(item.StartXPos +
-							((item.FrameCount) * item.FrameWidth) > CurrentSpriteSheet_Image.Width
-								? CurrentSpriteSheet_Image.Width - ((item.StartXPos + ((item.FrameCount - 1) * item.FrameWidth))) : item.FrameWidth);
+					//int width2 =
+					//	(int)(item.StartXPos +
+					//		((item.FrameCount) * item.FrameWidth) > CurrentSpriteSheet_Image.Width
+					//			? CurrentSpriteSheet_Image.Width - ((item.StartXPos + ((item.FrameCount - 1) * item.FrameWidth))) : item.FrameWidth);
 
 
 					CurrentSelectedAnimImages_List.Add(
 						(new CroppedBitmap(CurrentSpriteSheet_Image, new Int32Rect(
-							item.StartXPos + (i * item.FrameWidth),
-							item.StartYPos,
-							width2, item.FrameHeight))));
+							(int)item.CurrentFrameRect.Value.X,
+							(int)item.CurrentFrameRect.Value.Y,
+							(int)item.CurrentFrameRect.Value.Width,
+							(int)item.CurrentFrameRect.Value.Height
+							))));
 				}
 
 				CurrentActiveAnimationName_TB.Text = item.Name;
@@ -7915,8 +7922,13 @@ namespace AmethystEngine.Forms
 					//var index = (ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control) as TreeView).Items.IndexOf(item);
 
 					BitmapImage bmp = CurrentSpriteSheet_Image;
-					var crop = new CroppedBitmap(bmp, new Int32Rect(item.StartXPos, item.StartYPos, item.FrameWidth, item.FrameHeight));
-					(sp.Children[0] as Image).Source = crop;
+					//var crop = new CroppedBitmap(bmp, new Int32Rect(
+					//	(int)item.CurrentFrameRect.Value.X, 
+					//	(int)item.CurrentFrameRect.Value.Y, 
+					//	(int)item.CurrentFrameRect.Value.Width, 
+					//	(int)item.CurrentFrameRect.Value.Height 
+					//	));
+					//(sp.Children[0] as Image).Source = crop;
 
 				}
 			}
@@ -8029,7 +8041,12 @@ namespace AmethystEngine.Forms
 					{
 						item = CurrentActiveSpriteSheet.SpriteAnimations[(sp.DataContext as ChangeAnimationEvent).FromAnimationName];
 					}
-					var crop = new CroppedBitmap(bmp, new Int32Rect(item.StartXPos, item.StartYPos, item.FrameWidth, item.FrameHeight));
+					var crop = new CroppedBitmap(bmp, new Int32Rect(
+						(int)item.CurrentFrameRect.Value.X,
+						(int)item.CurrentFrameRect.Value.Y,
+						(int)item.CurrentFrameRect.Value.Width,
+						(int)item.CurrentFrameRect.Value.Height
+						));
 					(sp.Children[0] as Image).Source = crop;
 
 
@@ -8057,10 +8074,10 @@ namespace AmethystEngine.Forms
 				for (int i = 0; i < animval.FrameCount; i++)
 				{
 					//this eyesore will catch bad sprite sheets.So it doesn't go out of bounds....
-					int width2 =
-						(int)(animval.StartXPos +
-							((animval.FrameCount) * animval.FrameWidth) > CurrentSpriteSheet_Image.Width
-								? CurrentSpriteSheet_Image.Width - ((animval.StartXPos + ((animval.FrameCount - 1) * animval.FrameWidth))) : animval.FrameWidth);
+					//int width2 =
+					//	(int)(animval.StartXPos +
+					//		((animval.FrameCount) * animval.FrameWidth) > CurrentSpriteSheet_Image.Width
+					//			? CurrentSpriteSheet_Image.Width - ((animval.StartXPos + ((animval.FrameCount - 1) * animval.FrameWidth))) : animval.FrameWidth);
 				
 					BitmapImage bmi = new BitmapImage();
 					bmi.BeginInit();
@@ -8070,9 +8087,11 @@ namespace AmethystEngine.Forms
 
 					CurrentAnimPreviewImages_CE.Add(
 						(new CroppedBitmap(bmi, new Int32Rect(
-							animval.StartXPos + (i * animval.FrameWidth),
-							animval.StartYPos,
-							width2, animval.FrameHeight))));
+							(int)animval.CurrentFrameRect.Value.X,
+							(int)animval.CurrentFrameRect.Value.Y,
+							(int)animval.CurrentFrameRect.Value.Width,
+							(int)animval.CurrentFrameRect.Value.Height
+							))));
 				}
 
 				PreviewAnimUI_Image_PTR = (sender as Grid).Children[0] as Image;
@@ -8096,17 +8115,19 @@ namespace AmethystEngine.Forms
 				for (int i = 0; i < animval.FrameCount; i++)
 				{
 					//this eyesore will catch bad sprite sheets.So it doesn't go out of bounds....
-					int width2 =
-						(int)(animval.StartXPos +
-							((animval.FrameCount) * animval.FrameWidth) > CurrentSpriteSheet_Image.Width
-								? CurrentSpriteSheet_Image.Width - ((animval.StartXPos + ((animval.FrameCount - 1) * animval.FrameWidth))) : animval.FrameWidth);
+					//int width2 =
+					//	(int)(animval.StartXPos +
+					//		((animval.FrameCount) * animval.FrameWidth) > CurrentSpriteSheet_Image.Width
+					//			? CurrentSpriteSheet_Image.Width - ((animval.StartXPos + ((animval.FrameCount - 1) * animval.FrameWidth))) : animval.FrameWidth);
 
 
 					CurrentAnimPreviewImages_CE.Add(
 						(new CroppedBitmap(CurrentSpriteSheet_Image, new Int32Rect(
-							animval.StartXPos + (i * animval.FrameWidth),
-							animval.StartYPos,
-							width2, animval.FrameHeight))));
+							(int)animval.CurrentFrameRect.Value.X,
+							(int)animval.CurrentFrameRect.Value.Y,
+							(int)animval.CurrentFrameRect.Value.Width,
+							(int)animval.CurrentFrameRect.Value.Height
+						))));
 				}
 
 				PreviewAnimUI_Image_PTR = (sender as Grid).Children[0] as Image;
@@ -8264,23 +8285,24 @@ namespace AmethystEngine.Forms
 					bmp.UriSource = new Uri(spriteSheet.ImgPathLocation, UriKind.Absolute);
 					bmp.EndInit();
 
-					var crop = new CroppedBitmap(bmp, new Int32Rect(item.StartXPos, item.StartYPos, item.FrameWidth, item.FrameHeight));
+					var crop = new CroppedBitmap(bmp, new Int32Rect(
+						(int)item.CurrentFrameRect.Value.X,
+						(int)item.CurrentFrameRect.Value.Y,
+						(int)item.CurrentFrameRect.Value.Width,
+						(int)item.CurrentFrameRect.Value.Height
+					));
 					img.Source = crop;
 
 					List<CroppedBitmap> templist = new List<CroppedBitmap>();
 					for (int i = 0; i < item.FrameCount; i++)
 					{
 						//this eyesore will catch bad sprite sheets.So it doesn't go out of bounds....
-						int width2 =
-							(int)(item.StartXPos +
-								((item.FrameCount) * item.FrameWidth) > CurrentSpriteSheet_Image.Width
-									? CurrentSpriteSheet_Image.Width - ((item.StartXPos + ((item.FrameCount - 1) * item.FrameWidth))) : item.FrameWidth);
+						//int width2 =
+						//	(int)(item.StartXPos +
+						//		((item.FrameCount) * item.FrameWidth) > CurrentSpriteSheet_Image.Width
+						//			? CurrentSpriteSheet_Image.Width - ((item.StartXPos + ((item.FrameCount - 1) * item.FrameWidth))) : item.FrameWidth);
 
-						templist.Add(
-							(new CroppedBitmap(bmp, new Int32Rect(
-								item.StartXPos + (i * item.FrameWidth),
-								item.StartYPos,
-								width2, item.FrameHeight))));
+						templist.Add(crop);
 					}
 					AnimationSubLayerImages_List[AnimationSubLayer_CB.SelectedIndex - 2] = templist;
 

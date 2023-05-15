@@ -132,20 +132,17 @@ namespace BixBite.Rendering
 								int startx = int.Parse(reader.GetAttribute("StartX"));
 								int starty = int.Parse(reader.GetAttribute("StartY"));
 								int numframes = int.Parse(reader.GetAttribute("NumOfFrames"));
-								int fwidth = int.Parse(reader.GetAttribute("FrameWidth"));
-								int fheight = int.Parse(reader.GetAttribute("FrameHeight"));
 								int fps = int.Parse(reader.GetAttribute("FPS"));
 								bool isDefault = bool.Parse(reader.GetAttribute("isDefault"));
 
-								SpriteAnimation tempAnimation = new SpriteAnimation(retSpriteSheet, animName,
-									new Vector2(startx, starty), fwidth, fheight, numframes, fps)
+								SpriteAnimation tempAnimation = new SpriteAnimation(retSpriteSheet, animName,numframes, fps)
 								{
 
 								};
 								//now we need to fill in all the offset/frame position data.
 								for (int i = 0; i < numframes; i++)
 								{
-									tempAnimation.AddFramePosition(new Vector2(startx + (fwidth * i), starty));
+									// tempAnimation.AddFramePosition(new Rect(startx + (fwidth * i), starty));
 								}
 
 								tempAnimation.ResetAnimation(); //set the first position/pointer.
@@ -386,11 +383,7 @@ namespace BixBite.Rendering
 					writer.WriteStartElement(null, "AnimationState", null);
 					writer.WriteAttributeString(null, "Name", null, anim.Name.ToString());
 					writer.WriteAttributeString(null, "FPS", null, anim.FPS.ToString());
-					writer.WriteAttributeString(null, "StartX", null, anim.StartXPos.ToString());
-					writer.WriteAttributeString(null, "StartY", null, anim.StartYPos.ToString());
 					writer.WriteAttributeString(null, "NumOfFrames", null, anim.FrameCount.ToString());
-					writer.WriteAttributeString(null, "FrameWidth", null, anim.FrameWidth.ToString());
-					writer.WriteAttributeString(null, "FrameHeight", null, anim.FrameHeight.ToString());
 					writer.WriteAttributeString(null, "isDefault", null, anim.bIsDefualt.ToString());
 					writer.WriteEndElement(); //end of the AnimationState Tag
 
@@ -466,10 +459,10 @@ namespace BixBite.Rendering
 		//		SpriteAnimation tempSpriteAnimation = new SpriteAnimation(){ FrameWidth = 174, FrameHeight = 324, ParentSheet = this};
 		//		for (int j = 174; j < getTexture().Width ; j+= 174)
 		//		{
-		//			tempSpriteAnimation.FramePositions.AddLast(new LinkedListNode<Vector2>(new Vector2(j, i * 324 )));
+		//			tempSpriteAnimation.FrameDrawRects.AddLast(new LinkedListNode<Vector2>(new Vector2(j, i * 324 )));
 		//		}
 		//		SpriteAnimations.Add(tempSpriteAnimation);
-		//		SpriteAnimations.Last().CurrentFramePosition = SpriteAnimations.Last().FramePositions.First;
+		//		SpriteAnimations.Last().CurrentFrameRect = SpriteAnimations.Last().FrameDrawRects.First;
 		//	}
 		//	CurrentAnimation = SpriteAnimations[0];
 
@@ -482,9 +475,9 @@ namespace BixBite.Rendering
 
 		//public void Draw(SpriteBatch spriteBatch, int i)
 		//{
-		//	spriteBatch.Draw(text, new Vector2(100, 100), new Rectangle((int)CurrentAnimation.CurrentFramePosition.Value.X, (int)CurrentAnimation.CurrentFramePosition.Value.Y, 174, 324), Color.White, 0.0f,
+		//	spriteBatch.Draw(text, new Vector2(100, 100), new Rectangle((int)CurrentAnimation.CurrentFrameRect.Value.X, (int)CurrentAnimation.CurrentFrameRect.Value.Y, 174, 324), Color.White, 0.0f,
 		//		new Vector2(0, 0), new Vector2(1, 1), SpriteEffects.None, 0);
-		//	//Draw_Crop(spriteBatch, 0,0, (int)CurrentAnimation.CurrentFramePosition.Value.X, (int)CurrentAnimation.CurrentFramePosition.Value.Y, CurrentAnimation.FrameWidth, CurrentAnimation.FrameHeight);
+		//	//Draw_Crop(spriteBatch, 0,0, (int)CurrentAnimation.CurrentFrameRect.Value.X, (int)CurrentAnimation.CurrentFrameRect.Value.Y, CurrentAnimation.FrameWidth, CurrentAnimation.FrameHeight);
 		//}
 
 

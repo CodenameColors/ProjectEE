@@ -170,7 +170,7 @@ namespace AmethystEngine.Forms
 			_mainImage = MainImage;
 			if (currSpriteAnimation == null)
 			{
-				mainSpriteAnimation = new SpriteAnimation(parentSpriteSheet, "TempName", Vector2.Zero, 0,0,0,0);
+				mainSpriteAnimation = new SpriteAnimation(parentSpriteSheet, "TempName", 0, 0);
 
 				
 				_bIsAdding = true;
@@ -182,12 +182,7 @@ namespace AmethystEngine.Forms
 
 				//StateName_TB.Text = mainSpriteAnimation.Name;
 				this.Name = mainSpriteAnimation.Name;
-
-				this.StartX = mainSpriteAnimation.StartXPos;
-				this.StartY = mainSpriteAnimation.StartYPos;
 				this.FrameCount = mainSpriteAnimation.FrameCount ;
-				this.FrameWidth = mainSpriteAnimation.FrameWidth;
-				this.FrameHeight = mainSpriteAnimation.FrameHeight;
 				this.FPS = mainSpriteAnimation.FPS;
 				this.bIsDefaultState = mainSpriteAnimation.bIsDefaultState;
 				_bIsAdding = false;
@@ -416,11 +411,7 @@ namespace AmethystEngine.Forms
 
 
 			mainSpriteAnimation.Name = StateName_TB.Text;
-			mainSpriteAnimation.StartXPos = StartX;
-			mainSpriteAnimation.StartYPos = StartY;
 			mainSpriteAnimation.FrameCount = FrameCount;
-			mainSpriteAnimation.FrameWidth = FrameWidth;
-			mainSpriteAnimation.FrameHeight = FrameHeight;
 			mainSpriteAnimation.FPS = FPS;
 			mainSpriteAnimation.bIsDefaultState = bIsDefaultState;
 

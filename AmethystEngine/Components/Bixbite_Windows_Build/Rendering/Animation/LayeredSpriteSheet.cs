@@ -218,15 +218,14 @@ namespace BixBite.Rendering.Animation
 								int fps = int.Parse(reader.GetAttribute("FPS"));
 								bool isDefault = bool.Parse(reader.GetAttribute("isDefault"));
 
-								SpriteAnimation tempAnimation = new SpriteAnimation(retLayeredSpriteSheet.BaseLayer, animName,
-									new Vector2(startx, starty), fwidth, fheight, numframes, fps)
+								SpriteAnimation tempAnimation = new SpriteAnimation(retLayeredSpriteSheet.BaseLayer, animName, numframes, fps)
 								{
 
 								};
 								//now we need to fill in all the offset/frame position data.
 								for (int i = 0; i < numframes; i++)
 								{
-									tempAnimation.AddFramePosition(new Vector2(startx + (fwidth * i), starty));
+									// tempAnimation.AddFramePosition(new Vector2(startx + (fwidth * i), starty));
 								}
 
 								tempAnimation.ResetAnimation(); //set the first position/pointer.

@@ -36,7 +36,8 @@ namespace BixBite.Rendering
 		
 		private Rectangle _drawRectangle;
 
-		private LinkedList<Vector2> _framePositions = new LinkedList<Vector2>();
+		//private LinkedList<Vector2> _frameDrawRects = new LinkedList<Vector2>();
+		private LinkedList<Rect> _frameDrawRects = new LinkedList<Rect>();
 		private List<AnimationEvent> _animationEvents = new List<AnimationEvent>();
 
 		private SoundEffect _currentSoundEffect = null;
@@ -48,27 +49,6 @@ namespace BixBite.Rendering
 		{
 			get => _name;
 			set => _name = value;
-		}
-		public int StartXPos
-		{
-			get => (int)_startPosition.X;
-			set => _startPosition.X = value;
-		}
-		public int StartYPos
-		{
-			get => (int)_startPosition.Y;
-			set => _startPosition.Y = value;
-		}
-
-		public int FrameWidth
-		{
-			get => _frameWidth;
-			set => _frameWidth = value;
-		}
-		public int FrameHeight
-		{
-			get => _frameHeight;
-			set => _frameHeight = value;
 		}
 
 		public int FrameCount
@@ -88,10 +68,16 @@ namespace BixBite.Rendering
 			set => bIsDefualt = value;
 		}
 
-		public LinkedList<Vector2> FramePositions
+		//public LinkedList<Vector2> FrameDrawRects
+		//{
+		//	get => _frameDrawRects;
+		//	set => _frameDrawRects = value;
+		//}
+
+		public LinkedList<Rect> FrameDrawRects
 		{
-			get => _framePositions;
-			set => _framePositions = value;
+			get => _frameDrawRects;
+			set => _frameDrawRects = value;
 		}
 
 
@@ -103,13 +89,14 @@ namespace BixBite.Rendering
 		public bool bIsDefualt = false;
 
 		public Vector2 RelativeOrigin { get; set; }
-		public LinkedListNode<Vector2> CurrentFramePosition { get; set; }
+		//public LinkedListNode<Vector2> CurrentFrameRect { get; set; }
+		public LinkedListNode<Rect> CurrentFrameRect { get; set; }
 
 		public int CurrentFrameIndex
 		{
 			get
 			{
-				return _framePositions.ToList().IndexOf(CurrentFramePosition.Value);
+				return _frameDrawRects.ToList().IndexOf(CurrentFrameRect.Value);
 			}
 		}
 
@@ -117,20 +104,16 @@ namespace BixBite.Rendering
 
 		#endregion
 
-		public SpriteAnimation(SpriteSheet parent, String animName, Vector2 startPosition, int frameWidth, int frameHeight, int frameCount, int fps)
+		public SpriteAnimation(SpriteSheet parent, String animName, int frameCount, int fps)
 		{
 			this.ParentSheet = parent;
 			this.Name = animName;
-			this._startPosition = startPosition;
-			this._frameWidth = frameWidth;
-			this._frameHeight = frameHeight;
+
 			this._frameCount = frameCount;
 			this.FPSTimePeriod = 1 / (float) fps;
 			this._fps = fps;
 
-			_drawRectangle.Width = frameWidth;
-			_drawRectangle.Height = frameHeight;
-
+			CurrentFrameRect = FrameDrawRects.First;
 		}
 
 		public Rectangle GetScreenRectangle()
@@ -143,7 +126,7 @@ namespace BixBite.Rendering
 			if(x != null)
 				this._drawRectangle.X = (int)x;
 			if (y != null) 
-			this._drawRectangle.Y = (int)y;
+				this._drawRectangle.Y = (int)y;
 		}
 
 		public void SetDrawScreenPosRectangle(Rectangle r)
@@ -181,16 +164,24 @@ namespace BixBite.Rendering
 			return _frameHeight;
 		}
 
-		public void AddFramePosition(Vector2 v)
+		public void AddFramePosition(Rect v)
 		{
-			this._framePositions.AddLast(v);
+			this._frameDrawRects.AddLast(v);
+			if (_frameDrawRects.Count == 1)
+				CurrentFrameRect = FrameDrawRects.First;
 		}
 
 		public void ResetAnimation()
 		{
-			CurrentFramePosition = this._framePositions.First;
-			ParentSheet.DrawRectangle.X = (int)CurrentFramePosition.Value.X;
-			ParentSheet.DrawRectangle.Y = (int)CurrentFramePosition.Value.Y;
+			CurrentFrameRect = this._frameDrawRects.First;
+			ParentSheet.DrawRectangle.X = (int)CurrentFrameRect.Value.X;
+			ParentSheet.DrawRectangle.Y = (int)CurrentFrameRect.Value.Y;
+			ParentSheet.DrawRectangle.Width = (int)CurrentFrameRect.Value.Width;
+			ParentSheet.DrawRectangle.Height = (int)CurrentFrameRect.Value.Height;
+			_drawRectangle.X = (int)CurrentFrameRect.Value.X;
+			_drawRectangle.Y = (int)CurrentFrameRect.Value.Y;
+			_drawRectangle.Width = (int)CurrentFrameRect.Value.Width;
+			_drawRectangle.Height = (int)CurrentFrameRect.Value.Height;
 		}
 
 		/// <summary>
@@ -221,20 +212,26 @@ namespace BixBite.Rendering
 		public void Update(GameTime gameTime)
 		{
 			TimeBetweenFrames += gameTime.ElapsedGameTime.Milliseconds;
-			if (TimeBetweenFrames > FPSTimePeriod * 1000 && CurrentFramePosition != null)
+			if (TimeBetweenFrames > FPSTimePeriod * 1000 && CurrentFrameRect != null)
 			{
 				//Last frameNum
-				if (CurrentFramePosition == _framePositions.Last)
+				if (CurrentFrameRect == _frameDrawRects.Last)
 					bLoopFinished = true;
 				else bLoopFinished = false;
 
-				CurrentFramePosition = (CurrentFramePosition.Next == null ? _framePositions.First : CurrentFramePosition.Next);
-				ParentSheet.DrawRectangle.X = (int)CurrentFramePosition.Value.X;
-				ParentSheet.DrawRectangle.Y = (int)CurrentFramePosition.Value.Y;
+				CurrentFrameRect = (CurrentFrameRect.Next == null ? _frameDrawRects.First : CurrentFrameRect.Next);
+				ParentSheet.DrawRectangle.X = (int)CurrentFrameRect.Value.X;
+				ParentSheet.DrawRectangle.Y = (int)CurrentFrameRect.Value.Y;
+				ParentSheet.DrawRectangle.Width = (int)CurrentFrameRect.Value.Width;
+				ParentSheet.DrawRectangle.Height = (int)CurrentFrameRect.Value.Height;
+				_drawRectangle.X = (int)CurrentFrameRect.Value.X;
+				_drawRectangle.Y = (int)CurrentFrameRect.Value.Y;
+				_drawRectangle.Width = (int)CurrentFrameRect.Value.Width;
+				_drawRectangle.Height = (int)CurrentFrameRect.Value.Height;
 
 				TimeBetweenFrames = 0;
 
-				if (CurrentFramePosition == _framePositions.First)
+				if (CurrentFrameRect == _frameDrawRects.First)
 					_currentFrame = 0;
 				else _currentFrame++;
 				FindSoundEffect(_currentFrame);
