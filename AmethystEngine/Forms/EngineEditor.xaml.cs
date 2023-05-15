@@ -134,16 +134,16 @@ namespace AmethystEngine.Forms
 
 		#region Fields
 		
-		private String _newSpriteSheetFileName = "";
+		private String _newAnimimationStatemachineFileName = "";
 		private String _newSpriteSheetCharacterName = "";
-		private String _newSpriteSheetFileLocation = "";
+		private String _newAnimimationStatemachineFileLocation = "";
 
 		private bool _allowAnimationExporting = false;
 		private bool _bNewAnimStateMachine = false;
 		private bool _bAllAnimsOneLineEach = true;
 		private bool _bAllowImportAnimPreview = false;
-		private int _newAnimTotalWidth = -1;
-		private int _newAnimTotalHeight = -1;
+		private int _newAnimimationStatemachineTotalWidth = -1;
+		private int _newAnimimationStatemachineTotalHeight = -1;
 
 		private Image PreviewAnimUI_Image_PTR = null;
 		private SpriteAnimation PreviewAnim_Data_PTR = null;
@@ -184,13 +184,13 @@ namespace AmethystEngine.Forms
 
 		private String _animationState_TV_QueriedKey = String.Empty;
 
-		public String NewSpriteSheetFileName
+		public String NewAnimimationStatemachineFileName
 		{
-			get => _newSpriteSheetFileName;
+			get => _newAnimimationStatemachineFileName;
 			set
 			{
-				_newSpriteSheetFileName = value;
-				OnPropertyChanged("NewSpriteSheetFileName");
+				_newAnimimationStatemachineFileName = value;
+				OnPropertyChanged("NewAnimimationStatemachineFileName");
 			}
 		}
 
@@ -204,13 +204,13 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-		public String NewSpriteSheetLocation
+		public String NewAnimimationStatemachineLocation
 		{
-			get => _newSpriteSheetFileLocation;
+			get => _newAnimimationStatemachineFileLocation;
 			set
 			{
-				_newSpriteSheetFileLocation = value;
-				OnPropertyChanged("NewSpriteSheetLocation");
+				_newAnimimationStatemachineFileLocation = value;
+				OnPropertyChanged("NewAnimimationStatemachineLocation");
 			}
 		}
 
@@ -257,23 +257,23 @@ namespace AmethystEngine.Forms
 		}
 
 
-		public int NewAnimTotalWidth
+		public int NewAnimimationStatemachineTotalWidth
 		{
-			get => _newAnimTotalWidth;
+			get => _newAnimimationStatemachineTotalWidth;
 			set
 			{
-				_newAnimTotalWidth = value;
-				OnPropertyChanged("NewAnimTotalWidth");
+				_newAnimimationStatemachineTotalWidth = value;
+				OnPropertyChanged("NewAnimimationStatemachineTotalWidth");
 			}
 		}
 
-		public int NewAnimTotalHeight
+		public int NewAnimimationStatemachineTotalHeight
 		{
-			get => _newAnimTotalHeight;
+			get => _newAnimimationStatemachineTotalHeight;
 			set
 			{
-				_newAnimTotalHeight = value;
-				OnPropertyChanged("NewAnimTotalHeight");
+				_newAnimimationStatemachineTotalHeight = value;
+				OnPropertyChanged("NewAnimimationStatemachineTotalHeight");
 			}
 		}
 
@@ -6774,8 +6774,8 @@ namespace AmethystEngine.Forms
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
 			{
 				FileName = "SpriteSheet", //default file 
-				DefaultExt = "*.png", //default file extension
-				Filter = "png (*.png)|*.png" //filter files by extension
+				DefaultExt = "*.spritesheet", //default file extension
+				Filter = "spritesheet (*.spritesheet)|*.spritesheet" //filter files by extension
 			};
 
 			// Show save file dialog box
@@ -6788,31 +6788,55 @@ namespace AmethystEngine.Forms
 				return;
 
 			Console.WriteLine(filename);
-			NewSpriteSheetLocation = filename;
+
+			// NEW CODE for NEW SPRITESHEET
+			CanvasSpritesheet tempCanvasSpritesheet = CanvasSpritesheet.ImportSpriteSheet(filename);
+			NewAnimimationStatemachineFileName = tempCanvasSpritesheet.Name;
+			NewAnimimationStatemachineLocation = tempCanvasSpritesheet.ImagePath;
+			NewAnimimationStatemachineTotalWidth = tempCanvasSpritesheet.Width;
+			NewAnimimationStatemachineTotalHeight = tempCanvasSpritesheet.Height;
 
 			BitmapImage bmi = new BitmapImage();
 
 			bmi.BeginInit();
 			bmi.CacheOption = BitmapCacheOption.OnLoad;
-			bmi.UriSource = new Uri(filename, UriKind.Absolute);
+			bmi.UriSource = new Uri(NewAnimimationStatemachineLocation, UriKind.Absolute);
 			bmi.EndInit();
+			CurrentSpriteSheet_Image = bmi;
 
 			bNewAnimStateMachine = true;
 
-			NewAnimTotalWidth = (int)bmi.Width;
-			NewAnimTotalHeight = (int)bmi.Height;
+			// We have created a new SpriteSheet
+			CurrentActiveSpriteSheet = new SpriteSheet(NewAnimimationStatemachineFileName, NewAnimimationStatemachineLocation,
+				0, 0, NewAnimimationStatemachineTotalWidth, NewAnimimationStatemachineTotalHeight);
 
-			//We have created a new SpriteSheet
-			CurrentActiveSpriteSheet = new SpriteSheet("Tempname", filename, 0, 0, (int)bmi.Width, (int)bmi.Height);
+			// Let's take the canvas sprite sheet and use that data to fill in the Game spritesheet
+			foreach (CanvasAnimation canvasAnimation in tempCanvasSpritesheet.AllAnimationOnSheet)
+			{
+				CurrentActiveSpriteSheet.SpriteAnimations.Add( canvasAnimation.AnimName,
+					new SpriteAnimation(CurrentActiveSpriteSheet, canvasAnimation.AnimName, 
+						new Vector2(canvasAnimation.CanvasFrames.First().X, canvasAnimation.CanvasFrames.First().Y),
+						canvasAnimation.CanvasFrames.First().W, canvasAnimation.CanvasFrames.First().H, 
+						canvasAnimation.CanvasFrames.Count, 0)); // Default to 0, because this NEEDS to be set by the user on firt attempt
 
-			//ActiveSpriteSheets.Add((CurrentActiveSpriteSheet));
+				// Add the frame positions
+				foreach (CanvasImageProperties canvasImageProperties in canvasAnimation.CanvasFrames)
+				{
+					CurrentActiveSpriteSheet.SpriteAnimations.Last().Value.FramePositions.AddLast(
+						new LinkedListNode<Vector2>(new Vector2(canvasImageProperties.X, canvasImageProperties.Y)));
+				}
+				
+			}
+
+
+			ActiveSpriteSheets.Add((CurrentActiveSpriteSheet));
 
 			bAllowImportAnimPreview = true;
 			AnimationImporterPreview_Stopwatch = new Stopwatch();
 			AnimationImporterPreview_Stopwatch.Start();
 
 
-			//Set up the Editor Objects section
+			// Set up the Editor Objects section
 			Animation_CE_Tree.ItemsSource = CurrentActiveSpriteSheet.SpriteAnimations_List;
 
 			SceneExplorer_TreeView.ItemsSource = ActiveSpriteSheets;
@@ -6841,7 +6865,7 @@ namespace AmethystEngine.Forms
 
 								//Force update to MainGUI
 								Dispatcher.Invoke(() =>
-									AnimationImporterTime_MS = (int) AnimationImporterPreview_Stopwatch.ElapsedMilliseconds);
+									AnimationImporterTime_MS = (int)AnimationImporterPreview_Stopwatch.ElapsedMilliseconds);
 
 								//Okay let's update the animations!
 								for (int i = 0; i < AE_NewAnimStates_IC.Items.Count; i++)
@@ -6850,7 +6874,7 @@ namespace AmethystEngine.Forms
 									Dispatcher.Invoke(() =>
 									{
 										ContentPresenter c =
-											((ContentPresenter) AE_NewAnimStates_IC.ItemContainerGenerator.ContainerFromIndex(i));
+											((ContentPresenter)AE_NewAnimStates_IC.ItemContainerGenerator.ContainerFromIndex(i));
 										var v = c.ContentTemplate.FindName("CurrentFrame_TB", c);
 										var v1 = c.ContentTemplate.FindName("CurrentDeltaTime_TB", c);
 
@@ -6861,13 +6885,13 @@ namespace AmethystEngine.Forms
 										{
 
 											if (currentSpriteAnimation.StartXPos >= 0 && currentSpriteAnimation.StartYPos >= 0 &&
-											    currentSpriteAnimation.FrameWidth > 0 && currentSpriteAnimation.FrameHeight > 0 &&
-											    currentSpriteAnimation.FrameCount > 0 && currentSpriteAnimation.FPS > 0)
+													currentSpriteAnimation.FrameWidth > 0 && currentSpriteAnimation.FrameHeight > 0 &&
+													currentSpriteAnimation.FrameCount > 0 && currentSpriteAnimation.FPS > 0)
 											{
 												int framenum = (int.Parse((v as TextBox).Text));
 
-												if (((int) (1.0f / currentSpriteAnimation.FPS * 1000.0f)) <
-												    DT)
+												if (((int)(1.0f / currentSpriteAnimation.FPS * 1000.0f)) <
+														DT)
 												{
 													framenum++;
 													DT = 0; //we need to reset the timer.
@@ -6887,11 +6911,11 @@ namespace AmethystEngine.Forms
 												BitmapImage bmp = bmi;
 
 												int width2 =
-													(int) (currentSpriteAnimation.StartXPos +
+													(int)(currentSpriteAnimation.StartXPos +
 														((currentSpriteAnimation.FrameCount) * currentSpriteAnimation.FrameWidth) > bmp.Width
 															? bmp.Width - ((currentSpriteAnimation.StartXPos +
-															                ((currentSpriteAnimation.FrameCount - 1) *
-															                 currentSpriteAnimation.FrameWidth)))
+																							((currentSpriteAnimation.FrameCount - 1) *
+																							 currentSpriteAnimation.FrameWidth)))
 															: currentSpriteAnimation.FrameWidth);
 
 
@@ -6925,7 +6949,7 @@ namespace AmethystEngine.Forms
 				});
 
 			}
-			if(!animationImportPreviewThread.IsAlive)
+			if (!animationImportPreviewThread.IsAlive)
 				animationImportPreviewThread.Start();
 
 			bNewAnimStateMachine = true;
@@ -6975,7 +6999,7 @@ namespace AmethystEngine.Forms
 
 					bmi.BeginInit();
 					bmi.CacheOption = BitmapCacheOption.OnLoad;
-					bmi.UriSource = new Uri(NewSpriteSheetLocation, UriKind.Absolute);
+					bmi.UriSource = new Uri(NewAnimimationStatemachineLocation, UriKind.Absolute);
 					bmi.EndInit();
 
 					var crop = new CroppedBitmap(bmi, new Int32Rect(currentSpriteAnimation.StartXPos,
@@ -7079,7 +7103,7 @@ namespace AmethystEngine.Forms
 				AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Failed Import! Need to name the character who will use this sprite sheet";
 				return;
 			}
-			if (NewSpriteSheetFileName == String.Empty)
+			if (NewAnimimationStatemachineFileName == String.Empty)
 			{
 				AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Failed Import! Need to name the sprite sheet!";
 				return;
@@ -7089,22 +7113,22 @@ namespace AmethystEngine.Forms
 
 			AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Import Success!";
 
-			CurrentActiveSpriteSheet.SheetName = NewSpriteSheetFileName;
-			CurrentActiveSpriteSheet.ImgPathLocation = NewSpriteSheetLocation;
+			CurrentActiveSpriteSheet.SheetName = NewAnimimationStatemachineFileName;
+			CurrentActiveSpriteSheet.ImgPathLocation = NewAnimimationStatemachineLocation;
 			CurrentActiveSpriteSheet.CharacterName = NewSpriteSheetCharacterName;
 
 			//We need to recreate the dictionary with the correct keys
 			List<SpriteAnimation> tempsSpriteAnimations = new List<SpriteAnimation>(CurrentActiveSpriteSheet.SpriteAnimations.Values);
 			CurrentActiveSpriteSheet.SpriteAnimations.Clear();
-			CurrentActiveSpriteSheet.Width = NewAnimTotalWidth;
-			CurrentActiveSpriteSheet.Height = NewAnimTotalHeight;
+			CurrentActiveSpriteSheet.Width = NewAnimimationStatemachineTotalWidth;
+			CurrentActiveSpriteSheet.Height = NewAnimimationStatemachineTotalHeight;
 
 			SceneExplorer_TreeView.ItemsSource = ActiveSpriteSheets;
 
 			BitmapImage bmi = new BitmapImage();
 			bmi.BeginInit();
 			bmi.CacheOption = BitmapCacheOption.OnLoad;
-			bmi.UriSource = new Uri(NewSpriteSheetLocation, UriKind.Absolute);
+			bmi.UriSource = new Uri(NewAnimimationStatemachineLocation, UriKind.Absolute);
 			bmi.EndInit();
 
 			int count = 0; 
@@ -7158,11 +7182,11 @@ namespace AmethystEngine.Forms
 			AE_CurrentAnimSM_Grid.Visibility = Visibility.Visible;
 
 			//Reset all the properties!
-			NewSpriteSheetFileName = "";
-			NewSpriteSheetLocation = "";
+			NewAnimimationStatemachineFileName = "";
+			NewAnimimationStatemachineLocation = "";
 			NewSpriteSheetCharacterName = "";
-			NewAnimTotalWidth = -1;
-			NewAnimTotalHeight = -1;
+			NewAnimimationStatemachineTotalWidth = -1;
+			NewAnimimationStatemachineTotalHeight = -1;
 			bNewAnimStateMachine = false;
 
 			bAllowImportAnimPreview = false;
@@ -7693,11 +7717,11 @@ namespace AmethystEngine.Forms
 			AE_CurrentAnimSM_Grid.Visibility = Visibility.Hidden;
 
 			//Reset all the properties!
-			NewSpriteSheetFileName = "";
-			NewSpriteSheetLocation = "";
+			NewAnimimationStatemachineFileName = "";
+			NewAnimimationStatemachineLocation = "";
 			NewSpriteSheetCharacterName = "";
-			NewAnimTotalWidth = -1;
-			NewAnimTotalHeight = -1;
+			NewAnimimationStatemachineTotalWidth = -1;
+			NewAnimimationStatemachineTotalHeight = -1;
 			bNewAnimStateMachine = false;
 
 			bAllowImportAnimPreview = false;

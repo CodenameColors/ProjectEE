@@ -578,7 +578,7 @@
 							<HierarchicalDataTemplate DataType="{x:Type BixRen:SpriteAnimation }" ItemsSource="{Binding .}"  >
 								<StackPanel Orientation="Horizontal" MinWidth="150" MouseEnter="AnimationPreviewThumbnail_Image_Enter" MouseLeave="AnimationPreviewThumbnail_Image_Leave" 
 								            MouseRightButtonUp="Thumbnail_OnMouseRightButtonDown" Loaded="UpdateAnimationStateThumbnail_Event">
-									<Image x:Name="Thumbnail" Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50" 
+									<Image x:Name="Thumbnail" Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50"
 									       MouseEnter="AnimationPreviewThumbnail_Image_Enter" MouseLeave="AnimationPreviewThumbnail_Image_Leave"  />
 									<TextBlock Text="{Binding Name}" Foreground="White" />
 								</StackPanel>
@@ -1401,7 +1401,7 @@
 						<GridSplitter Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="3"  Background="#FF868686"/>
 						
 						
-						<Grid x:Name="AE_NewAnimSM_MainGrid" Background="#FF3C3C3C" Visibility="Hidden">
+						<Grid x:Name="AE_NewAnimSM_MainGrid" Background="#FF3C3C3C" Visibility="Visible">
 							<Grid.RowDefinitions>
 								<RowDefinition Height="30"/>
 								<RowDefinition Height="30"/>
@@ -1418,9 +1418,9 @@
 							<TextBox Grid.Row="0" Grid.Column="0" IsReadOnly="False" Background="#FF484848" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="350,0,10,0" Foreground="White">
 								<TextBox.Style>
 									<Style TargetType="TextBox">
-										<Setter Property="Text" Value="{Binding Path=NewSpriteSheetFileName,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+										<Setter Property="Text" Value="{Binding Path=NewAnimimationStatemachineFileName,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 										<Style.Triggers>
-											<DataTrigger Binding="{Binding Path=NewSpriteSheetFileName, UpdateSourceTrigger=PropertyChanged, Mode= TwoWay}" Value="{x:Null}">
+											<DataTrigger Binding="{Binding Path=NewAnimimationStatemachineFileName, UpdateSourceTrigger=PropertyChanged, Mode= TwoWay}" Value="{x:Null}">
 												<Setter Property="Text" Value="needs a NAME!"/>
 											</DataTrigger>
 										</Style.Triggers>
@@ -1446,9 +1446,9 @@
 							<TextBox Grid.Row="1" Grid.Column="0" IsReadOnly="True" Background="#FF484848" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="40,0,10,0" Foreground="White">
 								<TextBox.Style>
 									<Style TargetType="TextBox">
-										<Setter Property="Text" Value="{Binding Path=NewSpriteSheetLocation,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+										<Setter Property="Text" Value="{Binding Path=NewAnimimationStatemachineLocation,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 										<Style.Triggers>
-											<DataTrigger Binding="{Binding Path=NewSpriteSheetLocation, UpdateSourceTrigger=PropertyChanged, Mode= TwoWay}" Value="{x:Null}">
+											<DataTrigger Binding="{Binding Path=NewAnimimationStatemachineLocation, UpdateSourceTrigger=PropertyChanged, Mode= TwoWay}" Value="{x:Null}">
 												<Setter Property="Text" Value="None Selected yet"/>
 											</DataTrigger>
 										</Style.Triggers>
@@ -1485,9 +1485,9 @@
 								<TextBox Grid.Row="0" Grid.Column="0" IsReadOnly="True" Background="#FF484848" HorizontalAlignment="Left" Width="120" VerticalAlignment="Center" Margin="120,0,10,0" Foreground="White" >
 									<TextBox.Style>
 										<Style TargetType="TextBox">
-											<Setter Property="Text" Value="{Binding Path=NewAnimTotalWidth,UpdateSourceTrigger=PropertyChanged, Mode= TwoWay}"/>
+											<Setter Property="Text" Value="{Binding Path=NewAnimimationStatemachineTotalWidth,UpdateSourceTrigger=PropertyChanged, Mode= TwoWay}"/>
 											<Style.Triggers>
-												<DataTrigger Binding="{Binding Path=NewAnimTotalWidth, UpdateSourceTrigger=PropertyChanged, Mode= TwoWay}" Value="{x:Null}">
+												<DataTrigger Binding="{Binding Path=NewAnimimationStatemachineTotalWidth, UpdateSourceTrigger=PropertyChanged, Mode= TwoWay}" Value="{x:Null}">
 													<Setter Property="Text" Value="-1"/>
 												</DataTrigger>
 											</Style.Triggers>
@@ -1499,9 +1499,9 @@
 								<TextBox Grid.Row="0" Grid.Column="0" IsReadOnly="True" Background="#FF484848" HorizontalAlignment="Left" Width="120" VerticalAlignment="Center" Margin="360,0,10,0" Foreground="White" >
 									<TextBox.Style>
 										<Style TargetType="TextBox">
-											<Setter Property="Text" Value="{Binding Path=NewAnimTotalHeight,UpdateSourceTrigger=PropertyChanged, Mode= TwoWay}"/>
+											<Setter Property="Text" Value="{Binding Path=NewAnimimationStatemachineTotalHeight,UpdateSourceTrigger=PropertyChanged, Mode= TwoWay}"/>
 											<Style.Triggers>
-												<DataTrigger Binding="{Binding Path=NewAnimTotalHeight, UpdateSourceTrigger=PropertyChanged, Mode= TwoWay}" Value="{x:Null}">
+												<DataTrigger Binding="{Binding Path=NewAnimimationStatemachineTotalHeight, UpdateSourceTrigger=PropertyChanged, Mode= TwoWay}" Value="{x:Null}">
 													<Setter Property="Text" Value="-1"/>
 												</DataTrigger>
 											</Style.Triggers>
@@ -1657,7 +1657,7 @@
 
 						</Grid>
 
-						<Grid x:Name="AE_CurrentAnimSM_Grid" Visibility="Visible" Background="#FF3C3C3C">
+						<Grid x:Name="AE_CurrentAnimSM_Grid" Visibility="Hidden" Background="#FF3C3C3C">
 
 							<Grid.RowDefinitions>
 								<RowDefinition Height="3*"/>

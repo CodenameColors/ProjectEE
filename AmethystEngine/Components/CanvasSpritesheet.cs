@@ -219,7 +219,7 @@ namespace AmethystEngine.Components
 
 				writer.WriteStartElement(null, "SpriteSheet", null);
 				writer.WriteAttributeString(null, "SheetName", null, desiredSheet.Name);
-				writer.WriteAttributeString(null, "File", null, filepath);	// We are creating this sheet. so we need to use our sent path
+				writer.WriteAttributeString(null, "File", null, filepath + ".png");	// We are creating this sheet. so we need to use our sent path
 				writer.WriteAttributeString(null, "AnimationCount", null, desiredSheet.AllAnimationOnSheet.Count.ToString());
 				writer.WriteAttributeString(null, "Width", null, desiredSheet.Width.ToString());
 				writer.WriteAttributeString(null, "Height", null, desiredSheet.Height.ToString());
