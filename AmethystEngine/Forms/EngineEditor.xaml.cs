@@ -939,6 +939,11 @@ namespace AmethystEngine.Forms
 			}
 			else if (((TabItem) EditorWindows_TC.SelectedItem).Header.ToString().Contains("Spritesheet"))
 			{
+				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["SpriteSheetObjects_Template"];
+				//SceneExplorer_Control.Template = (ControlTemplate)this.Resources["AnimationEditorSceneExplorer_Template"];
+				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["SpritesheetEditorObjectExplorer_Template"];
+				//ObjectProperties_Control.Template = (ControlTemplate)this.Resources["AnimationEditorProperties_Template"];
+				UpdateLayout();
 			}
 			else if (((TabItem) EditorWindows_TC.SelectedItem).Header.ToString().Contains("Animation"))
 			{
@@ -6810,7 +6815,7 @@ namespace AmethystEngine.Forms
 			CurrentActiveSpriteSheet = new SpriteSheet(NewAnimimationStatemachineFileName, NewAnimimationStatemachineLocation,
 				0, 0, NewAnimimationStatemachineTotalWidth, NewAnimimationStatemachineTotalHeight);
 
-			// Let's take the canvas sprite sheet and use that data to fill in the Game spritesheet
+			// Let's take the canvas sprite sheet andEditorToolBar_CC use that data to fill in the Game spritesheet
 			foreach (CanvasAnimation canvasAnimation in tempCanvasSpritesheet.AllAnimationOnSheet)
 			{
 				CurrentActiveSpriteSheet.SpriteAnimations.Add( canvasAnimation.AnimName,
@@ -8491,11 +8496,21 @@ namespace AmethystEngine.Forms
 					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
 					SpritesheetEditor_BackCanvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
 					Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
-				
 
-					//TODO: resize selection rectangle
+					// Update the scroll viewer
+					var scaleTransform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+					SpritesheetEditor_Canvas.LayoutTransform = scaleTransform;
+
+					// Adjust scroll position based on zoom
+					SpritesheetEditor_ScrollViewer.ScrollToHorizontalOffset(SpritesheetEditor_ScrollViewer.HorizontalOffset * SpritesheetEditorZoomLevel);
+					SpritesheetEditor_ScrollViewer.ScrollToVerticalOffset(SpritesheetEditor_ScrollViewer.VerticalOffset * SpritesheetEditorZoomLevel);
+
+					SpritesheetEditor_ScrollViewer.InvalidateScrollInfo();
+
+
+				//TODO: resize selection rectangle
 			}
-				else //zoom out!
+			else //zoom out!
 				{
 					SpritesheetEditorZoomLevel -= .2;
 					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
@@ -8505,10 +8520,22 @@ namespace AmethystEngine.Forms
 					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
 					SpritesheetEditor_BackCanvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
 					Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
+
+					// Update the scroll viewer
+					var scaleTransform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+					SpritesheetEditor_Canvas.LayoutTransform = scaleTransform;
+
+					// Adjust scroll position based on zoom
+					SpritesheetEditor_ScrollViewer.ScrollToHorizontalOffset(SpritesheetEditor_ScrollViewer.HorizontalOffset * SpritesheetEditorZoomLevel);
+					SpritesheetEditor_ScrollViewer.ScrollToVerticalOffset(SpritesheetEditor_ScrollViewer.VerticalOffset * SpritesheetEditorZoomLevel);
+
+				SpritesheetEditor_ScrollViewer.InvalidateScrollInfo();
+
+
 				//TODO: resize selection rectangle
 			}
 
-				if (SpritesheetEditorZoomLevel < .2)
+			if (SpritesheetEditorZoomLevel < .2)
 				{
 					SpritesheetEditorZoomLevel = .2;
 					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
@@ -8521,7 +8548,9 @@ namespace AmethystEngine.Forms
 
 				SpritesheetZoomFactor_TB.Text = String.Format("({0})%  ({1}x{1})", 100 * SpritesheetEditorZoomLevel , SpritesheetGridWidth * SpritesheetEditorZoomLevel );
 				ScaleSpriteSheetEditorCanvas();
-			
+
+				SpritesheetEditor_BackCanvas.ReleaseMouseCapture();
+				e.Handled = true;
 		}
 
 		private void ScaleSpriteSheetEditorCanvas()
@@ -8654,13 +8683,16 @@ namespace AmethystEngine.Forms
 							image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
 							image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
+							Border parentBorder = CreateDashedLineBorder();
+							parentBorder.Child = image;
+							CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().LinkedBorderImage = parentBorder;
 
-							SpritesheetEditor_Canvas.Children.Add(image);
+							SpritesheetEditor_Canvas.Children.Add(parentBorder);
 
 							double xPos = Canvas.GetLeft(SpritesheetEditor_CropImage);
 							double yPos = Canvas.GetTop(SpritesheetEditor_CropImage);
-							Canvas.SetLeft(image, xPos);
-							Canvas.SetTop(image, yPos);
+							Canvas.SetLeft(parentBorder, xPos);
+							Canvas.SetTop(parentBorder, yPos);
 
 							// ClearAdorners(c);
 							SpritesheetEditor_CropImage.bHasFocus = false;
@@ -8679,7 +8711,9 @@ namespace AmethystEngine.Forms
 					SpritesheetEditor_CropImage.Visibility = Visibility.Visible;
 					if(SpritesheetEditor_CropImage.updateSizeLocation_Hook == null)
 						SpritesheetEditor_CropImage.updateSizeLocation_Hook += UpdateSizeLocationHook_FrameInfo;
-					//DIALOGUE SCENE HOOKS
+
+					SpritesheetEditor_CropImage.Focus();
+
 				}
 			}
 		}
@@ -8773,7 +8807,7 @@ namespace AmethystEngine.Forms
 			return false;
 		}
 
-		private void SpritesheetEditor_BackCanvas_OnMouseDown(object sender, MouseButtonEventArgs e)
+		private void SpritesheetEditor_BackCanvas_OnLeftMouseDown(object sender, MouseButtonEventArgs e)
 		{
 			if (SpritesheetEditor_CropImage.Visibility == Visibility.Hidden || SpritesheetEditor_CropImage.ResizeService == null)
 				return;
@@ -8809,13 +8843,16 @@ namespace AmethystEngine.Forms
 					image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
 					image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
+					// Create a border for the image
+					Border border = CreateDashedLineBorder();
+					border.Child = image;
 
-					SpritesheetEditor_Canvas.Children.Add(image);
+					SpritesheetEditor_Canvas.Children.Add(border);
 
 					double xPos = Canvas.GetLeft(SpritesheetEditor_CropImage);
 					double yPos = Canvas.GetTop(SpritesheetEditor_CropImage);
-					Canvas.SetLeft(image, xPos);
-					Canvas.SetTop(image, yPos);
+					Canvas.SetLeft(border, xPos);
+					Canvas.SetTop(border, yPos);
 
 					// ClearAdorners(c);
 					SpritesheetEditor_CropImage.bHasFocus = false;
@@ -8891,7 +8928,7 @@ namespace AmethystEngine.Forms
 					if (((img.Source as CroppedBitmap)?.Source != null))
 					{
 						imagePath = (img.Source as CroppedBitmap)?.Source.ToString();
-						SpritesheetEditor_CropImage.SetImage(imagePath, true);
+						SpritesheetEditor_CropImage.SetImage(imagePath, true, (img.Source as CroppedBitmap).SourceRect);
 
 					}
 					else
@@ -8908,31 +8945,34 @@ namespace AmethystEngine.Forms
 				SpritesheetEditor_CropImage.bHasFocus = true;
 				SpritesheetEditor_CropImage.Visibility = Visibility.Visible;
 
-				// Get the image loaction, and set that to the cropper location
-				Canvas.SetLeft(SpritesheetEditor_CropImage, Canvas.GetLeft(img));
-				Canvas.SetTop(SpritesheetEditor_CropImage, Canvas.GetTop(img));
-
-				// We need to set the cropper to the new image size
-				SpritesheetEditor_CropImage.MaxHeight = img.Height;
-				SpritesheetEditor_CropImage.Height = img.Height;
-				SpritesheetEditor_CropImage.MaxWidth = img.Width;
-				SpritesheetEditor_CropImage.Width = img.Width;
-
-				SpritesheetEditor_Canvas.Children.Remove(img);
-				if (!SpritesheetEditor_Canvas.Children.Contains(SpritesheetEditor_CropImage))
-					SpritesheetEditor_Canvas.Children.Add(SpritesheetEditor_CropImage);
-
-				// Create a new MouseEventArgs
-				var args = new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
+				Border parentBorder = img.Parent as Border;
+				if(parentBorder != null)
 				{
-					RoutedEvent = UIElement.MouseLeftButtonDownEvent // Set the RoutedEvent property
-				};
-				SpritesheetEditor_CropImage.RaiseEvent(args);
+					// Get the image loaction, and set that to the cropper location
+					Canvas.SetLeft(SpritesheetEditor_CropImage, Canvas.GetLeft(parentBorder));
+					Canvas.SetTop(SpritesheetEditor_CropImage, Canvas.GetTop(parentBorder));
 
-				// Handle the mouse down event on the child control here
-				// Make sure to set e.Handled = true to prevent the event from bubbling up to the parent control
-				e.Handled = true;
+					// We need to set the cropper to the new image size
+					SpritesheetEditor_CropImage.MaxHeight = img.Height;
+					SpritesheetEditor_CropImage.Height = img.Height;
+					SpritesheetEditor_CropImage.MaxWidth = img.Width;
+					SpritesheetEditor_CropImage.Width = img.Width;
 
+					SpritesheetEditor_Canvas.Children.Remove(parentBorder);
+					if (!SpritesheetEditor_Canvas.Children.Contains(SpritesheetEditor_CropImage))
+						SpritesheetEditor_Canvas.Children.Add(SpritesheetEditor_CropImage);
+
+					// Create a new MouseEventArgs
+					var args = new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
+					{
+						RoutedEvent = UIElement.MouseLeftButtonDownEvent // Set the RoutedEvent property
+					};
+					SpritesheetEditor_CropImage.RaiseEvent(args);
+
+					// Handle the mouse down event on the child control here
+					// Make sure to set e.Handled = true to prevent the event from bubbling up to the parent control
+					e.Handled = true;
+				}
 			}
 
 
@@ -9025,6 +9065,175 @@ namespace AmethystEngine.Forms
 			}
 
 
+		}
+
+		private void SpriteSheet_Resize_MI_Click(object sender, RoutedEventArgs e)
+		{
+			Window w = new ResizeSpritesheet() { UpdateSizeHook = UpdateSpriteSheetSize};//((int) SpritesheetEditor_BackCanvas.Width, (int) SpritesheetEditor_BackCanvas.Height); //{ UpdateSizeHook = UpdateSpriteSheetSize};
+			// w.Content = this;
+			w.ShowDialog();
+		}
+
+		private void UpdateSpriteSheetSize(int width, int height)
+		{
+			SpritesheetEditor_BackCanvas.Width = width;
+			SpritesheetEditor_BackCanvas.Height = height;
+			SpritesheetEditor_Canvas.Width = width;
+			SpritesheetEditor_Canvas.Height = height;
+		}
+
+		private Point _SpriteShheetCanvasStartPoint = new Point();
+		private void SpritesheetEditor_BackCanvas_OnMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			if (e.MiddleButton == MouseButtonState.Pressed)
+			{
+				_SpriteShheetCanvasStartPoint = e.GetPosition(SpritesheetEditor_Canvas);
+				SpritesheetEditor_Canvas.CaptureMouse();
+			}
+		}
+
+		private void SpritesheetEditor_BackCanvas_OnMouseMove(object sender, MouseEventArgs e)
+		{
+			if (e.MiddleButton == MouseButtonState.Pressed && SpritesheetEditor_Canvas.IsMouseCaptured)
+			{
+				Point currentPoint = e.GetPosition(SpritesheetEditor_BackCanvas);
+				double deltaX = currentPoint.X - _SpriteShheetCanvasStartPoint.X;
+				double deltaY = currentPoint.Y - _SpriteShheetCanvasStartPoint.Y;
+
+				Canvas.SetLeft(SpritesheetEditor_Canvas, Canvas.GetLeft(SpritesheetEditor_Canvas) + deltaX);
+				Canvas.SetTop(SpritesheetEditor_Canvas, Canvas.GetTop(SpritesheetEditor_Canvas) + deltaY);
+			}
+		}
+
+		private void SpritesheetEditor_BackCanvas_OnMouseUp(object sender, MouseButtonEventArgs e)
+		{
+			if (e.MiddleButton == MouseButtonState.Released)
+			{
+				SpritesheetEditor_Canvas.ReleaseMouseCapture();
+			}
+		}
+
+		private bool _isPanning;
+		private Point _lastMousePosition;
+
+		private void ScrollViewer_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			if (e.MiddleButton == MouseButtonState.Pressed)
+			{
+				_isPanning = true;
+				_lastMousePosition = e.GetPosition(SpritesheetEditor_ScrollViewer);
+				SpritesheetEditor_ScrollViewer.CaptureMouse();
+			}
+		}
+
+		private void ScrollViewer_MouseMove(object sender, MouseEventArgs e)
+		{
+			if (_isPanning)
+			{
+				Point currentMousePosition = e.GetPosition(SpritesheetEditor_ScrollViewer);
+				double deltaX = currentMousePosition.X - _lastMousePosition.X;
+				double deltaY = currentMousePosition.Y - _lastMousePosition.Y;
+
+				SpritesheetEditor_ScrollViewer.ScrollToHorizontalOffset(SpritesheetEditor_ScrollViewer.HorizontalOffset - deltaX);
+				SpritesheetEditor_ScrollViewer.ScrollToVerticalOffset(SpritesheetEditor_ScrollViewer.VerticalOffset - deltaY);
+
+				_lastMousePosition = currentMousePosition;
+			}
+		}
+
+		private void ScrollViewer_MouseUp(object sender, MouseButtonEventArgs e)
+		{
+			if (e.MiddleButton == MouseButtonState.Released)
+			{
+				_isPanning = false;
+				SpritesheetEditor_ScrollViewer.ReleaseMouseCapture();
+			}
+		}
+
+		private void SpritesheetScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+		{
+			// e.Handled = true; // Mark the event as handled to prevent scrolling
+			SpritesheetEditor_BackCanvas.CaptureMouse();
+		}
+
+		private Border CreateDashedLineBorder()
+		{
+			Border border = new Border();
+			DrawingBrush brush = new DrawingBrush();
+
+			brush.Viewport = new Rect(0, 0, 8, 8);
+			brush.ViewportUnits = BrushMappingMode.Absolute;
+			brush.TileMode = TileMode.Tile;
+
+			DrawingGroup drawingGroup = new DrawingGroup();
+			GeometryDrawing geometryDrawing = new GeometryDrawing();
+			geometryDrawing.Brush = Brushes.GreenYellow;
+
+			GeometryGroup geometryGroup = new GeometryGroup();
+			geometryGroup.Children.Add(new RectangleGeometry(new Rect(0, 0, 50, 50)));
+			geometryGroup.Children.Add(new RectangleGeometry(new Rect(50, 50, 50, 50)));
+
+			geometryDrawing.Geometry = geometryGroup;
+			drawingGroup.Children.Add(geometryDrawing);
+			brush.Drawing = drawingGroup;
+
+			border.BorderBrush = brush;
+			border.BorderThickness = new Thickness(1,1,1,1);
+			border.Visibility = Visibility.Visible;
+
+			return border;
+		}
+
+
+		/// <summary>
+		/// Event for global key events
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void EngineEditor_OnKeyDown(object sender, KeyEventArgs e)
+		{
+			// Moving a sprite on the spritesheet editor canvas
+			if (EditorWindows_TC.SelectedIndex == 1)
+			{
+				if (SpritesheetEditor_CropImage.Visibility == Visibility.Visible)
+				{
+					switch (e.Key)
+					{
+						case Key.Left:
+							Canvas.SetLeft(SpritesheetEditor_CropImage, Canvas.GetLeft(SpritesheetEditor_CropImage) - 1);
+							break;
+						case Key.Right:
+							Canvas.SetLeft(SpritesheetEditor_CropImage, Canvas.GetLeft(SpritesheetEditor_CropImage) + 1);
+							break;
+						case Key.Up:
+							Canvas.SetTop(SpritesheetEditor_CropImage, Canvas.GetTop(SpritesheetEditor_CropImage) - 1);
+							break;
+						case Key.Down:
+							Canvas.SetTop(SpritesheetEditor_CropImage, Canvas.GetTop(SpritesheetEditor_CropImage) + 1);
+							break;
+					}
+
+					SpritesheetEditor_CropImage.Focus();
+				}
+			}
+
+		}
+
+		private void SpriteSheetEditor_CE_TV_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+			TreeView treeViewItem = sender as TreeView;
+			if (treeViewItem != null)
+			{
+				if (treeViewItem.SelectedItem is CanvasAnimation)
+				{
+
+				}
+				else if (treeViewItem.SelectedItem is CanvasImageProperties canvasFrame)
+				{
+					if(canvasFrame.LinkedBorderImage is Border parentBorder)
+						parentBorder.BorderThickness= new Thickness(1);
+				}
+			}
 		}
 	}
 }

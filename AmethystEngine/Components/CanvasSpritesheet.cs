@@ -73,7 +73,7 @@ namespace AmethystEngine.Components
 
 		public float SX { get; set; }
 		public float SY { get; set; }
-		public Image LinkedImage = new Image();
+		public Border LinkedBorderImage = null;
 		private int _x;
 		private int _y;
 		private int _w;

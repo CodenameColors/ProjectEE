@@ -24,6 +24,7 @@
 				xmlns:textBlock="clr-namespace:BixBite.Rendering.UI.TextBlock"
 				xmlns:imagecropper="clr-namespace:ImageCropper;assembly=ImageCropper"
 				mc:Ignorable="d" Background="#FF0E0D0D"
+				KeyDown="EngineEditor_OnKeyDown"
         Title="AmethystEngine" Height="800" Width="1200" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
 
 
@@ -320,6 +321,8 @@
 							<MenuItem Header="Open Spritesheet" Foreground="Black" Click="OpenSpritesheet_MI_Click"/>
 							<MenuItem Header="Save Spritesheet" Foreground="Black"  Click="SaveSpriteSheet_MI_Click"/>
 							<MenuItem Header="Save SpriteSheet As" Foreground="Black" Click="SaveSpriteSheetAs_MI_Click" />
+						</MenuItem>
+						<MenuItem Header="Resize" Foreground="White" Click="SpriteSheet_Resize_MI_Click">
 						</MenuItem>
 					</Menu>
 					
@@ -640,7 +643,8 @@
 					<Button Content="+" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="106,5,5,5" Height="20" VerticalContentAlignment="Top" Width="20"
 					        RenderTransformOrigin="1.5,0.5" Click="AddNewSpriteAnimation_BTN_Click"/>
 
-					<TreeView x:Name="SpriteSheetEditor_CE_TV" Grid.Row="1" Background="#FF383838" 
+					<TreeView x:Name="SpriteSheetEditor_CE_TV" Grid.Row="1" Background="#FF383838"
+										SelectedItemChanged="SpriteSheetEditor_CE_TV_OnSelectedItemChanged"
 					          ItemsSource="{Binding SpritesheetAnimationDictionary}">
 						<TreeView.Resources>
 							<HierarchicalDataTemplate DataType="{x:Type comp:CanvasAnimation}" ItemsSource="{Binding Path=CanvasFrames}">
@@ -1322,7 +1326,7 @@
 				</TabItem>
 				<TabItem Header="Spritesheet Editor" Background="#FF383838" Foreground="Black" BorderBrush="#FF4D4D4D">
 					<Grid>
-						<Grid x:Name="SpritesheetEditorCreation_Grid" Visibility="Visible"  Background="#FF3C3C3C">
+						<Grid x:Name="SpritesheetEditorCreation_Grid" Visibility="Hidden"  Background="#FF3C3C3C">
 
 							<Grid>
 								<Grid.RowDefinitions>
@@ -1349,7 +1353,7 @@
 							</Grid>
 
 						</Grid>
-						<Grid x:Name="SpritesheetEditorMainGrid_Grid" Visibility="Hidden">
+						<Grid x:Name="SpritesheetEditorMainGrid_Grid" Visibility="Visible">
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="20"/>
 								<ColumnDefinition Width="*"/>
@@ -1366,23 +1370,35 @@
 									<RowDefinition Height="*"/>
 								</Grid.RowDefinitions>
 
-								<Canvas Grid.Row="0" Grid.Column="0" x:Name="SpritesheetEditor_BackCanvas" IsHitTestVisible="True" ClipToBounds="True" 
-								        SizeChanged="SpritesheetEditor_BackCanvas_OnSizeChanged" MouseWheel="SpritesheetEditor_BackCanvas_OnMouseWheel"
-								        DragOver="SpritesheetEditor_BackCanvas_OnDragOver" MouseLeftButtonDown="SpritesheetEditor_BackCanvas_OnMouseDown">
-									
-										<Canvas.Background>
-										<VisualBrush x:Name="SpritesheetEditor_VB" TileMode="Tile" Stretch="Uniform" Viewport="0,0,40,40" ViewportUnits="Absolute" >
-											<VisualBrush.Visual>
-												<Rectangle Width="40" Height="40" Fill="Black" Stroke="Gray" StrokeThickness=".4" />
-											</VisualBrush.Visual>
-										</VisualBrush>
-									</Canvas.Background>
+								<ScrollViewer x:Name="SpritesheetEditor_ScrollViewer" 
+								              HorizontalScrollBarVisibility="Visible"
+								              VerticalScrollBarVisibility="Visible"
+								              MouseDown="ScrollViewer_MouseDown"
+								              MouseMove="ScrollViewer_MouseMove"
+															MouseWheel="SpritesheetScrollViewer_PreviewMouseWheel"
+								              MouseUp="ScrollViewer_MouseUp" Padding="10">
+									<Canvas  x:Name="SpritesheetEditor_BackCanvas" IsHitTestVisible="True" ClipToBounds="True" Margin="0"
+									         SizeChanged="SpritesheetEditor_BackCanvas_OnSizeChanged" PreviewMouseWheel="SpritesheetEditor_BackCanvas_OnMouseWheel"
+									         DragOver="SpritesheetEditor_BackCanvas_OnDragOver" MouseLeftButtonDown="SpritesheetEditor_BackCanvas_OnLeftMouseDown" 
+													 MouseDown="SpritesheetEditor_BackCanvas_OnMouseDown" MouseMove="SpritesheetEditor_BackCanvas_OnMouseMove"
+													 MouseUp="SpritesheetEditor_BackCanvas_OnMouseUp"
+													 HorizontalAlignment="Center" VerticalAlignment="Center">
 
-									<Canvas x:Name="SpritesheetEditor_Canvas" Background="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
-										<imagecropper:CroppableImage x:Name="SpritesheetEditor_CropImage" Visibility="Visible"
-										                             Canvas.Left="0" Canvas.Top="0"/>
+										<Canvas.Background>
+											<VisualBrush x:Name="SpritesheetEditor_VB" TileMode="Tile" Stretch="Uniform" Viewport="0,0,40,40" ViewportUnits="Absolute" >
+												<VisualBrush.Visual>
+													<Rectangle Width="40" Height="40" Fill="Black" Stroke="Gray" StrokeThickness=".4" />
+												</VisualBrush.Visual>
+											</VisualBrush>
+										</Canvas.Background>
+
+										<Canvas x:Name="SpritesheetEditor_Canvas" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" >
+											<imagecropper:CroppableImage x:Name="SpritesheetEditor_CropImage" Visibility="Visible" 
+											                             Canvas.Left="0" Canvas.Top="0"/>
+										</Canvas>
 									</Canvas>
-								</Canvas>
+								</ScrollViewer>
+								
 							</Grid>
 							<TextBox x:Name="SpritesheetZoomFactor_TB" Grid.Row="2" Grid.Column="1" MinWidth="35" Width="35" Margin="70,2,0,2" 
 						         FontSize="10" Background="#FF4F4F4F" Foreground="White" BorderBrush="#00ABADB3" HorizontalAlignment="Left" Text="100% " VerticalAlignment="Stretch" />

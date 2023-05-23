@@ -1,0 +1,61 @@
+﻿<Window x:Class="AmethystEngine.Forms.ResizeSpritesheet"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        Background="#FF0E0D0D"  WindowStyle="None" AllowsTransparency="True"
+        Title="ResizeSpritesheet" Height="150" Width="500">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="30"/>
+			<RowDefinition Height="30"/>
+			<RowDefinition Height="30"/>
+			<RowDefinition Height="10" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="100"/>
+			<ColumnDefinition Width="*"/>
+			<ColumnDefinition Width="100"/>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+
+		<Grid Grid.Row="0" Grid.ColumnSpan="4" Background="#FF484848" MouseLeftButtonDown="LBind_DragMove">
+			<Grid>
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
+				</Grid.ColumnDefinitions>
+				<Image Height="30" HorizontalAlignment="Left" Margin="3,0,0,0" x:Name="AmeIcon_im" Stretch="None" VerticalAlignment="Top" Width="30"  OpacityMask="Black" Source="/AmethystEngine;component/images/Ame_icon_small.png" />
+				<Label Content="Amethyst Engine"  Padding="40,7,0,0" Foreground="White" Grid.Column="0"/>
+
+				<Label x:Name="ProjectName_LBL" Content="Change the sprite sheet size" Foreground="White" Grid.Column="7" HorizontalAlignment="Center"/>
+				<Button Content="X" Background="Transparent" BorderBrush="Transparent" Foreground="White" HorizontalAlignment="Center" Grid.Column="11" Width="20" Click="LBind_close" />
+			</Grid>
+		</Grid>
+		<TextBlock Grid.Row="1" Grid.Column="0" Text="Current Width:" Foreground="White" Margin="10,6,0,8" HorizontalAlignment="Left" Width="119"/>
+		<TextBox Grid.Row="1" Grid.Column="1" x:Name="PreviousWidth_TB" IsEnabled="False" Background="#FF383838" Foreground="White" BorderBrush="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,6,10,6" Height="18"/>
+		<TextBlock Grid.Row="1" Grid.Column="2" Text="Current Height:" Foreground="White" Margin="10,6,0,8" HorizontalAlignment="Left" Width="119"/>
+		<TextBox Grid.Row="1" Grid.Column="3" x:Name="PreviousHeight_TB" IsEnabled="False" Background="#FF383838" Foreground="White" BorderBrush="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,6,10,6" Height="18" />
+
+		<TextBlock Grid.Row="2" Grid.Column="0" Text="New Width:" Foreground="White" Margin="10,6,0,8" HorizontalAlignment="Left" Width="119"/>
+		<TextBox Grid.Row="2" Grid.Column="1" x:Name="NewWidth_TB"  Background="#FF383838" Foreground="White" BorderBrush="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,6,10,6" Height="18"/>
+		<TextBlock Grid.Row="2" Grid.Column="2" Text="New Height:" Foreground="White" Margin="10,6,0,8" HorizontalAlignment="Left" Width="119"/>
+		<TextBox Grid.Row="2" Grid.Column="3" x:Name="NewHeight_TB"  Background="#FF383838" Foreground="White" BorderBrush="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,6,10,6" Height="18" />
+
+		<Button x:Name="ConfirmChange_BTN" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Content="Browse"  Background="#FF383838" Foreground="White"  BorderBrush="Transparent" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="10,2,10,2" Click="ConfirmChange_BTN_Click"/>
+
+	</Grid>
+</Window>

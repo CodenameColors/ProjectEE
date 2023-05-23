@@ -279,6 +279,9 @@
     <Compile Include="Forms\NewMapChange.xaml.cs">
       <DependentUpon>NewMapChange.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ResizeSpritesheet.xaml.cs">
+      <DependentUpon>ResizeSpritesheet.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ResizeThumb.cs" />
     <Compile Include="Resources\Adorners\ResizeRotateAdorner.cs" />
     <Compile Include="Resources\Adorners\ResizeRotateChrome.cs" />
@@ -339,6 +342,10 @@
     <Compile Include="Forms\ProjectSettings.xaml.cs">
       <DependentUpon>ProjectSettings.xaml</DependentUpon>
     </Compile>
+    <Page Include="Forms\ResizeSpritesheet.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Resources\DesignerItem.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
