@@ -171,6 +171,7 @@ namespace AmethystEngine.Forms
 
 
 		BitmapImage CurrentSpriteSheet_Image = new BitmapImage();
+		Border CurrentSpritesheetBorderForLinking = null;
 		
 
 		
@@ -8620,6 +8621,32 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		private CanvasImageProperties FindCanvasFrame(Border linkedBorder)
+		{
+			foreach (CanvasAnimation canvasAnim in CurrentSelectedSpriteSheet.AllAnimationOnSheet)
+			{
+				foreach (CanvasImageProperties frame in canvasAnim.CanvasFrames)
+				{
+					if (frame.LinkedBorderImage == linkedBorder)
+						return frame;
+				}
+			}
+			return null;
+		}
+
+		private CanvasImageProperties FindCanvasFrame(CroppableImage croppableImage)
+		{
+			foreach (CanvasAnimation canvasAnim in CurrentSelectedSpriteSheet.AllAnimationOnSheet)
+			{
+				foreach (CanvasImageProperties frame in canvasAnim.CanvasFrames)
+				{
+					if (frame.LinkedCroppableImage == croppableImage)
+						return frame;
+				}
+			}
+			return null;
+		}
+
 		private void Spritesheet_OE_Add_Frame_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			// We need to make sure we know where to add this.
@@ -8685,6 +8712,15 @@ namespace AmethystEngine.Forms
 
 							Border parentBorder = CreateDashedLineBorder();
 							parentBorder.Child = image;
+
+							// First we need to find the current frame we linked to the crop control if there is one.
+							CanvasImageProperties foundFrame = FindCanvasFrame(SpritesheetEditor_CropImage);
+							if (foundFrame != null)
+							{
+								foundFrame.LinkedCroppableImage = null;
+								foundFrame.LinkedBorderImage = parentBorder;
+							}
+
 							CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().LinkedBorderImage = parentBorder;
 
 							SpritesheetEditor_Canvas.Children.Add(parentBorder);
@@ -8698,6 +8734,10 @@ namespace AmethystEngine.Forms
 							SpritesheetEditor_CropImage.bHasFocus = false;
 							SpritesheetEditor_CropImage.Visibility = Visibility.Hidden;
 						}
+					}
+					else
+					{
+						CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().LinkedCroppableImage = SpritesheetEditor_CropImage;
 
 					}
 
@@ -8720,11 +8760,16 @@ namespace AmethystEngine.Forms
 
 		private void UpdateSizeLocationHook_FrameInfo(double x, double y, double w, double h)
 		{
-			currentSelectedCanvasFrame.X = (int)(x / SpritesheetEditorZoomLevel);
-			currentSelectedCanvasFrame.Y = (int)(y / SpritesheetEditorZoomLevel);
-			currentSelectedCanvasFrame.W = (int)(w / SpritesheetEditorZoomLevel);
-			currentSelectedCanvasFrame.H = (int)(h/ SpritesheetEditorZoomLevel);
 
+			// We need to find out what this croppable image is linked to!
+			CanvasImageProperties foundFrame = FindCanvasFrame(SpritesheetEditor_CropImage);
+			if (foundFrame != null)
+			{
+				foundFrame.X = (int)(x / SpritesheetEditorZoomLevel);
+				foundFrame.Y = (int)(y / SpritesheetEditorZoomLevel);
+				foundFrame.W = (int)(w / SpritesheetEditorZoomLevel);
+				foundFrame.H = (int)(h / SpritesheetEditorZoomLevel);
+			}
 		}
 
 		private void CreateSpritesheet_BTN_Click(object sender, RoutedEventArgs e)
@@ -8812,7 +8857,6 @@ namespace AmethystEngine.Forms
 			if (SpritesheetEditor_CropImage.Visibility == Visibility.Hidden || SpritesheetEditor_CropImage.ResizeService == null)
 				return;
 
-
 			Canvas c = sender as Canvas;
 			if (c != null)
 			{
@@ -8846,6 +8890,14 @@ namespace AmethystEngine.Forms
 					// Create a border for the image
 					Border border = CreateDashedLineBorder();
 					border.Child = image;
+
+					// We need to find out what this croppable image is linked to!
+					CanvasImageProperties foundFrame = FindCanvasFrame(SpritesheetEditor_CropImage);
+					if (foundFrame != null)
+					{
+						foundFrame.LinkedCroppableImage = null;
+						foundFrame.LinkedBorderImage = border;
+					}
 
 					SpritesheetEditor_Canvas.Children.Add(border);
 
@@ -8958,6 +9010,14 @@ namespace AmethystEngine.Forms
 					SpritesheetEditor_CropImage.MaxWidth = img.Width;
 					SpritesheetEditor_CropImage.Width = img.Width;
 
+					// We need to find out what this croppable image is linked to!
+					CanvasImageProperties foundFrame = FindCanvasFrame(parentBorder);
+					if (foundFrame != null)
+					{
+						foundFrame.LinkedCroppableImage = SpritesheetEditor_CropImage;
+						foundFrame.LinkedBorderImage = null;
+					}
+
 					SpritesheetEditor_Canvas.Children.Remove(parentBorder);
 					if (!SpritesheetEditor_Canvas.Children.Contains(SpritesheetEditor_CropImage))
 						SpritesheetEditor_Canvas.Children.Add(SpritesheetEditor_CropImage);
@@ -8977,82 +9037,6 @@ namespace AmethystEngine.Forms
 
 
 		}
-
-		//private void LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB(object sender, MouseButtonEventArgs e)
-		//{
-		//	// DO NOT DO ANYTHING if we have a cropper open already
-		//	if (SpritesheetEditor_CropImage.ResizeService != null)
-		//	{
-		//		return;
-		//	}
-
-		//	Image img = sender as Image;
-		//	if(img != null)
-		//	{
-		//		CanvasImageProperties frame = CompareImagePathToCanvasImagePath(img);
-		//		if (frame != null)
-		//		{
-		//			// We have found the linked image frame!
-		//			frame.X = (int)Canvas.GetLeft(img);
-		//			frame.Y = (int)Canvas.GetTop(img);
-		//			frame.W = (int)img.Width;
-		//			frame.H = (int)img.Height;
-		//		}
-
-		//		string imagePath = ((img.Source as CroppedBitmap)?.Source as CroppedBitmap)?.Source.ToString();
-		//		if (imagePath != null)
-		//		{
-		//			SpritesheetEditor_CropImage.SetImage(imagePath, true, (img.Source as CroppedBitmap).SourceRect);
-		//		}
-		//		else
-		//		{
-		//			if (((img.Source as CroppedBitmap)?.Source != null))
-		//			{
-		//				imagePath = (img.Source as CroppedBitmap)?.Source.ToString();
-		//			}
-		//			else
-		//			{
-		//				imagePath = ((BitmapImage)img.Source).UriSource.ToString();
-		//				SpritesheetEditor_CropImage.SetImage(imagePath, true);
-		//			}
-		//		}
-
-		//		SpritesheetEditor_CropImage.bHasFocus = true;
-		//		SpritesheetEditor_CropImage.Visibility = Visibility.Visible;
-
-		//		// Get the image loaction, and set that to the cropper location
-		//		Canvas.SetLeft(SpritesheetEditor_CropImage, Canvas.GetLeft(img));
-		//		Canvas.SetTop(SpritesheetEditor_CropImage, Canvas.GetTop(img));
-
-		//		// We need to set the cropper to the new image size
-		//		SpritesheetEditor_CropImage.MaxHeight = img.Height;
-		//		SpritesheetEditor_CropImage.Height = img.Height;
-		//		SpritesheetEditor_CropImage.MaxWidth = img.Width;
-		//		SpritesheetEditor_CropImage.Width = img.Width;
-
-		//		SpritesheetEditor_Canvas.Children.Remove(img);
-		//		if(!SpritesheetEditor_Canvas.Children.Contains(SpritesheetEditor_CropImage))
-		//			SpritesheetEditor_Canvas.Children.Add(SpritesheetEditor_CropImage);
-
-		//		// Capture the mouse events to allow the child control to continue to receive them
-		//		(sender as UIElement).CaptureMouse();
-		//		SpritesheetEditor_CropImage.CaptureMouse();
-
-		//		// Create a new MouseEventArgs
-		//		var args = new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
-		//		{
-		//			RoutedEvent = UIElement.MouseLeftButtonDownEvent // Set the RoutedEvent property
-		//		};
-		//		SpritesheetEditor_CropImage.RaiseEvent(args);
-
-		//		// Handle the mouse down event on the child control here
-		//		// Make sure to set e.Handled = true to prevent the event from bubbling up to the parent control
-		//		e.Handled = true;
-
-		//	}
-
-
-		//}
 
 		private void LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB(object sender, MouseButtonEventArgs e)
 		{
@@ -9178,7 +9162,7 @@ namespace AmethystEngine.Forms
 			brush.Drawing = drawingGroup;
 
 			border.BorderBrush = brush;
-			border.BorderThickness = new Thickness(1,1,1,1);
+			border.BorderThickness = new Thickness(0);
 			border.Visibility = Visibility.Visible;
 
 			return border;

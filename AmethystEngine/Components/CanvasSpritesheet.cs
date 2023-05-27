@@ -12,6 +12,7 @@ using BixBite.Rendering;
 using BixBite.Rendering.Animation;
 using BixBite.Resources;
 using DrWPF.Windows.Data;
+using ImageCropper;
 
 namespace AmethystEngine.Components
 {
@@ -74,6 +75,7 @@ namespace AmethystEngine.Components
 		public float SX { get; set; }
 		public float SY { get; set; }
 		public Border LinkedBorderImage = null;
+		public CroppableImage LinkedCroppableImage = null;
 		private int _x;
 		private int _y;
 		private int _w;
