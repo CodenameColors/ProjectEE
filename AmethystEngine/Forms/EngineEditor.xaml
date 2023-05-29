@@ -31,7 +31,6 @@
 	<Window.Resources>
 		<ResourceDictionary>
 
-
 			<!--<src:ObservableStyleDictionary x:Key="ButtonStyles" />
 			<DataTemplate x:Key="StyleNameTemplate">
 				<TextBlock Text="{Binding Key}" />
@@ -41,8 +40,6 @@
 			</DataTemplate>-->
 
 			<!--#endregion-->
-
-
 
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="/AmethystEngine;component/Resources/DesignerItem.xaml"/>
@@ -77,6 +74,52 @@
 				<MenuItem x:Name="Edit_CM" IsChecked="False" Header="Edit" Click="EditMoveableControl_Click">
 				</MenuItem>
 			</ContextMenu>
+
+			<BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+
+			<!-- TreeViewItemToggleButtonStyle -->
+			<Style x:Key="TreeViewItemToggleButtonStyle" TargetType="ToggleButton">
+				<Setter Property="Template">
+					<Setter.Value>
+						<ControlTemplate TargetType="ToggleButton">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="Auto" />
+									<ColumnDefinition Width="Auto" />
+								</Grid.ColumnDefinitions>
+								<Border x:Name="Border"
+								        Grid.Column="0"
+								        Background="Transparent"
+								        BorderBrush="Transparent"
+								        BorderThickness="0"
+								        Padding="2">
+									<Path x:Name="Arrow"
+									      Width="8"
+									      Height="8"
+									      HorizontalAlignment="Center"
+									      VerticalAlignment="Center"
+									      Fill="Black"
+									      Data="M0,0 L0,6 L6,0 z" />
+								</Border>
+								<ContentPresenter x:Name="ContentPresenter"
+								                  Grid.Column="1"
+								                  ContentTemplate="{TemplateBinding ContentTemplate}"
+								                  Content="{TemplateBinding Content}"
+								                  HorizontalAlignment="Left"
+								                  Margin="4,0" />
+							</Grid>
+							<ControlTemplate.Triggers>
+								<Trigger Property="IsChecked" Value="True">
+									<Setter TargetName="Arrow" Property="Data" Value="M0,6 L6,6 L3,0 z" />
+								</Trigger>
+								<Trigger Property="IsMouseOver" Value="True">
+									<Setter TargetName="Border" Property="Background" Value="LightGray" />
+								</Trigger>
+							</ControlTemplate.Triggers>
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
+			</Style>
 
 			<ContextMenu x:Key="LevelContextMenu_Template">
 				<MenuItem Header="Add Tile Layer" Click="AddTileLayer_Click"/>
@@ -646,7 +689,11 @@
 					<TreeView x:Name="SpriteSheetEditor_CE_TV" Grid.Row="1" Background="#FF383838"
 										SelectedItemChanged="SpriteSheetEditor_CE_TV_OnSelectedItemChanged"
 					          ItemsSource="{Binding SpritesheetAnimationDictionary}">
+
 						<TreeView.Resources>
+
+
+
 							<HierarchicalDataTemplate DataType="{x:Type comp:CanvasAnimation}" ItemsSource="{Binding Path=CanvasFrames}">
 								<Grid>
 									<Grid.RowDefinitions>
@@ -659,11 +706,12 @@
 										<ColumnDefinition Width="20"/>
 										<ColumnDefinition Width="10"/>
 										<ColumnDefinition Width="40"/>
+										<ColumnDefinition Width="40"/>
 										<ColumnDefinition Width="*"/>
 									</Grid.ColumnDefinitions>
 
 									<Image Grid.RowSpan="2" Grid.ColumnSpan="1" Grid.Column="0" Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50"/>
-									<TextBlock Grid.Row="0" Grid.ColumnSpan="10" Grid.Column="1"  Text="{Binding AnimName}" Foreground="White" />
+									<TextBox Grid.Row="0" Grid.ColumnSpan="3" Grid.Column="1" Background="#FF383838" Text="{Binding AnimName}" Foreground="White" />
 									<TextBlock Grid.Row="1" Grid.Column="1" Text="Frames:" Foreground="White" />
 									<TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding NumOfFrames}" Foreground="White" />
 									<Button Grid.Row="0" Grid.RowSpan="2" Grid.Column="4" Background="#FF383838" Foreground="White"
@@ -686,30 +734,81 @@
 									<Grid.RowDefinitions>
 										<RowDefinition Height="20"/>
 										<RowDefinition Height="20"/>
+										<RowDefinition Height="20"/>
+										<RowDefinition Height="20"/>
 									</Grid.RowDefinitions>
 									<Grid.ColumnDefinitions>
 										<ColumnDefinition Width="40"/>
 										<ColumnDefinition Width="10"/>
-										<ColumnDefinition Width="20"/>
-										<ColumnDefinition Width="10"/>
-										<ColumnDefinition Width="20"/>
+										<ColumnDefinition MinWidth="25"/>
+										<ColumnDefinition Width="1"/>
+										<ColumnDefinition Width="15"/>
+										<ColumnDefinition MinWidth="25"/>
+										<ColumnDefinition Width="3"/>
+										<ColumnDefinition Width="*"/>
 									</Grid.ColumnDefinitions>
 
 									<Image Grid.RowSpan="2" Grid.ColumnSpan="1" Grid.Column="0" Margin="0,0,5,0" 
+												 ToolTip="{Binding ImageLocation}" 
 									       Source="{Binding ImageLocation}" MaxWidth="50" MaxHeight="50"/>
 									<!--<TextBlock Grid.Row="0" Grid.ColumnSpan="10" Grid.Column="1"  Text="{Binding ImageLocation}" Foreground="White" />-->
 									<TextBlock Grid.Row="0" Grid.Column="1" Text="x:" Foreground="White" />
-									<TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding X,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="White" />
-									<TextBlock Grid.Row="0" Grid.Column="3" Text="y:" Foreground="White" />
-									<TextBlock Grid.Row="0" Grid.Column="4" Text="{Binding Y, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="White" />
+									<TextBox Grid.Row="0" Grid.Column="2" Background="#FF383838" KeyDown="SpritesheetCanvasFrame_KeyDown" Tag="x"
+									         Text="{Binding X,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="White" />
+									<TextBlock Grid.Row="0" Grid.Column="4" Text="y:" Foreground="White" />
+									<TextBox Grid.Row="0" Grid.Column="5" Background="#FF383838" KeyDown="SpritesheetCanvasFrame_KeyDown" Tag="y"
+									         Text="{Binding Y, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="White" />
 									
 									<TextBlock Grid.Row="1" Grid.Column="1" Text="w:" Foreground="White" />
-									<TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding W, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="White" />
-									<TextBlock Grid.Row="1" Grid.Column="3" Text="h:" Foreground="White" />
-									<TextBlock Grid.Row="1" Grid.Column="4" Text="{Binding H, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="White" />
+									<TextBox Grid.Row="1" Grid.Column="2" Background="#FF383838" KeyDown="SpritesheetCanvasFrame_KeyDown" Tag="w"
+									         Text="{Binding W, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="White" />
+									<TextBlock Grid.Row="1" Grid.Column="4" Text="h:" Foreground="White" />
+									<TextBox Grid.Row="1" Grid.Column="5" Background="#FF383838" KeyDown="SpritesheetCanvasFrame_KeyDown" Tag="h"
+									         Text="{Binding H, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="White" />
+
+									<TextBlock Grid.Row="2" Grid.Column="1" Text="rx:" Foreground="White" />
+									<TextBox Grid.Row="2" Grid.Column="2" Background="#FF383838" KeyDown="SpritesheetCanvasFrame_KeyDown" Tag="rx"
+									         Text="{Binding RX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="White" />
+									<TextBlock Grid.Row="2" Grid.Column="4" Text="ry:" Foreground="White" />
+									<TextBox Grid.Row="2" Grid.Column="5" Background="#FF383838" KeyDown="SpritesheetCanvasFrame_KeyDown" Tag="ry"
+									         Text="{Binding RY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="White" />
+
+									<TextBlock Grid.Row="3" Grid.Column="1" Text="cx:" Foreground="White" />
+									<TextBox Grid.Row="3" Grid.Column="2" Background="#FF383838" KeyDown="SpritesheetCanvasFrame_KeyDown" Tag="Cx"
+									         Text="{Binding CropX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="White" />
+									<TextBlock Grid.Row="3" Grid.Column="4" Text="cy:" Foreground="White" />
+									<TextBox Grid.Row="3" Grid.Column="5" Background="#FF383838" KeyDown="SpritesheetCanvasFrame_KeyDown" Tag="cy"
+									         Text="{Binding CropY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="White" />
+
+									<Button Grid.Row="0" Grid.RowSpan="2" Grid.Column="7" Background="#FF383838" Foreground="White"
+									        Click="Spritesheet_OE_Delete_Frame_BTN_Click">
+										<Button.Content>
+											<Grid>
+												<Grid.RowDefinitions>
+													<RowDefinition/>
+													<RowDefinition/>
+												</Grid.RowDefinitions>
+												<TextBlock Grid.Row="0" Text="delete" HorizontalAlignment="Center"/>
+												<TextBlock Grid.Row="1" Text="Frame" HorizontalAlignment="Center"/>
+											</Grid>
+										</Button.Content>
+									</Button>
+
+									<CheckBox Grid.Row="2" Grid.RowSpan="2" Content="Border" Grid.Column="7" Background="#FF383838" Foreground="White"
+														VerticalAlignment="Center"
+									        Click="SpritesheetCanvasFrame_CB_Click">
+									</CheckBox>
 
 								</Grid>
 							</DataTemplate>
+							<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+							                 Color="Transparent" />
+							<SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}"
+							                 Color="Black" />
+							<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
+							                 Color="Transparent" />
+							<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
+							                 Color="Black" />
 						</TreeView.Resources>
 					</TreeView>
 

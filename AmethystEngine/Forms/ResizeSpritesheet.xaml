@@ -55,7 +55,7 @@
 		<TextBlock Grid.Row="2" Grid.Column="2" Text="New Height:" Foreground="White" Margin="10,6,0,8" HorizontalAlignment="Left" Width="119"/>
 		<TextBox Grid.Row="2" Grid.Column="3" x:Name="NewHeight_TB"  Background="#FF383838" Foreground="White" BorderBrush="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,6,10,6" Height="18" />
 
-		<Button x:Name="ConfirmChange_BTN" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Content="Browse"  Background="#FF383838" Foreground="White"  BorderBrush="Transparent" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="10,2,10,2" Click="ConfirmChange_BTN_Click"/>
+		<Button x:Name="ConfirmChange_BTN" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Content="Confirm Resize"  Background="#FF383838" Foreground="White"  BorderBrush="Transparent" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="10,2,10,2" Click="ConfirmChange_BTN_Click"/>
 
 	</Grid>
 </Window>

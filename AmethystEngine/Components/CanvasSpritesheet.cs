@@ -52,6 +52,46 @@ namespace AmethystEngine.Components
 			}
 		}
 
+		public int CropX
+		{
+			get => _cropXPos;
+			set
+			{
+				_cropXPos = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CropX"));
+			}
+		}
+
+		public int CropY
+		{
+			get => _cropYPos;
+			set
+			{
+				_cropYPos = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CropY"));
+			}
+		}
+
+		public int RX
+		{
+			get => _rx;
+			set
+			{
+				_rx = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("RX"));
+			}
+		}
+
+		public int RY
+		{
+			get => _ry;
+			set
+			{
+				_ry = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("RY"));
+			}
+		}
+
 		public int W
 		{
 			get => _w;
@@ -78,6 +118,8 @@ namespace AmethystEngine.Components
 		public CroppableImage LinkedCroppableImage = null;
 		private int _x;
 		private int _y;
+		private int _rx;
+		private int _ry;
 		private int _w;
 		private int _h;
 		private int _cropXPos;
@@ -184,6 +226,8 @@ namespace AmethystEngine.Components
 										imageProperty.Y = int.Parse(reader.GetAttribute("Y") ?? "0"); // fallback
 										imageProperty.W = int.Parse(reader.GetAttribute("W") ?? "0"); // fallback
 										imageProperty.H = int.Parse(reader.GetAttribute("H") ?? "0"); // fallback
+										imageProperty.CropX = int.Parse(reader.GetAttribute("CX") ?? "0"); // fallback
+										imageProperty.CropY = int.Parse(reader.GetAttribute("CY") ?? "0"); // fallback
 										imageProperty.ImageLocation = (reader.GetAttribute("Path") ?? ""); // fallback
 
 										spriteAnimation.CanvasFrames.Add(imageProperty);
@@ -244,6 +288,8 @@ namespace AmethystEngine.Components
 						writer.WriteAttributeString(null, "Y", null, imgpProperty.Y.ToString());
 						writer.WriteAttributeString(null, "W", null, imgpProperty.W.ToString());
 						writer.WriteAttributeString(null, "H", null, imgpProperty.H.ToString());
+						writer.WriteAttributeString(null, "CX", null, imgpProperty.CropX.ToString());
+						writer.WriteAttributeString(null, "CY", null, imgpProperty.CropY.ToString());
 						writer.WriteAttributeString(null, "Path", null, imgpProperty.ImageLocation.ToString());
 
 						writer.WriteEndElement(); //end of the Frame Tag

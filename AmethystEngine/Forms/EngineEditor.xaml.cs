@@ -40,6 +40,7 @@ using NodeEditor.Components;
 using NodeEditor.Components.Arithmetic;
 using NodeEditor.Components.Logic;
 using Button = System.Windows.Controls.Button;
+using CanvasImageProperties = AmethystEngine.Components.CanvasImageProperties;
 using CheckBox = System.Windows.Controls.CheckBox;
 using Color = System.Windows.Media.Color;
 using ComboBox = System.Windows.Controls.ComboBox;
@@ -6833,6 +6834,7 @@ namespace AmethystEngine.Forms
 				
 			}
 
+			AE_NewAnimStates_IC.ItemsSource = null;
 
 			ActiveSpriteSheets.Add((CurrentActiveSpriteSheet));
 
@@ -6843,6 +6845,7 @@ namespace AmethystEngine.Forms
 
 			// Set up the Editor Objects section
 			Animation_CE_Tree.ItemsSource = CurrentActiveSpriteSheet.SpriteAnimations_List;
+			AE_NewAnimStates_IC.ItemsSource = CurrentActiveSpriteSheet.SpriteAnimations_List;
 
 			SceneExplorer_TreeView.ItemsSource = ActiveSpriteSheets;
 
@@ -7135,18 +7138,18 @@ namespace AmethystEngine.Forms
 			int count = 0; 
 			foreach (var spriteanim in tempsSpriteAnimations)
 			{
-				spriteanim.FrameDrawRects.Clear();
-				for (int i = 0; i < spriteanim.FrameCount; i++)
-				{
-					spriteanim.FrameDrawRects.AddLast(new Rect(
-						(int)spriteanim.CurrentFrameRect.Value.X,
-						(int)spriteanim.CurrentFrameRect.Value.Y,
-						(int)spriteanim.CurrentFrameRect.Value.Width,
-						(int)spriteanim.CurrentFrameRect.Value.Height
-						)
-					);
+				// spriteanim.FrameDrawRects.Clear();
+				//for (int i = 0; i < spriteanim.FrameCount; i++)
+				//{
+				//	spriteanim.FrameDrawRects.AddLast(new Rect(
+				//		(int)spriteanim.CurrentFrameRect.Value.X,
+				//		(int)spriteanim.CurrentFrameRect.Value.Y,
+				//		(int)spriteanim.CurrentFrameRect.Value.Width,
+				//		(int)spriteanim.CurrentFrameRect.Value.Height
+				//		)
+				//	);
 
-				}
+				//}
 
 				CurrentActiveSpriteSheet.SpriteAnimations.Add(spriteanim.Name, spriteanim);
 
@@ -7827,6 +7830,7 @@ namespace AmethystEngine.Forms
 			if (tvtemp != null)
 			{
 				SpriteAnimation item = tvtemp.SelectedItem as SpriteAnimation;
+				item.CurrentFrameRect = item.FrameDrawRects.First;
 				if (item == null) return;
 				for (int i = 0; i < item.FrameCount; i++)
 				{
@@ -7844,6 +7848,7 @@ namespace AmethystEngine.Forms
 							(int)item.CurrentFrameRect.Value.Width,
 							(int)item.CurrentFrameRect.Value.Height
 							))));
+					item.CurrentFrameRect = item.CurrentFrameRect.Next;
 				}
 
 				CurrentActiveAnimationName_TB.Text = item.Name;
@@ -8387,7 +8392,16 @@ namespace AmethystEngine.Forms
 
 			if (CurrentSelectedSpriteSheet != null)
 			{
-				var imageControls = SpritesheetEditor_Canvas.Children.OfType<Image>().ToList();
+				if (SpritesheetEditor_CropImage.updateSizeLocation_Hook == null)
+					SpritesheetEditor_CropImage.updateSizeLocation_Hook += UpdateSizeLocationHook_FrameInfo;
+				if (SpritesheetEditor_CropImage.updateCropLocation_Hook == null)
+					SpritesheetEditor_CropImage.updateCropLocation_Hook += UpdateCropLocationHook_FrameInfo;
+
+				var imageControls = SpritesheetEditor_Canvas.Children.OfType<Border>().ToList();
+				SpritesheetEditor_BackCanvas.Width = CurrentSelectedSpriteSheet.Width;
+				SpritesheetEditor_BackCanvas.Height = CurrentSelectedSpriteSheet.Height;
+				SpritesheetEditor_Canvas.Width = CurrentSelectedSpriteSheet.Width;
+				SpritesheetEditor_Canvas.Height = CurrentSelectedSpriteSheet.Height;
 
 				// Remove all Image controls from the Canvas
 				SpriteSheet_CE_Tree.ItemsSource = null;
@@ -8402,22 +8416,27 @@ namespace AmethystEngine.Forms
 				{
 					foreach (CanvasImageProperties frame in canvasAnimation.CanvasFrames)
 					{
+						Border parentBorder = CreateDashedLineBorder();
 						Image image = new Image();
 						BitmapImage bitmap = new BitmapImage(new Uri(frame.ImageLocation));
-						CroppedBitmap croppedBitmap = new CroppedBitmap(bitmap, new Int32Rect(0,0, (int)bitmap.Width, (int)bitmap.Height));
+						CroppedBitmap croppedBitmap = new CroppedBitmap(bitmap, new Int32Rect(frame.CropX, frame.CropY, (int)frame.W, (int)frame.H));
 						image.Source = croppedBitmap;
 						image.Width = frame.W;
 						image.Height = frame.H;
+						image.HorizontalAlignment = HorizontalAlignment.Center;
+						image.VerticalAlignment = VerticalAlignment.Center;
 						image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
 						image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
-						SpritesheetEditor_Canvas.Children.Add(image);
+						parentBorder.Child = image;
+						frame.LinkedBorderImage = parentBorder;
 
-						Canvas.SetLeft(image, frame.X);
-						Canvas.SetTop(image, frame.Y);
+						SpritesheetEditor_Canvas.Children.Add(parentBorder);
+
+						Canvas.SetLeft(parentBorder, frame.X);
+						Canvas.SetTop(parentBorder, frame.Y);
 					}
 				}
-
 			}
 		}
 
@@ -8467,7 +8486,7 @@ namespace AmethystEngine.Forms
 
 		private void SaveSpriteSheetAs_MI_Click(object sender, RoutedEventArgs e)
 		{
-			throw new NotImplementedException();
+			// throw new NotImplementedException();
 		}
 
 		private void SpritesheetEditor_BackCanvas_OnSizeChanged(object sender, SizeChangedEventArgs e)
@@ -8621,6 +8640,23 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		private bool RemoveCanvasFrame(CanvasImageProperties frameToDelete)
+		{
+			for (int i = 0; i < CurrentSelectedSpriteSheet.AllAnimationOnSheet.Count; i++)
+			{
+				CanvasAnimation canvasAnim = CurrentSelectedSpriteSheet.AllAnimationOnSheet[i];
+				for (int j = 0; j < canvasAnim.CanvasFrames.Count; j++)
+				{
+					CanvasImageProperties frame = canvasAnim.CanvasFrames[j];
+					if (frame == frameToDelete)
+					{
+						return canvasAnim.CanvasFrames.Remove(frame);
+					}
+				}
+			}
+			return false;
+		}
+
 		private CanvasImageProperties FindCanvasFrame(Border linkedBorder)
 		{
 			foreach (CanvasAnimation canvasAnim in CurrentSelectedSpriteSheet.AllAnimationOnSheet)
@@ -8691,7 +8727,7 @@ namespace AmethystEngine.Forms
 
 					//var adorn = new AdornerDecorator();
 					CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Add(
-						new CanvasImageProperties(filename, (int)_baseImage.Width, (int)_baseImage.Height));
+						new CanvasImageProperties(filename, _baseImage.PixelWidth , _baseImage.PixelHeight));
 
 					currentSelectedCanvasFrame = CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last();
 
@@ -8705,8 +8741,11 @@ namespace AmethystEngine.Forms
 						{
 							Image image = new Image();
 							image.Source = new BitmapImage(new Uri(path));
-							image.Width = SpritesheetEditor_CropImage.Width;
-							image.Height = SpritesheetEditor_CropImage.Height;
+							image.Width = _baseImage.PixelWidth;
+							image.Height = _baseImage.PixelHeight;
+							image.Stretch = Stretch.Fill;
+							image.HorizontalAlignment = HorizontalAlignment.Center;
+							image.VerticalAlignment = VerticalAlignment.Center;
 							image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
 							image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
@@ -8721,7 +8760,7 @@ namespace AmethystEngine.Forms
 								foundFrame.LinkedBorderImage = parentBorder;
 							}
 
-							CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().LinkedBorderImage = parentBorder;
+							CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().LinkedCroppableImage = SpritesheetEditor_CropImage;
 
 							SpritesheetEditor_Canvas.Children.Add(parentBorder);
 
@@ -8751,6 +8790,8 @@ namespace AmethystEngine.Forms
 					SpritesheetEditor_CropImage.Visibility = Visibility.Visible;
 					if(SpritesheetEditor_CropImage.updateSizeLocation_Hook == null)
 						SpritesheetEditor_CropImage.updateSizeLocation_Hook += UpdateSizeLocationHook_FrameInfo;
+					if (SpritesheetEditor_CropImage.updateCropLocation_Hook == null)
+						SpritesheetEditor_CropImage.updateCropLocation_Hook += UpdateCropLocationHook_FrameInfo;
 
 					SpritesheetEditor_CropImage.Focus();
 
@@ -8760,7 +8801,6 @@ namespace AmethystEngine.Forms
 
 		private void UpdateSizeLocationHook_FrameInfo(double x, double y, double w, double h)
 		{
-
 			// We need to find out what this croppable image is linked to!
 			CanvasImageProperties foundFrame = FindCanvasFrame(SpritesheetEditor_CropImage);
 			if (foundFrame != null)
@@ -8769,6 +8809,17 @@ namespace AmethystEngine.Forms
 				foundFrame.Y = (int)(y / SpritesheetEditorZoomLevel);
 				foundFrame.W = (int)(w / SpritesheetEditorZoomLevel);
 				foundFrame.H = (int)(h / SpritesheetEditorZoomLevel);
+			}
+		}
+
+		private void UpdateCropLocationHook_FrameInfo(double cx, double cy)
+		{
+			// We need to find out what this croppable image is linked to!
+			CanvasImageProperties foundFrame = FindCanvasFrame(SpritesheetEditor_CropImage);
+			if (foundFrame != null)
+			{
+				foundFrame.CropX = (int)(cx);
+				foundFrame.CropY = (int)(cy);
 			}
 		}
 
@@ -8884,6 +8935,8 @@ namespace AmethystEngine.Forms
 					image.MaxWidth = SpritesheetEditor_CropImage.Width;
 					image.Height = SpritesheetEditor_CropImage.Height;
 					image.MaxHeight = SpritesheetEditor_CropImage.Height;
+					image.HorizontalAlignment = HorizontalAlignment.Center;
+					image.VerticalAlignment = VerticalAlignment.Center;
 					image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
 					image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
@@ -9162,7 +9215,10 @@ namespace AmethystEngine.Forms
 			brush.Drawing = drawingGroup;
 
 			border.BorderBrush = brush;
+			border.Margin = new Thickness(-1);
 			border.BorderThickness = new Thickness(0);
+			border.HorizontalAlignment = HorizontalAlignment.Center;
+			border.VerticalAlignment = VerticalAlignment.Center;
 			border.Visibility = Visibility.Visible;
 
 			return border;
@@ -9214,11 +9270,161 @@ namespace AmethystEngine.Forms
 				}
 				else if (treeViewItem.SelectedItem is CanvasImageProperties canvasFrame)
 				{
-					if(canvasFrame.LinkedBorderImage is Border parentBorder)
-						parentBorder.BorderThickness= new Thickness(1);
+					if (canvasFrame.LinkedBorderImage is Border parentBorder)
+					{
+						// parentBorder.BorderThickness = new Thickness(1);
+
+						// We need to create the croppable control again.
+					}
+
+
 				}
 			}
 		}
+
+		private void Spritesheet_OE_Delete_Frame_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			// We need to make sure we know where to add this.
+			Button btn = sender as Button;
+			if (btn != null)
+			{
+				// We need to play WPF games... aka find the template, and then with that find the acutal control (treeview)
+				ControlTemplate spriteSheeControlTemplate = (ControlTemplate) this.Resources["SpriteSheetObjects_Template"];
+				TreeView spritesheetTreeView =
+					(TreeView) spriteSheeControlTemplate.FindName("SpriteSheetEditor_CE_TV", ContentLibrary_Control);
+				TreeViewItem tvi = FindParentTreeViewItem(btn);
+
+				// Get the actual index of the list from the BUTTON we pressed
+				CanvasImageProperties foundFrame = tvi.DataContext as CanvasImageProperties; // MAGIC BULLSHIT
+				if (foundFrame != null)
+				{
+					// We found the data we needed. so let's delete the information from the canvas
+					if (foundFrame.LinkedBorderImage != null)
+						SpritesheetEditor_Canvas.Children.Remove(foundFrame.LinkedBorderImage);
+					if (foundFrame.LinkedCroppableImage != null)
+					{
+						SpritesheetEditor_CropImage.bHasFocus = false;
+						SpritesheetEditor_CropImage.Visibility = Visibility.Hidden;
+					}
+					RemoveCanvasFrame(foundFrame);
+				}
+			}
+		}
+
+		private void SpritesheetCanvasFrame_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key != Key.Enter)
+				return;
+
+			TextBox tb = sender as TextBox;
+			if (tb != null)
+			{
+				if (int.TryParse(tb.Text, out int val))
+				{
+
+					// We need to play WPF games... aka find the template, and then with that find the acutal control (treeview)
+					ControlTemplate spriteSheeControlTemplate = (ControlTemplate) this.Resources["SpriteSheetObjects_Template"];
+					TreeView spritesheetTreeView =
+						(TreeView) spriteSheeControlTemplate.FindName("SpriteSheetEditor_CE_TV", ContentLibrary_Control);
+					TreeViewItem tvi = FindParentTreeViewItem(tb);
+
+					// Get the actual index of the list from the BUTTON we pressed
+					CanvasImageProperties foundFrame = tvi.DataContext as CanvasImageProperties; // MAGIC BULLSHIT
+					if (foundFrame != null)
+					{
+
+						string propertyTag = tb.Tag.ToString();
+						if (propertyTag == "x")
+						{
+							if (foundFrame.LinkedBorderImage != null)
+							{
+								Canvas.SetLeft(foundFrame.LinkedBorderImage, val);
+							}
+							else if (foundFrame.LinkedCroppableImage != null)
+							{
+								Canvas.SetLeft(foundFrame.LinkedCroppableImage, val);
+							}
+						}
+						else if (propertyTag == "y")
+						{
+							if (foundFrame.LinkedBorderImage != null)
+							{
+								Canvas.SetTop(foundFrame.LinkedBorderImage, val);
+							}
+							else if (foundFrame.LinkedCroppableImage != null)
+							{
+								Canvas.SetTop(foundFrame.LinkedCroppableImage, val);
+							}
+						}
+						else if (propertyTag == "w")
+						{
+							if (foundFrame.LinkedBorderImage != null)
+							{
+								foundFrame.LinkedBorderImage.Width = val;
+								(foundFrame.LinkedBorderImage.Child as Image).Width = val;
+							}
+							else if (foundFrame.LinkedCroppableImage != null)
+							{
+								// foundFrame.LinkedCroppableImage.MaxWidth = val;
+								foundFrame.LinkedCroppableImage.Width = val;
+							}
+						}
+						else if (propertyTag == "h")
+						{
+							if (foundFrame.LinkedBorderImage != null)
+							{
+								(foundFrame.LinkedBorderImage.Child as Image).Height = val;
+							}
+							else if (foundFrame.LinkedCroppableImage != null)
+							{
+								// foundFrame.LinkedCroppableImage.MaxWidth = val;
+								foundFrame.LinkedCroppableImage.Height = val;
+							}
+						}
+
+					}
+				}
+			}
+		}
+
+		private void SpritesheetCanvasFrame_CB_Click(object sender, RoutedEventArgs e)
+		{
+			CheckBox cb = sender as CheckBox;
+			if (cb != null)
+			{
+
+
+				// We need to play WPF games... aka find the template, and then with that find the acutal control (treeview)
+				ControlTemplate spriteSheeControlTemplate = (ControlTemplate) this.Resources["SpriteSheetObjects_Template"];
+				TreeView spritesheetTreeView =
+					(TreeView) spriteSheeControlTemplate.FindName("SpriteSheetEditor_CE_TV", ContentLibrary_Control);
+				TreeViewItem tvi = FindParentTreeViewItem(cb);
+
+				// Get the actual index of the list from the BUTTON we pressed
+				CanvasImageProperties foundFrame = tvi.DataContext as CanvasImageProperties; // MAGIC BULLSHIT
+				if (foundFrame != null)
+				{
+					if (cb.IsChecked == true)
+					{
+						if(foundFrame.LinkedBorderImage != null)
+							foundFrame.LinkedBorderImage.BorderThickness = new Thickness(1);
+						else
+							foundFrame.LinkedCroppableImage.BorderThickness = new Thickness(1);
+
+					}
+					else
+					{
+						{
+							if (foundFrame.LinkedBorderImage != null)
+								foundFrame.LinkedBorderImage.BorderThickness = new Thickness(0);
+							else
+								foundFrame.LinkedCroppableImage.BorderThickness = new Thickness(0);
+						}
+					}
+				}
+			}
+		}
+
 	}
 }
 
