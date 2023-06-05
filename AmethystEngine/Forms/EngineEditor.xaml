@@ -1780,7 +1780,35 @@
 								<RowDefinition Height="*"/>
 							</Grid.RowDefinitions>
 
-							<Image x:Name="CurrentBaseLayerAnimation_Img" Margin="10" />
+							<ScrollViewer x:Name="AnimationEditor_ScrollViewer" 
+							              HorizontalScrollBarVisibility="Visible"
+							              VerticalScrollBarVisibility="Visible"
+							              MouseDown="ScrollViewer_MouseDown"
+							              MouseMove="ScrollViewer_MouseMove"
+							              MouseWheel="SpritesheetScrollViewer_PreviewMouseWheel"
+							              MouseUp="ScrollViewer_MouseUp" Padding="10">
+								<Canvas  x:Name="AnimationEditor_BackCanvas" IsHitTestVisible="True" ClipToBounds="True" Margin="0"
+								         SizeChanged="SpritesheetEditor_BackCanvas_OnSizeChanged" PreviewMouseWheel="SpritesheetEditor_BackCanvas_OnMouseWheel"
+								         DragOver="SpritesheetEditor_BackCanvas_OnDragOver" MouseLeftButtonDown="SpritesheetEditor_BackCanvas_OnLeftMouseDown" 
+								         MouseDown="SpritesheetEditor_BackCanvas_OnMouseDown" MouseMove="SpritesheetEditor_BackCanvas_OnMouseMove"
+								         MouseUp="SpritesheetEditor_BackCanvas_OnMouseUp"
+								         HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+									<Canvas.Background>
+										<VisualBrush x:Name="AnimationEditor_VB" TileMode="Tile" Stretch="Uniform" Viewport="0,0,40,40" ViewportUnits="Absolute" >
+											<VisualBrush.Visual>
+												<Rectangle Width="40" Height="40" Fill="Black" Stroke="Gray" StrokeThickness=".4" />
+											</VisualBrush.Visual>
+										</VisualBrush>
+									</Canvas.Background>
+
+									<Canvas x:Name="AnimationEditor_Canvas" Background="Transparent" HorizontalAlignment="Center" VerticalAlignment="Center" >
+										<Image x:Name="CurrentBaseLayerAnimation_Img" Stretch="None" />
+									</Canvas>
+								</Canvas>
+							</ScrollViewer>
+
+							
 							<Grid x:Name="AnimationLayersPreview_Canvas_IC">
 								<!--<ItemsControl.ItemContainerStyle>
 									<Style>

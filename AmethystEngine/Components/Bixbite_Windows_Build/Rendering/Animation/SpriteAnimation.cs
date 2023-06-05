@@ -17,7 +17,28 @@ using Color = Microsoft.Xna.Framework.Color;
 
 namespace BixBite.Rendering
 {
-	public class SpriteAnimation
+	public class FrameInfo
+	{
+		public int XPos { get; set; }
+		public int YPos { get; set; }
+		public int Width { get; set; }
+		public int Height { get; set; }
+		public int RenderPointX { get; set; }
+		public int RenderPointY { get; set; }
+
+		public FrameInfo(int x, int y, int width, int height, int renderx, int rendery)
+		{
+			this.XPos = x;
+			this.YPos = y;
+			this.Width = width;
+			this.Height = height;
+			this.RenderPointX = renderx;
+			this.RenderPointY = rendery;
+		}
+	}
+
+
+public class SpriteAnimation
 	{
 
 		#region Fields
@@ -37,7 +58,8 @@ namespace BixBite.Rendering
 		private Rectangle _drawRectangle;
 
 		//private LinkedList<Vector2> _frameDrawRects = new LinkedList<Vector2>();
-		private LinkedList<Rect> _frameDrawRects = new LinkedList<Rect>();
+		//private LinkedList<Rect> _frameDrawRects = new LinkedList<Rect>();
+		private LinkedList<FrameInfo> _frameDrawRects = new LinkedList<FrameInfo>();
 		private List<AnimationEvent> _animationEvents = new List<AnimationEvent>();
 
 		private SoundEffect _currentSoundEffect = null;
@@ -74,7 +96,13 @@ namespace BixBite.Rendering
 		//	set => _frameDrawRects = value;
 		//}
 
-		public LinkedList<Rect> FrameDrawRects
+		//public LinkedList<Rect> FrameDrawRects
+		//{
+		//	get => _frameDrawRects;
+		//	set => _frameDrawRects = value;
+		//}
+
+		public LinkedList<FrameInfo> FrameDrawRects
 		{
 			get => _frameDrawRects;
 			set => _frameDrawRects = value;
@@ -90,7 +118,8 @@ namespace BixBite.Rendering
 
 		public Vector2 RelativeOrigin { get; set; }
 		//public LinkedListNode<Vector2> CurrentFrameRect { get; set; }
-		public LinkedListNode<Rect> CurrentFrameRect { get; set; }
+		//public LinkedListNode<Rect> CurrentFrameRect { get; set; }
+		public LinkedListNode<FrameInfo> CurrentFrameRect { get; set; }
 
 		public int CurrentFrameIndex
 		{
@@ -164,9 +193,9 @@ namespace BixBite.Rendering
 			return _frameHeight;
 		}
 
-		public void AddFramePosition(Rect v)
+		public void AddFramePosition(FrameInfo frameInfo)
 		{
-			this._frameDrawRects.AddLast(v);
+			this._frameDrawRects.AddLast(frameInfo);
 			if (_frameDrawRects.Count == 1)
 				CurrentFrameRect = FrameDrawRects.First;
 		}
@@ -174,12 +203,12 @@ namespace BixBite.Rendering
 		public void ResetAnimation()
 		{
 			CurrentFrameRect = this._frameDrawRects.First;
-			ParentSheet.DrawRectangle.X = (int)CurrentFrameRect.Value.X;
-			ParentSheet.DrawRectangle.Y = (int)CurrentFrameRect.Value.Y;
+			ParentSheet.DrawRectangle.X = (int)CurrentFrameRect.Value.XPos;
+			ParentSheet.DrawRectangle.Y = (int)CurrentFrameRect.Value.YPos;
 			ParentSheet.DrawRectangle.Width = (int)CurrentFrameRect.Value.Width;
 			ParentSheet.DrawRectangle.Height = (int)CurrentFrameRect.Value.Height;
-			_drawRectangle.X = (int)CurrentFrameRect.Value.X;
-			_drawRectangle.Y = (int)CurrentFrameRect.Value.Y;
+			_drawRectangle.X = (int)CurrentFrameRect.Value.XPos;
+			_drawRectangle.Y = (int)CurrentFrameRect.Value.YPos;
 			_drawRectangle.Width = (int)CurrentFrameRect.Value.Width;
 			_drawRectangle.Height = (int)CurrentFrameRect.Value.Height;
 		}
@@ -220,12 +249,12 @@ namespace BixBite.Rendering
 				else bLoopFinished = false;
 
 				CurrentFrameRect = (CurrentFrameRect.Next == null ? _frameDrawRects.First : CurrentFrameRect.Next);
-				ParentSheet.DrawRectangle.X = (int)CurrentFrameRect.Value.X;
-				ParentSheet.DrawRectangle.Y = (int)CurrentFrameRect.Value.Y;
+				ParentSheet.DrawRectangle.X = (int)CurrentFrameRect.Value.XPos;
+				ParentSheet.DrawRectangle.Y = (int)CurrentFrameRect.Value.YPos;
 				ParentSheet.DrawRectangle.Width = (int)CurrentFrameRect.Value.Width;
 				ParentSheet.DrawRectangle.Height = (int)CurrentFrameRect.Value.Height;
-				_drawRectangle.X = (int)CurrentFrameRect.Value.X;
-				_drawRectangle.Y = (int)CurrentFrameRect.Value.Y;
+				_drawRectangle.X = (int)CurrentFrameRect.Value.XPos;
+				_drawRectangle.Y = (int)CurrentFrameRect.Value.YPos;
 				_drawRectangle.Width = (int)CurrentFrameRect.Value.Width;
 				_drawRectangle.Height = (int)CurrentFrameRect.Value.Height;
 

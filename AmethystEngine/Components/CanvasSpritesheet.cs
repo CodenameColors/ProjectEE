@@ -226,6 +226,8 @@ namespace AmethystEngine.Components
 										imageProperty.Y = int.Parse(reader.GetAttribute("Y") ?? "0"); // fallback
 										imageProperty.W = int.Parse(reader.GetAttribute("W") ?? "0"); // fallback
 										imageProperty.H = int.Parse(reader.GetAttribute("H") ?? "0"); // fallback
+										imageProperty.RX = int.Parse(reader.GetAttribute("RX") ?? "0"); // fallback
+										imageProperty.RY = int.Parse(reader.GetAttribute("RY") ?? "0"); // fallback
 										imageProperty.CropX = int.Parse(reader.GetAttribute("CX") ?? "0"); // fallback
 										imageProperty.CropY = int.Parse(reader.GetAttribute("CY") ?? "0"); // fallback
 										imageProperty.ImageLocation = (reader.GetAttribute("Path") ?? ""); // fallback
@@ -288,6 +290,8 @@ namespace AmethystEngine.Components
 						writer.WriteAttributeString(null, "Y", null, imgpProperty.Y.ToString());
 						writer.WriteAttributeString(null, "W", null, imgpProperty.W.ToString());
 						writer.WriteAttributeString(null, "H", null, imgpProperty.H.ToString());
+						writer.WriteAttributeString(null, "RX", null, imgpProperty.RX.ToString());
+						writer.WriteAttributeString(null, "RY", null, imgpProperty.RY.ToString());
 						writer.WriteAttributeString(null, "CX", null, imgpProperty.CropX.ToString());
 						writer.WriteAttributeString(null, "CY", null, imgpProperty.CropY.ToString());
 						writer.WriteAttributeString(null, "Path", null, imgpProperty.ImageLocation.ToString());

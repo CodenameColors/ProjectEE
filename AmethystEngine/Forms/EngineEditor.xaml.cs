@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -39,6 +40,7 @@ using NodeEditor;
 using NodeEditor.Components;
 using NodeEditor.Components.Arithmetic;
 using NodeEditor.Components.Logic;
+using Brushes = System.Windows.Media.Brushes;
 using Button = System.Windows.Controls.Button;
 using CanvasImageProperties = AmethystEngine.Components.CanvasImageProperties;
 using CheckBox = System.Windows.Controls.CheckBox;
@@ -50,6 +52,7 @@ using Cursors = System.Windows.Input.Cursors;
 using DragEventArgs = System.Windows.DragEventArgs;
 using GameImage = BixBite.Rendering.UI.Image.GameImage;
 using HorizontalAlignment = System.Windows.HorizontalAlignment;
+using Image = System.Windows.Controls.Image;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Label = System.Windows.Controls.Label;
 using ListBox = System.Windows.Controls.ListBox;
@@ -59,9 +62,12 @@ using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Point = System.Windows.Point;
 using Rectangle = System.Windows.Shapes.Rectangle;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
+using Size = System.Windows.Size;
 using TabControl = System.Windows.Controls.TabControl;
 using TextBox = System.Windows.Controls.TextBox;
 using TreeView = System.Windows.Controls.TreeView;
+using System.Windows.Interop;
+using System.Drawing.Imaging;
 
 namespace AmethystEngine.Forms
 {
@@ -441,6 +447,9 @@ namespace AmethystEngine.Forms
 			SetupPreviewAnimationThread_CE();
 			SetupSelectedAnimationThread();
 
+			// Set up the tab control
+			AE_CurrentAnimSM_Grid.Visibility = Visibility.Hidden;
+			AE_NewAnimSM_MainGrid.Visibility = Visibility.Visible;
 
 		}
 
@@ -6775,6 +6784,42 @@ namespace AmethystEngine.Forms
 
 		}
 
+		private Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)
+		{
+			// BitmapImage bitmapImage = new BitmapImage(new Uri("../Images/test.png", UriKind.Relative));
+
+			using (MemoryStream outStream = new MemoryStream())
+			{
+				BitmapEncoder enc = new BmpBitmapEncoder();
+				enc.Frames.Add(BitmapFrame.Create(bitmapImage));
+				enc.Save(outStream);
+				System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(outStream);
+
+				return new Bitmap(bitmap);
+			}
+		}
+
+		public BitmapImage ToBitmapImage(Bitmap bitmap)
+		{
+			using (var memory = new MemoryStream())
+			{
+				bitmap.SetResolution(96.0f, 96.0f);
+				bitmap.Save(memory, ImageFormat.Png);
+				memory.Position = 0;
+
+				var bitmapImage = new BitmapImage();
+				bitmapImage.BeginInit();
+				bitmapImage.StreamSource = memory;
+				bitmapImage.DecodePixelWidth = bitmap.Width;
+				bitmapImage.DecodePixelHeight = bitmap.Height;
+				bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+				bitmapImage.EndInit();
+				bitmapImage.Freeze();
+
+				return bitmapImage;
+			}
+		}
+
 		private void ImportNewSpriteSheetFile_BTN(object sender, RoutedEventArgs e)
 		{
 			String filename = "";
@@ -6803,12 +6848,18 @@ namespace AmethystEngine.Forms
 			NewAnimimationStatemachineTotalWidth = tempCanvasSpritesheet.Width;
 			NewAnimimationStatemachineTotalHeight = tempCanvasSpritesheet.Height;
 
+			Image img = new Image();
 			BitmapImage bmi = new BitmapImage();
 
 			bmi.BeginInit();
 			bmi.CacheOption = BitmapCacheOption.OnLoad;
 			bmi.UriSource = new Uri(NewAnimimationStatemachineLocation, UriKind.Absolute);
 			bmi.EndInit();
+			Bitmap pain = BitmapImage2Bitmap(bmi);
+			pain.SetResolution(96.0f, 96.0f);
+			bmi = ToBitmapImage(pain);
+			img.Source = bmi;
+
 			CurrentSpriteSheet_Image = bmi;
 
 			bNewAnimStateMachine = true;
@@ -6828,8 +6879,8 @@ namespace AmethystEngine.Forms
 				foreach (CanvasImageProperties canvasImageProperties in canvasAnimation.CanvasFrames)
 				{
 					CurrentActiveSpriteSheet.SpriteAnimations.Last().Value.FrameDrawRects.AddLast(
-						new LinkedListNode<Rect>(new Rect(canvasImageProperties.X, canvasImageProperties.Y,
-							canvasImageProperties.W, canvasImageProperties.H)));
+						new LinkedListNode<FrameInfo>(new FrameInfo(canvasImageProperties.X, canvasImageProperties.Y,
+							canvasImageProperties.W, canvasImageProperties.H, canvasImageProperties.RX, canvasImageProperties.RY)));
 				}
 				
 			}
@@ -6931,8 +6982,8 @@ namespace AmethystEngine.Forms
 
 
 												var crop = new CroppedBitmap(bmp, new Int32Rect(
-													(int)currentSpriteAnimation.CurrentFrameRect.Value.X,
-													(int)currentSpriteAnimation.CurrentFrameRect.Value.Y,
+													(int)currentSpriteAnimation.CurrentFrameRect.Value.XPos,
+													(int)currentSpriteAnimation.CurrentFrameRect.Value.YPos,
 													(int)currentSpriteAnimation.CurrentFrameRect.Value.Width, (int)currentSpriteAnimation.CurrentFrameRect.Value.Height));
 												// using BitmapImage version to prove its created successfully
 												(vimg as Image).Source = crop;
@@ -7010,8 +7061,8 @@ namespace AmethystEngine.Forms
 					bmi.UriSource = new Uri(NewAnimimationStatemachineLocation, UriKind.Absolute);
 					bmi.EndInit();
 
-					var crop = new CroppedBitmap(bmi, new Int32Rect((int)currentSpriteAnimation.CurrentFrameRect.Value.X,
-						(int)currentSpriteAnimation.CurrentFrameRect.Value.Y,
+					var crop = new CroppedBitmap(bmi, new Int32Rect((int)currentSpriteAnimation.CurrentFrameRect.Value.XPos,
+						(int)currentSpriteAnimation.CurrentFrameRect.Value.YPos,
 						(int)currentSpriteAnimation.CurrentFrameRect.Value.Width, (int)currentSpriteAnimation.CurrentFrameRect.Value.Height));
 					// using BitmapImage version to prove its created successfully
 					(v as Image).Source = crop;
@@ -7027,8 +7078,8 @@ namespace AmethystEngine.Forms
 
 					var crop2 = new CroppedBitmap(bmi,
 						new Int32Rect(
-							(int)currentSpriteAnimation.CurrentFrameRect.Value.X,
-							(int)currentSpriteAnimation.CurrentFrameRect.Value.Y,
+							(int)currentSpriteAnimation.CurrentFrameRect.Value.XPos,
+							(int)currentSpriteAnimation.CurrentFrameRect.Value.YPos,
 							(int)currentSpriteAnimation.CurrentFrameRect.Value.Width,
 							(int)currentSpriteAnimation.CurrentFrameRect.Value.Height
 							));
@@ -7129,11 +7180,19 @@ namespace AmethystEngine.Forms
 
 			SceneExplorer_TreeView.ItemsSource = ActiveSpriteSheets;
 
+			Image img = new Image();
 			BitmapImage bmi = new BitmapImage();
+
 			bmi.BeginInit();
 			bmi.CacheOption = BitmapCacheOption.OnLoad;
 			bmi.UriSource = new Uri(NewAnimimationStatemachineLocation, UriKind.Absolute);
 			bmi.EndInit();
+			Bitmap pain = BitmapImage2Bitmap(bmi);
+			pain.SetResolution(96.0f, 96.0f);
+			bmi = ToBitmapImage(pain);
+			img.Source = bmi;
+
+			CurrentSpriteSheet_Image = bmi;
 
 			int count = 0; 
 			foreach (var spriteanim in tempsSpriteAnimations)
@@ -7166,8 +7225,8 @@ namespace AmethystEngine.Forms
 
 				
 				var crop = new CroppedBitmap(bmi, new Int32Rect(
-					(int)spriteanim.CurrentFrameRect.Value.X,
-					(int)spriteanim.CurrentFrameRect.Value.Y,
+					(int)spriteanim.CurrentFrameRect.Value.XPos,
+					(int)spriteanim.CurrentFrameRect.Value.YPos,
 					(int)spriteanim.CurrentFrameRect.Value.Width,
 					(int)spriteanim.CurrentFrameRect.Value.Height
 					));
@@ -7181,7 +7240,7 @@ namespace AmethystEngine.Forms
 
 			}
 
-			CurrentSpriteSheet_Image = bmi;
+			// CurrentSpriteSheet_Image = bmi;
 
 			//dummy binding force because 2 years ago me was DUMB
 			SceneExplorer_TreeView.ItemsSource = ActiveSpriteSheets;
@@ -7328,8 +7387,8 @@ namespace AmethystEngine.Forms
 
 					CurrentAnimPreviewImages_CE.Add(
 						(new CroppedBitmap(CurrentSpriteSheet_Image, new Int32Rect(
-							(int)spriteanim.CurrentFrameRect.Value.X,
-							(int)spriteanim.CurrentFrameRect.Value.Y,
+							(int)spriteanim.CurrentFrameRect.Value.XPos,
+							(int)spriteanim.CurrentFrameRect.Value.YPos,
 							(int)spriteanim.CurrentFrameRect.Value.Width,
 							(int)spriteanim.CurrentFrameRect.Value.Height
 							))));
@@ -7410,7 +7469,8 @@ namespace AmethystEngine.Forms
 
 		}
 
-		//Called on Load, so this always happens
+		// Called on Load, so this always happens
+		// Used to run the animation preview on the canvas
 		private void SetupSelectedAnimationThread()
 		{
 			selectedAnimThread_CE = new Thread(() =>
@@ -7440,7 +7500,6 @@ namespace AmethystEngine.Forms
 									int? frame = CurrentBaseLayerAnimation_Img?.Tag as int?;
 									if (frame != null)
 									{
-										CurrentBaseLayerAnimation_Img.Source = CurrentSelectedAnimImages_List[(int) frame - 1];
 
 										if (frame == CurrentlySelectedAnimation.FrameCount)
 										{
@@ -7451,8 +7510,45 @@ namespace AmethystEngine.Forms
 											frame++;
 										}
 
+										// CurrentBaseLayerAnimation_Img.Source = CurrentSelectedAnimImages_List[(int) frame - 1];
+										AnimationEditor_Canvas.Children.Remove(CurrentBaseLayerAnimation_Img);
+										CurrentBaseLayerAnimation_Img = new Image();
+										CurrentBaseLayerAnimation_Img.Source = CurrentSelectedAnimImages_List[(int)frame - 1];
+										CurrentBaseLayerAnimation_Img.Stretch = Stretch.Fill;
+										CurrentBaseLayerAnimation_Img.Width = CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].Width;
+										CurrentBaseLayerAnimation_Img.MaxWidth = CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].Width;
+										CurrentBaseLayerAnimation_Img.Height = CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].Height;
+										CurrentBaseLayerAnimation_Img.MaxHeight = CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].Height;
+										CurrentBaseLayerAnimation_Img.StretchDirection = StretchDirection.Both;
+										AnimationEditor_Canvas.Children.Add(CurrentBaseLayerAnimation_Img);
+										CurrentBaseLayerAnimation_Img.UpdateLayout();
+										AnimationEditor_Canvas.UpdateLayout();
+
+
 										CurrentBaseLayerAnimation_Img.Tag = frame;
 										CurrentActiveAnimationCurrentFrame_TB.Text = frame.ToString();
+
+										int middleX = (int) (AnimationEditor_BackCanvas.ActualWidth / 2.0f);
+										int middleY = (int) (AnimationEditor_BackCanvas.ActualHeight / 2.0f);
+										int newX = middleX - CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].RenderPointX;
+										//newX = newX + ((CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int) frame) - 1].Width -
+										//                (int) CurrentBaseLayerAnimation_Img.ActualWidth) / 2);
+
+										int newY = middleY - CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].RenderPointY;
+										//newY = newY + ((CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int) frame) - 1].Height -
+										//                (int) CurrentBaseLayerAnimation_Img.Height) / 2);
+										//Canvas.SetLeft(CurrentBaseLayerAnimation_Img, middleX - ((int)(CurrentBaseLayerAnimation_Img.ActualWidth/ 2.0f)));
+										//Canvas.SetTop(CurrentBaseLayerAnimation_Img, middleY - ((int)(CurrentBaseLayerAnimation_Img.ActualHeight/ 2.0f)));
+
+										Canvas.SetLeft(CurrentBaseLayerAnimation_Img, newX);
+										Canvas.SetTop(CurrentBaseLayerAnimation_Img, newY);
+
+										Console.WriteLine(String.Format("w:{0}, h:{1} newX:{2}, newY:{3} | iWidth:{4}, iHeight:{5}, mx:{6}, my:{7}, FRAME:{8}" ,
+											CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].Width,
+											CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].Height,
+											newX, newY, (int)CurrentBaseLayerAnimation_Img.ActualWidth, (int)CurrentBaseLayerAnimation_Img.ActualHeight,
+											middleX, middleY, frame-1));
+
 									}
 
 
@@ -7754,6 +7850,41 @@ namespace AmethystEngine.Forms
 
 		}
 
+		public BitmapSource ChangeDpi(BitmapSource source, double dpiX, double dpiY)
+		{
+			var dpiTransform = new TransformedBitmap(source, new ScaleTransform(dpiX / 96, dpiY / 96));
+			return dpiTransform;
+		}
+
+		private BitmapImage ChangeImageDpi(BitmapImage sourceImage, double newDpiX, double newDpiY)
+{
+    var bitmapFrame = BitmapFrame.Create(sourceImage);
+    var metadata = (BitmapMetadata)bitmapFrame.Metadata.Clone();
+
+    // Update the DPI values in the metadata
+    metadata.SetQuery("/app1/ifd/{ushort=282}", newDpiX);
+    metadata.SetQuery("/app1/ifd/{ushort=283}", newDpiY);
+
+    var encoder = new JpegBitmapEncoder();
+    encoder.Frames.Add(BitmapFrame.Create(bitmapFrame, bitmapFrame.Thumbnail, metadata, bitmapFrame.ColorContexts));
+
+    // Create a new MemoryStream to hold the encoded image data
+    using (var memoryStream = new MemoryStream())
+    {
+        // Save the encoded image data to the MemoryStream
+        encoder.Save(memoryStream);
+
+        // Create a new BitmapImage from the MemoryStream
+        var newImage = new BitmapImage();
+        newImage.BeginInit();
+        newImage.CacheOption = BitmapCacheOption.OnLoad;
+        newImage.StreamSource = new MemoryStream(memoryStream.ToArray());
+        newImage.EndInit();
+
+        return newImage;
+    }
+}
+
 		private void ChangeActiveSpriteSheet_TVI_Click(object sender, MouseButtonEventArgs e)
 		{
 			AnimationSelected_Stopwatch.Stop();
@@ -7775,6 +7906,7 @@ namespace AmethystEngine.Forms
 				bmi.BeginInit();
 				bmi.CacheOption = BitmapCacheOption.OnLoad;
 				bmi.UriSource = new Uri(CurrentActiveSpriteSheet.ImgPathLocation, UriKind.Absolute);
+				
 				bmi.EndInit();
 				CurrentSpriteSheet_Image = bmi;
 
@@ -7843,10 +7975,10 @@ namespace AmethystEngine.Forms
 
 					CurrentSelectedAnimImages_List.Add(
 						(new CroppedBitmap(CurrentSpriteSheet_Image, new Int32Rect(
-							(int)item.CurrentFrameRect.Value.X,
-							(int)item.CurrentFrameRect.Value.Y,
-							(int)item.CurrentFrameRect.Value.Width,
-							(int)item.CurrentFrameRect.Value.Height
+							(int)item.FrameDrawRects.ToList()[i].XPos,
+							(int)item.FrameDrawRects.ToList()[i].YPos,
+							(int)item.FrameDrawRects.ToList()[i].Width,
+							(int)item.FrameDrawRects.ToList()[i].Height
 							))));
 					item.CurrentFrameRect = item.CurrentFrameRect.Next;
 				}
@@ -7867,6 +7999,19 @@ namespace AmethystEngine.Forms
 			AnimationAudioEvents_Properties_Tree.ItemsSource = CurrentlySelectedAnimation.GetAnimationEvents().FindAll(x => x is AudioEvent); 
 
 		}
+
+		public static BitmapSource ConvertBitmapTo96DPI(BitmapImage bitmapImage)
+{
+    double dpi = 96;
+    int width = bitmapImage.PixelWidth;
+    int height = bitmapImage.PixelHeight;
+
+    int stride = width * bitmapImage.Format.BitsPerPixel;
+    byte[] pixelData = new byte[stride * height];
+    bitmapImage.CopyPixels(pixelData, stride, 0);
+
+    return BitmapSource.Create(width, height, dpi, dpi, bitmapImage.Format, null, pixelData, stride);
+}
 
 		private void Thumbnail_OnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
@@ -8053,8 +8198,8 @@ namespace AmethystEngine.Forms
 						item = CurrentActiveSpriteSheet.SpriteAnimations[(sp.DataContext as ChangeAnimationEvent).FromAnimationName];
 					}
 					var crop = new CroppedBitmap(bmp, new Int32Rect(
-						(int)item.CurrentFrameRect.Value.X,
-						(int)item.CurrentFrameRect.Value.Y,
+						(int)item.CurrentFrameRect.Value.XPos,
+						(int)item.CurrentFrameRect.Value.YPos,
 						(int)item.CurrentFrameRect.Value.Width,
 						(int)item.CurrentFrameRect.Value.Height
 						));
@@ -8098,8 +8243,8 @@ namespace AmethystEngine.Forms
 
 					CurrentAnimPreviewImages_CE.Add(
 						(new CroppedBitmap(bmi, new Int32Rect(
-							(int)animval.CurrentFrameRect.Value.X,
-							(int)animval.CurrentFrameRect.Value.Y,
+							(int)animval.CurrentFrameRect.Value.XPos,
+							(int)animval.CurrentFrameRect.Value.YPos,
 							(int)animval.CurrentFrameRect.Value.Width,
 							(int)animval.CurrentFrameRect.Value.Height
 							))));
@@ -8134,8 +8279,8 @@ namespace AmethystEngine.Forms
 
 					CurrentAnimPreviewImages_CE.Add(
 						(new CroppedBitmap(CurrentSpriteSheet_Image, new Int32Rect(
-							(int)animval.CurrentFrameRect.Value.X,
-							(int)animval.CurrentFrameRect.Value.Y,
+							(int)animval.CurrentFrameRect.Value.XPos,
+							(int)animval.CurrentFrameRect.Value.YPos,
 							(int)animval.CurrentFrameRect.Value.Width,
 							(int)animval.CurrentFrameRect.Value.Height
 						))));
@@ -8297,8 +8442,8 @@ namespace AmethystEngine.Forms
 					bmp.EndInit();
 
 					var crop = new CroppedBitmap(bmp, new Int32Rect(
-						(int)item.CurrentFrameRect.Value.X,
-						(int)item.CurrentFrameRect.Value.Y,
+						(int)item.CurrentFrameRect.Value.XPos,
+						(int)item.CurrentFrameRect.Value.YPos,
 						(int)item.CurrentFrameRect.Value.Width,
 						(int)item.CurrentFrameRect.Value.Height
 					));
@@ -8396,8 +8541,10 @@ namespace AmethystEngine.Forms
 					SpritesheetEditor_CropImage.updateSizeLocation_Hook += UpdateSizeLocationHook_FrameInfo;
 				if (SpritesheetEditor_CropImage.updateCropLocation_Hook == null)
 					SpritesheetEditor_CropImage.updateCropLocation_Hook += UpdateCropLocationHook_FrameInfo;
+				if (SpritesheetEditor_CropImage.setRenderPoint_Hook == null)
+					SpritesheetEditor_CropImage.setRenderPoint_Hook += UpdateRenderPointLocationHook_FrameInfo;
 
-				var imageControls = SpritesheetEditor_Canvas.Children.OfType<Border>().ToList();
+					var imageControls = SpritesheetEditor_Canvas.Children.OfType<Border>().ToList();
 				SpritesheetEditor_BackCanvas.Width = CurrentSelectedSpriteSheet.Width;
 				SpritesheetEditor_BackCanvas.Height = CurrentSelectedSpriteSheet.Height;
 				SpritesheetEditor_Canvas.Width = CurrentSelectedSpriteSheet.Width;
@@ -8792,6 +8939,8 @@ namespace AmethystEngine.Forms
 						SpritesheetEditor_CropImage.updateSizeLocation_Hook += UpdateSizeLocationHook_FrameInfo;
 					if (SpritesheetEditor_CropImage.updateCropLocation_Hook == null)
 						SpritesheetEditor_CropImage.updateCropLocation_Hook += UpdateCropLocationHook_FrameInfo;
+					if (SpritesheetEditor_CropImage.setRenderPoint_Hook == null)
+						SpritesheetEditor_CropImage.setRenderPoint_Hook += UpdateRenderPointLocationHook_FrameInfo;
 
 					SpritesheetEditor_CropImage.Focus();
 
@@ -8820,6 +8969,17 @@ namespace AmethystEngine.Forms
 			{
 				foundFrame.CropX = (int)(cx);
 				foundFrame.CropY = (int)(cy);
+			}
+		}
+
+		private void UpdateRenderPointLocationHook_FrameInfo(int x, int y)
+		{
+			Console.WriteLine(String.Format("X:{0}, Y:{1}", x, y));
+			CanvasImageProperties foundFrame = FindCanvasFrame(SpritesheetEditor_CropImage);
+			if (foundFrame != null)
+			{
+				foundFrame.RX = x;
+				foundFrame.RY = y;
 			}
 		}
 
