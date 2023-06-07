@@ -267,7 +267,7 @@
     <Compile Include="Components\PropertyBag.cs" />
     <Compile Include="Components\Tools\Cuprite.cs" />
     <Compile Include="DesignerItemDecorator.cs" />
-    <Compile Include="Forms\AddCharacterForm.xaml.cs">
+    <Compile Include="Forms\AddCharacterForm.xaml.cs"> 
       <DependentUpon>AddCharacterForm.xaml</DependentUpon>
     </Compile>
     <Compile Include="Forms\AddEditAnimationStateMachine.xaml.cs">
