@@ -13,8 +13,12 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using BixBite.Rendering.UI.Button;
+using BixBite.Rendering.UI.TextBlock;
 using NodeEditor;
 using NodeEditor.Components;
+using Camera = BixBite.Rendering.Camera;
+using Map = BixBite.Rendering.Map;
 
 namespace ProjectE_E
 {
@@ -31,14 +35,14 @@ namespace ProjectE_E
 		Player Player;
 		Camera camera;
 
-		private List<UIComponent> _uiComponents;
-		private UIComponent Debug_LogBlock;
-		private GameUI TestGameUIFromEngine;
+		private List<BaseUIComponent> _uiComponents;
+		private BaseUIComponent Debug_LogBlock;
+		private BaseUIComponent TestGameUIFromEngine;
 
 		string MainLevelPath = "";
 		private Color _backgroundColour;
 
-		private List<UIComponent> dialoguechoicebtns= new List<UIComponent>();
+		private List<BaseUIComponent> dialoguechoicebtns= new List<BaseUIComponent>();
 
 		private DialogueNodeBlock curDiaBlock;
 
@@ -95,7 +99,7 @@ namespace ProjectE_E
 			map = new Map();
 			C_map = new Map();
 			Player = new Player();
-			TestGameUIFromEngine = GameUI.ImportGameUI("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\UI\\EE_right.UI");
+			TestGameUIFromEngine = BaseUI.ImportBaseUI("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\UI\\EE_right.UI");
 
 			//Dialogue choice testing
 			diaTestBlock_choices1 = new DialogueNodeBlock("Emma", true);
@@ -165,7 +169,7 @@ namespace ProjectE_E
 
 
 			//TestSprite.setTexture(t); //set the image.
-			Tile.Content = this.Content;
+			BixBite.Rendering.Tile.Content = this.Content;
 
 			camera = new Camera(GraphicsDevice.Viewport);
 			
@@ -189,70 +193,70 @@ namespace ProjectE_E
 
 
 
-			//UI TESTING STARTS HEREE
-			var randomButton = new GameButton(Content.Load<Texture2D>("Images/Button"), Content.Load<SpriteFont>("Fonts/File"))
-			{
-				Position = new Vector2(350, 800),
-				Text = "Random",
-			};
+			////UI TESTING STARTS HEREE
+			//var randomButton = new GameButton(Content.Load<Texture2D>("Images/Button"), Content.Load<SpriteFont>("Fonts/File"))
+			//{
+			//	Position = new Vector2(350, 800),
+			//	Text = "Random",
+			//};
 
-			randomButton.Click += RandomButton_Click;
+			//randomButton.Click += RandomButton_Click;
 
-			var quitButton = new GameButton(Content.Load<Texture2D>("Images/Button"), Content.Load<SpriteFont>("Fonts/File"))
-			{
-				Position = new Vector2(350, 850),
-				Text = "Quit",
-			};
+			//var quitButton = new GameButton(Content.Load<Texture2D>("Images/Button"), Content.Load<SpriteFont>("Fonts/File"))
+			//{
+			//	Position = new Vector2(350, 850),
+			//	Text = "Quit",
+			//};
 
-			quitButton.Click += QuitButton_Click;
+			//quitButton.Click += QuitButton_Click;
 
-			_uiComponents = new List<UIComponent>()
-			{
-				randomButton,
-				quitButton,
-			};
+			//_uiComponents = new List<UIComponent>()
+			//{
+			//	randomButton,
+			//	quitButton,
+			//};
 
-			var tbtest = new GameTextBlock("LogTextblock", 500, 30, 0, 0, 1, "#00000000", "testing");
-			tbtest._font = Content.Load<SpriteFont>("Fonts/File");
-			tbtest.PenColour = Color.Blue;
-			Debug_LogBlock = (tbtest);
+			//var tbtest = new GameTextBlock("LogTextblock", 500, 30, 0, 0, 1, "#00000000", "testing");
+			//tbtest._font = Content.Load<SpriteFont>("Fonts/File");
+			//tbtest.PenColour = Color.Blue;
+			//Debug_LogBlock = (tbtest);
 
 
-			foreach (GameUI gameUi in TestGameUIFromEngine.UIElements)
-			{
-				if (gameUi is GameTextBlock GTB)
-				{
-					GTB._font = Content.Load<SpriteFont>("Fonts/File");
-					GTB.Position = new Vector2(350, 400);
-					GTB.graphicsDevice = GraphicsDevice;
-					GTB.SetUITexture(); //set the current desired texture to be drawn on draw/update
-				}
-				else if (gameUi is GameIMG GIMG)
-				{
-					GIMG.Position = new Vector2(350, 450);
-					GIMG.SetGraphicsDeviceRef(GraphicsDevice);
-					GIMG.SetUITexture(); //set the current desired texture to be drawn on draw/update
-				}
-				_uiComponents.Add(gameUi);
-			}
+			//foreach (GameUI gameUi in TestGameUIFromEngine.UIElements)
+			//{
+			//	if (gameUi is GameTextBlock GTB)
+			//	{
+			//		GTB._font = Content.Load<SpriteFont>("Fonts/File");
+			//		GTB.Position = new Vector2(350, 400);
+			//		GTB.graphicsDevice = GraphicsDevice;
+			//		GTB.SetUITexture(); //set the current desired texture to be drawn on draw/update
+			//	}
+			//	else if (gameUi is GameIMG GIMG)
+			//	{
+			//		GIMG.Position = new Vector2(350, 450);
+			//		GIMG.SetGraphicsDeviceRef(GraphicsDevice);
+			//		GIMG.SetUITexture(); //set the current desired texture to be drawn on draw/update
+			//	}
+			//	_uiComponents.Add(gameUi);
+			//}
 			// TODO: use this.Content to load your game content here
 
-			((GameTextBlock)_uiComponents.First(x => x is GameTextBlock)).Text = diaTestBlock_1.DialogueTextOptions[0];
+			//((GameTextBlock)_uiComponents.First(x => x is GameTextBlock)).Text = diaTestBlock_1.DialogueTextOptions[0];
 
 			//C_map.level = Level.ImportLevel("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\Levels\\LevelChangeTestNew.lvl");
 		}
 
-		private void QuitButton_Click(object sender, System.EventArgs e)
-		{
-			Exit();
-		}
+		//private void QuitButton_Click(object sender, System.EventArgs e)
+		//{
+		//	Exit();
+		//}
 
-		private void RandomButton_Click(object sender, System.EventArgs e)
-		{
-			var random = new Random();
+		//private void RandomButton_Click(object sender, System.EventArgs e)
+		//{
+		//	var random = new Random();
 
-			_backgroundColour = new Color(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255));
-		}
+		//	_backgroundColour = new Color(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255));
+		//}
 
 
 
@@ -331,14 +335,14 @@ namespace ProjectE_E
 			//	System.Console.WriteLine("M DOWN");
 			//}
 
-			foreach (UIComponent ui in _uiComponents)
-			{
-				ui.Update(gameTime);
-			}
-			foreach (UIComponent ui in dialoguechoicebtns)
-			{
-				ui.Update(gameTime);
-			}
+			//foreach (UIComponent ui in _uiComponents)
+			//{
+			//	ui.Update(gameTime);
+			//}
+			//foreach (UIComponent ui in dialoguechoicebtns)
+			//{
+			//	ui.Update(gameTime);
+			//}
 
 
 			if (Keyboard.GetState().IsKeyDown(Keys.Q))
@@ -360,27 +364,27 @@ namespace ProjectE_E
 
 			//we are going to assume i want these dialogue choices to be displayed in the center
 			//create some buttons
-			for (int i = 0; i < numofchoices; i++)
-			{
-				GameButton tempbtn = new GameButton(
-					Content.Load<Texture2D>("Images/Button"), Content.Load<SpriteFont>("Fonts/File"))
-				{
-					Position = new Vector2(
-						drawAreaRectangle.X + (drawAreaRectangle.Width / 2),
-						drawAreaRectangle.Y + ((drawAreaRectangle.Height / 2)) + ((buttonspacing + 30) * i)),
-					Text = diablock.DialogueTextOptions[i]
-				};
-				tempbtn.Click += (object sender, EventArgs e) =>
-				{
-					((GameTextBlock)_uiComponents.First(x => x is GameTextBlock)).Text = (curDiaBlock as DialogueNodeBlock)?.DialogueTextOptions[dialoguechoicebtns.IndexOf(sender as GameButton)];
-					((GameIMG)_uiComponents.First(x => x is GameIMG)).SetProperty("Image", "C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\Images\\PC_girl\\listening_right.PNG");
-					((GameIMG)_uiComponents.First(x => x is GameIMG)).SetUITexture();
-					(curDiaBlock as DialogueNodeBlock).ChoiceVar = dialoguechoicebtns.IndexOf(sender as GameButton);
-					Console.WriteLine("Choose Option:{0}", dialoguechoicebtns.IndexOf(sender as GameButton));
-				};
-				dialoguechoicebtns.Add(tempbtn);
+			//for (int i = 0; i < numofchoices; i++)
+			//{
+			//	GameButton tempbtn = new GameButton(
+			//		Content.Load<Texture2D>("Images/Button"), Content.Load<SpriteFont>("Fonts/File"))
+			//	{
+			//		Position = new Vector2(
+			//			drawAreaRectangle.X + (drawAreaRectangle.Width / 2),
+			//			drawAreaRectangle.Y + ((drawAreaRectangle.Height / 2)) + ((buttonspacing + 30) * i)),
+			//		Text = diablock.DialogueTextOptions[i]
+			//	};
+			//	tempbtn.Click += (object sender, EventArgs e) =>
+			//	{
+			//		((GameTextBlock)_uiComponents.First(x => x is GameTextBlock)).Text = (curDiaBlock as DialogueNodeBlock)?.DialogueTextOptions[dialoguechoicebtns.IndexOf(sender as GameButton)];
+			//		((GameIMG)_uiComponents.First(x => x is GameIMG)).SetProperty("Image", "C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\Images\\PC_girl\\listening_right.PNG");
+			//		((GameIMG)_uiComponents.First(x => x is GameIMG)).SetUITexture();
+			//		(curDiaBlock as DialogueNodeBlock).ChoiceVar = dialoguechoicebtns.IndexOf(sender as GameButton);
+			//		Console.WriteLine("Choose Option:{0}", dialoguechoicebtns.IndexOf(sender as GameButton));
+			//	};
+			//	dialoguechoicebtns.Add(tempbtn);
 				
-			}
+			//}
 
 
 		}
@@ -441,18 +445,18 @@ namespace ProjectE_E
 				map.Draw(spriteBatch);
 			Player.Draw(gameTime ,spriteBatch);
 
-			foreach (UIComponent ui in _uiComponents)
-			{
-				ui.Draw(gameTime, spriteBatch); //draw UI to screen. BUT it doesn't handle events!
-			}
+			//foreach (UIComponent ui in _uiComponents)
+			//{
+			//	ui.Draw(gameTime, spriteBatch); //draw UI to screen. BUT it doesn't handle events!
+			//}
 
-			foreach (UIComponent ui in dialoguechoicebtns)
-			{
-				ui.Draw(gameTime, spriteBatch); //draw UI to screen. BUT it doesn't handle events!
-			}
-			if(Debug_LogBlock != null)
-				Debug_LogBlock.Draw(gameTime, spriteBatch);
-			//TestGameUIFromEngine.Draw(gameTime, spriteBatch);
+			//foreach (UIComponent ui in dialoguechoicebtns)
+			//{
+			//	ui.Draw(gameTime, spriteBatch); //draw UI to screen. BUT it doesn't handle events!
+			//}
+			//if(Debug_LogBlock != null)
+			//	Debug_LogBlock.Draw(gameTime, spriteBatch);
+			////TestGameUIFromEngine.Draw(gameTime, spriteBatch);
 
 			spriteBatch.End();
 			base.Draw(gameTime);
