@@ -68,6 +68,7 @@ using TextBox = System.Windows.Controls.TextBox;
 using TreeView = System.Windows.Controls.TreeView;
 using System.Windows.Interop;
 using System.Drawing.Imaging;
+using System.Windows.Media.Converters;
 
 namespace AmethystEngine.Forms
 {
@@ -8564,6 +8565,7 @@ namespace AmethystEngine.Forms
 					foreach (CanvasImageProperties frame in canvasAnimation.CanvasFrames)
 					{
 						Border parentBorder = CreateDashedLineBorder();
+						
 						Image image = new Image();
 						BitmapImage bitmap = new BitmapImage(new Uri(frame.ImageLocation));
 						CroppedBitmap croppedBitmap = new CroppedBitmap(bitmap, new Int32Rect(frame.CropX, frame.CropY, (int)frame.W, (int)frame.H));
@@ -8575,7 +8577,10 @@ namespace AmethystEngine.Forms
 						image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
 						image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
-						parentBorder.Child = image;
+						Canvas overlayCanvas = new Canvas() { Width = frame.W, Height = frame.H };
+						overlayCanvas.Children.Add(image);
+
+						parentBorder.Child = overlayCanvas;
 						frame.LinkedBorderImage = parentBorder;
 
 						SpritesheetEditor_Canvas.Children.Add(parentBorder);
@@ -8896,8 +8901,12 @@ namespace AmethystEngine.Forms
 							image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
 							image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
+
+							Canvas overlayCanvas = new Canvas() { Width = _baseImage.PixelWidth, Height = _baseImage.PixelHeight };
+							overlayCanvas.Children.Add(image);
+
 							Border parentBorder = CreateDashedLineBorder();
-							parentBorder.Child = image;
+							parentBorder.Child = overlayCanvas;
 
 							// First we need to find the current frame we linked to the crop control if there is one.
 							CanvasImageProperties foundFrame = FindCanvasFrame(SpritesheetEditor_CropImage);
@@ -9100,9 +9109,12 @@ namespace AmethystEngine.Forms
 					image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
 					image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
+					Canvas overlayCanvas = new Canvas() { Width = SpritesheetEditor_CropImage.Width, Height = SpritesheetEditor_CropImage.Height };
+					overlayCanvas.Children.Add(image);
+
 					// Create a border for the image
 					Border border = CreateDashedLineBorder();
-					border.Child = image;
+					border.Child = overlayCanvas;
 
 					// We need to find out what this croppable image is linked to!
 					CanvasImageProperties foundFrame = FindCanvasFrame(SpritesheetEditor_CropImage);
@@ -9210,7 +9222,7 @@ namespace AmethystEngine.Forms
 				SpritesheetEditor_CropImage.bHasFocus = true;
 				SpritesheetEditor_CropImage.Visibility = Visibility.Visible;
 
-				Border parentBorder = img.Parent as Border;
+				Border parentBorder = (img.Parent as Canvas).Parent as Border;
 				if(parentBorder != null)
 				{
 					// Get the image loaction, and set that to the cropper location

@@ -352,7 +352,7 @@ namespace BixBite.Rendering
 
 		public static bool ExportSpriteSheet(SpriteSheet desiredSheet, String filepath)
 		{
-			bool retbool = false;
+			bool retbool = false; 
 
 			XmlWriterSettings settings = new XmlWriterSettings
 			{

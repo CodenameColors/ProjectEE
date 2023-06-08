@@ -195,6 +195,9 @@
     <Compile Include="Tweening\Tweening.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="BuildScripts\BixbiteCopyForAmetheystEngine.py" />
+    <Content Include="BuildScripts\NodeEditorCopyFiles.py" />
+    <Content Include="BuildScripts\NodeEditorPatchFiles.py" />
     <Content Include="Resources\FMOD\x64\fmod.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -257,12 +260,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>C:\Users\Antonio\AppData\Local\Programs\Python\Python310\python.exe .\..\..\..\BuildScripts\NodeEditorCopyFiles.py py2exe
-
-C:\Users\Antonio\AppData\Local\Programs\Python\Python310\python.exe .\..\..\..\BuildScripts\BixbiteCopyForAmetheystEngine.py py2exe
-
-
-C:\Users\Antonio\AppData\Local\Programs\Python\Python310\python.exe .\..\..\..\BuildScripts\NodeEditorPatchFiles.py py2exe
-</PostBuildEvent>
+    <PostBuildEvent>
+      python .\..\..\BuildScripts\NodeEditorCopyFiles.py py2exe
+      python .\..\..\BuildScripts\BixbiteCopyForAmetheystEngine.py py2exe
+      python .\..\..\BuildScripts\NodeEditorPatchFiles.py py2exe
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
