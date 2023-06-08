@@ -267,7 +267,7 @@
     <Compile Include="Components\PropertyBag.cs" />
     <Compile Include="Components\Tools\Cuprite.cs" />
     <Compile Include="DesignerItemDecorator.cs" />
-    <Compile Include="Forms\AddCharacterForm.xaml.cs"> 
+    <Compile Include="Forms\AddCharacterForm.xaml.cs">
       <DependentUpon>AddCharacterForm.xaml</DependentUpon>
     </Compile>
     <Compile Include="Forms\AddEditAnimationStateMachine.xaml.cs">
@@ -461,6 +461,7 @@
     <Folder Include="Components\Bixbite_Windows_Build\Rendering\UI\Textbox\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\ImageCropper.dll" />
     <Resource Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\readme.txt" />
     <Content Include="Components\Bixbite_Windows_Build\bin\Debug\BixBite.dll" />
     <Content Include="Components\Bixbite_Windows_Build\bin\Debug\BixBite.pdb" />
