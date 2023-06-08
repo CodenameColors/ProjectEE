@@ -461,8 +461,12 @@
     <Folder Include="Components\Bixbite_Windows_Build\Rendering\UI\Textbox\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\CollapsedPropertyGrid.dll" />
-    <Content Include="Resources\CustomColorPicker.dll" />
+    <Content Include="Resources\CollapsedPropertyGrid.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\CustomColorPicker.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\ImageCropper.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
