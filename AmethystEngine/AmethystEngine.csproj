@@ -461,7 +461,23 @@
     <Folder Include="Components\Bixbite_Windows_Build\Rendering\UI\Textbox\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\ImageCropper.dll" />
+    <Content Include="Resources\CollapsedPropertyGrid.dll" />
+    <Content Include="Resources\CustomColorPicker.dll" />
+    <Content Include="Resources\ImageCropper.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\NodeEditor.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\OutputLog.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\PropertyGridEditor.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\TimelinePlayer.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Components\Bixbite_Windows_Build\Audio\FMod\FMODLibrary\readme.txt" />
     <Content Include="Components\Bixbite_Windows_Build\bin\Debug\BixBite.dll" />
     <Content Include="Components\Bixbite_Windows_Build\bin\Debug\BixBite.pdb" />
