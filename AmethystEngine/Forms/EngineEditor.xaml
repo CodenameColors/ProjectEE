@@ -184,7 +184,86 @@
 				</Grid>
 			</ControlTemplate>
 
-			<ControlTemplate x:Key="AnimationEditorProperties_Template">
+			<ControlTemplate x:Key="SpritesheetEditorProperties_Template">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="30"/>
+						<RowDefinition Height="*"/>
+					</Grid.RowDefinitions>
+				
+				<Grid Row="1" Background="#FF2B2B2B">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="0"/>
+							<RowDefinition Height="2"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="2"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="*"/>
+						</Grid.RowDefinitions>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="2*"/>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+
+						<GridSplitter Grid.Row="1" Grid.RowSpan="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter2" Background="#FF868686" ResizeDirection="Rows"/>
+						<GridSplitter Grid.Row="5" Grid.RowSpan="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter3" Background="#FF868686" ResizeDirection="Rows"/>
+
+						<TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Text="Frame Properties:" Foreground="White" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="5" />
+						<TextBlock Grid.Row="3" Grid.Column="0" Text="Frame Number:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<TextBlock Grid.Row="4" Grid.Column="0" Text="Image Path:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<TextBlock Grid.Row="6" Grid.Column="0" Text="X Position:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<TextBlock Grid.Row="7" Grid.Column="0" Text="Y Position:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<TextBlock Grid.Row="8" Grid.Column="0" Text="Width:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<TextBlock Grid.Row="9" Grid.Column="0" Text="Height:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<TextBlock Grid.Row="10" Grid.Column="0" Text="Crop X:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<TextBlock Grid.Row="11" Grid.Column="0" Text="Crop Y:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<TextBlock Grid.Row="12" Grid.Column="0" Text="Render Point X:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<TextBlock Grid.Row="13" Grid.Column="0" Text="Render Point Y:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<TextBlock Grid.Row="14" Grid.Column="0" Text="Show Render Point:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<TextBlock Grid.Row="15" Grid.Column="0" Text="Show Border:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+
+						<TextBox x:Name="SpriteSheetEditorProperties_FrameNumber_TB" Grid.Row="3" Grid.Column="1"   Background="#FF383838" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<TextBox x:Name="SpriteSheetEditorProperties_ImagePath_TB" Grid.Row="4" Grid.Column="1"   Background="#FF383838" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<TextBox x:Name="SpriteSheetEditorProperties_XPos_TB" Grid.Row="6" Grid.Column="1"   Background="#FF383838" Foreground="White" VerticalAlignment="Bottom" Margin="5" 
+						         KeyDown="SpriteSheetPropertyFrameXPos_TB_KeyDown"/>
+
+						<TextBox x:Name="SpriteSheetEditorProperties_YPos_TB" Grid.Row="7" Grid.Column="1"   Background="#FF383838" Foreground="White" VerticalAlignment="Bottom" Margin="5" 
+						         KeyDown="SpriteSheetEditorProperties_YPos_TB_OnKeyDown"/>
+
+						<TextBox x:Name="SpriteSheetEditorProperties_Width_TB" Grid.Row="8" Grid.Column="1"   Background="#FF383838" Foreground="White" VerticalAlignment="Bottom" Margin="5" 
+						         KeyDown="SpriteSheetEditorProperties_Width_TB_OnKeyDown"/>
+						<TextBox x:Name="SpriteSheetEditorProperties_Height_TB" Grid.Row="9" Grid.Column="1"  	Background="#FF383838" Foreground="White" VerticalAlignment="Bottom" Margin="5" 
+						         KeyDown="SpriteSheetEditorProperties_Height_TB_OnKeyDown"/>
+						<TextBox x:Name="SpriteSheetEditorProperties_CropWidth_TB" Grid.Row="10" Grid.Column="1"  	Background="#FF383838" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<TextBox x:Name="SpriteSheetEditorProperties_CropHeight_TB" Grid.Row="11" Grid.Column="1"  Background="#FF383838" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<TextBox x:Name="SpriteSheetEditorProperties_RenderPointX_TB" Grid.Row="12" Grid.Column="1"  Background="#FF383838" Foreground="White" VerticalAlignment="Bottom" Margin="5" 
+						         KeyDown="SpriteSheetEditorProperties_RenderPointX_TB_OnKeyDown"/>
+						<TextBox x:Name="SpriteSheetEditorProperties_RenderPointY_TB" Grid.Row="13" Grid.Column="1"  Background="#FF383838" Foreground="White" VerticalAlignment="Bottom" Margin="5" 
+						         KeyDown="SpriteSheetEditorProperties_RenderPointY_TB_OnKeyDown"/>
+						
+						<CheckBox Grid.Row="14" Grid.Column="1" Background="#FF383838" Foreground="White" VerticalAlignment="Bottom" Margin="5" 
+						          Click="SpriteSheetEditorProperties_ShowRenderPoint_CB_Checked"/>
+						<CheckBox Grid.Row="15" Grid.Column="1" Background="#FF383838" Foreground="White" VerticalAlignment="Bottom" Margin="5" 
+								  Click="SpriteSheetEditorProperties_ShowBorder_CB_Checked"/>
+
+						<!--x:Name="SpritesheetFrameProperties_FrameNumber"-->
+
+					</Grid>
+				</Grid>
+			</ControlTemplate>
+
+					<ControlTemplate x:Key="AnimationEditorProperties_Template">
 			<Grid>
 				<Grid.RowDefinitions>
 					<RowDefinition Height="30"/>
@@ -682,7 +761,7 @@
 						<RowDefinition Height="*"/>
 					</Grid.RowDefinitions>
 
-					<TextBlock Text="Add an Animation State" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,7,0,7"/>
+					<TextBlock Text="Add Sprite Animation" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,7,0,7"/>
 					<Button Content="+" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="106,5,5,5" Height="20" VerticalContentAlignment="Top" Width="20"
 					        RenderTransformOrigin="1.5,0.5" Click="AddNewSpriteAnimation_BTN_Click"/>
 
@@ -1325,7 +1404,7 @@
 			<Label x:Name="label4" Content="Properties" Foreground="White" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
 
-			<ContentControl x:Name="ObjectProperties_Control" Template="{DynamicResource AnimationEditorProperties_Template}" Grid.Column="2" Grid.ColumnSpan="2"/>
+			<ContentControl x:Name="ObjectProperties_Control" Template="{DynamicResource SpritesheetEditorProperties_Template}" Grid.Column="2" Grid.ColumnSpan="2"/>
 
 			<ContentControl x:Name="EditorToolBar_CC" Grid.Column="1" Height="25" VerticalAlignment="Top" Margin="10,4,123,0"
 											Template="{DynamicResource SpritesheetEditorObjectExplorer_Template}"/>

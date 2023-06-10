@@ -68,6 +68,7 @@ using TextBox = System.Windows.Controls.TextBox;
 using TreeView = System.Windows.Controls.TreeView;
 using System.Windows.Interop;
 using System.Drawing.Imaging;
+using System.Resources;
 using System.Windows.Media.Converters;
 
 namespace AmethystEngine.Forms
@@ -166,6 +167,7 @@ namespace AmethystEngine.Forms
 		#region Properties
 
 		TreeView SpriteSheet_CE_Tree;
+		CanvasImageProperties currentCanvasImagePropertiesSelected = null;
 		ObservableCollection<SpriteSheet> ActiveSpriteSheets = new ObservableCollection<SpriteSheet>();
 		SpriteSheet CurrentActiveSpriteSheet;
 		SpriteAnimation CurrentlySelectedAnimation;
@@ -8567,6 +8569,7 @@ namespace AmethystEngine.Forms
 						Border parentBorder = CreateDashedLineBorder();
 						
 						Image image = new Image();
+						image.Name = "cropped_image_preview";
 						BitmapImage bitmap = new BitmapImage(new Uri(frame.ImageLocation));
 						CroppedBitmap croppedBitmap = new CroppedBitmap(bitmap, new Int32Rect(frame.CropX, frame.CropY, (int)frame.W, (int)frame.H));
 						image.Source = croppedBitmap;
@@ -8577,8 +8580,13 @@ namespace AmethystEngine.Forms
 						image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
 						image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
+						Image renderPointImage = new Image();
+						renderPointImage.Name = "Render_Point_Image";
+						renderPointImage.Source = new BitmapImage(new Uri(String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()), UriKind.Absolute));
+
 						Canvas overlayCanvas = new Canvas() { Width = frame.W, Height = frame.H };
 						overlayCanvas.Children.Add(image);
+						overlayCanvas.Children.Add(renderPointImage);
 
 						parentBorder.Child = overlayCanvas;
 						frame.LinkedBorderImage = parentBorder;
@@ -8587,6 +8595,10 @@ namespace AmethystEngine.Forms
 
 						Canvas.SetLeft(parentBorder, frame.X);
 						Canvas.SetTop(parentBorder, frame.Y);
+
+						// Place the Render point in the correct position
+						Canvas.SetLeft(renderPointImage, frame.RX);
+						Canvas.SetTop(renderPointImage, frame.RY);
 					}
 				}
 			}
@@ -8621,6 +8633,16 @@ namespace AmethystEngine.Forms
 			Console.WriteLine("Saving Spritesheet");
 
 			CanvasSpritesheet.ExportSpriteSheet(CurrentSelectedSpriteSheet, dlg.FileName.Replace(".spritesheet",""));
+
+			// Let's not let frames render target crosshairs be visiable
+			foreach (var anim in CurrentSelectedSpriteSheet.AllAnimationOnSheet)
+			{
+				foreach (var frame in anim.CanvasFrames)
+				{
+					(frame.LinkedBorderImage?.Child as Canvas).Children[1].Visibility = Visibility.Hidden;
+				}
+			}
+			SpritesheetEditor_Canvas.UpdateLayout();
 
 			// Render the canvas and its child elements onto a RenderTargetBitmap
 			var renderTargetBitmap = new RenderTargetBitmap((int)CurrentSelectedSpriteSheet.Width, (int)CurrentSelectedSpriteSheet.Height, 96, 96, PixelFormats.Pbgra32);
@@ -8892,6 +8914,7 @@ namespace AmethystEngine.Forms
 						if (path != null)
 						{
 							Image image = new Image();
+							image.Name = "cropped_image_preview";
 							image.Source = new BitmapImage(new Uri(path));
 							image.Width = _baseImage.PixelWidth;
 							image.Height = _baseImage.PixelHeight;
@@ -8902,8 +8925,13 @@ namespace AmethystEngine.Forms
 							image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
 
+							Image renderPointImage = new Image();
+							renderPointImage.Name = "Render_Point_Image";
+							renderPointImage.Source = new BitmapImage(new Uri(String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()), UriKind.Absolute));
+
 							Canvas overlayCanvas = new Canvas() { Width = _baseImage.PixelWidth, Height = _baseImage.PixelHeight };
 							overlayCanvas.Children.Add(image);
+							overlayCanvas.Children.Add(renderPointImage);
 
 							Border parentBorder = CreateDashedLineBorder();
 							parentBorder.Child = overlayCanvas;
@@ -8914,6 +8942,10 @@ namespace AmethystEngine.Forms
 							{
 								foundFrame.LinkedCroppableImage = null;
 								foundFrame.LinkedBorderImage = parentBorder;
+
+								// Place the Render point in the correct position
+								Canvas.SetLeft(renderPointImage, foundFrame.RX);
+								Canvas.SetTop(renderPointImage, foundFrame.RY);
 							}
 
 							CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().LinkedCroppableImage = SpritesheetEditor_CropImage;
@@ -8989,6 +9021,30 @@ namespace AmethystEngine.Forms
 			{
 				foundFrame.RX = x;
 				foundFrame.RY = y;
+
+				// we need to find the child for the render point
+
+				if (foundFrame.LinkedBorderImage != null)
+				{
+					foreach (var childImage in (foundFrame.LinkedBorderImage.Child as Canvas).Children)
+					{
+						if (childImage is Image img)
+						{
+							if (img.Name == "Render_Point_Image")
+							{
+								Canvas.SetLeft(img, x);
+								Canvas.SetTop(img, y);
+							}
+						}
+					}
+
+
+
+				}
+				else if (foundFrame.LinkedCroppableImage != null)
+				{
+
+				}
 			}
 		}
 
@@ -9100,6 +9156,7 @@ namespace AmethystEngine.Forms
 					}
 
 					image.Stretch = Stretch.Fill;
+					image.Name = "cropped_image_preview";
 					image.Width = SpritesheetEditor_CropImage.Width;
 					image.MaxWidth = SpritesheetEditor_CropImage.Width;
 					image.Height = SpritesheetEditor_CropImage.Height;
@@ -9109,8 +9166,13 @@ namespace AmethystEngine.Forms
 					image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
 					image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
+					Image renderPointImage = new Image();
+					renderPointImage.Name = "Render_Point_Image";
+					renderPointImage.Source = new BitmapImage(new Uri(String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()), UriKind.Absolute));
+
 					Canvas overlayCanvas = new Canvas() { Width = SpritesheetEditor_CropImage.Width, Height = SpritesheetEditor_CropImage.Height };
 					overlayCanvas.Children.Add(image);
+					overlayCanvas.Children.Add(renderPointImage);
 
 					// Create a border for the image
 					Border border = CreateDashedLineBorder();
@@ -9122,6 +9184,10 @@ namespace AmethystEngine.Forms
 					{
 						foundFrame.LinkedCroppableImage = null;
 						foundFrame.LinkedBorderImage = border;
+
+						// Place the Render point in the correct position
+						Canvas.SetLeft(renderPointImage, foundFrame.RX);
+						Canvas.SetTop(renderPointImage, foundFrame.RY);
 					}
 
 					SpritesheetEditor_Canvas.Children.Add(border);
@@ -9447,6 +9513,40 @@ namespace AmethystEngine.Forms
 						// parentBorder.BorderThickness = new Thickness(1);
 
 						// We need to create the croppable control again.
+
+						// We are going to fill in the frame properties.
+
+						// Keep track of the frame property
+						currentCanvasImagePropertiesSelected = canvasFrame;
+
+						TextBox frameNumber_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_ImagePath_TB", ObjectProperties_Control);
+						frameNumber_TB.Text = canvasFrame.ImageLocation;
+						frameNumber_TB.ToolTip = canvasFrame.ImageLocation;
+
+						TextBox XPosition_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_XPos_TB", ObjectProperties_Control);
+						XPosition_TB.Text = canvasFrame.X.ToString();
+
+						TextBox YPosition_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_YPos_TB", ObjectProperties_Control);
+						YPosition_TB.Text = canvasFrame.Y.ToString();
+
+						TextBox Width_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_Width_TB", ObjectProperties_Control);
+						Width_TB.Text = canvasFrame.W.ToString();
+
+						TextBox Height_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_Height_TB", ObjectProperties_Control);
+						Height_TB.Text = canvasFrame.H.ToString();
+
+						TextBox CropX_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_CropWidth_TB", ObjectProperties_Control);
+						CropX_TB.Text = canvasFrame.CropX.ToString();
+
+						TextBox CropY_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_CropHeight_TB", ObjectProperties_Control);
+						CropY_TB.Text = canvasFrame.CropY.ToString();
+
+						TextBox RenderPointX_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_RenderPointX_TB", ObjectProperties_Control);
+						RenderPointX_TB.Text = canvasFrame.RX.ToString();
+
+						TextBox RenderPointY_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_RenderPointY_TB", ObjectProperties_Control);
+						RenderPointY_TB.Text = canvasFrame.RY.ToString();
+
 					}
 
 
@@ -9533,7 +9633,8 @@ namespace AmethystEngine.Forms
 							if (foundFrame.LinkedBorderImage != null)
 							{
 								foundFrame.LinkedBorderImage.Width = val;
-								(foundFrame.LinkedBorderImage.Child as Image).Width = val;
+								(foundFrame.LinkedBorderImage.Child as Canvas).Width = val;
+								((foundFrame.LinkedBorderImage.Child as Canvas).Children[0] as Image ).Width = val;
 							}
 							else if (foundFrame.LinkedCroppableImage != null)
 							{
@@ -9545,7 +9646,10 @@ namespace AmethystEngine.Forms
 						{
 							if (foundFrame.LinkedBorderImage != null)
 							{
-								(foundFrame.LinkedBorderImage.Child as Image).Height = val;
+								foundFrame.LinkedBorderImage.Width = val;
+								(foundFrame.LinkedBorderImage.Child as Canvas).Height  = val;
+								((foundFrame.LinkedBorderImage.Child as Canvas).Children[0] as Image).Height = val;
+
 							}
 							else if (foundFrame.LinkedCroppableImage != null)
 							{
@@ -9596,6 +9700,197 @@ namespace AmethystEngine.Forms
 				}
 			}
 		}
+
+		private void SpriteSheetPropertyFrameXPos_TB_KeyDown(object sender, KeyEventArgs e)
+		{
+			TextBox textBox = sender as TextBox;
+			if (textBox != null && int.TryParse(textBox.Text, out int dataVal))
+			{
+				if (e.Key == Key.Enter)
+				{
+					if (currentCanvasImagePropertiesSelected != null)
+					{
+						currentCanvasImagePropertiesSelected.X = dataVal;
+						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
+							Canvas.SetLeft(currentCanvasImagePropertiesSelected.LinkedBorderImage, dataVal);
+						else if (currentCanvasImagePropertiesSelected.LinkedCroppableImage != null)
+							Canvas.SetLeft(currentCanvasImagePropertiesSelected.LinkedCroppableImage, dataVal);
+					}
+				}
+			}
+		}
+
+		private void SpriteSheetEditorProperties_YPos_TB_OnKeyDown(object sender, KeyEventArgs e)
+		{
+			TextBox textBox = sender as TextBox;
+			if (textBox != null && int.TryParse(textBox.Text, out int dataVal))
+			{
+				if (e.Key == Key.Enter)
+				{
+					if (currentCanvasImagePropertiesSelected != null)
+					{
+						currentCanvasImagePropertiesSelected.Y = dataVal;
+						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
+							Canvas.SetTop(currentCanvasImagePropertiesSelected.LinkedBorderImage, dataVal);
+						else if (currentCanvasImagePropertiesSelected.LinkedCroppableImage != null)
+							Canvas.SetTop(currentCanvasImagePropertiesSelected.LinkedCroppableImage, dataVal);
+					}
+				}
+			}
+		}
+
+		private void SpriteSheetEditorProperties_Width_TB_OnKeyDown(object sender, KeyEventArgs e)
+		{
+			TextBox textBox = sender as TextBox;
+			if (textBox != null && int.TryParse(textBox.Text, out int dataVal))
+			{
+				if (e.Key == Key.Enter)
+				{
+					if (currentCanvasImagePropertiesSelected != null)
+					{
+						currentCanvasImagePropertiesSelected.W = dataVal;
+						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
+						{
+							currentCanvasImagePropertiesSelected.LinkedBorderImage.Width = dataVal;
+							(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Width = dataVal;
+							((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[0] as Image).Width = dataVal;
+						}
+						else if (currentCanvasImagePropertiesSelected.LinkedCroppableImage != null)
+						{
+							currentCanvasImagePropertiesSelected.LinkedCroppableImage.Width = dataVal;
+						}
+					}
+				}
+			}
+		}
+
+
+		private void SpriteSheetEditorProperties_Height_TB_OnKeyDown(object sender, KeyEventArgs e)
+		{
+			TextBox textBox = sender as TextBox;
+			if (textBox != null && int.TryParse(textBox.Text, out int dataVal))
+			{
+				if (e.Key == Key.Enter)
+				{
+					if (currentCanvasImagePropertiesSelected != null)
+					{
+						currentCanvasImagePropertiesSelected.H = dataVal;
+						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
+						{
+							currentCanvasImagePropertiesSelected.LinkedBorderImage.Height = dataVal;
+							(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Height = dataVal;
+							((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[0] as Image).Height = dataVal;
+						}
+						else if (currentCanvasImagePropertiesSelected.LinkedCroppableImage != null)
+						{
+							currentCanvasImagePropertiesSelected.LinkedCroppableImage.Height = dataVal;
+						}
+					}
+				}
+			}
+		}
+
+
+		private void SpriteSheetEditorProperties_RenderPointX_TB_OnKeyDown(object sender, KeyEventArgs e)
+		{
+			TextBox textBox = sender as TextBox;
+			if (textBox != null && int.TryParse(textBox.Text, out int dataVal))
+			{
+				if (e.Key == Key.Enter)
+				{
+					if (currentCanvasImagePropertiesSelected != null)
+					{
+						currentCanvasImagePropertiesSelected.RX = dataVal;
+						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
+						{
+							Canvas.SetLeft(
+								((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1] as Image), dataVal);
+						}
+						else if (currentCanvasImagePropertiesSelected.LinkedCroppableImage != null)
+						{
+							// This doesn't exist right now
+						}
+					}
+				}
+			}
+		}
+
+		private void SpriteSheetEditorProperties_RenderPointY_TB_OnKeyDown(object sender, KeyEventArgs e)
+		{
+			TextBox textBox = sender as TextBox;
+			if (textBox != null && int.TryParse(textBox.Text, out int dataVal))
+			{
+				if (e.Key == Key.Enter)
+				{
+					if (currentCanvasImagePropertiesSelected != null)
+					{
+						currentCanvasImagePropertiesSelected.RY = dataVal;
+						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
+						{
+							Canvas.SetTop(
+								((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1] as Image), dataVal);
+						}
+						else if (currentCanvasImagePropertiesSelected.LinkedCroppableImage != null)
+						{
+							// This doesn't exist right now
+						}
+					}
+				}
+			}
+		}
+
+
+		private void SpriteSheetEditorProperties_ShowBorder_CB_Checked(object sender, RoutedEventArgs e)
+		{
+			CheckBox checkBox = sender as CheckBox;
+			if (checkBox != null)
+			{
+				if (checkBox.IsChecked == true)
+				{
+					if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
+						currentCanvasImagePropertiesSelected.LinkedBorderImage.BorderThickness = new Thickness(1);
+					else
+						currentCanvasImagePropertiesSelected.LinkedCroppableImage.BorderThickness = new Thickness(1);
+
+				}
+				else
+				{
+					{
+						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
+							currentCanvasImagePropertiesSelected.LinkedBorderImage.BorderThickness = new Thickness(0);
+						else
+							currentCanvasImagePropertiesSelected.LinkedCroppableImage.BorderThickness = new Thickness(0);
+					}
+				}
+			}
+		}
+
+
+		private void SpriteSheetEditorProperties_ShowRenderPoint_CB_Checked(object sender, RoutedEventArgs e)
+		{
+			CheckBox checkBox = sender as CheckBox;
+			if (checkBox != null)
+			{
+				if (checkBox.IsChecked == true)
+				{
+					if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
+						(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1].Visibility = Visibility.Visible;
+					//else
+					//	currentCanvasImagePropertiesSelected.LinkedCroppableImage.BorderThickness = new Thickness(1);
+
+				}
+				else
+				{
+					{
+						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
+							(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1].Visibility = Visibility.Hidden;
+						//else
+						//	currentCanvasImagePropertiesSelected.LinkedCroppableImage.BorderThickness = new Thickness(0);
+					}
+				}
+			}
+		}
+
 
 	}
 }
