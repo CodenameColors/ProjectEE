@@ -112,6 +112,8 @@ namespace AmethystEngine.Components
 			}
 		}
 
+		public ObservableCollection<CanvasSubLayerPoint> SubLayerPoints = new ObservableCollection<CanvasSubLayerPoint>();
+
 		public float SX { get; set; }
 		public float SY { get; set; }
 		public Border LinkedBorderImage = null;
@@ -281,6 +283,16 @@ namespace AmethystEngine.Components
 					writer.WriteAttributeString(null, "Name", null, anim.AnimName.ToString());
 					writer.WriteAttributeString(null, "NumOfFrames", null, anim.CanvasFrames.Count.ToString());
 
+					writer.WriteStartElement(null, "SubLayers", null);
+					foreach (var layerName in anim.NamesOfSubLayers)
+					{
+						writer.WriteStartElement(null, "Layer", null);
+						writer.WriteAttributeString(null, "Name", null, layerName);
+						writer.WriteEndElement(); //end of the Layer Tag
+					}
+					writer.WriteEndElement(); //end of the SubLayers Tag
+
+
 					// Animation Frames!
 					//writer.WriteStartElement(null, "Frames", null);
 					foreach (CanvasImageProperties imgpProperty in anim.CanvasFrames)
@@ -295,6 +307,17 @@ namespace AmethystEngine.Components
 						writer.WriteAttributeString(null, "CX", null, imgpProperty.CropX.ToString());
 						writer.WriteAttributeString(null, "CY", null, imgpProperty.CropY.ToString());
 						writer.WriteAttributeString(null, "Path", null, imgpProperty.ImageLocation.ToString());
+
+						// Export all the Sub layer points
+						writer.WriteStartElement(null, "SubLayerPoints", null);
+						foreach (var subLayerPoint in imgpProperty.SubLayerPoints)
+						{
+							writer.WriteAttributeString(null, "Name", null, subLayerPoint.LayerName);
+							writer.WriteAttributeString(null, "RX", null, subLayerPoint.RX.ToString());
+							writer.WriteAttributeString(null, "RY", null, subLayerPoint.RX.ToString());
+						}
+						writer.WriteEndElement(); //end of the SubLayerPoints Tag
+
 
 						writer.WriteEndElement(); //end of the Frame Tag
 
@@ -364,11 +387,65 @@ namespace AmethystEngine.Components
 
 		public String AnimName { get; set; }
 		public uint NumOfFrames { get; set; }
-
+		public ObservableCollection<String> NamesOfSubLayers = new ObservableCollection<string>();
 
 		public CanvasAnimation(String name)
 		{
 			this.AnimName = name;
 		}
 	}
+
+	public class CanvasSubLayerPoint : INotifyPropertyChanged
+	{
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		public void OnPropertyChanged(string name)
+		{
+			PropertyChangedEventHandler handler = PropertyChanged;
+			if (handler != null)
+			{
+				handler(this, new PropertyChangedEventArgs(name));
+			}
+		}
+
+		private String _layerName = "";
+		private int _rx;
+		private int _ry;
+
+		public String LayerName
+		{
+			get => _layerName;
+			set
+			{
+				_layerName = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("LayerName"));
+			}
+		}
+
+		public int RX
+		{
+			get => _rx;
+			set
+			{
+				_rx = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("RX"));
+			}
+		}
+
+		public int RY
+		{
+			get => _ry;
+			set
+			{
+				_ry = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("RY"));
+			}
+		}
+
+		public CanvasSubLayerPoint()
+		{
+
+		}
+	}
+
 }

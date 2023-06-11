@@ -168,6 +168,7 @@ namespace AmethystEngine.Forms
 
 		TreeView SpriteSheet_CE_Tree;
 		CanvasImageProperties currentCanvasImagePropertiesSelected = null;
+		CanvasAnimation currentCanvasAnimationPropertiesSelected = null;
 		ObservableCollection<SpriteSheet> ActiveSpriteSheets = new ObservableCollection<SpriteSheet>();
 		SpriteSheet CurrentActiveSpriteSheet;
 		SpriteAnimation CurrentlySelectedAnimation;
@@ -956,7 +957,7 @@ namespace AmethystEngine.Forms
 				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["SpriteSheetObjects_Template"];
 				//SceneExplorer_Control.Template = (ControlTemplate)this.Resources["AnimationEditorSceneExplorer_Template"];
 				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["SpritesheetEditorObjectExplorer_Template"];
-				//ObjectProperties_Control.Template = (ControlTemplate)this.Resources["AnimationEditorProperties_Template"];
+				ObjectProperties_Control.Template = (ControlTemplate)this.Resources["SpritesheetEditorProperties_Template"];
 				UpdateLayout();
 			}
 			else if (((TabItem) EditorWindows_TC.SelectedItem).Header.ToString().Contains("Animation"))
@@ -9250,6 +9251,35 @@ namespace AmethystEngine.Forms
 			return null;
 		}
 
+		private int GetFrameNumberFromFrame(CanvasImageProperties desiredFrame)
+		{
+			// Let's find out what SpriteAnimation this image belongs too!
+			foreach (CanvasAnimation spriteAntimation in CurrentSelectedSpriteSheet.AllAnimationOnSheet)
+			{
+				for(int i = 0; i < spriteAntimation.CanvasFrames.Count; i++)
+				{
+					CanvasImageProperties frame = spriteAntimation.CanvasFrames[i];
+					if (frame == desiredFrame)
+						return i;
+				}
+			}
+			return -1;
+		}
+
+		private CanvasAnimation GetCanvasAnimationFromFrame(CanvasImageProperties desiredFrame)
+		{
+			// Let's find out what SpriteAnimation this image belongs too!
+			foreach (CanvasAnimation spriteAntimation in CurrentSelectedSpriteSheet.AllAnimationOnSheet)
+			{
+				foreach (CanvasImageProperties frame in spriteAntimation.CanvasFrames)
+				{
+					if (frame == desiredFrame)
+						return spriteAntimation;
+				}
+			}
+			return null;
+		}
+
 		private void LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB(object sender, MouseButtonEventArgs e)
 		{
 			// DO NOT DO ANYTHING if we have a cropper open already
@@ -9502,14 +9532,21 @@ namespace AmethystEngine.Forms
 			TreeView treeViewItem = sender as TreeView;
 			if (treeViewItem != null)
 			{
-				if (treeViewItem.SelectedItem is CanvasAnimation)
+				if (treeViewItem.SelectedItem is CanvasAnimation canvasAnimationProp)
 				{
+					ObjectProperties_Control.Template = (ControlTemplate)this.Resources["SpritesheetEditorProperties_Anim_Template"];
+					ObjectProperties_Control.UpdateLayout();
+
+					currentCanvasImagePropertiesSelected = null;
+					currentCanvasAnimationPropertiesSelected = canvasAnimationProp;
 
 				}
 				else if (treeViewItem.SelectedItem is CanvasImageProperties canvasFrame)
 				{
 					if (canvasFrame.LinkedBorderImage is Border parentBorder)
 					{
+						ObjectProperties_Control.Template = (ControlTemplate)this.Resources["SpritesheetEditorProperties_Template"];
+						ObjectProperties_Control.UpdateLayout();
 						// parentBorder.BorderThickness = new Thickness(1);
 
 						// We need to create the croppable control again.
@@ -9518,10 +9555,14 @@ namespace AmethystEngine.Forms
 
 						// Keep track of the frame property
 						currentCanvasImagePropertiesSelected = canvasFrame;
+						currentCanvasAnimationPropertiesSelected = null;
 
-						TextBox frameNumber_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_ImagePath_TB", ObjectProperties_Control);
-						frameNumber_TB.Text = canvasFrame.ImageLocation;
-						frameNumber_TB.ToolTip = canvasFrame.ImageLocation;
+						TextBox FrameNumber_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_FrameNumber_TB", ObjectProperties_Control);
+						FrameNumber_TB.Text = GetFrameNumberFromFrame(canvasFrame).ToString();
+
+						TextBox ImagePath_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_ImagePath_TB", ObjectProperties_Control);
+						ImagePath_TB.Text = canvasFrame.ImageLocation.Substring(canvasFrame.ImageLocation.LastIndexOf("\\"));
+						ImagePath_TB.ToolTip = canvasFrame.ImageLocation;
 
 						TextBox XPosition_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_XPos_TB", ObjectProperties_Control);
 						XPosition_TB.Text = canvasFrame.X.ToString();
@@ -9547,9 +9588,29 @@ namespace AmethystEngine.Forms
 						TextBox RenderPointY_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_RenderPointY_TB", ObjectProperties_Control);
 						RenderPointY_TB.Text = canvasFrame.RY.ToString();
 
+						// We need to Fill in the ITEM CONTROL of sublayers now!
+						ItemsControl SubLayerIC = (ItemsControl)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_SubLayerInfo_IC", ObjectProperties_Control);
+						CanvasAnimation canvasAnimation = GetCanvasAnimationFromFrame(canvasFrame);
+						if (canvasAnimation != null)
+						{
+							SubLayerIC.Items.Clear();
+							for (int i = 0; i < canvasAnimation.NamesOfSubLayers.Count; i++)
+							{
+								if(canvasFrame.SubLayerPoints.Count < canvasAnimation.NamesOfSubLayers.Count)
+								{
+									CanvasSubLayerPoint subRenderPoint = new CanvasSubLayerPoint() { LayerName = canvasAnimation.NamesOfSubLayers[i] };
+									SubLayerIC.Items.Add(subRenderPoint);
+									canvasFrame.SubLayerPoints.Add(subRenderPoint);
+								}
+								else
+								{
+									// We don't need to add a new layer here. it's already been added
+									SubLayerIC.Items.Add(canvasFrame.SubLayerPoints[i]);
+								}
+							}
+						}
+
 					}
-
-
 				}
 			}
 		}
@@ -9891,6 +9952,57 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		private void SpriteSheetEditorProperties_AddSubLayer_TB_OnKeyDown(object sender, KeyEventArgs e)
+		{
+			TextBox textBox = sender as TextBox;
+			if (textBox != null)
+			{
+				if (e.Key == Key.Enter)
+				{
+					if (currentCanvasAnimationPropertiesSelected != null)
+					{
+						int index = GetItemIndex(textBox);
+						if(index >= 0)
+							currentCanvasAnimationPropertiesSelected.NamesOfSubLayers[index] = textBox.Text;
+					}
+				}
+			}
+		}
+
+		private void SpriteSheetEditorProperties_AddSubLayer_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			ItemsControl SubLayerIC = (ItemsControl)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_SubLayerInfo_IC", ObjectProperties_Control);
+			currentCanvasAnimationPropertiesSelected.NamesOfSubLayers.Add("Layer " + SubLayerIC.Items.Count);
+			SubLayerIC.Items.Add("Layer " + SubLayerIC.Items.Count);
+
+		}
+
+
+		private int GetItemIndex(FrameworkElement element)
+		{
+	    ItemsControl itemsControl = FindParentItemsControl(element);
+	    if (itemsControl != null)
+	    {
+		    return itemsControl.Items.IndexOf(element.DataContext);
+	    }
+	    return -1;
+		}
+
+		private ItemsControl FindParentItemsControl(FrameworkElement element)
+		{
+			FrameworkElement parent = VisualTreeHelper.GetParent(element) as FrameworkElement;
+			while (parent != null)
+			{
+				if (parent is ItemsControl itemsControl)
+				{
+					return itemsControl;
+				}
+
+				parent = VisualTreeHelper.GetParent(parent) as FrameworkElement;
+			}
+
+			return null;
+		}
 
 	}
 }
