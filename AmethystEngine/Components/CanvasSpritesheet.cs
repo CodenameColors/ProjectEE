@@ -247,6 +247,8 @@ namespace AmethystEngine.Components
 												subLayerPoint.RX = int.Parse(reader.GetAttribute("RX") ?? "0"); // fallback
 												subLayerPoint.RY = int.Parse(reader.GetAttribute("RY") ?? "0"); // fallback
 												spriteAnimation.CanvasFrames.Last().SubLayerPoints.Add(subLayerPoint);
+												if(!spriteAnimation.NamesOfSubLayers.Contains(subLayerPoint.LayerName))
+													spriteAnimation.NamesOfSubLayers.Add(subLayerPoint.LayerName);
 											}
 										} while (reader.Name.Trim() != "Frame");
 									}
