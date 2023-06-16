@@ -240,7 +240,7 @@
 											</Grid.ColumnDefinitions>
 
 											<TextBlock Text="Name:" Foreground="White" KeyDown="SpriteSheetEditorProperties_AddSubLayer_TB_OnKeyDown" VerticalAlignment="Center" />
-											<TextBox Grid.Column="1 " KeyDown="SpriteSheetEditorProperties_AddSubLayer_TB_OnKeyDown" />
+											<TextBox Grid.Column="1 " Text="{Binding Path=.}" KeyDown="SpriteSheetEditorProperties_AddSubLayer_TB_OnKeyDown" />
 
 										</Grid>
 									</DataTemplate>
@@ -350,15 +350,18 @@
 												<ColumnDefinition Width="*"/>
 											</Grid.ColumnDefinitions>
 
-											<TextBlock Text="Layer Name:" Foreground="White"/>
-											<TextBlock Grid.Column="1"  Text="{Binding Path=LayerName}" Foreground="White" Background="#FF383838"/>
+											<CheckBox Grid.Column="1" Content="Show:" Background="#FF383838" Foreground="White" VerticalAlignment="Center" Margin="20,0,0,0" 
+												Click="SpriteSheetEditor_ShowSubLayer_CB_Click"/>
+											<TextBlock Grid.Column="0"  Text="{Binding Path=LayerName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Foreground="White" Background="#FF383838"/>
 
-											<TextBlock Grid.Row="1" Grid.Column="0" Text="RX" Foreground="White"/>
-											<TextBox Grid.Row="1" Grid.Column="0"  Text="{Binding Path=RX}" Margin="20,0,0,0" Foreground="White" Background="#FF383838"/>
+											<TextBlock Grid.Row="1" Grid.Column="0" Text="RX:" Foreground="White"/>
+											<TextBox Grid.Row="1" Grid.Column="0"  Text="{Binding Path=RX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="20,0,0,0" Foreground="White" Background="#FF383838"
+											         KeyDown="SpriteSheetEditor_SubLayerRX_Keydown"/>
 
 
-											<TextBlock Grid.Row="1" Grid.Column="1" Text="RY" Foreground="White"/>
-											<TextBox Grid.Row="1" Grid.Column="1"  Text="{Binding Path=RY}" Margin="20,0,0,0" Foreground="White" Background="#FF383838"/>
+											<TextBlock Grid.Row="1" Grid.Column="1" Text="RY:" Foreground="White"/>
+											<TextBox Grid.Row="1" Grid.Column="1"  Text="{Binding Path=RY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="20,0,0,0" Foreground="White" Background="#FF383838"
+											         KeyDown="SpriteSheetEditor_SubLayerRY_Keydown"/>
 
 										</Grid>
 									</DataTemplate>

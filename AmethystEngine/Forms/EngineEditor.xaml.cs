@@ -89,7 +89,7 @@ namespace AmethystEngine.Forms
 		Eraser,
 		Move,
 		Brush,
-    Fill,
+		Fill,
 		Image,
 		Gameevent,
 	}
@@ -103,18 +103,20 @@ namespace AmethystEngine.Forms
 	}
 
 	public class LevelEditorProp
-  {
-    public String PropertyName { get; set; }
-    public String PropertyData { get; set; }
+	{
+		public String PropertyName { get; set; }
+		public String PropertyData { get; set; }
 
-    public LevelEditorProp() { }
+		public LevelEditorProp()
+		{
+		}
 
-    public LevelEditorProp(String PName)
-    {
-      PropertyName = PName;
-      PropertyData = "";
-    }
-  }
+		public LevelEditorProp(String PName)
+		{
+			PropertyName = PName;
+			PropertyData = "";
+		}
+	}
 
 	/// <summary>
 	/// Interaction logic for EngineEditor.xaml
@@ -142,7 +144,7 @@ namespace AmethystEngine.Forms
 		TreeView CurrentProjectTreeView = new TreeView();
 
 		#region Fields
-		
+
 		private String _newAnimimationStatemachineFileName = "";
 		private String _newSpriteSheetCharacterName = "";
 		private String _newAnimimationStatemachineFileLocation = "";
@@ -175,6 +177,7 @@ namespace AmethystEngine.Forms
 		CanvasSpritesheet CurrentSelectedSpriteSheet = null;
 		ObservableCollection<CanvasSpritesheet> ActiveCanvasSpritesheets = new ObservableCollection<CanvasSpritesheet>();
 		LayeredSpriteSheet currentLayeredSpriteSheet;
+
 		CanvasImageProperties currentSelectedCanvasFrame = null;
 		//List<String> CurrentLayeredSpriteSheet_SubLayerNames = new List<string>();
 		//List<String> CurrentAnimationSubLayer_AnimStates = new List<string>();
@@ -183,9 +186,9 @@ namespace AmethystEngine.Forms
 
 		BitmapImage CurrentSpriteSheet_Image = new BitmapImage();
 		Border CurrentSpritesheetBorderForLinking = null;
-		
 
-		
+
+
 		TreeView Animation_CE_Tree;
 		TreeView AnimationChangeEvents_Properties_Tree;
 		TreeView AnimationAudioEvents_Properties_Tree;
@@ -437,7 +440,7 @@ namespace AmethystEngine.Forms
 			SceneExplorer_TreeView =
 				(TreeView) SceneExplorer_Control.Template.FindName("LESceneExplorer_TreeView", SceneExplorer_Control);
 			SpriteSheet_CE_Tree =
-					(TreeView)ContentLibrary_Control.Template.FindName("SpriteSheetEditor_CE_TV", ContentLibrary_Control);
+				(TreeView) ContentLibrary_Control.Template.FindName("SpriteSheetEditor_CE_TV", ContentLibrary_Control);
 
 
 
@@ -954,17 +957,17 @@ namespace AmethystEngine.Forms
 			}
 			else if (((TabItem) EditorWindows_TC.SelectedItem).Header.ToString().Contains("Spritesheet"))
 			{
-				ContentLibrary_Control.Template = (ControlTemplate)this.Resources["SpriteSheetObjects_Template"];
+				ContentLibrary_Control.Template = (ControlTemplate) this.Resources["SpriteSheetObjects_Template"];
 				//SceneExplorer_Control.Template = (ControlTemplate)this.Resources["AnimationEditorSceneExplorer_Template"];
-				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["SpritesheetEditorObjectExplorer_Template"];
-				ObjectProperties_Control.Template = (ControlTemplate)this.Resources["SpritesheetEditorProperties_Template"];
+				EditorToolBar_CC.Template = (ControlTemplate) this.Resources["SpritesheetEditorObjectExplorer_Template"];
+				ObjectProperties_Control.Template = (ControlTemplate) this.Resources["SpritesheetEditorProperties_Template"];
 				UpdateLayout();
 			}
 			else if (((TabItem) EditorWindows_TC.SelectedItem).Header.ToString().Contains("Animation"))
 			{
 				ContentLibrary_Control.Template = (ControlTemplate) this.Resources["AnimationEditorObjects_Template"];
 				SceneExplorer_Control.Template = (ControlTemplate) this.Resources["AnimationEditorSceneExplorer_Template"];
-				EditorToolBar_CC.Template = (ControlTemplate)this.Resources["AnimationEditorObjectExplorer_Template"];
+				EditorToolBar_CC.Template = (ControlTemplate) this.Resources["AnimationEditorObjectExplorer_Template"];
 				ObjectProperties_Control.Template = (ControlTemplate) this.Resources["AnimationEditorProperties_Template"];
 				UpdateLayout();
 
@@ -985,11 +988,16 @@ namespace AmethystEngine.Forms
 				//}"AnimationEditor_CE_TV"
 				ControlTemplate cc = (ControlTemplate) this.Resources["AnimationEditorSceneExplorer_Template"];
 				SceneExplorer_TreeView = (TreeView) cc.FindName("AnimationSceneExplorer_TreeView", SceneExplorer_Control);
-				
+
 				SceneExplorer_TreeView.ItemsSource = ActiveSpriteSheets;
-				Animation_CE_Tree = (TreeView) ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control);
-				AnimationChangeEvents_Properties_Tree = (TreeView)ObjectProperties_Control.Template.FindName("AnimationEditor_ChangeEvents_TV", ObjectProperties_Control);
-				AnimationAudioEvents_Properties_Tree = (TreeView)ObjectProperties_Control.Template.FindName("AnimationEditor_AudioEvents_TV", ObjectProperties_Control);
+				Animation_CE_Tree =
+					(TreeView) ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control);
+				AnimationChangeEvents_Properties_Tree =
+					(TreeView) ObjectProperties_Control.Template.FindName("AnimationEditor_ChangeEvents_TV",
+						ObjectProperties_Control);
+				AnimationAudioEvents_Properties_Tree =
+					(TreeView) ObjectProperties_Control.Template.FindName("AnimationEditor_AudioEvents_TV",
+						ObjectProperties_Control);
 			}
 
 
@@ -1935,6 +1943,7 @@ namespace AmethystEngine.Forms
 								Canvas.SetTop(selectTool.SelectedTiles[i],
 									Canvas.GetTop(selectTool.SelectedTiles[i]) - selectTool.SelectedTiles[i].ActualWidth);
 							}
+
 							//EditorObjectAnimationPreviewsList_Template
 							shiftpoints[2] = new Point((int) e.GetPosition(LevelEditor_BackCanvas).X,
 								(int) e.GetPosition(LevelEditor_BackCanvas).Y); //the first point of selection.
@@ -2852,7 +2861,8 @@ namespace AmethystEngine.Forms
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void SceneExplorerLevel_TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		private void SceneExplorerLevel_TreeView_SelectedItemChanged(object sender,
+			RoutedPropertyChangedEventArgs<object> e)
 		{
 			Console.WriteLine("Changed Scene Object");
 			if (e.NewValue is Level)
@@ -4111,12 +4121,12 @@ namespace AmethystEngine.Forms
 			{
 				//base.PropertyCallback(sender, e);
 				Console.WriteLine("GAMETB UI CALLBACK");
-				Console.WriteLine(((TextBox)sender).Tag.ToString());
+				Console.WriteLine(((TextBox) sender).Tag.ToString());
 
-				String Property = ((TextBox)sender).Tag.ToString();
+				String Property = ((TextBox) sender).Tag.ToString();
 				if (baseUi.GetProperties().Any(m => m.Item1 == Property))
 				{
-					baseUi.SetProperty(Property, ((TextBox)sender).Text);
+					baseUi.SetProperty(Property, ((TextBox) sender).Text);
 					if (Property == "FontSize")
 					{
 						//((TextBox)sender).FontSize = Int32.Parse(((TextBox)sender).Text);
@@ -4231,7 +4241,7 @@ namespace AmethystEngine.Forms
 
 			CC.Name = name;
 			UIEditor_Canvas.Children.Add(CC);
-			CurrentUIDictionary.Add(name, new GameTextBlock(name, 0,0,50, 50, 1,false, 0, 0, "",
+			CurrentUIDictionary.Add(name, new GameTextBlock(name, 0, 0, 50, 50, 1, false, 0, 0, "",
 				0.0f, "", "", null, null, Microsoft.Xna.Framework.Color.Black));
 			OpenUIEdits[0].AddUIElement(CurrentUIDictionary.Values.Last()); //TODO: use the selection Treeview
 		}
@@ -4271,7 +4281,7 @@ namespace AmethystEngine.Forms
 
 			CC.Name = name;
 			UIEditor_Canvas.Children.Add(CC);
-			CurrentUIDictionary.Add(name, new GameImage(name, 0,0, 50, 50, 1, 0, 0));
+			CurrentUIDictionary.Add(name, new GameImage(name, 0, 0, 50, 50, 1, 0, 0));
 			OpenUIEdits[0].AddUIElement(CurrentUIDictionary.Values.Last()); //TODO: use the selection Treeview
 		}
 
@@ -4567,7 +4577,7 @@ namespace AmethystEngine.Forms
 			CC.Tag = "Border";
 			Canvas.SetZIndex(CC, 0);
 
-			OpenUIEdits.Add(new BaseUI("NewUITool", 0,0,0,0, 50, 50, 1));
+			OpenUIEdits.Add(new BaseUI("NewUITool", 0, 0, 0, 0, 50, 50, 1));
 			SelectedUI = OpenUIEdits.Last();
 			CurrentUIDictionary.Add(OpenUIEdits.Last().UIName, OpenUIEdits.Last());
 
@@ -4869,7 +4879,9 @@ namespace AmethystEngine.Forms
 						VerticalAlignment = VerticalAlignment.Stretch,
 						Background =
 							(SolidColorBrush) new BrushConverter().ConvertFromString(
-								(childUI.GetPropertyData("BackgroundColor") == null ? "#00000000" : childUI.GetPropertyData("BackgroundColor"))
+								(childUI.GetPropertyData("BackgroundColor") == null
+									? "#00000000"
+									: childUI.GetPropertyData("BackgroundColor"))
 								.ToString()),
 						IsHitTestVisible = false,
 					};
@@ -5027,7 +5039,9 @@ namespace AmethystEngine.Forms
 						VerticalAlignment = VerticalAlignment.Stretch,
 						Background =
 							(SolidColorBrush) new BrushConverter().ConvertFromString(
-								(childUI.GetPropertyData("BackgroundColor") == null ? "#00000000" : childUI.GetPropertyData("BackgroundColor"))
+								(childUI.GetPropertyData("BackgroundColor") == null
+									? "#00000000"
+									: childUI.GetPropertyData("BackgroundColor"))
 								.ToString()),
 						IsHitTestVisible = false,
 					};
@@ -5409,7 +5423,8 @@ namespace AmethystEngine.Forms
 					new Tuple<string, object, Control>("Duration", TimeB.Duration.ToString(), durationime_TB));
 
 				int i = 0;
-				foreach (String s in (TimeB.LinkedDialogueBlock as NodeEditor.Components.DialogueNodeBlock)?.DialogueTextOptions)
+				foreach (String s in (TimeB.LinkedDialogueBlock as NodeEditor.Components.DialogueNodeBlock)
+					?.DialogueTextOptions)
 				{
 					ComboBox CB = new ComboBox() {Height = 50, ItemTemplate = (DataTemplate) this.Resources["CBIMGItems"]};
 					CB.SelectionChanged += SetSpriteImagePath_Dia;
@@ -5471,7 +5486,8 @@ namespace AmethystEngine.Forms
 				PropertyBag dialoguePropertyBag = new PropertyBag(sender);
 				dialoguePropertyBag.Name = "Dialogue Data";
 
-				TimelinePlayer.Components.TimeBlock TimeB = dialogueNodeBlock.LinkedTimeBlock as TimelinePlayer.Components.TimeBlock;
+				TimelinePlayer.Components.TimeBlock TimeB =
+					dialogueNodeBlock.LinkedTimeBlock as TimelinePlayer.Components.TimeBlock;
 				if (TimeB == null) throw new NotImplementedException("The Linked TextBox has NOT been set!");
 
 				if (PropertyBags.Count > 0)
@@ -5637,7 +5653,8 @@ namespace AmethystEngine.Forms
 			{
 				if (DialogueEditorSelectedControl is TimeBlock timeBlock)
 				{
-					(timeBlock.LinkedDialogueBlock as NodeEditor.Components.DialogueNodeBlock).DialogueTextOptions[(Grid.GetRow(sender as TextBox)) / 3]
+					(timeBlock.LinkedDialogueBlock as NodeEditor.Components.DialogueNodeBlock).DialogueTextOptions[
+							(Grid.GetRow(sender as TextBox)) / 3]
 						= (sender as TextBox).Text; //set the dialogue data
 					timeBlock.CurrentDialogue = (sender as TextBox).Text; //set the timeblock data
 				}
@@ -5894,7 +5911,8 @@ namespace AmethystEngine.Forms
 					ListBox lb = new ListBox();
 					lb.VerticalAlignment = VerticalAlignment.Bottom;
 					lb.HorizontalAlignment = HorizontalAlignment.Stretch;
-					foreach (String datachoices in (choiceTimeBlock.LinkedDialogueBlock as NodeEditor.Components.DialogueNodeBlock).DialogueTextOptions)
+					foreach (String datachoices in
+						(choiceTimeBlock.LinkedDialogueBlock as NodeEditor.Components.DialogueNodeBlock).DialogueTextOptions)
 					{
 						lb.Items.Add(datachoices);
 					}
@@ -5955,11 +5973,13 @@ namespace AmethystEngine.Forms
 					}
 
 					gtb.SetProperty("Text",
-						((((TimeBlock) e.NewItems[0]).LinkedDialogueBlock) as NodeEditor.Components.DialogueNodeBlock).DialogueTextOptions[0]);
+						((((TimeBlock) e.NewItems[0]).LinkedDialogueBlock) as NodeEditor.Components.DialogueNodeBlock)
+						.DialogueTextOptions[0]);
 
 					UIElementCollection uie =
 						((Grid) CurSceneEntityDisplays[
-							DialogueEditor_Timeline.GetTimelinePosition(((TimelinePlayer.Components.TimeBlock) e.NewItems[0]).TimelineParent)].Item2.Content)
+							DialogueEditor_Timeline.GetTimelinePosition(((TimelinePlayer.Components.TimeBlock) e.NewItems[0])
+								.TimelineParent)].Item2.Content)
 						.Children;
 					ContentControl CC = null;
 					foreach (UIElement ccc in uie)
@@ -6152,7 +6172,8 @@ namespace AmethystEngine.Forms
 		public object CreateDialogueBlockForTimeline(object Timeblock, bool bChoices)
 		{
 			int i = DialogueEditor_Timeline.GetTimelinePosition(DialogueEditor_Timeline.selectedTimeline, null);
-			NodeEditor.Components.DialogueNodeBlock dialogueNode = new NodeEditor.Components.DialogueNodeBlock(CurActiveDialogueScene.Characters[i].Name);
+			NodeEditor.Components.DialogueNodeBlock dialogueNode =
+				new NodeEditor.Components.DialogueNodeBlock(CurActiveDialogueScene.Characters[i].Name);
 			DialogueEditor_NodeGraph.AddDialogueBlockToGraph(dialogueNode, CurActiveDialogueScene.Characters[i].Name,
 				Timeblock);
 
@@ -6174,7 +6195,8 @@ namespace AmethystEngine.Forms
 		public object CreateTimeBlockForDialogue(object DialogueBlock)
 		{
 			int i = DialogueEditor_Timeline.GetTimelinePosition(DialogueEditor_Timeline.selectedTimeline, null);
-			TimelinePlayer.Components.TimeBlock timeBlock = new TimelinePlayer.Components.TimeBlock(DialogueEditor_Timeline.GetTimelines()[0], 0);
+			TimelinePlayer.Components.TimeBlock timeBlock =
+				new TimelinePlayer.Components.TimeBlock(DialogueEditor_Timeline.GetTimelines()[0], 0);
 			timeBlock.Trackname = (DialogueBlock as NodeEditor.Components.DialogueNodeBlock)?.Header;
 
 			//DialogueEditor_NodeGraph.AddDialogueBlockToGraph(timeBlock, CurActiveDialogueScene.Characters[i].Name, DialogueBlock);
@@ -6235,7 +6257,8 @@ namespace AmethystEngine.Forms
 			return retLL;
 		}
 
-		private void AddTimeBlocksTillExit(ref LinkedList<TimeBlock> output, NodeEditor.Components.BaseNodeBlock currentBlock)
+		private void AddTimeBlocksTillExit(ref LinkedList<TimeBlock> output,
+			NodeEditor.Components.BaseNodeBlock currentBlock)
 		{
 			//add until exit is found.
 			try
@@ -6400,7 +6423,7 @@ namespace AmethystEngine.Forms
 
 			//get the Params list of this scene
 			List<Tuple<String, object>> varDataList = new List<Tuple<string, object>>();
-			foreach ( BlockNodeEditor.RuntimeVars rtVars in DialogueEditor_NodeGraph.TestingVars_list)
+			foreach (BlockNodeEditor.RuntimeVars rtVars in DialogueEditor_NodeGraph.TestingVars_list)
 			{
 				varDataList.Add(new Tuple<string, object>(rtVars.VarName, rtVars.OrginalVarData));
 			}
@@ -6447,7 +6470,7 @@ namespace AmethystEngine.Forms
 			Console.WriteLine(dlg.FileName);
 			int charcnt = 0;
 			//DIALOGUE SCENE HOOKS
-			SetupDialogueSceneHooks(); 
+			SetupDialogueSceneHooks();
 
 			List<Tuple<String, String, int, String, String, int>> connectiList =
 				new List<Tuple<string, String, int, String, string, int>>();
@@ -6465,7 +6488,7 @@ namespace AmethystEngine.Forms
 			DialogueEditor_NodeGraph.NodeCanvas.Children.Clear();
 			foreach (NodeEditor.Components.BaseNodeBlock bn in dia.DialogueBlockNodes)
 			{
-				if (bn is NodeEditor.StartBlockNode )
+				if (bn is NodeEditor.StartBlockNode)
 					DialogueEditor_NodeGraph.StartExecutionBlock = bn;
 			}
 
@@ -6689,7 +6712,8 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-		private Point GetNodePosition(NodeEditor.Components.BaseNodeBlock NodeBlock, NodeEditor.Components.ConnectionNode DesNode)
+		private Point GetNodePosition(NodeEditor.Components.BaseNodeBlock NodeBlock,
+			NodeEditor.Components.ConnectionNode DesNode)
 		{
 			Point retPoint = new Point(0, 0);
 
@@ -6706,9 +6730,10 @@ namespace AmethystEngine.Forms
 					retPoint.Y = Canvas.GetTop(NodeBlock) + 30;
 				}
 			}
-			else if (NodeBlock is NodeEditor.Components.Arithmetic.BaseArithmeticBlock || NodeBlock is NodeEditor.Components.Logic.BaseLogicNodeBlock
-																								|| NodeBlock is NodeEditor.Components.ConditionalNodeBlock
-																								|| NodeBlock is NodeEditor.Components.SetConstantNodeBlock)
+			else if (NodeBlock is NodeEditor.Components.Arithmetic.BaseArithmeticBlock ||
+			         NodeBlock is NodeEditor.Components.Logic.BaseLogicNodeBlock
+			         || NodeBlock is NodeEditor.Components.ConditionalNodeBlock
+			         || NodeBlock is NodeEditor.Components.SetConstantNodeBlock)
 			{
 				if (NodeBlock.EntryNode == DesNode)
 				{
@@ -6791,7 +6816,7 @@ namespace AmethystEngine.Forms
 		private Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)
 		{
 			// BitmapImage bitmapImage = new BitmapImage(new Uri("../Images/test.png", UriKind.Relative));
-			 
+
 			using (MemoryStream outStream = new MemoryStream())
 			{
 				BitmapEncoder enc = new BmpBitmapEncoder();
@@ -6875,9 +6900,10 @@ namespace AmethystEngine.Forms
 			// Let's take the canvas sprite sheet andEditorToolBar_CC use that data to fill in the Game spritesheet
 			foreach (CanvasAnimation canvasAnimation in tempCanvasSpritesheet.AllAnimationOnSheet)
 			{
-				CurrentActiveSpriteSheet.SpriteAnimations.Add( canvasAnimation.AnimName,
+				CurrentActiveSpriteSheet.SpriteAnimations.Add(canvasAnimation.AnimName,
 					new SpriteAnimation(CurrentActiveSpriteSheet, canvasAnimation.AnimName,
-						canvasAnimation.CanvasFrames.Count, 0)); // Default to 0, because this NEEDS to be set by the user on firt attempt
+						canvasAnimation.CanvasFrames.Count,
+						0)); // Default to 0, because this NEEDS to be set by the user on firt attempt
 
 				// Add the frame positions
 				foreach (CanvasImageProperties canvasImageProperties in canvasAnimation.CanvasFrames)
@@ -6886,7 +6912,7 @@ namespace AmethystEngine.Forms
 						new LinkedListNode<FrameInfo>(new FrameInfo(canvasImageProperties.X, canvasImageProperties.Y,
 							canvasImageProperties.W, canvasImageProperties.H, canvasImageProperties.RX, canvasImageProperties.RY)));
 				}
-				
+
 			}
 
 			AE_NewAnimStates_IC.ItemsSource = null;
@@ -6919,6 +6945,7 @@ namespace AmethystEngine.Forms
 							Console.WriteLine("animation preview thread == interrupted");
 							break;
 						}
+
 						try
 						{
 							if (bAllowImportAnimPreview)
@@ -6928,7 +6955,7 @@ namespace AmethystEngine.Forms
 
 								//Force update to MainGUI
 								Dispatcher.Invoke(() =>
-									AnimationImporterTime_MS = (int)AnimationImporterPreview_Stopwatch.ElapsedMilliseconds);
+									AnimationImporterTime_MS = (int) AnimationImporterPreview_Stopwatch.ElapsedMilliseconds);
 
 								//Okay let's update the animations!
 								for (int i = 0; i < AE_NewAnimStates_IC.Items.Count; i++)
@@ -6939,7 +6966,7 @@ namespace AmethystEngine.Forms
 									Dispatcher.Invoke(() =>
 									{
 										ContentPresenter c =
-											((ContentPresenter)AE_NewAnimStates_IC.ItemContainerGenerator.ContainerFromIndex(i));
+											((ContentPresenter) AE_NewAnimStates_IC.ItemContainerGenerator.ContainerFromIndex(i));
 										var v = c.ContentTemplate.FindName("CurrentFrame_TB", c);
 										var v1 = c.ContentTemplate.FindName("CurrentDeltaTime_TB", c);
 
@@ -6953,8 +6980,8 @@ namespace AmethystEngine.Forms
 											{
 												int framenum = (int.Parse((v as TextBox).Text));
 
-												if (((int)(1.0f / currentSpriteAnimation.FPS * 1000.0f)) <
-														DT)
+												if (((int) (1.0f / currentSpriteAnimation.FPS * 1000.0f)) <
+												    DT)
 												{
 													framenum++;
 													currentSpriteAnimation.CurrentFrameRect = currentSpriteAnimation.CurrentFrameRect.Next;
@@ -6986,9 +7013,10 @@ namespace AmethystEngine.Forms
 
 
 												var crop = new CroppedBitmap(bmp, new Int32Rect(
-													(int)currentSpriteAnimation.CurrentFrameRect.Value.XPos,
-													(int)currentSpriteAnimation.CurrentFrameRect.Value.YPos,
-													(int)currentSpriteAnimation.CurrentFrameRect.Value.Width, (int)currentSpriteAnimation.CurrentFrameRect.Value.Height));
+													(int) currentSpriteAnimation.CurrentFrameRect.Value.XPos,
+													(int) currentSpriteAnimation.CurrentFrameRect.Value.YPos,
+													(int) currentSpriteAnimation.CurrentFrameRect.Value.Width,
+													(int) currentSpriteAnimation.CurrentFrameRect.Value.Height));
 												// using BitmapImage version to prove its created successfully
 												(vimg as Image).Source = crop;
 
@@ -7015,6 +7043,7 @@ namespace AmethystEngine.Forms
 				});
 
 			}
+
 			if (!animationImportPreviewThread.IsAlive)
 				animationImportPreviewThread.Start();
 
@@ -7065,9 +7094,10 @@ namespace AmethystEngine.Forms
 					bmi.UriSource = new Uri(NewAnimimationStatemachineLocation, UriKind.Absolute);
 					bmi.EndInit();
 
-					var crop = new CroppedBitmap(bmi, new Int32Rect((int)currentSpriteAnimation.CurrentFrameRect.Value.XPos,
-						(int)currentSpriteAnimation.CurrentFrameRect.Value.YPos,
-						(int)currentSpriteAnimation.CurrentFrameRect.Value.Width, (int)currentSpriteAnimation.CurrentFrameRect.Value.Height));
+					var crop = new CroppedBitmap(bmi, new Int32Rect((int) currentSpriteAnimation.CurrentFrameRect.Value.XPos,
+						(int) currentSpriteAnimation.CurrentFrameRect.Value.YPos,
+						(int) currentSpriteAnimation.CurrentFrameRect.Value.Width,
+						(int) currentSpriteAnimation.CurrentFrameRect.Value.Height));
 					// using BitmapImage version to prove its created successfully
 					(v as Image).Source = crop;
 
@@ -7082,11 +7112,11 @@ namespace AmethystEngine.Forms
 
 					var crop2 = new CroppedBitmap(bmi,
 						new Int32Rect(
-							(int)currentSpriteAnimation.CurrentFrameRect.Value.XPos,
-							(int)currentSpriteAnimation.CurrentFrameRect.Value.YPos,
-							(int)currentSpriteAnimation.CurrentFrameRect.Value.Width,
-							(int)currentSpriteAnimation.CurrentFrameRect.Value.Height
-							));
+							(int) currentSpriteAnimation.CurrentFrameRect.Value.XPos,
+							(int) currentSpriteAnimation.CurrentFrameRect.Value.YPos,
+							(int) currentSpriteAnimation.CurrentFrameRect.Value.Width,
+							(int) currentSpriteAnimation.CurrentFrameRect.Value.Height
+						));
 					(v2 as Image).Source = crop2;
 
 
@@ -7094,7 +7124,7 @@ namespace AmethystEngine.Forms
 
 				}
 			}
-			catch (ArgumentException ae )
+			catch (ArgumentException ae)
 			{
 				// We shouldn't get here anymore because of the sprite sheet editor
 
@@ -7103,7 +7133,8 @@ namespace AmethystEngine.Forms
 				//else if (bmi.Height < CurrentActiveSpriteSheet.SpriteAnimations_List[index].FrameHeight )
 				//	AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Desired Height of animation EXCEEDS the max width of given sprite sheet PNG";
 				//else
-				AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Invalid Parameters resetting Text box input";
+				AE_ImportStatusLog_TB.Text =
+					DateTime.Now.ToLongTimeString() + ":   Invalid Parameters resetting Text box input";
 				(sender as TextBox).Text = "0";
 			}
 		}
@@ -7121,7 +7152,8 @@ namespace AmethystEngine.Forms
 
 			if (CurrentActiveSpriteSheet.SpriteAnimations.Values.ToList()[index].FPS == 0)
 			{
-				AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   FPS CANNOT BE ZERO PREVIEW WILL NOT RUN. Please change";
+				AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() +
+				                             ":   FPS CANNOT BE ZERO PREVIEW WILL NOT RUN. Please change";
 			}
 			else
 			{
@@ -7159,12 +7191,15 @@ namespace AmethystEngine.Forms
 
 			if (NewSpriteSheetCharacterName == String.Empty)
 			{
-				AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Failed Import! Need to name the character who will use this sprite sheet";
+				AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() +
+				                             ":   Failed Import! Need to name the character who will use this sprite sheet";
 				return;
 			}
+
 			if (NewAnimimationStatemachineFileName == String.Empty)
 			{
-				AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Failed Import! Need to name the sprite sheet!";
+				AE_ImportStatusLog_TB.Text =
+					DateTime.Now.ToLongTimeString() + ":   Failed Import! Need to name the sprite sheet!";
 				return;
 			}
 
@@ -7177,7 +7212,8 @@ namespace AmethystEngine.Forms
 			CurrentActiveSpriteSheet.CharacterName = NewSpriteSheetCharacterName;
 
 			//We need to recreate the dictionary with the correct keys
-			List<SpriteAnimation> tempsSpriteAnimations = new List<SpriteAnimation>(CurrentActiveSpriteSheet.SpriteAnimations.Values);
+			List<SpriteAnimation> tempsSpriteAnimations =
+				new List<SpriteAnimation>(CurrentActiveSpriteSheet.SpriteAnimations.Values);
 			CurrentActiveSpriteSheet.SpriteAnimations.Clear();
 			CurrentActiveSpriteSheet.Width = NewAnimimationStatemachineTotalWidth;
 			CurrentActiveSpriteSheet.Height = NewAnimimationStatemachineTotalHeight;
@@ -7198,7 +7234,7 @@ namespace AmethystEngine.Forms
 
 			CurrentSpriteSheet_Image = bmi;
 
-			int count = 0; 
+			int count = 0;
 			foreach (var spriteanim in tempsSpriteAnimations)
 			{
 				// spriteanim.FrameDrawRects.Clear();
@@ -7216,7 +7252,8 @@ namespace AmethystEngine.Forms
 
 				CurrentActiveSpriteSheet.SpriteAnimations.Add(spriteanim.Name, spriteanim);
 
-				TreeView tempTV = (TreeView) ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control);
+				TreeView tempTV =
+					(TreeView) ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control);
 				var vvv = (ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control));
 				var vv = tempTV.ItemContainerGenerator.ContainerFromIndex(count++);
 
@@ -7225,15 +7262,15 @@ namespace AmethystEngine.Forms
 				//var v = (vv as TreeViewItem).ItemTemplate.FindName("Thumbnail", (vv as TreeViewItem));
 
 
-				var v  = FindElementByName<Image>((vv as TreeViewItem), "Thumbnail");
+				var v = FindElementByName<Image>((vv as TreeViewItem), "Thumbnail");
 
-				
+
 				var crop = new CroppedBitmap(bmi, new Int32Rect(
-					(int)spriteanim.CurrentFrameRect.Value.XPos,
-					(int)spriteanim.CurrentFrameRect.Value.YPos,
-					(int)spriteanim.CurrentFrameRect.Value.Width,
-					(int)spriteanim.CurrentFrameRect.Value.Height
-					));
+					(int) spriteanim.CurrentFrameRect.Value.XPos,
+					(int) spriteanim.CurrentFrameRect.Value.YPos,
+					(int) spriteanim.CurrentFrameRect.Value.Width,
+					(int) spriteanim.CurrentFrameRect.Value.Height
+				));
 				// using BitmapImage version to prove its created successfully
 				(v as Image).Source = crop;
 
@@ -7266,7 +7303,7 @@ namespace AmethystEngine.Forms
 
 			bAllowImportAnimPreview = false;
 			AE_NewAnimStates_IC.ItemsSource = null;
-			
+
 
 		}
 
@@ -7287,7 +7324,8 @@ namespace AmethystEngine.Forms
 			}
 			else
 			{
-				EngineOutputLog.AddErrorLogItem(-4, "New Animation Machine hasn't been created or opened yet!", "Animation Editor", true);
+				EngineOutputLog.AddErrorLogItem(-4, "New Animation Machine hasn't been created or opened yet!",
+					"Animation Editor", true);
 				EngineOutputLog.AddLogItem("Animation Machine error. See Error log for details");
 				if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
 					resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
@@ -7295,7 +7333,8 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-		private void AddToStatemachineFromForm(SpriteAnimation retspriteanimation, String name, bool bIsAdding, bool bDefaultChanged, String oldkey = "")
+		private void AddToStatemachineFromForm(SpriteAnimation retspriteanimation, String name, bool bIsAdding,
+			bool bDefaultChanged, String oldkey = "")
 		{
 			SceneExplorer_TreeView.ItemsSource = null;
 			Animation_CE_Tree.ItemsSource = null;
@@ -7310,7 +7349,7 @@ namespace AmethystEngine.Forms
 
 				retspriteanimation.bIsDefaultState = bDefaultChanged;
 			}
-			
+
 
 
 			if (bIsAdding)
@@ -7364,17 +7403,19 @@ namespace AmethystEngine.Forms
 			CurrentAnimPreviewImages_CE.Clear();
 
 			//First up which Item are we in/binded too?
-			var item = new  object();
+			var item = new object();
 			if (sender is StackPanel sp)
 			{
-				 item = (sender as StackPanel).DataContext;
+				item = (sender as StackPanel).DataContext;
 			}
 			else
 			{
 				item = (VisualTreeHelper.GetParent(sender as Image) as StackPanel).DataContext;
 			}
 
-			var index = (ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control) as TreeView).Items.IndexOf(item);
+			var index =
+				(ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control) as TreeView).Items
+				.IndexOf(item);
 
 			if (index >= 0)
 			{
@@ -7391,13 +7432,13 @@ namespace AmethystEngine.Forms
 
 					CurrentAnimPreviewImages_CE.Add(
 						(new CroppedBitmap(CurrentSpriteSheet_Image, new Int32Rect(
-							(int)spriteanim.CurrentFrameRect.Value.XPos,
-							(int)spriteanim.CurrentFrameRect.Value.YPos,
-							(int)spriteanim.CurrentFrameRect.Value.Width,
-							(int)spriteanim.CurrentFrameRect.Value.Height
-							))));
-					}
+							(int) spriteanim.CurrentFrameRect.Value.XPos,
+							(int) spriteanim.CurrentFrameRect.Value.YPos,
+							(int) spriteanim.CurrentFrameRect.Value.Width,
+							(int) spriteanim.CurrentFrameRect.Value.Height
+						))));
 				}
+			}
 
 			if (sender is StackPanel ss)
 			{
@@ -7411,12 +7452,12 @@ namespace AmethystEngine.Forms
 
 			PreviewAnimUI_Image_PTR.Tag = 1;
 			Animation_CE_Preview_Stopwatch.Start();
-			PreviewAnim_Data_PTR = (SpriteAnimation )item;
+			PreviewAnim_Data_PTR = (SpriteAnimation) item;
 
 
-	}
+		}
 
-	private void AnimationPreviewThumbnail_Image_Leave(object sender, MouseEventArgs e)
+		private void AnimationPreviewThumbnail_Image_Leave(object sender, MouseEventArgs e)
 		{
 			PreviewAnimUI_Image_PTR = null;
 			Animation_CE_Preview_Stopwatch.Reset();
@@ -7490,7 +7531,9 @@ namespace AmethystEngine.Forms
 						Console.WriteLine("selected animation thread == interrupted");
 						break;
 					}
-					if (CurrentSelectedAnimImages_List.Count > 0 && AE_CurrentAnimSM_Grid.Visibility == Visibility.Visible && CurrentlySelectedAnimation != null)
+
+					if (CurrentSelectedAnimImages_List.Count > 0 && AE_CurrentAnimSM_Grid.Visibility == Visibility.Visible &&
+					    CurrentlySelectedAnimation != null)
 					{
 						//Let's make the image "move"
 						if (AnimationSelected_Stopwatch.ElapsedMilliseconds > (1.0f / CurrentlySelectedAnimation.FPS * 1000.0f))
@@ -7517,12 +7560,16 @@ namespace AmethystEngine.Forms
 										// CurrentBaseLayerAnimation_Img.Source = CurrentSelectedAnimImages_List[(int) frame - 1];
 										AnimationEditor_Canvas.Children.Remove(CurrentBaseLayerAnimation_Img);
 										CurrentBaseLayerAnimation_Img = new Image();
-										CurrentBaseLayerAnimation_Img.Source = CurrentSelectedAnimImages_List[(int)frame - 1];
+										CurrentBaseLayerAnimation_Img.Source = CurrentSelectedAnimImages_List[(int) frame - 1];
 										CurrentBaseLayerAnimation_Img.Stretch = Stretch.Fill;
-										CurrentBaseLayerAnimation_Img.Width = CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].Width;
-										CurrentBaseLayerAnimation_Img.MaxWidth = CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].Width;
-										CurrentBaseLayerAnimation_Img.Height = CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].Height;
-										CurrentBaseLayerAnimation_Img.MaxHeight = CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].Height;
+										CurrentBaseLayerAnimation_Img.Width =
+											CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int) frame) - 1].Width;
+										CurrentBaseLayerAnimation_Img.MaxWidth =
+											CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int) frame) - 1].Width;
+										CurrentBaseLayerAnimation_Img.Height =
+											CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int) frame) - 1].Height;
+										CurrentBaseLayerAnimation_Img.MaxHeight =
+											CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int) frame) - 1].Height;
 										CurrentBaseLayerAnimation_Img.StretchDirection = StretchDirection.Both;
 										AnimationEditor_Canvas.Children.Add(CurrentBaseLayerAnimation_Img);
 										CurrentBaseLayerAnimation_Img.UpdateLayout();
@@ -7534,11 +7581,13 @@ namespace AmethystEngine.Forms
 
 										int middleX = (int) (AnimationEditor_BackCanvas.ActualWidth / 2.0f);
 										int middleY = (int) (AnimationEditor_BackCanvas.ActualHeight / 2.0f);
-										int newX = middleX - CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].RenderPointX;
+										int newX = middleX - CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int) frame) - 1]
+											.RenderPointX;
 										//newX = newX + ((CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int) frame) - 1].Width -
 										//                (int) CurrentBaseLayerAnimation_Img.ActualWidth) / 2);
 
-										int newY = middleY - CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].RenderPointY;
+										int newY = middleY - CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int) frame) - 1]
+											.RenderPointY;
 										//newY = newY + ((CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int) frame) - 1].Height -
 										//                (int) CurrentBaseLayerAnimation_Img.Height) / 2);
 										//Canvas.SetLeft(CurrentBaseLayerAnimation_Img, middleX - ((int)(CurrentBaseLayerAnimation_Img.ActualWidth/ 2.0f)));
@@ -7547,11 +7596,13 @@ namespace AmethystEngine.Forms
 										Canvas.SetLeft(CurrentBaseLayerAnimation_Img, newX);
 										Canvas.SetTop(CurrentBaseLayerAnimation_Img, newY);
 
-										Console.WriteLine(String.Format("w:{0}, h:{1} newX:{2}, newY:{3} | iWidth:{4}, iHeight:{5}, mx:{6}, my:{7}, FRAME:{8}" ,
-											CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].Width,
-											CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int)frame) - 1].Height,
-											newX, newY, (int)CurrentBaseLayerAnimation_Img.ActualWidth, (int)CurrentBaseLayerAnimation_Img.ActualHeight,
-											middleX, middleY, frame-1));
+										Console.WriteLine(String.Format(
+											"w:{0}, h:{1} newX:{2}, newY:{3} | iWidth:{4}, iHeight:{5}, mx:{6}, my:{7}, FRAME:{8}",
+											CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int) frame) - 1].Width,
+											CurrentlySelectedAnimation.FrameDrawRects.ToList()[((int) frame) - 1].Height,
+											newX, newY, (int) CurrentBaseLayerAnimation_Img.ActualWidth,
+											(int) CurrentBaseLayerAnimation_Img.ActualHeight,
+											middleX, middleY, frame - 1));
 
 									}
 
@@ -7561,8 +7612,8 @@ namespace AmethystEngine.Forms
 									{
 										if (frame > AnimationSubLayerImages_List[i].Count)
 											continue;
-										(AnimationLayersPreview_Canvas_IC.Children[i] as Image).Source = 
-											AnimationSubLayerImages_List[i][(int)frame-1];
+										(AnimationLayersPreview_Canvas_IC.Children[i] as Image).Source =
+											AnimationSubLayerImages_List[i][(int) frame - 1];
 										(AnimationLayersPreview_Canvas_IC.Children[i] as Image).Tag = frame.ToString();
 									}
 
@@ -7590,7 +7641,7 @@ namespace AmethystEngine.Forms
 									//	{
 									//		framesublayer++;
 									//	}
-										
+
 									//	//this needs the +1 because of base layer
 									//	(AnimationLayersPreview_Canvas_IC.Children[count+1] as Image).Tag = framesublayer.ToString();
 									//	count++;
@@ -7613,7 +7664,7 @@ namespace AmethystEngine.Forms
 		}
 
 
-		private void OpenLayeredSpriteSheetFile_MI_Click( object sender, RoutedEventArgs e)
+		private void OpenLayeredSpriteSheetFile_MI_Click(object sender, RoutedEventArgs e)
 		{
 			SceneExplorer_TreeView.ItemsSource = null;
 			Animation_CE_Tree.ItemsSource = null;
@@ -7633,27 +7684,29 @@ namespace AmethystEngine.Forms
 			{
 				// Save document
 				filename = dlg.FileName;
-				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] {'/', '\\'}));
 			}
 			else return; //invalid name
 
 			Console.WriteLine(dlg.FileName);
-			LayeredSpriteSheet ret =  LayeredSpriteSheet.ImportlayeredAnimationSheet(dlg.FileName);
+			LayeredSpriteSheet ret = LayeredSpriteSheet.ImportlayeredAnimationSheet(dlg.FileName);
 
 			//Now that we have a layed sheet imported let's add all that data to the screen
 			currentLayeredSpriteSheet = ret;
 
 			Console.WriteLine(AnimationSubLayer_CB.Items.Count);
-			for(int i = AnimationSubLayer_CB.Items.Count-1; i >= 2; i--)
+			for (int i = AnimationSubLayer_CB.Items.Count - 1; i >= 2; i--)
 			{
 				AnimationSubLayer_CB.Items.RemoveAt(i)
-;			}
+					;
+			}
+
 			AnimationLayersPreview_Canvas_IC.Children.Clear();
 			for (int i = 0; i < ret.subLayerSpritesheets_Dict.Keys.Count; i++)
 			{
 				AnimationSubLayer_CB.Items.Add(ret.subLayerSpritesheets_Dict.Keys.ToList()[i]);
 				//we have added the layer Data wise, but not display wise don't forget
-				Image img = new Image() { Tag = "1" };
+				Image img = new Image() {Tag = "1"};
 				Grid.SetZIndex(img, currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Count);
 				AnimationLayersPreview_Canvas_IC.Children.Add(img);
 				AnimationSubLayerImages_List.Add(new List<CroppedBitmap>());
@@ -7661,15 +7714,18 @@ namespace AmethystEngine.Forms
 				if (i == 0) AnimationSubLayer_CB.SelectedIndex = 2;
 			}
 
-			if (AnimationSubLayer_CB.SelectedIndex == 2) {
-				CurrentSubLayerSpriteSheets_LB.ItemsSource = ret.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Items[2].ToString()];
+			if (AnimationSubLayer_CB.SelectedIndex == 2)
+			{
+				CurrentSubLayerSpriteSheets_LB.ItemsSource =
+					ret.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Items[2].ToString()];
 
 
-			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.Count > 0)
+				if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.Count > 0)
 				{
 					CurrentSubLayerAnimStates_LB.ItemsSource =
-						currentLayeredSpriteSheet.subLayerSpritesheets_Dict[currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[0]]
-						.ToList();
+						currentLayeredSpriteSheet
+							.subLayerSpritesheets_Dict[currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[0]]
+							.ToList();
 				}
 			}
 
@@ -7715,7 +7771,7 @@ namespace AmethystEngine.Forms
 				AnimationSelected_Stopwatch.Start();
 
 
-			
+
 		}
 
 
@@ -7741,7 +7797,7 @@ namespace AmethystEngine.Forms
 			{
 				// Save document
 				filename = dlg.FileName;
-				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] {'/', '\\'}));
 			}
 			else return; //invalid name
 
@@ -7784,7 +7840,7 @@ namespace AmethystEngine.Forms
 			AE_NewAnimSM_MainGrid.Visibility = Visibility.Hidden;
 			AE_CurrentAnimSM_Grid.Visibility = Visibility.Visible;
 
-			if(!AnimationSelected_Stopwatch.IsRunning)
+			if (!AnimationSelected_Stopwatch.IsRunning)
 				AnimationSelected_Stopwatch.Start();
 
 			//Adding this to the layered Sprite sheet. THIS import must be changed later.
@@ -7813,9 +7869,10 @@ namespace AmethystEngine.Forms
 			{
 				// Save document
 				filename = dlg.FileName;
-				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] {'/', '\\'}));
 			}
 			else return; //invalid name
+
 			SpriteSheet.ExportSpriteSheet(CurrentActiveSpriteSheet, dlg.FileName.Replace(".anim", ""));
 
 		}
@@ -7848,7 +7905,8 @@ namespace AmethystEngine.Forms
 			}
 		}
 
-		private void AnimationSceneExplorer_TreeView_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		private void AnimationSceneExplorer_TreeView_OnSelectedItemChanged(object sender,
+			RoutedPropertyChangedEventArgs<object> e)
 		{
 			SpriteSheet sheet = (sender as TreeViewItem).DataContext as SpriteSheet;
 
@@ -7861,33 +7919,33 @@ namespace AmethystEngine.Forms
 		}
 
 		private BitmapImage ChangeImageDpi(BitmapImage sourceImage, double newDpiX, double newDpiY)
-{
-    var bitmapFrame = BitmapFrame.Create(sourceImage);
-    var metadata = (BitmapMetadata)bitmapFrame.Metadata.Clone();
+		{
+			var bitmapFrame = BitmapFrame.Create(sourceImage);
+			var metadata = (BitmapMetadata) bitmapFrame.Metadata.Clone();
 
-    // Update the DPI values in the metadata
-    metadata.SetQuery("/app1/ifd/{ushort=282}", newDpiX);
-    metadata.SetQuery("/app1/ifd/{ushort=283}", newDpiY);
+			// Update the DPI values in the metadata
+			metadata.SetQuery("/app1/ifd/{ushort=282}", newDpiX);
+			metadata.SetQuery("/app1/ifd/{ushort=283}", newDpiY);
 
-    var encoder = new JpegBitmapEncoder();
-    encoder.Frames.Add(BitmapFrame.Create(bitmapFrame, bitmapFrame.Thumbnail, metadata, bitmapFrame.ColorContexts));
+			var encoder = new JpegBitmapEncoder();
+			encoder.Frames.Add(BitmapFrame.Create(bitmapFrame, bitmapFrame.Thumbnail, metadata, bitmapFrame.ColorContexts));
 
-    // Create a new MemoryStream to hold the encoded image data
-    using (var memoryStream = new MemoryStream())
-    {
-        // Save the encoded image data to the MemoryStream
-        encoder.Save(memoryStream);
+			// Create a new MemoryStream to hold the encoded image data
+			using (var memoryStream = new MemoryStream())
+			{
+				// Save the encoded image data to the MemoryStream
+				encoder.Save(memoryStream);
 
-        // Create a new BitmapImage from the MemoryStream
-        var newImage = new BitmapImage();
-        newImage.BeginInit();
-        newImage.CacheOption = BitmapCacheOption.OnLoad;
-        newImage.StreamSource = new MemoryStream(memoryStream.ToArray());
-        newImage.EndInit();
+				// Create a new BitmapImage from the MemoryStream
+				var newImage = new BitmapImage();
+				newImage.BeginInit();
+				newImage.CacheOption = BitmapCacheOption.OnLoad;
+				newImage.StreamSource = new MemoryStream(memoryStream.ToArray());
+				newImage.EndInit();
 
-        return newImage;
-    }
-}
+				return newImage;
+			}
+		}
 
 		private void ChangeActiveSpriteSheet_TVI_Click(object sender, MouseButtonEventArgs e)
 		{
@@ -7904,13 +7962,13 @@ namespace AmethystEngine.Forms
 
 				Animation_CE_Tree.UpdateLayout();
 				//SceneExplorer_TreeView.UpdateLayout();
-				
+
 				//Set up the PNG This will allow it to NOT be locked
 				BitmapImage bmi = new BitmapImage();
 				bmi.BeginInit();
 				bmi.CacheOption = BitmapCacheOption.OnLoad;
 				bmi.UriSource = new Uri(CurrentActiveSpriteSheet.ImgPathLocation, UriKind.Absolute);
-				
+
 				bmi.EndInit();
 				CurrentSpriteSheet_Image = bmi;
 
@@ -7944,13 +8002,15 @@ namespace AmethystEngine.Forms
 
 		private void PlayCurrentSelectedAnimation_BTN_Click(object sender, RoutedEventArgs e)
 		{
-			if(!AnimationSelected_Stopwatch.IsRunning)
+			if (!AnimationSelected_Stopwatch.IsRunning)
 				AnimationSelected_Stopwatch.Start();
 		}
+
 		private void PauseCurrentSelectedAnimation_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			AnimationSelected_Stopwatch.Stop();
 		}
+
 		private void ResetCurrentSelectedAnimation_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			//throw new NotImplementedException();
@@ -7979,11 +8039,11 @@ namespace AmethystEngine.Forms
 
 					CurrentSelectedAnimImages_List.Add(
 						(new CroppedBitmap(CurrentSpriteSheet_Image, new Int32Rect(
-							(int)item.FrameDrawRects.ToList()[i].XPos,
-							(int)item.FrameDrawRects.ToList()[i].YPos,
-							(int)item.FrameDrawRects.ToList()[i].Width,
-							(int)item.FrameDrawRects.ToList()[i].Height
-							))));
+							(int) item.FrameDrawRects.ToList()[i].XPos,
+							(int) item.FrameDrawRects.ToList()[i].YPos,
+							(int) item.FrameDrawRects.ToList()[i].Width,
+							(int) item.FrameDrawRects.ToList()[i].Height
+						))));
 					item.CurrentFrameRect = item.CurrentFrameRect.Next;
 				}
 
@@ -7993,29 +8053,32 @@ namespace AmethystEngine.Forms
 				CurrentBaseLayerAnimation_Img.Tag = 1;
 				CurrentlySelectedAnimation = item;
 			}
+
 			if (!AnimationSelected_Stopwatch.IsRunning)
 				AnimationSelected_Stopwatch.Start();
 
 			AnimationChangeEvents_Properties_Tree.ItemsSource = null;
 			AnimationAudioEvents_Properties_Tree.ItemsSource = null;
 
-			AnimationChangeEvents_Properties_Tree.ItemsSource = CurrentlySelectedAnimation.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent); 
-			AnimationAudioEvents_Properties_Tree.ItemsSource = CurrentlySelectedAnimation.GetAnimationEvents().FindAll(x => x is AudioEvent); 
+			AnimationChangeEvents_Properties_Tree.ItemsSource =
+				CurrentlySelectedAnimation.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent);
+			AnimationAudioEvents_Properties_Tree.ItemsSource =
+				CurrentlySelectedAnimation.GetAnimationEvents().FindAll(x => x is AudioEvent);
 
 		}
 
 		public static BitmapSource ConvertBitmapTo96DPI(BitmapImage bitmapImage)
-{
-    double dpi = 96;
-    int width = bitmapImage.PixelWidth;
-    int height = bitmapImage.PixelHeight;
+		{
+			double dpi = 96;
+			int width = bitmapImage.PixelWidth;
+			int height = bitmapImage.PixelHeight;
 
-    int stride = width * bitmapImage.Format.BitsPerPixel;
-    byte[] pixelData = new byte[stride * height];
-    bitmapImage.CopyPixels(pixelData, stride, 0);
+			int stride = width * bitmapImage.Format.BitsPerPixel;
+			byte[] pixelData = new byte[stride * height];
+			bitmapImage.CopyPixels(pixelData, stride, 0);
 
-    return BitmapSource.Create(width, height, dpi, dpi, bitmapImage.Format, null, pixelData, stride);
-}
+			return BitmapSource.Create(width, height, dpi, dpi, bitmapImage.Format, null, pixelData, stride);
+		}
 
 		private void Thumbnail_OnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
 		{
@@ -8050,8 +8113,9 @@ namespace AmethystEngine.Forms
 		{
 
 			//throw new NotImplementedException();
-			Window ae = new AddEditAnimationStateMachine(CurrentSpriteSheet_Image, CurrentActiveSpriteSheet, CurrentActiveSpriteSheet.SpriteAnimations[_animationState_TV_QueriedKey])
-				{ AddToStatemachine = AddToStatemachineFromForm };
+			Window ae = new AddEditAnimationStateMachine(CurrentSpriteSheet_Image, CurrentActiveSpriteSheet,
+					CurrentActiveSpriteSheet.SpriteAnimations[_animationState_TV_QueriedKey])
+				{AddToStatemachine = AddToStatemachineFromForm};
 			ae.ShowDialog();
 
 		}
@@ -8115,7 +8179,7 @@ namespace AmethystEngine.Forms
 
 			AnimationChangeEvents_Properties_Tree.ItemsSource = null;
 			CurrentlySelectedAnimation.AddAnimationEvents(
-				new ChangeAnimationEvent(CurrentlySelectedAnimation.Name, "NONE", true ));
+				new ChangeAnimationEvent(CurrentlySelectedAnimation.Name, "NONE", true));
 			AnimationChangeEvents_Properties_Tree.ItemsSource =
 				CurrentlySelectedAnimation.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent);
 		}
@@ -8134,12 +8198,13 @@ namespace AmethystEngine.Forms
 		private void AnimationAudioEvent_TB_KeyUp(object sender, KeyEventArgs e)
 		{
 			//Lamooo this is so dumb...
-			String stotal = (sender as TextBox).Text + e.Key.ToString().Replace("D","");
+			String stotal = (sender as TextBox).Text + e.Key.ToString().Replace("D", "");
 			if (int.TryParse(stotal, out int val))
 			{
 				if (val > CurrentlySelectedAnimation.FrameCount)
 				{
-					EngineOutputLog.AddErrorLogItem(-5, "Frame Entered for event Exceeds Max Frame Count!", "Animation Editor", true);
+					EngineOutputLog.AddErrorLogItem(-5, "Frame Entered for event Exceeds Max Frame Count!", "Animation Editor",
+						true);
 					EngineOutputLog.AddLogItem("Animation Machine error. See Error log for details");
 					if (resizeGrid.RowDefinitions.Last().Height.Value < 100)
 						resizeGrid.RowDefinitions.Last().Height = new GridLength(100);
@@ -8148,6 +8213,7 @@ namespace AmethystEngine.Forms
 					(sender as TextBox).Text = "0";
 
 				}
+
 				if (val < 0)
 				{
 					EngineOutputLog.AddErrorLogItem(-5, "Frame Entered cannot be negative!!", "Animation Editor", true);
@@ -8175,7 +8241,8 @@ namespace AmethystEngine.Forms
 				if (sp != null)
 				{
 					SpriteAnimation item = null;
-					if(!CurrentActiveSpriteSheet.SpriteAnimations.TryGetValue((sp.DataContext as ChangeAnimationEvent).FromAnimationName, out item))
+					if (!CurrentActiveSpriteSheet.SpriteAnimations.TryGetValue(
+						(sp.DataContext as ChangeAnimationEvent).FromAnimationName, out item))
 						return;
 					//var index = (ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control) as TreeView).Items.IndexOf(item);
 
@@ -8199,14 +8266,16 @@ namespace AmethystEngine.Forms
 					}
 					else
 					{
-						item = CurrentActiveSpriteSheet.SpriteAnimations[(sp.DataContext as ChangeAnimationEvent).FromAnimationName];
+						item = CurrentActiveSpriteSheet.SpriteAnimations[
+							(sp.DataContext as ChangeAnimationEvent).FromAnimationName];
 					}
+
 					var crop = new CroppedBitmap(bmp, new Int32Rect(
-						(int)item.CurrentFrameRect.Value.XPos,
-						(int)item.CurrentFrameRect.Value.YPos,
-						(int)item.CurrentFrameRect.Value.Width,
-						(int)item.CurrentFrameRect.Value.Height
-						));
+						(int) item.CurrentFrameRect.Value.XPos,
+						(int) item.CurrentFrameRect.Value.YPos,
+						(int) item.CurrentFrameRect.Value.Width,
+						(int) item.CurrentFrameRect.Value.Height
+					));
 					(sp.Children[0] as Image).Source = crop;
 
 
@@ -8217,15 +8286,17 @@ namespace AmethystEngine.Forms
 
 		private void AnimationPreviewThumbnail_SubLayer_EVENT_Image_Enter(object sender, MouseEventArgs e)
 		{
-			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].
-				ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].ImgPathLocation == null) return;
-			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].
-				ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].SpriteAnimations.TryGetValue(((sender as Grid).DataContext as ChangeAnimationEvent).ToAnimationName,
-				out SpriteAnimation animval))
+			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].ToList()[
+				CurrentSubLayerSpriteSheets_LB.SelectedIndex].ImgPathLocation == null) return;
+			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].ToList()
+				[CurrentSubLayerSpriteSheets_LB.SelectedIndex].SpriteAnimations.TryGetValue(
+					((sender as Grid).DataContext as ChangeAnimationEvent).ToAnimationName,
+					out SpriteAnimation animval))
 			{
 
-				String imgpath = currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].
-				ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].ImgPathLocation;
+				String imgpath =
+					currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].ToList()[
+						CurrentSubLayerSpriteSheets_LB.SelectedIndex].ImgPathLocation;
 
 				//CurrentAnimPreviewImages_CE 
 				CurrentAnimPreviewImages_CE.Clear();
@@ -8238,7 +8309,7 @@ namespace AmethystEngine.Forms
 					//	(int)(animval.StartXPos +
 					//		((animval.FrameCount) * animval.FrameWidth) > CurrentSpriteSheet_Image.Width
 					//			? CurrentSpriteSheet_Image.Width - ((animval.StartXPos + ((animval.FrameCount - 1) * animval.FrameWidth))) : animval.FrameWidth);
-				
+
 					BitmapImage bmi = new BitmapImage();
 					bmi.BeginInit();
 					bmi.CacheOption = BitmapCacheOption.OnLoad;
@@ -8247,17 +8318,17 @@ namespace AmethystEngine.Forms
 
 					CurrentAnimPreviewImages_CE.Add(
 						(new CroppedBitmap(bmi, new Int32Rect(
-							(int)animval.CurrentFrameRect.Value.XPos,
-							(int)animval.CurrentFrameRect.Value.YPos,
-							(int)animval.CurrentFrameRect.Value.Width,
-							(int)animval.CurrentFrameRect.Value.Height
-							))));
+							(int) animval.CurrentFrameRect.Value.XPos,
+							(int) animval.CurrentFrameRect.Value.YPos,
+							(int) animval.CurrentFrameRect.Value.Width,
+							(int) animval.CurrentFrameRect.Value.Height
+						))));
 				}
 
 				PreviewAnimUI_Image_PTR = (sender as Grid).Children[0] as Image;
 				PreviewAnimUI_Image_PTR.Tag = 1;
 				Animation_CE_Preview_Stopwatch.Start();
-				PreviewAnim_Data_PTR = (SpriteAnimation)animval;
+				PreviewAnim_Data_PTR = (SpriteAnimation) animval;
 			}
 		}
 
@@ -8265,7 +8336,8 @@ namespace AmethystEngine.Forms
 		private void AnimationPreviewThumbnail_EVENT_Image_Enter(object sender, MouseEventArgs e)
 		{
 			if (CurrentSpriteSheet_Image.UriSource == null) return;
-			if (CurrentActiveSpriteSheet.SpriteAnimations.TryGetValue(((sender as Grid).DataContext as ChangeAnimationEvent).ToAnimationName,
+			if (CurrentActiveSpriteSheet.SpriteAnimations.TryGetValue(
+				((sender as Grid).DataContext as ChangeAnimationEvent).ToAnimationName,
 				out SpriteAnimation animval))
 			{
 				//CurrentAnimPreviewImages_CE 
@@ -8283,17 +8355,17 @@ namespace AmethystEngine.Forms
 
 					CurrentAnimPreviewImages_CE.Add(
 						(new CroppedBitmap(CurrentSpriteSheet_Image, new Int32Rect(
-							(int)animval.CurrentFrameRect.Value.XPos,
-							(int)animval.CurrentFrameRect.Value.YPos,
-							(int)animval.CurrentFrameRect.Value.Width,
-							(int)animval.CurrentFrameRect.Value.Height
+							(int) animval.CurrentFrameRect.Value.XPos,
+							(int) animval.CurrentFrameRect.Value.YPos,
+							(int) animval.CurrentFrameRect.Value.Width,
+							(int) animval.CurrentFrameRect.Value.Height
 						))));
 				}
 
 				PreviewAnimUI_Image_PTR = (sender as Grid).Children[0] as Image;
 				PreviewAnimUI_Image_PTR.Tag = 1;
 				Animation_CE_Preview_Stopwatch.Start();
-				PreviewAnim_Data_PTR = (SpriteAnimation)animval;
+				PreviewAnim_Data_PTR = (SpriteAnimation) animval;
 			}
 		}
 
@@ -8307,16 +8379,16 @@ namespace AmethystEngine.Forms
 			                        + "/images/Ame_icon_small.png", UriKind.Absolute);
 			bmi.EndInit();
 
-			
+
 
 			AnimationLayersPreview_Canvas_IC.Children.Add(new Image() {Source = bmi});
-			Grid.SetZIndex(AnimationLayersPreview_Canvas_IC.Children[1] as Image,1);
+			Grid.SetZIndex(AnimationLayersPreview_Canvas_IC.Children[1] as Image, 1);
 		}
 
 		private void AnimTestLayerSwitchZindex_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			Image img = AnimationLayersPreview_Canvas_IC.Children[1] as Image;
-			Grid.SetZIndex(AnimationLayersPreview_Canvas_IC.Children[0] as Image,1);
+			Grid.SetZIndex(AnimationLayersPreview_Canvas_IC.Children[0] as Image, 1);
 
 
 			Grid.SetZIndex(img, 0);
@@ -8332,7 +8404,7 @@ namespace AmethystEngine.Forms
 				AnimationAddSubLayer_Grid.Visibility = Visibility.Visible;
 				AnimationLayersSettings_Grid.Visibility = Visibility.Hidden;
 			}
-			else if (cb.SelectedIndex > 1&& cb.Items[cb.SelectedIndex]as ComboBoxItem != null)
+			else if (cb.SelectedIndex > 1 && cb.Items[cb.SelectedIndex] as ComboBoxItem != null)
 			{
 				//this is an actual sub layer, So we need to load all the possible Spritesheets to the screen
 				CurrentSubLayerSpriteSheets_LB.ItemsSource =
@@ -8347,13 +8419,13 @@ namespace AmethystEngine.Forms
 		{
 			if (AddSubLayerName_TB.Text != "")
 			{
-				if(!currentLayeredSpriteSheet.AddSubLayer(AddSubLayerName_TB.Text)) return; //failed
+				if (!currentLayeredSpriteSheet.AddSubLayer(AddSubLayerName_TB.Text)) return; //failed
 
 
-				AnimationSubLayer_CB.Items.Add(new ComboBoxItem(){Content = AddSubLayerName_TB.Text });
+				AnimationSubLayer_CB.Items.Add(new ComboBoxItem() {Content = AddSubLayerName_TB.Text});
 				AnimationSubLayer_CB.SelectedIndex = AnimationSubLayer_CB.Items.Count - 1;
 
-				Image img = new Image(){Tag = "1"};
+				Image img = new Image() {Tag = "1"};
 				Grid.SetZIndex(img, currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Count);
 				AnimationLayersPreview_Canvas_IC.Children.Add(img);
 
@@ -8367,7 +8439,7 @@ namespace AmethystEngine.Forms
 
 		private void AddSpriteSheetToSubLayer_BTN_Click(object sender, RoutedEventArgs e)
 		{
-			
+
 
 			if (AnimationSubLayer_CB.SelectedIndex < 1) return;
 
@@ -8389,16 +8461,18 @@ namespace AmethystEngine.Forms
 			{
 				// Save document
 				filename = dlg.FileName;
-				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] {'/', '\\'}));
 			}
 			else return; //invalid name
+
 			SpriteSheet retSheet = SpriteSheet.ImportSpriteSheet(dlg.FileName);
-			
-				//Adding this to the layered Sprite sheet. THIS import must be changed later.
+
+			//Adding this to the layered Sprite sheet. THIS import must be changed later.
 			//currentLayeredSpriteSheet = new LayeredSpriteSheet(retSheet);
 			currentLayeredSpriteSheet.AddSpriteSheetToSubLayer(
-				currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[AnimationSubLayer_CB.SelectedIndex-2], retSheet);
-			
+				currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[AnimationSubLayer_CB.SelectedIndex - 2],
+				retSheet);
+
 			CurrentSubLayerSpriteSheets_LB.ItemsSource =
 				currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Text].ToList();
 		}
@@ -8407,17 +8481,17 @@ namespace AmethystEngine.Forms
 		{
 			if (AnimationSubLayer_CB.SelectedIndex >= 2)
 			{
-					String name =
-						currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[AnimationSubLayer_CB.SelectedIndex - 2];
+				String name =
+					currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[AnimationSubLayer_CB.SelectedIndex - 2];
 
-					SpriteSheet spriteSheet = currentLayeredSpriteSheet.ActiveSubLayerSheet[name];
-					if (spriteSheet != null && (sender as ListBox).SelectedItem != null)
-					{
-						CurrentSubLayerAnimStates_LB.ItemsSource = spriteSheet.SpriteAnimations.Values;
-						currentLayeredSpriteSheet.ChangeActiveSheetString(AnimationSubLayer_CB.Text,
-							currentLayeredSpriteSheet.ActiveSubLayerSheet[AnimationSubLayer_CB.Text].SheetName,
-							((sender as ListBox).SelectedItem as SpriteSheet).SheetName);
-					}
+				SpriteSheet spriteSheet = currentLayeredSpriteSheet.ActiveSubLayerSheet[name];
+				if (spriteSheet != null && (sender as ListBox).SelectedItem != null)
+				{
+					CurrentSubLayerAnimStates_LB.ItemsSource = spriteSheet.SpriteAnimations.Values;
+					currentLayeredSpriteSheet.ChangeActiveSheetString(AnimationSubLayer_CB.Text,
+						currentLayeredSpriteSheet.ActiveSubLayerSheet[AnimationSubLayer_CB.Text].SheetName,
+						((sender as ListBox).SelectedItem as SpriteSheet).SheetName);
+				}
 			}
 		}
 
@@ -8430,7 +8504,8 @@ namespace AmethystEngine.Forms
 				{
 
 					String name =
-						currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Text][CurrentSubLayerSpriteSheets_LB.SelectedIndex].SheetName;
+						currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Text][
+							CurrentSubLayerSpriteSheets_LB.SelectedIndex].SheetName;
 
 					SpriteSheet spriteSheet = currentLayeredSpriteSheet.ActiveSubLayerSheet[AnimationSubLayer_CB.Text];
 					if (spriteSheet == null || (sender as ListBox).SelectedIndex == -1) return;
@@ -8446,10 +8521,10 @@ namespace AmethystEngine.Forms
 					bmp.EndInit();
 
 					var crop = new CroppedBitmap(bmp, new Int32Rect(
-						(int)item.CurrentFrameRect.Value.XPos,
-						(int)item.CurrentFrameRect.Value.YPos,
-						(int)item.CurrentFrameRect.Value.Width,
-						(int)item.CurrentFrameRect.Value.Height
+						(int) item.CurrentFrameRect.Value.XPos,
+						(int) item.CurrentFrameRect.Value.YPos,
+						(int) item.CurrentFrameRect.Value.Width,
+						(int) item.CurrentFrameRect.Value.Height
 					));
 					img.Source = crop;
 
@@ -8464,39 +8539,43 @@ namespace AmethystEngine.Forms
 
 						templist.Add(crop);
 					}
+
 					AnimationSubLayerImages_List[AnimationSubLayer_CB.SelectedIndex - 2] = templist;
 
 					//Now we need to set the animation events to the screen
 
 					if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Text]
-						.ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].SpriteAnimations_List[CurrentSubLayerAnimStates_LB.SelectedIndex]
+						.ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex]
+						.SpriteAnimations_List[CurrentSubLayerAnimStates_LB.SelectedIndex]
 						.GetAnimationEvents()
 						.Count > 0)
 
 					{
 						CurrentSubLayerStateChanges_TV.ItemsSource =
 							currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Text]
-								.ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].SpriteAnimations_List[CurrentSubLayerAnimStates_LB.SelectedIndex]
+								.ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex]
+								.SpriteAnimations_List[CurrentSubLayerAnimStates_LB.SelectedIndex]
 								.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent);
 					}
 
-					
+
 				}
 			}
 		}
 
-		 
+
 
 		public void AddEventToSubLayerAnimation_BTN_Click(object sender, RoutedEventArgs e)
 		{
-			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].
-	ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex] == null) return;
-			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].
-				ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].CurrentAnimation == null) return;
+			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].ToList()[
+				CurrentSubLayerSpriteSheets_LB.SelectedIndex] == null) return;
+			if (currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].ToList()[
+				CurrentSubLayerSpriteSheets_LB.SelectedIndex].CurrentAnimation == null) return;
 
 
-			SpriteAnimation spriteAnimation = currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].
-			ToList()[CurrentSubLayerSpriteSheets_LB.SelectedIndex].CurrentAnimation;
+			SpriteAnimation spriteAnimation =
+				currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.SelectedItem.ToString()].ToList()[
+					CurrentSubLayerSpriteSheets_LB.SelectedIndex].CurrentAnimation;
 
 			//if (CurrentlySelectedAnimation == null || CurrentActiveSpriteSheet == null) return;
 
@@ -8548,7 +8627,7 @@ namespace AmethystEngine.Forms
 				if (SpritesheetEditor_CropImage.setRenderPoint_Hook == null)
 					SpritesheetEditor_CropImage.setRenderPoint_Hook += UpdateRenderPointLocationHook_FrameInfo;
 
-					var imageControls = SpritesheetEditor_Canvas.Children.OfType<Border>().ToList();
+				var imageControls = SpritesheetEditor_Canvas.Children.OfType<Border>().ToList();
 				SpritesheetEditor_BackCanvas.Width = CurrentSelectedSpriteSheet.Width;
 				SpritesheetEditor_BackCanvas.Height = CurrentSelectedSpriteSheet.Height;
 				SpritesheetEditor_Canvas.Width = CurrentSelectedSpriteSheet.Width;
@@ -8560,6 +8639,7 @@ namespace AmethystEngine.Forms
 				{
 					SpritesheetEditor_Canvas.Children.Remove(imageControl);
 				}
+
 				// Set the Item Source for the Content Editor
 				SpriteSheet_CE_Tree.ItemsSource = CurrentSelectedSpriteSheet.AllAnimationOnSheet;
 
@@ -8568,26 +8648,46 @@ namespace AmethystEngine.Forms
 					foreach (CanvasImageProperties frame in canvasAnimation.CanvasFrames)
 					{
 						Border parentBorder = CreateDashedLineBorder();
-						
+
 						Image image = new Image();
 						image.Name = "cropped_image_preview";
 						BitmapImage bitmap = new BitmapImage(new Uri(frame.ImageLocation));
-						CroppedBitmap croppedBitmap = new CroppedBitmap(bitmap, new Int32Rect(frame.CropX, frame.CropY, (int)frame.W, (int)frame.H));
+						CroppedBitmap croppedBitmap = new CroppedBitmap(bitmap,
+							new Int32Rect(frame.CropX, frame.CropY, (int) frame.W, (int) frame.H));
 						image.Source = croppedBitmap;
 						image.Width = frame.W;
 						image.Height = frame.H;
 						image.HorizontalAlignment = HorizontalAlignment.Center;
 						image.VerticalAlignment = VerticalAlignment.Center;
-						image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
-						image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
+						image.PreviewMouseLeftButtonDown +=
+							new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
+						image.PreviewMouseLeftButtonUp +=
+							new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
 						Image renderPointImage = new Image();
 						renderPointImage.Name = "Render_Point_Image";
-						renderPointImage.Source = new BitmapImage(new Uri(String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()), UriKind.Absolute));
+						renderPointImage.Source =
+							new BitmapImage(new Uri(
+								String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()),
+								UriKind.Absolute));
 
-						Canvas overlayCanvas = new Canvas() { Width = frame.W, Height = frame.H };
+						Canvas overlayCanvas = new Canvas() {Width = frame.W, Height = frame.H};
 						overlayCanvas.Children.Add(image);
 						overlayCanvas.Children.Add(renderPointImage);
+
+						foreach (var subLayerPoint in frame.SubLayerPoints)
+						{
+							Image subPointImage = new Image();
+							subPointImage.Source =
+								new BitmapImage(new Uri(
+									String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()),
+									UriKind.Absolute));
+
+							overlayCanvas.Children.Add(subPointImage);
+							subLayerPoint.LinkedImage = subPointImage;
+							Canvas.SetLeft(subPointImage, subLayerPoint.RX);
+							Canvas.SetTop(subPointImage, subLayerPoint.RY);
+						}
 
 						parentBorder.Child = overlayCanvas;
 						frame.LinkedBorderImage = parentBorder;
@@ -8625,7 +8725,7 @@ namespace AmethystEngine.Forms
 			{
 				// Save document
 				filename = dlg.FileName;
-				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] {'/', '\\'}));
 			}
 			else return; //invalid name
 
@@ -8633,7 +8733,7 @@ namespace AmethystEngine.Forms
 
 			Console.WriteLine("Saving Spritesheet");
 
-			CanvasSpritesheet.ExportSpriteSheet(CurrentSelectedSpriteSheet, dlg.FileName.Replace(".spritesheet",""));
+			CanvasSpritesheet.ExportSpriteSheet(CurrentSelectedSpriteSheet, dlg.FileName.Replace(".spritesheet", ""));
 
 			// Let's not let frames render target crosshairs be visiable
 			foreach (var anim in CurrentSelectedSpriteSheet.AllAnimationOnSheet)
@@ -8643,10 +8743,12 @@ namespace AmethystEngine.Forms
 					(frame.LinkedBorderImage?.Child as Canvas).Children[1].Visibility = Visibility.Hidden;
 				}
 			}
+
 			SpritesheetEditor_Canvas.UpdateLayout();
 
 			// Render the canvas and its child elements onto a RenderTargetBitmap
-			var renderTargetBitmap = new RenderTargetBitmap((int)CurrentSelectedSpriteSheet.Width, (int)CurrentSelectedSpriteSheet.Height, 96, 96, PixelFormats.Pbgra32);
+			var renderTargetBitmap = new RenderTargetBitmap((int) CurrentSelectedSpriteSheet.Width,
+				(int) CurrentSelectedSpriteSheet.Height, 96, 96, PixelFormats.Pbgra32);
 			renderTargetBitmap.Render(SpritesheetEditor_Canvas);
 
 			// Create a PngBitmapEncoder and add the RenderTargetBitmap to it
@@ -8654,7 +8756,8 @@ namespace AmethystEngine.Forms
 			pngEncoder.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
 
 			// Save the PngBitmapEncoder to a file or stream
-			var fileStream = new FileStream(String.Format("{0}.png", dlg.FileName.Replace(".spritesheet", "")), FileMode.Create);
+			var fileStream = new FileStream(String.Format("{0}.png", dlg.FileName.Replace(".spritesheet", "")),
+				FileMode.Create);
 			pngEncoder.Save(fileStream);
 			fileStream.Close();
 		}
@@ -8677,52 +8780,60 @@ namespace AmethystEngine.Forms
 		/// <param name="e"></param>
 		private void SpritesheetEditor_BackCanvas_OnMouseWheel(object sender, MouseWheelEventArgs e)
 		{
-			
+
 			Console.WriteLine("canvas scroollll to zoom");
 
 
-				if (e.Delta > 0) //zoom in!
-				{
-					SpritesheetEditorZoomLevel += .2;
-					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel );
-					SpritesheetEditor_Canvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
-					Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
+			if (e.Delta > 0) //zoom in!
+			{
+				SpritesheetEditorZoomLevel += .2;
+				SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+				SpritesheetEditor_Canvas.RenderTransform =
+					new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+				Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
 
-					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
-					SpritesheetEditor_BackCanvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
-					Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
+				SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+				SpritesheetEditor_BackCanvas.RenderTransform =
+					new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+				Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
 
-					// Update the scroll viewer
-					var scaleTransform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
-					SpritesheetEditor_Canvas.LayoutTransform = scaleTransform;
+				// Update the scroll viewer
+				var scaleTransform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+				SpritesheetEditor_Canvas.LayoutTransform = scaleTransform;
 
-					// Adjust scroll position based on zoom
-					SpritesheetEditor_ScrollViewer.ScrollToHorizontalOffset(SpritesheetEditor_ScrollViewer.HorizontalOffset * SpritesheetEditorZoomLevel);
-					SpritesheetEditor_ScrollViewer.ScrollToVerticalOffset(SpritesheetEditor_ScrollViewer.VerticalOffset * SpritesheetEditorZoomLevel);
+				// Adjust scroll position based on zoom
+				SpritesheetEditor_ScrollViewer.ScrollToHorizontalOffset(SpritesheetEditor_ScrollViewer.HorizontalOffset *
+				                                                        SpritesheetEditorZoomLevel);
+				SpritesheetEditor_ScrollViewer.ScrollToVerticalOffset(SpritesheetEditor_ScrollViewer.VerticalOffset *
+				                                                      SpritesheetEditorZoomLevel);
 
-					SpritesheetEditor_ScrollViewer.InvalidateScrollInfo();
+				SpritesheetEditor_ScrollViewer.InvalidateScrollInfo();
 
 
 				//TODO: resize selection rectangle
 			}
 			else //zoom out!
-				{
-					SpritesheetEditorZoomLevel -= .2;
-					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
-					SpritesheetEditor_Canvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
-					Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
+			{
+				SpritesheetEditorZoomLevel -= .2;
+				SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+				SpritesheetEditor_Canvas.RenderTransform =
+					new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+				Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
 
-					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
-					SpritesheetEditor_BackCanvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
-					Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
+				SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+				SpritesheetEditor_BackCanvas.RenderTransform =
+					new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+				Console.WriteLine(String.Format("W:{0},  H{1}", SpritesheetGridWidth, SpritesheetGridHeight));
 
-					// Update the scroll viewer
-					var scaleTransform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
-					SpritesheetEditor_Canvas.LayoutTransform = scaleTransform;
+				// Update the scroll viewer
+				var scaleTransform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+				SpritesheetEditor_Canvas.LayoutTransform = scaleTransform;
 
-					// Adjust scroll position based on zoom
-					SpritesheetEditor_ScrollViewer.ScrollToHorizontalOffset(SpritesheetEditor_ScrollViewer.HorizontalOffset * SpritesheetEditorZoomLevel);
-					SpritesheetEditor_ScrollViewer.ScrollToVerticalOffset(SpritesheetEditor_ScrollViewer.VerticalOffset * SpritesheetEditorZoomLevel);
+				// Adjust scroll position based on zoom
+				SpritesheetEditor_ScrollViewer.ScrollToHorizontalOffset(SpritesheetEditor_ScrollViewer.HorizontalOffset *
+				                                                        SpritesheetEditorZoomLevel);
+				SpritesheetEditor_ScrollViewer.ScrollToVerticalOffset(SpritesheetEditor_ScrollViewer.VerticalOffset *
+				                                                      SpritesheetEditorZoomLevel);
 
 				SpritesheetEditor_ScrollViewer.InvalidateScrollInfo();
 
@@ -8731,21 +8842,24 @@ namespace AmethystEngine.Forms
 			}
 
 			if (SpritesheetEditorZoomLevel < .2)
-				{
-					SpritesheetEditorZoomLevel = .2;
-					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
-					SpritesheetEditor_Canvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel , SpritesheetEditorZoomLevel );
+			{
+				SpritesheetEditorZoomLevel = .2;
+				SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+				SpritesheetEditor_Canvas.RenderTransform =
+					new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
 
-					SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
-					SpritesheetEditor_BackCanvas.RenderTransform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
-					return;
-				} //do not allow this be 0 which in turn / by 0;
+				SpritesheetEditor_VB.Transform = new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+				SpritesheetEditor_BackCanvas.RenderTransform =
+					new ScaleTransform(SpritesheetEditorZoomLevel, SpritesheetEditorZoomLevel);
+				return;
+			} //do not allow this be 0 which in turn / by 0;
 
-				SpritesheetZoomFactor_TB.Text = String.Format("({0})%  ({1}x{1})", 100 * SpritesheetEditorZoomLevel , SpritesheetGridWidth * SpritesheetEditorZoomLevel );
-				ScaleSpriteSheetEditorCanvas();
+			SpritesheetZoomFactor_TB.Text = String.Format("({0})%  ({1}x{1})", 100 * SpritesheetEditorZoomLevel,
+				SpritesheetGridWidth * SpritesheetEditorZoomLevel);
+			ScaleSpriteSheetEditorCanvas();
 
-				SpritesheetEditor_BackCanvas.ReleaseMouseCapture();
-				e.Handled = true;
+			SpritesheetEditor_BackCanvas.ReleaseMouseCapture();
+			e.Handled = true;
 		}
 
 		private void ScaleSpriteSheetEditorCanvas()
@@ -8788,18 +8902,20 @@ namespace AmethystEngine.Forms
 		private void AddNewSpriteAnimation_BTN_Click(object sender, RoutedEventArgs e)
 		{
 			// Step one find the content control
-			SpriteSheet_CE_Tree = (TreeView) ContentLibrary_Control.Template.FindName("SpriteSheetEditor_CE_TV", ContentLibrary_Control);
+			SpriteSheet_CE_Tree =
+				(TreeView) ContentLibrary_Control.Template.FindName("SpriteSheetEditor_CE_TV", ContentLibrary_Control);
 
-			if(SpriteSheet_CE_Tree != null)
+			if (SpriteSheet_CE_Tree != null)
 			{
 				// When testing i don't have "starting screen for this so it's null. this will be removed later
-				if(CurrentSelectedSpriteSheet == null)
+				if (CurrentSelectedSpriteSheet == null)
 				{
 					// FOR TESTING ONLY
 					CurrentSelectedSpriteSheet = new CanvasSpritesheet("Testing_Sheet", 1000, 1000);
 				}
+
 				// If for some dumbass reason i forgot to set it... then set it
-				if(SpriteSheet_CE_Tree.ItemsSource == null)
+				if (SpriteSheet_CE_Tree.ItemsSource == null)
 				{
 					SpriteSheet_CE_Tree.ItemsSource = CurrentSelectedSpriteSheet.AllAnimationOnSheet;
 				}
@@ -8829,6 +8945,7 @@ namespace AmethystEngine.Forms
 					}
 				}
 			}
+
 			return false;
 		}
 
@@ -8842,6 +8959,7 @@ namespace AmethystEngine.Forms
 						return frame;
 				}
 			}
+
 			return null;
 		}
 
@@ -8855,6 +8973,7 @@ namespace AmethystEngine.Forms
 						return frame;
 				}
 			}
+
 			return null;
 		}
 
@@ -8865,14 +8984,17 @@ namespace AmethystEngine.Forms
 			if (btn != null)
 			{
 				// We need to play WPF games... aka find the template, and then with that find the acutal control (treeview)
-				ControlTemplate spriteSheeControlTemplate = (ControlTemplate)this.Resources["SpriteSheetObjects_Template"];
-				TreeView spritesheetTreeView = (TreeView)spriteSheeControlTemplate.FindName("SpriteSheetEditor_CE_TV", ContentLibrary_Control);
+				ControlTemplate spriteSheeControlTemplate = (ControlTemplate) this.Resources["SpriteSheetObjects_Template"];
+				TreeView spritesheetTreeView =
+					(TreeView) spriteSheeControlTemplate.FindName("SpriteSheetEditor_CE_TV", ContentLibrary_Control);
 				TreeViewItem tvi = FindParentTreeViewItem(btn);
 
 				// Get the actual index of the list from the BUTTON we pressed
-				int animationIndex = CurrentSelectedSpriteSheet.AllAnimationOnSheet.IndexOf((tvi.DataContext as CanvasAnimation)); // MAGIC BULLSHIT
+				int animationIndex =
+					CurrentSelectedSpriteSheet.AllAnimationOnSheet.IndexOf(
+						(tvi.DataContext as CanvasAnimation)); // MAGIC BULLSHIT
 
-				if(animationIndex >= 0)
+				if (animationIndex >= 0)
 				{
 					// Get a new image file
 					Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
@@ -8902,9 +9024,10 @@ namespace AmethystEngine.Forms
 
 					//var adorn = new AdornerDecorator();
 					CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Add(
-						new CanvasImageProperties(filename, _baseImage.PixelWidth , _baseImage.PixelHeight));
+						new CanvasImageProperties(filename, _baseImage.PixelWidth, _baseImage.PixelHeight));
 
-					currentSelectedCanvasFrame = CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last();
+					currentSelectedCanvasFrame =
+						CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last();
 
 					// we need to check if we are already using the croppable control
 					if (SpritesheetEditor_CropImage.ResizeService != null)
@@ -8922,15 +9045,20 @@ namespace AmethystEngine.Forms
 							image.Stretch = Stretch.Fill;
 							image.HorizontalAlignment = HorizontalAlignment.Center;
 							image.VerticalAlignment = VerticalAlignment.Center;
-							image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
-							image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
+							image.PreviewMouseLeftButtonDown +=
+								new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
+							image.PreviewMouseLeftButtonUp +=
+								new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
 
 							Image renderPointImage = new Image();
 							renderPointImage.Name = "Render_Point_Image";
-							renderPointImage.Source = new BitmapImage(new Uri(String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()), UriKind.Absolute));
+							renderPointImage.Source =
+								new BitmapImage(new Uri(
+									String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()),
+									UriKind.Absolute));
 
-							Canvas overlayCanvas = new Canvas() { Width = _baseImage.PixelWidth, Height = _baseImage.PixelHeight };
+							Canvas overlayCanvas = new Canvas() {Width = _baseImage.PixelWidth, Height = _baseImage.PixelHeight};
 							overlayCanvas.Children.Add(image);
 							overlayCanvas.Children.Add(renderPointImage);
 
@@ -8949,7 +9077,8 @@ namespace AmethystEngine.Forms
 								Canvas.SetTop(renderPointImage, foundFrame.RY);
 							}
 
-							CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().LinkedCroppableImage = SpritesheetEditor_CropImage;
+							CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().LinkedCroppableImage =
+								SpritesheetEditor_CropImage;
 
 							SpritesheetEditor_Canvas.Children.Add(parentBorder);
 
@@ -8965,7 +9094,8 @@ namespace AmethystEngine.Forms
 					}
 					else
 					{
-						CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().LinkedCroppableImage = SpritesheetEditor_CropImage;
+						CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().LinkedCroppableImage =
+							SpritesheetEditor_CropImage;
 
 					}
 
@@ -8977,7 +9107,7 @@ namespace AmethystEngine.Forms
 					SpritesheetEditor_CropImage.SetImage(filename, true);
 					SpritesheetEditor_CropImage.bHasFocus = true;
 					SpritesheetEditor_CropImage.Visibility = Visibility.Visible;
-					if(SpritesheetEditor_CropImage.updateSizeLocation_Hook == null)
+					if (SpritesheetEditor_CropImage.updateSizeLocation_Hook == null)
 						SpritesheetEditor_CropImage.updateSizeLocation_Hook += UpdateSizeLocationHook_FrameInfo;
 					if (SpritesheetEditor_CropImage.updateCropLocation_Hook == null)
 						SpritesheetEditor_CropImage.updateCropLocation_Hook += UpdateCropLocationHook_FrameInfo;
@@ -8996,10 +9126,10 @@ namespace AmethystEngine.Forms
 			CanvasImageProperties foundFrame = FindCanvasFrame(SpritesheetEditor_CropImage);
 			if (foundFrame != null)
 			{
-				foundFrame.X = (int)(x / SpritesheetEditorZoomLevel);
-				foundFrame.Y = (int)(y / SpritesheetEditorZoomLevel);
-				foundFrame.W = (int)(w / SpritesheetEditorZoomLevel);
-				foundFrame.H = (int)(h / SpritesheetEditorZoomLevel);
+				foundFrame.X = (int) (x / SpritesheetEditorZoomLevel);
+				foundFrame.Y = (int) (y / SpritesheetEditorZoomLevel);
+				foundFrame.W = (int) (w / SpritesheetEditorZoomLevel);
+				foundFrame.H = (int) (h / SpritesheetEditorZoomLevel);
 			}
 		}
 
@@ -9009,8 +9139,8 @@ namespace AmethystEngine.Forms
 			CanvasImageProperties foundFrame = FindCanvasFrame(SpritesheetEditor_CropImage);
 			if (foundFrame != null)
 			{
-				foundFrame.CropX = (int)(cx);
-				foundFrame.CropY = (int)(cy);
+				foundFrame.CropX = (int) (cx);
+				foundFrame.CropY = (int) (cy);
 			}
 		}
 
@@ -9053,11 +9183,11 @@ namespace AmethystEngine.Forms
 		{
 
 			// make sure there is valid creation data
-			if (SpritesheetName_TB.Text != "" && int.TryParse(SpritesheetWidth_TB.Text, out int width) 
+			if (SpritesheetName_TB.Text != "" && int.TryParse(SpritesheetWidth_TB.Text, out int width)
 			                                  && int.TryParse(SpritesheetHeight_TB.Text, out int height))
 			{
 				SE_NewSpritesheet_MainGrid.Visibility = Visibility.Visible;
-				SpritesheetEditorMainGrid_Grid.Visibility = Visibility.Visible; 
+				SpritesheetEditorMainGrid_Grid.Visibility = Visibility.Visible;
 				SpritesheetEditorCreation_Grid.Visibility = Visibility.Hidden;
 
 				CurrentSelectedSpriteSheet = new CanvasSpritesheet(SpritesheetName_TB.Name, width, height);
@@ -9079,6 +9209,7 @@ namespace AmethystEngine.Forms
 				{
 					parent = VisualTreeHelper.GetParent(parent);
 				}
+
 				return parent as TreeViewItem;
 			}
 			catch (Exception e)
@@ -9097,8 +9228,10 @@ namespace AmethystEngine.Forms
 				{
 					return index;
 				}
+
 				index++;
 			}
+
 			return null;
 			//throw new Exception("No parent window detected");
 		}
@@ -9126,12 +9259,14 @@ namespace AmethystEngine.Forms
 						return true;
 				}
 			}
+
 			return false;
 		}
 
 		private void SpritesheetEditor_BackCanvas_OnLeftMouseDown(object sender, MouseButtonEventArgs e)
 		{
-			if (SpritesheetEditor_CropImage.Visibility == Visibility.Hidden || SpritesheetEditor_CropImage.ResizeService == null)
+			if (SpritesheetEditor_CropImage.Visibility == Visibility.Hidden ||
+			    SpritesheetEditor_CropImage.ResizeService == null)
 				return;
 
 			Canvas c = sender as Canvas;
@@ -9164,14 +9299,19 @@ namespace AmethystEngine.Forms
 					image.MaxHeight = SpritesheetEditor_CropImage.Height;
 					image.HorizontalAlignment = HorizontalAlignment.Center;
 					image.VerticalAlignment = VerticalAlignment.Center;
-					image.PreviewMouseLeftButtonDown += new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
+					image.PreviewMouseLeftButtonDown +=
+						new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
 					image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
 					Image renderPointImage = new Image();
 					renderPointImage.Name = "Render_Point_Image";
-					renderPointImage.Source = new BitmapImage(new Uri(String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()), UriKind.Absolute));
+					renderPointImage.Source =
+						new BitmapImage(new Uri(
+							String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()),
+							UriKind.Absolute));
 
-					Canvas overlayCanvas = new Canvas() { Width = SpritesheetEditor_CropImage.Width, Height = SpritesheetEditor_CropImage.Height };
+					Canvas overlayCanvas = new Canvas()
+						{Width = SpritesheetEditor_CropImage.Width, Height = SpritesheetEditor_CropImage.Height};
 					overlayCanvas.Children.Add(image);
 					overlayCanvas.Children.Add(renderPointImage);
 
@@ -9189,6 +9329,20 @@ namespace AmethystEngine.Forms
 						// Place the Render point in the correct position
 						Canvas.SetLeft(renderPointImage, foundFrame.RX);
 						Canvas.SetTop(renderPointImage, foundFrame.RY);
+
+						// We will need to set up the render points now.
+						foreach (var subLayerPoint in foundFrame.SubLayerPoints)
+						{
+							Image subPointImage = new Image();
+							subPointImage.Source = new BitmapImage(new Uri(
+									String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()),
+									UriKind.Absolute));
+
+							overlayCanvas.Children.Add(subPointImage);
+							Canvas.SetLeft(subPointImage, subLayerPoint.RX);
+							Canvas.SetTop(subPointImage, subLayerPoint.RY);
+
+						}
 					}
 
 					SpritesheetEditor_Canvas.Children.Add(border);
@@ -9227,6 +9381,7 @@ namespace AmethystEngine.Forms
 					}
 				}
 			}
+
 			return imagePath;
 		}
 
@@ -9248,6 +9403,7 @@ namespace AmethystEngine.Forms
 					}
 				}
 			}
+
 			return null;
 		}
 
@@ -9256,13 +9412,14 @@ namespace AmethystEngine.Forms
 			// Let's find out what SpriteAnimation this image belongs too!
 			foreach (CanvasAnimation spriteAntimation in CurrentSelectedSpriteSheet.AllAnimationOnSheet)
 			{
-				for(int i = 0; i < spriteAntimation.CanvasFrames.Count; i++)
+				for (int i = 0; i < spriteAntimation.CanvasFrames.Count; i++)
 				{
 					CanvasImageProperties frame = spriteAntimation.CanvasFrames[i];
 					if (frame == desiredFrame)
 						return i;
 				}
 			}
+
 			return -1;
 		}
 
@@ -9277,6 +9434,7 @@ namespace AmethystEngine.Forms
 						return spriteAntimation;
 				}
 			}
+
 			return null;
 		}
 
@@ -9306,7 +9464,7 @@ namespace AmethystEngine.Forms
 					}
 					else
 					{
-						imagePath = ((BitmapImage)img.Source).UriSource.ToString();
+						imagePath = ((BitmapImage) img.Source).UriSource.ToString();
 						SpritesheetEditor_CropImage.SetImage(imagePath, true);
 					}
 				}
@@ -9319,7 +9477,7 @@ namespace AmethystEngine.Forms
 				SpritesheetEditor_CropImage.Visibility = Visibility.Visible;
 
 				Border parentBorder = (img.Parent as Canvas).Parent as Border;
-				if(parentBorder != null)
+				if (parentBorder != null)
 				{
 					// Get the image loaction, and set that to the cropper location
 					Canvas.SetLeft(SpritesheetEditor_CropImage, Canvas.GetLeft(parentBorder));
@@ -9374,7 +9532,11 @@ namespace AmethystEngine.Forms
 
 		private void SpriteSheet_Resize_MI_Click(object sender, RoutedEventArgs e)
 		{
-			Window w = new ResizeSpritesheet() { UpdateSizeHook = UpdateSpriteSheetSize};//((int) SpritesheetEditor_BackCanvas.Width, (int) SpritesheetEditor_BackCanvas.Height); //{ UpdateSizeHook = UpdateSpriteSheetSize};
+			Window
+				w = new ResizeSpritesheet()
+				{
+					UpdateSizeHook = UpdateSpriteSheetSize
+				}; //((int) SpritesheetEditor_BackCanvas.Width, (int) SpritesheetEditor_BackCanvas.Height); //{ UpdateSizeHook = UpdateSpriteSheetSize};
 			// w.Content = this;
 			w.ShowDialog();
 		}
@@ -9388,6 +9550,7 @@ namespace AmethystEngine.Forms
 		}
 
 		private Point _SpriteShheetCanvasStartPoint = new Point();
+
 		private void SpritesheetEditor_BackCanvas_OnMouseDown(object sender, MouseButtonEventArgs e)
 		{
 			if (e.MiddleButton == MouseButtonState.Pressed)
@@ -9439,7 +9602,8 @@ namespace AmethystEngine.Forms
 				double deltaX = currentMousePosition.X - _lastMousePosition.X;
 				double deltaY = currentMousePosition.Y - _lastMousePosition.Y;
 
-				SpritesheetEditor_ScrollViewer.ScrollToHorizontalOffset(SpritesheetEditor_ScrollViewer.HorizontalOffset - deltaX);
+				SpritesheetEditor_ScrollViewer.ScrollToHorizontalOffset(
+					SpritesheetEditor_ScrollViewer.HorizontalOffset - deltaX);
 				SpritesheetEditor_ScrollViewer.ScrollToVerticalOffset(SpritesheetEditor_ScrollViewer.VerticalOffset - deltaY);
 
 				_lastMousePosition = currentMousePosition;
@@ -9534,18 +9698,26 @@ namespace AmethystEngine.Forms
 			{
 				if (treeViewItem.SelectedItem is CanvasAnimation canvasAnimationProp)
 				{
-					ObjectProperties_Control.Template = (ControlTemplate)this.Resources["SpritesheetEditorProperties_Anim_Template"];
+					ObjectProperties_Control.Template =
+						(ControlTemplate) this.Resources["SpritesheetEditorProperties_Anim_Template"];
 					ObjectProperties_Control.UpdateLayout();
 
 					currentCanvasImagePropertiesSelected = null;
 					currentCanvasAnimationPropertiesSelected = canvasAnimationProp;
+
+					ItemsControl SubLayerIC =
+						(ItemsControl) ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_SubLayerInfo_IC",
+							ObjectProperties_Control);
+					SubLayerIC.ItemsSource = canvasAnimationProp.NamesOfSubLayers;
+
 
 				}
 				else if (treeViewItem.SelectedItem is CanvasImageProperties canvasFrame)
 				{
 					if (canvasFrame.LinkedBorderImage is Border parentBorder)
 					{
-						ObjectProperties_Control.Template = (ControlTemplate)this.Resources["SpritesheetEditorProperties_Template"];
+						ObjectProperties_Control.Template =
+							(ControlTemplate) this.Resources["SpritesheetEditorProperties_Template"];
 						ObjectProperties_Control.UpdateLayout();
 						// parentBorder.BorderThickness = new Thickness(1);
 
@@ -9557,48 +9729,71 @@ namespace AmethystEngine.Forms
 						currentCanvasImagePropertiesSelected = canvasFrame;
 						currentCanvasAnimationPropertiesSelected = null;
 
-						TextBox FrameNumber_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_FrameNumber_TB", ObjectProperties_Control);
+						TextBox FrameNumber_TB =
+							(TextBox) ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_FrameNumber_TB",
+								ObjectProperties_Control);
 						FrameNumber_TB.Text = GetFrameNumberFromFrame(canvasFrame).ToString();
 
-						TextBox ImagePath_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_ImagePath_TB", ObjectProperties_Control);
+						TextBox ImagePath_TB =
+							(TextBox) ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_ImagePath_TB",
+								ObjectProperties_Control);
 						ImagePath_TB.Text = canvasFrame.ImageLocation.Substring(canvasFrame.ImageLocation.LastIndexOf("\\"));
 						ImagePath_TB.ToolTip = canvasFrame.ImageLocation;
 
-						TextBox XPosition_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_XPos_TB", ObjectProperties_Control);
+						TextBox XPosition_TB =
+							(TextBox) ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_XPos_TB",
+								ObjectProperties_Control);
 						XPosition_TB.Text = canvasFrame.X.ToString();
 
-						TextBox YPosition_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_YPos_TB", ObjectProperties_Control);
+						TextBox YPosition_TB =
+							(TextBox) ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_YPos_TB",
+								ObjectProperties_Control);
 						YPosition_TB.Text = canvasFrame.Y.ToString();
 
-						TextBox Width_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_Width_TB", ObjectProperties_Control);
+						TextBox Width_TB =
+							(TextBox) ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_Width_TB",
+								ObjectProperties_Control);
 						Width_TB.Text = canvasFrame.W.ToString();
 
-						TextBox Height_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_Height_TB", ObjectProperties_Control);
+						TextBox Height_TB =
+							(TextBox) ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_Height_TB",
+								ObjectProperties_Control);
 						Height_TB.Text = canvasFrame.H.ToString();
 
-						TextBox CropX_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_CropWidth_TB", ObjectProperties_Control);
+						TextBox CropX_TB =
+							(TextBox) ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_CropWidth_TB",
+								ObjectProperties_Control);
 						CropX_TB.Text = canvasFrame.CropX.ToString();
 
-						TextBox CropY_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_CropHeight_TB", ObjectProperties_Control);
+						TextBox CropY_TB =
+							(TextBox) ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_CropHeight_TB",
+								ObjectProperties_Control);
 						CropY_TB.Text = canvasFrame.CropY.ToString();
 
-						TextBox RenderPointX_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_RenderPointX_TB", ObjectProperties_Control);
+						TextBox RenderPointX_TB =
+							(TextBox) ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_RenderPointX_TB",
+								ObjectProperties_Control);
 						RenderPointX_TB.Text = canvasFrame.RX.ToString();
 
-						TextBox RenderPointY_TB = (TextBox)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_RenderPointY_TB", ObjectProperties_Control);
+						TextBox RenderPointY_TB =
+							(TextBox) ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_RenderPointY_TB",
+								ObjectProperties_Control);
 						RenderPointY_TB.Text = canvasFrame.RY.ToString();
 
 						// We need to Fill in the ITEM CONTROL of sublayers now!
-						ItemsControl SubLayerIC = (ItemsControl)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_SubLayerInfo_IC", ObjectProperties_Control);
+						ItemsControl SubLayerIC =
+							(ItemsControl) ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_SubLayerInfo_IC",
+								ObjectProperties_Control);
 						CanvasAnimation canvasAnimation = GetCanvasAnimationFromFrame(canvasFrame);
 						if (canvasAnimation != null)
 						{
 							SubLayerIC.Items.Clear();
 							for (int i = 0; i < canvasAnimation.NamesOfSubLayers.Count; i++)
 							{
-								if(canvasFrame.SubLayerPoints.Count < canvasAnimation.NamesOfSubLayers.Count)
+								if (canvasFrame.SubLayerPoints.Count < canvasAnimation.NamesOfSubLayers.Count)
 								{
-									CanvasSubLayerPoint subRenderPoint = new CanvasSubLayerPoint() { LayerName = canvasAnimation.NamesOfSubLayers[i] };
+									CanvasSubLayerPoint subRenderPoint = new CanvasSubLayerPoint()
+										{LayerName = canvasAnimation.NamesOfSubLayers[i]};
 									SubLayerIC.Items.Add(subRenderPoint);
 									canvasFrame.SubLayerPoints.Add(subRenderPoint);
 								}
@@ -9639,6 +9834,7 @@ namespace AmethystEngine.Forms
 						SpritesheetEditor_CropImage.bHasFocus = false;
 						SpritesheetEditor_CropImage.Visibility = Visibility.Hidden;
 					}
+
 					RemoveCanvasFrame(foundFrame);
 				}
 			}
@@ -9695,7 +9891,7 @@ namespace AmethystEngine.Forms
 							{
 								foundFrame.LinkedBorderImage.Width = val;
 								(foundFrame.LinkedBorderImage.Child as Canvas).Width = val;
-								((foundFrame.LinkedBorderImage.Child as Canvas).Children[0] as Image ).Width = val;
+								((foundFrame.LinkedBorderImage.Child as Canvas).Children[0] as Image).Width = val;
 							}
 							else if (foundFrame.LinkedCroppableImage != null)
 							{
@@ -9708,7 +9904,7 @@ namespace AmethystEngine.Forms
 							if (foundFrame.LinkedBorderImage != null)
 							{
 								foundFrame.LinkedBorderImage.Width = val;
-								(foundFrame.LinkedBorderImage.Child as Canvas).Height  = val;
+								(foundFrame.LinkedBorderImage.Child as Canvas).Height = val;
 								((foundFrame.LinkedBorderImage.Child as Canvas).Children[0] as Image).Height = val;
 
 							}
@@ -9743,7 +9939,7 @@ namespace AmethystEngine.Forms
 				{
 					if (cb.IsChecked == true)
 					{
-						if(foundFrame.LinkedBorderImage != null)
+						if (foundFrame.LinkedBorderImage != null)
 							foundFrame.LinkedBorderImage.BorderThickness = new Thickness(1);
 						else
 							foundFrame.LinkedCroppableImage.BorderThickness = new Thickness(1);
@@ -9814,7 +10010,8 @@ namespace AmethystEngine.Forms
 						{
 							currentCanvasImagePropertiesSelected.LinkedBorderImage.Width = dataVal;
 							(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Width = dataVal;
-							((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[0] as Image).Width = dataVal;
+							((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[0] as Image).Width =
+								dataVal;
 						}
 						else if (currentCanvasImagePropertiesSelected.LinkedCroppableImage != null)
 						{
@@ -9840,7 +10037,8 @@ namespace AmethystEngine.Forms
 						{
 							currentCanvasImagePropertiesSelected.LinkedBorderImage.Height = dataVal;
 							(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Height = dataVal;
-							((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[0] as Image).Height = dataVal;
+							((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[0] as Image).Height =
+								dataVal;
 						}
 						else if (currentCanvasImagePropertiesSelected.LinkedCroppableImage != null)
 						{
@@ -9865,7 +10063,8 @@ namespace AmethystEngine.Forms
 						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
 						{
 							Canvas.SetLeft(
-								((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1] as Image), dataVal);
+								((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1] as Image),
+								dataVal);
 						}
 						else if (currentCanvasImagePropertiesSelected.LinkedCroppableImage != null)
 						{
@@ -9889,7 +10088,8 @@ namespace AmethystEngine.Forms
 						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
 						{
 							Canvas.SetTop(
-								((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1] as Image), dataVal);
+								((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1] as Image),
+								dataVal);
 						}
 						else if (currentCanvasImagePropertiesSelected.LinkedCroppableImage != null)
 						{
@@ -9935,7 +10135,8 @@ namespace AmethystEngine.Forms
 				if (checkBox.IsChecked == true)
 				{
 					if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
-						(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1].Visibility = Visibility.Visible;
+						(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1].Visibility =
+							Visibility.Visible;
 					//else
 					//	currentCanvasImagePropertiesSelected.LinkedCroppableImage.BorderThickness = new Thickness(1);
 
@@ -9944,7 +10145,8 @@ namespace AmethystEngine.Forms
 				{
 					{
 						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
-							(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1].Visibility = Visibility.Hidden;
+							(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1].Visibility =
+								Visibility.Hidden;
 						//else
 						//	currentCanvasImagePropertiesSelected.LinkedCroppableImage.BorderThickness = new Thickness(0);
 					}
@@ -9962,8 +10164,14 @@ namespace AmethystEngine.Forms
 					if (currentCanvasAnimationPropertiesSelected != null)
 					{
 						int index = GetItemIndex(textBox);
-						if(index >= 0)
+						if (index >= 0)
+						{
 							currentCanvasAnimationPropertiesSelected.NamesOfSubLayers[index] = textBox.Text;
+							foreach (var frame in currentCanvasAnimationPropertiesSelected.CanvasFrames)
+							{
+								frame.SubLayerPoints[index].LayerName = textBox.Text;
+							}
+						}
 					}
 				}
 			}
@@ -9971,21 +10179,41 @@ namespace AmethystEngine.Forms
 
 		private void SpriteSheetEditorProperties_AddSubLayer_BTN_Click(object sender, RoutedEventArgs e)
 		{
-			ItemsControl SubLayerIC = (ItemsControl)ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_SubLayerInfo_IC", ObjectProperties_Control);
-			currentCanvasAnimationPropertiesSelected.NamesOfSubLayers.Add("Layer " + SubLayerIC.Items.Count);
-			SubLayerIC.Items.Add("Layer " + SubLayerIC.Items.Count);
+			ItemsControl SubLayerIC =
+				(ItemsControl) ObjectProperties_Control.Template.FindName("SpriteSheetEditorProperties_SubLayerInfo_IC",
+					ObjectProperties_Control);
+			foreach (var frame in currentCanvasAnimationPropertiesSelected.CanvasFrames)
+			{
+				Image renderPointImage = new Image();
+				renderPointImage.Name = "Render_Point_Image";
+				renderPointImage.Source =
+					new BitmapImage(new Uri(
+						String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()),
+						UriKind.Absolute));
 
+				Canvas overlayCanvas = new Canvas() {Width = frame.W, Height = frame.H};
+				(frame.LinkedBorderImage.Child as Canvas)?.Children.Add(renderPointImage);
+
+				frame.SubLayerPoints.Add(new CanvasSubLayerPoint()
+				{
+					LinkedImage = renderPointImage,
+					LayerName = "Layer " + (SubLayerIC.Items.Count)
+				});
+			}
+
+			currentCanvasAnimationPropertiesSelected.NamesOfSubLayers.Add("Layer " + SubLayerIC.Items.Count);
 		}
 
 
 		private int GetItemIndex(FrameworkElement element)
 		{
-	    ItemsControl itemsControl = FindParentItemsControl(element);
-	    if (itemsControl != null)
-	    {
-		    return itemsControl.Items.IndexOf(element.DataContext);
-	    }
-	    return -1;
+			ItemsControl itemsControl = FindParentItemsControl(element);
+			if (itemsControl != null)
+			{
+				return itemsControl.Items.IndexOf(element.DataContext);
+			}
+
+			return -1;
 		}
 
 		private ItemsControl FindParentItemsControl(FrameworkElement element)
@@ -10004,6 +10232,107 @@ namespace AmethystEngine.Forms
 			return null;
 		}
 
+		private static T FindParent<T>(DependencyObject child) where T : DependencyObject
+		{
+			DependencyObject parentObject = VisualTreeHelper.GetParent(child);
+
+			if (parentObject == null)
+				return null;
+
+			T parent = parentObject as T;
+			return parent ?? FindParent<T>(parentObject);
+		}
+
+		private void SpriteSheetEditor_SubLayerRX_Keydown(object sender, KeyEventArgs e)
+		{
+			TextBox tb = sender as TextBox;
+			if (e.Key == Key.Enter)
+			{
+				if (int.TryParse(tb.Text, out int rxVal))
+				{
+					if (tb != null)
+					{
+						// We need to play WPF games... aka find the template, and then with that find the acutal control (treeview)
+						ControlTemplate spriteSheeControlTemplate =
+							(ControlTemplate) this.Resources["SpritesheetEditorProperties_Template"];
+						ItemsControl spritesheetTreeView =
+							(ItemsControl) spriteSheeControlTemplate.FindName("SpriteSheetEditorProperties_SubLayerInfo_IC",
+								ObjectProperties_Control);
+
+						// Get the actual index of the list from the BUTTON we pressed
+						CanvasSubLayerPoint subLayerPoint = tb.DataContext as CanvasSubLayerPoint;
+						int foundFrameIndex = spritesheetTreeView.Items.IndexOf(tb.DataContext); // MAGIC BULLSHIT
+						if (foundFrameIndex >= 0)
+						{
+							Canvas.SetLeft(subLayerPoint.LinkedImage, rxVal);
+						}
+					}
+				}
+			}
+		}
+
+		private void SpriteSheetEditor_SubLayerRY_Keydown(object sender, KeyEventArgs e)
+		{
+			TextBox tb = sender as TextBox;
+
+			if (e.Key == Key.Enter)
+			{
+				if (int.TryParse(tb.Text, out int ryVal))
+				{
+					if (tb != null)
+					{
+						// We need to play WPF games... aka find the template, and then with that find the acutal control (treeview)
+						ControlTemplate spriteSheeControlTemplate =
+							(ControlTemplate) this.Resources["SpritesheetEditorProperties_Template"];
+						ItemsControl spritesheetTreeView =
+							(ItemsControl) spriteSheeControlTemplate.FindName("SpriteSheetEditorProperties_SubLayerInfo_IC",
+								ObjectProperties_Control);
+
+						// Get the actual index of the list from the BUTTON we pressed
+						CanvasSubLayerPoint subLayerPoint = tb.DataContext as CanvasSubLayerPoint;
+						int foundFrameIndex = spritesheetTreeView.Items.IndexOf(tb.DataContext); // MAGIC BULLSHIT
+						if (foundFrameIndex >= 0)
+						{
+							Canvas.SetTop(subLayerPoint.LinkedImage, ryVal);
+						}
+					}
+				}
+			}
+		}
+
+		private void SpriteSheetEditor_ShowSubLayer_CB_Click(object sender, RoutedEventArgs e)
+		{
+			CheckBox checkBox = sender as CheckBox;
+			if (checkBox != null)
+			{
+				CanvasSubLayerPoint subLayerPoint = checkBox.DataContext as CanvasSubLayerPoint;
+				if (subLayerPoint != null)
+				{
+					// We need to play WPF games... aka find the template, and then with that find the acutal control (treeview)
+					ControlTemplate spriteSheeControlTemplate =
+						(ControlTemplate) this.Resources["SpritesheetEditorProperties_Template"];
+					ItemsControl spritesheetTreeView =
+						(ItemsControl) spriteSheeControlTemplate.FindName("SpriteSheetEditorProperties_SubLayerInfo_IC",
+							ObjectProperties_Control);
+					if (checkBox.IsChecked == true)
+					{
+						if (subLayerPoint.LinkedImage != null)
+							subLayerPoint.LinkedImage.Visibility = Visibility.Visible;
+						//else
+						//	currentCanvasImagePropertiesSelected.LinkedCroppableImage.BorderThickness = new Thickness(1);
+
+					}
+					else
+					{
+						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
+							subLayerPoint.LinkedImage.Visibility = Visibility.Hidden;
+
+						//else
+						//	currentCanvasImagePropertiesSelected.LinkedCroppableImage.BorderThickness = new Thickness(0);
+					}
+				}
+			}
+		}
 	}
 }
 

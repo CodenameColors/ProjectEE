@@ -113,6 +113,7 @@ namespace AmethystEngine.Components
 		}
 
 		public ObservableCollection<CanvasSubLayerPoint> SubLayerPoints = new ObservableCollection<CanvasSubLayerPoint>();
+		//public List<Image> SubLayerCrossHairsImages = new List<Image>();
 
 		public float SX { get; set; }
 		public float SY { get; set; }
@@ -235,7 +236,21 @@ namespace AmethystEngine.Components
 										imageProperty.ImageLocation = (reader.GetAttribute("Path") ?? ""); // fallback
 
 										spriteAnimation.CanvasFrames.Add(imageProperty);
+
+										do
+										{
+											reader.Read();
+											if (reader.Name == "SubLayerPoints" && reader.NodeType == XmlNodeType.Element)
+											{
+												CanvasSubLayerPoint subLayerPoint = new CanvasSubLayerPoint();
+												subLayerPoint.LayerName = reader.GetAttribute("LayerName");
+												subLayerPoint.RX = int.Parse(reader.GetAttribute("RX") ?? "0"); // fallback
+												subLayerPoint.RY = int.Parse(reader.GetAttribute("RY") ?? "0"); // fallback
+												spriteAnimation.CanvasFrames.Last().SubLayerPoints.Add(subLayerPoint);
+											}
+										} while (reader.Name.Trim() != "Frame");
 									}
+
 								} while (reader.Name.Trim() != "AnimationState");
 
 								retSpriteSheet.AllAnimationOnSheet.Add(spriteAnimation);
@@ -312,9 +327,9 @@ namespace AmethystEngine.Components
 						writer.WriteStartElement(null, "SubLayerPoints", null);
 						foreach (var subLayerPoint in imgpProperty.SubLayerPoints)
 						{
-							writer.WriteAttributeString(null, "Name", null, subLayerPoint.LayerName);
+							writer.WriteAttributeString(null, "LayerName", null, subLayerPoint.LayerName);
 							writer.WriteAttributeString(null, "RX", null, subLayerPoint.RX.ToString());
-							writer.WriteAttributeString(null, "RY", null, subLayerPoint.RX.ToString());
+							writer.WriteAttributeString(null, "RY", null, subLayerPoint.RY.ToString());
 						}
 						writer.WriteEndElement(); //end of the SubLayerPoints Tag
 
@@ -411,6 +426,7 @@ namespace AmethystEngine.Components
 		private String _layerName = "";
 		private int _rx;
 		private int _ry;
+		public Image LinkedImage = null;
 
 		public String LayerName
 		{
