@@ -270,7 +270,6 @@
     <Compile Include="Forms\AddEditAnimationStateMachine.xaml.cs">
       <DependentUpon>AddEditAnimationStateMachine.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Forms\EngineEditor.LevelEditor.xaml.cs" />
     <Compile Include="Forms\GameEventsSettings.xaml.cs">
       <DependentUpon>GameEventsSettings.xaml</DependentUpon>
     </Compile>
@@ -329,6 +328,27 @@
     <Compile Include="Components\Tools\SelectTool.cs" />
     <Compile Include="Components\XMLManager.cs" />
     <Compile Include="Forms\EngineEditor.xaml.cs">
+      <DependentUpon>EngineEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EngineEditor.LevelEditor.xaml.cs">
+      <DependentUpon>EngineEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EngineEditor.AnimationEditor.xaml.cs" >
+      <DependentUpon>EngineEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EngineEditor.CutSceneEditor.xaml.cs" >
+      <DependentUpon>EngineEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EngineEditor.DialogueEditor.xaml.cs" >
+      <DependentUpon>EngineEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EngineEditor.ParticleEditor.xaml.cs" >
+      <DependentUpon>EngineEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EngineEditor.SpriteSheetEditor.xaml.cs" >
+      <DependentUpon>EngineEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EngineEditor.UIEditor.xaml.cs" >
       <DependentUpon>EngineEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Forms\MainWindow.xaml.cs">
