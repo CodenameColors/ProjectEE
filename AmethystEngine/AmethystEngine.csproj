@@ -270,6 +270,7 @@
     <Compile Include="Forms\AddEditAnimationStateMachine.xaml.cs">
       <DependentUpon>AddEditAnimationStateMachine.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Forms\EngineEditor.LevelEditor.xaml.cs" />
     <Compile Include="Forms\GameEventsSettings.xaml.cs">
       <DependentUpon>GameEventsSettings.xaml</DependentUpon>
     </Compile>
@@ -494,7 +495,6 @@
     <Content Include="Components\Bixbite_Windows_Build\bin\Debug\SQLite.Interop.dll" />
     <Content Include="Components\Bixbite_Windows_Build\bin\Debug\sqlite3.dll" />
     <Content Include="Components\Bixbite_Windows_Build\bin\Debug\TimelinePlayer.dll" />
-    <Resource Include="Components\Bixbite_Windows_Build\obj\Debug\BixBite.csproj.FileListAbsolute.txt" />
     <Content Include="Components\Bixbite_Windows_Build\obj\Debug\BixBite.dll" />
     <Content Include="Components\Bixbite_Windows_Build\obj\Debug\BixBite.pdb" />
     <Content Include="Components\Bixbite_Windows_Build\Resources\FMOD\x64\fmod.dll" />

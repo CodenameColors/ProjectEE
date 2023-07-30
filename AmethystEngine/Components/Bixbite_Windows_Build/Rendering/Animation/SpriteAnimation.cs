@@ -13,6 +13,7 @@ using BixBite.Rendering.Animation;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Color = Microsoft.Xna.Framework.Color;
+using Point = Microsoft.Xna.Framework.Point;
 
 
 namespace BixBite.Rendering
@@ -26,6 +27,8 @@ namespace BixBite.Rendering
 		public int RenderPointX { get; set; }
 		public int RenderPointY { get; set; }
 
+		public Dictionary<String, Point> SubLayerPoints = new Dictionary<string, Point>();
+
 		public FrameInfo(int x, int y, int width, int height, int renderx, int rendery)
 		{
 			this.XPos = x;
@@ -34,6 +37,14 @@ namespace BixBite.Rendering
 			this.Height = height;
 			this.RenderPointX = renderx;
 			this.RenderPointY = rendery;
+		}
+
+		public void AddSubLayerPoint(String layerName, int rx, int ry)
+		{
+			if (!SubLayerPoints.ContainsKey(layerName))
+			{
+				SubLayerPoints.Add(layerName, new Point(rx,ry));
+			}
 		}
 	}
 
@@ -90,18 +101,6 @@ public class SpriteAnimation
 			set => bIsDefualt = value;
 		}
 
-		//public LinkedList<Vector2> FrameDrawRects
-		//{
-		//	get => _frameDrawRects;
-		//	set => _frameDrawRects = value;
-		//}
-
-		//public LinkedList<Rect> FrameDrawRects
-		//{
-		//	get => _frameDrawRects;
-		//	set => _frameDrawRects = value;
-		//}
-
 		public LinkedList<FrameInfo> FrameDrawRects
 		{
 			get => _frameDrawRects;
@@ -116,10 +115,9 @@ public class SpriteAnimation
 		public double TimeBetweenFrames = 0.0f;
 		public bool bIsDefualt = false;
 
-		public Vector2 RelativeOrigin { get; set; }
-		//public LinkedListNode<Vector2> CurrentFrameRect { get; set; }
-		//public LinkedListNode<Rect> CurrentFrameRect { get; set; }
+		public List<String> NamesOfSubLayers = new List<string>();
 		public LinkedListNode<FrameInfo> CurrentFrameRect { get; set; }
+		public Dictionary<String, SpriteAnimation> SubLayerAnimations = new Dictionary<String, SpriteAnimation>();
 
 		public int CurrentFrameIndex
 		{
@@ -143,6 +141,34 @@ public class SpriteAnimation
 			this._fps = fps;
 
 			CurrentFrameRect = FrameDrawRects.First;
+		}
+		
+		/// <summary>
+		/// Sets the animation on a sublayer, if it exists.
+		/// </summary>
+		/// <param name="LayerName"></param>
+		/// <param name="newLayer"></param>
+		/// <returns></returns>
+		public bool SetAnimationOnSubLayer(String LayerName, SpriteAnimation newLayer)
+		{
+			bool returnStatus = false;
+			if (SubLayerAnimations.ContainsKey(LayerName))
+			{
+				SubLayerAnimations[LayerName] = newLayer;
+				returnStatus = true;
+			}
+			return returnStatus;
+		}
+
+		public bool AddSubLayer(String LayerName, SpriteAnimation newLayer)
+		{
+			bool returnStatus = false;
+			if(!SubLayerAnimations.ContainsKey(LayerName))
+			{
+				SubLayerAnimations.Add(LayerName, newLayer);
+				returnStatus = true;
+			}
+			return returnStatus;
 		}
 
 		public Rectangle GetScreenRectangle()

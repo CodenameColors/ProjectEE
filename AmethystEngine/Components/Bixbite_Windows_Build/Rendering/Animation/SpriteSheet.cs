@@ -26,8 +26,6 @@ namespace BixBite.Rendering
 		private String _name = String.Empty;
 		private String _characterName = String.Empty;
 
-		private int _frameWidth = 0;
-		private int _frameHeight = 0;
 		private SpriteAnimation _nextAnimation = null;
 
 		#endregion

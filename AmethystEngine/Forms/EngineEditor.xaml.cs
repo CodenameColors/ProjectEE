@@ -70,6 +70,7 @@ using System.Windows.Interop;
 using System.Drawing.Imaging;
 using System.Resources;
 using System.Windows.Media.Converters;
+using SpriteAnimation = BixBite.Rendering.SpriteAnimation;
 
 namespace AmethystEngine.Forms
 {
@@ -6893,27 +6894,8 @@ namespace AmethystEngine.Forms
 
 			bNewAnimStateMachine = true;
 
-			// We have created a new SpriteSheet
-			CurrentActiveSpriteSheet = new SpriteSheet(NewAnimimationStatemachineFileName, NewAnimimationStatemachineLocation,
-				0, 0, NewAnimimationStatemachineTotalWidth, NewAnimimationStatemachineTotalHeight);
-
-			// Let's take the canvas sprite sheet andEditorToolBar_CC use that data to fill in the Game spritesheet
-			foreach (CanvasAnimation canvasAnimation in tempCanvasSpritesheet.AllAnimationOnSheet)
-			{
-				CurrentActiveSpriteSheet.SpriteAnimations.Add(canvasAnimation.AnimName,
-					new SpriteAnimation(CurrentActiveSpriteSheet, canvasAnimation.AnimName,
-						canvasAnimation.CanvasFrames.Count,
-						0)); // Default to 0, because this NEEDS to be set by the user on firt attempt
-
-				// Add the frame positions
-				foreach (CanvasImageProperties canvasImageProperties in canvasAnimation.CanvasFrames)
-				{
-					CurrentActiveSpriteSheet.SpriteAnimations.Last().Value.FrameDrawRects.AddLast(
-						new LinkedListNode<FrameInfo>(new FrameInfo(canvasImageProperties.X, canvasImageProperties.Y,
-							canvasImageProperties.W, canvasImageProperties.H, canvasImageProperties.RX, canvasImageProperties.RY)));
-				}
-
-			}
+			// We have created a new WPF spritesheet. GET THE BIXBITE ONE
+			CurrentActiveSpriteSheet = canvaSpriteSheetToSpriteSheetBixbite(tempCanvasSpritesheet);
 
 			AE_NewAnimStates_IC.ItemsSource = null;
 
@@ -8028,15 +8010,10 @@ namespace AmethystEngine.Forms
 				SpriteAnimation item = tvtemp.SelectedItem as SpriteAnimation;
 				item.CurrentFrameRect = item.FrameDrawRects.First;
 				if (item == null) return;
+
+				// First up we need to get all the frames, and create CROPPED images for them!
 				for (int i = 0; i < item.FrameCount; i++)
 				{
-					//this eyesore will catch bad sprite sheets.So it doesn't go out of bounds....
-					//int width2 =
-					//	(int)(item.StartXPos +
-					//		((item.FrameCount) * item.FrameWidth) > CurrentSpriteSheet_Image.Width
-					//			? CurrentSpriteSheet_Image.Width - ((item.StartXPos + ((item.FrameCount - 1) * item.FrameWidth))) : item.FrameWidth);
-
-
 					CurrentSelectedAnimImages_List.Add(
 						(new CroppedBitmap(CurrentSpriteSheet_Image, new Int32Rect(
 							(int) item.FrameDrawRects.ToList()[i].XPos,
@@ -8046,6 +8023,12 @@ namespace AmethystEngine.Forms
 						))));
 					item.CurrentFrameRect = item.CurrentFrameRect.Next;
 				}
+
+				AnimationSubLayer_CB.ItemsSource = item.NamesOfSubLayers;
+				//foreach (var namesOfSubLayer in item.NamesOfSubLayers)
+				//{
+				//	AnimationSubLayer_CB.Items.Add(namesOfSubLayer);
+				//}
 
 				CurrentActiveAnimationName_TB.Text = item.Name;
 				CurrentActiveAnimationFPS_TB.Text = item.FPS.ToString();
@@ -8397,22 +8380,22 @@ namespace AmethystEngine.Forms
 
 		private void ChangeAnimationSubLayer_CB_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			ComboBox cb = sender as ComboBox;
-			if (cb.SelectedIndex == 0)
-			{
-				//We need to change grids, so the user can add a sprite layer
-				AnimationAddSubLayer_Grid.Visibility = Visibility.Visible;
-				AnimationLayersSettings_Grid.Visibility = Visibility.Hidden;
-			}
-			else if (cb.SelectedIndex > 1 && cb.Items[cb.SelectedIndex] as ComboBoxItem != null)
-			{
-				//this is an actual sub layer, So we need to load all the possible Spritesheets to the screen
-				CurrentSubLayerSpriteSheets_LB.ItemsSource =
-					currentLayeredSpriteSheet.subLayerSpritesheets_Dict
-						[(cb.Items[cb.SelectedIndex] as ComboBoxItem).Content.ToString()].ToList();
+			//ComboBox cb = sender as ComboBox;
+			//if (cb.SelectedIndex == 0)
+			//{
+			//	//We need to change grids, so the user can add a sprite layer
+			//	AnimationAddSubLayer_Grid.Visibility = Visibility.Visible;
+			//	AnimationLayersSettings_Grid.Visibility = Visibility.Hidden;
+			//}
+			//else if (cb.SelectedIndex > 1 && cb.Items[cb.SelectedIndex] as ComboBoxItem != null)
+			//{
+			//	//this is an actual sub layer, So we need to load all the possible Spritesheets to the screen
+			//	CurrentSubLayerSpriteSheets_LB.ItemsSource =
+			//		currentLayeredSpriteSheet.subLayerSpritesheets_Dict
+			//			[(cb.Items[cb.SelectedIndex] as ComboBoxItem).Content.ToString()].ToList();
 
 
-			}
+			//}
 		}
 
 		private void AddAnimationSubLayer_BTN_Click(object sender, RoutedEventArgs e)
@@ -8437,20 +8420,61 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		/// <summary>
+		/// give this a valid CanvasSpriteSheet and it will return a BIXBITE spritesheet
+		/// </summary>
+		/// <param name="wpfCanvasSpritesheet"></param>
+		/// <returns></returns>
+		private SpriteSheet canvaSpriteSheetToSpriteSheetBixbite(CanvasSpritesheet wpfCanvasSpritesheet)
+		{
+			// NEW CODE for NEW SPRITESHEET
+			CanvasSpritesheet tempCanvasSpritesheet = wpfCanvasSpritesheet;
+
+			// We have created a new SpriteSheet
+			SpriteSheet returnSpriteSheet = new SpriteSheet(NewAnimimationStatemachineFileName, NewAnimimationStatemachineLocation,
+				0, 0, NewAnimimationStatemachineTotalWidth, NewAnimimationStatemachineTotalHeight);
+
+			// Let's take the canvas sprite sheet andEditorToolBar_CC use that data to fill in the Game spritesheet
+			foreach (CanvasAnimation canvasAnimation in tempCanvasSpritesheet.AllAnimationOnSheet)
+			{
+				returnSpriteSheet.SpriteAnimations.Add(canvasAnimation.AnimName,
+					new SpriteAnimation(returnSpriteSheet, canvasAnimation.AnimName,
+						canvasAnimation.CanvasFrames.Count,
+						0)); // Default to 0, because this NEEDS to be set by the user on firt attempt
+
+				// We need to add all the sub layers names!
+				foreach (var namesOfSubLayer in canvasAnimation.NamesOfSubLayers)
+				{
+					returnSpriteSheet.SpriteAnimations.Last().Value.NamesOfSubLayers.Add(namesOfSubLayer);
+				}
+
+				// Add the frame positions
+				foreach (CanvasImageProperties canvasImageProperties in canvasAnimation.CanvasFrames)
+				{
+					returnSpriteSheet.SpriteAnimations.Last().Value.FrameDrawRects.AddLast(
+						new LinkedListNode<FrameInfo>(new FrameInfo(canvasImageProperties.X, canvasImageProperties.Y,
+							canvasImageProperties.W, canvasImageProperties.H, canvasImageProperties.RX, canvasImageProperties.RY)));
+
+					foreach (var subLayerPoint in canvasImageProperties.SubLayerPoints)
+					{
+						returnSpriteSheet.SpriteAnimations.Last().Value.FrameDrawRects.Last().AddSubLayerPoint(
+							subLayerPoint.LayerName, subLayerPoint.RX, subLayerPoint.RY);
+					}
+				}
+			}
+			return returnSpriteSheet;
+		}
+
 		private void AddSpriteSheetToSubLayer_BTN_Click(object sender, RoutedEventArgs e)
 		{
-
-
-			if (AnimationSubLayer_CB.SelectedIndex < 1) return;
-
 			CurrentSubLayerSpriteSheets_LB.ItemsSource = null;
 
+			// Get a new image file
 			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
 			{
-				Title = "Open Animation State machine File",
+				Title = "Import Sprite Sheet File",
 				FileName = "", //default file name
-				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Animations"),
-				Filter = "Animation State Machine files (*.anim)|*.anim",
+				Filter = "Sprite Sheet files (*.spritesheet)|*.spritesheet",
 				RestoreDirectory = true
 			};
 
@@ -8461,17 +8485,35 @@ namespace AmethystEngine.Forms
 			{
 				// Save document
 				filename = dlg.FileName;
-				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] {'/', '\\'}));
+				// filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] {'/', '\\'}));
 			}
 			else return; //invalid name
 
-			SpriteSheet retSheet = SpriteSheet.ImportSpriteSheet(dlg.FileName);
+			Console.WriteLine(dlg.FileName);
 
-			//Adding this to the layered Sprite sheet. THIS import must be changed later.
-			//currentLayeredSpriteSheet = new LayeredSpriteSheet(retSheet);
-			currentLayeredSpriteSheet.AddSpriteSheetToSubLayer(
-				currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[AnimationSubLayer_CB.SelectedIndex - 2],
-				retSheet);
+			CanvasSpritesheet tempCanvasSpritesheet = CanvasSpritesheet.ImportSpriteSheet(dlg.FileName);
+			SpriteSheet tempBixbiteSpriteSheet = canvaSpriteSheetToSpriteSheetBixbite(tempCanvasSpritesheet);
+			
+			// We need to play WPF games... aka find the template, and then with that find the acutal control (treeview)
+			ControlTemplate spriteSheeControlTemplate = (ControlTemplate)this.Resources["AnimationEditorObjects_Template"];
+			TreeView spritesheetTreeView = (TreeView)spriteSheeControlTemplate.FindName("AnimationEditor_CE_TV", ContentLibrary_Control);
+			SpriteAnimation currentSelectedAnimation = spritesheetTreeView.SelectedItem as SpriteAnimation;
+
+			//if (CurrentActiveSpriteSheet.SpriteAnimations.ContainsKey(currentSelectedAnimation.Name))
+			//{
+			//	if (!CurrentActiveSpriteSheet.SpriteAnimations[currentSelectedAnimation.Name].AddSubLayer(AnimationSubLayer_CB.Text, ))
+			//	{
+
+			//	}
+			//}
+
+			////AnimationEditor_CE_TV
+
+			////Adding this to the layered Sprite sheet. THIS import must be changed later.
+			////currentLayeredSpriteSheet = new LayeredSpriteSheet(retSheet);
+			//currentLayeredSpriteSheet.AddSpriteSheetToSubLayer(
+			//	currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[AnimationSubLayer_CB.SelectedIndex - 2],
+			//	retSheet);
 
 			CurrentSubLayerSpriteSheets_LB.ItemsSource =
 				currentLayeredSpriteSheet.subLayerSpritesheets_Dict[AnimationSubLayer_CB.Text].ToList();
