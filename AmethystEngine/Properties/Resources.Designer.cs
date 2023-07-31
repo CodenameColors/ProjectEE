@@ -69,15 +69,5 @@ namespace AmethystEngine.Properties {
                 return ((byte[])(obj));
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap render_point_crosshair {
-            get {
-                object obj = ResourceManager.GetObject("render_point_crosshair", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
     }
 }

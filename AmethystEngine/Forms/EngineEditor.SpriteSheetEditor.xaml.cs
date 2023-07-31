@@ -800,7 +800,8 @@ namespace AmethystEngine.Forms
 				renderPointImage.Name = "Render_Point_Image";
 				renderPointImage.Source =
 					new BitmapImage(new Uri(
-						String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()),
+						String.Format("{0}/Resources/render_point_crosshair_{1}.png", Directory.GetCurrentDirectory(),
+							(SubLayerIC.Items.Count + 1).ToString()),
 						UriKind.Absolute));
 
 				Canvas overlayCanvas = new Canvas() { Width = frame.W, Height = frame.H };
@@ -876,7 +877,7 @@ namespace AmethystEngine.Forms
 						int foundFrameIndex = spritesheetTreeView.Items.IndexOf(tb.DataContext); // MAGIC BULLSHIT
 						if (foundFrameIndex >= 0)
 						{
-							Canvas.SetLeft(subLayerPoint.LinkedImage, rxVal);
+							Canvas.SetLeft((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[2 + foundFrameIndex], rxVal);
 						}
 					}
 				}
@@ -905,7 +906,7 @@ namespace AmethystEngine.Forms
 						int foundFrameIndex = spritesheetTreeView.Items.IndexOf(tb.DataContext); // MAGIC BULLSHIT
 						if (foundFrameIndex >= 0)
 						{
-							Canvas.SetTop(subLayerPoint.LinkedImage, ryVal);
+							Canvas.SetTop((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[2 + foundFrameIndex], ryVal);
 						}
 					}
 				}
@@ -926,10 +927,15 @@ namespace AmethystEngine.Forms
 					ItemsControl spritesheetTreeView =
 						(ItemsControl)spriteSheeControlTemplate.FindName("SpriteSheetEditorProperties_SubLayerInfo_IC",
 							ObjectProperties_Control);
+					int index = spritesheetTreeView.Items.IndexOf(subLayerPoint);
 					if (checkBox.IsChecked == true)
 					{
 						if (subLayerPoint.LinkedImage != null)
+						{
 							subLayerPoint.LinkedImage.Visibility = Visibility.Visible;
+							(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[2 + index].Visibility = Visibility.Visible;
+
+						}
 						//else
 						//	currentCanvasImagePropertiesSelected.LinkedCroppableImage.BorderThickness = new Thickness(1);
 
@@ -937,8 +943,10 @@ namespace AmethystEngine.Forms
 					else
 					{
 						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
+						{
 							subLayerPoint.LinkedImage.Visibility = Visibility.Hidden;
-
+							(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[2 + index].Visibility = Visibility.Hidden;
+						}
 						//else
 						//	currentCanvasImagePropertiesSelected.LinkedCroppableImage.BorderThickness = new Thickness(0);
 					}
@@ -1024,23 +1032,26 @@ namespace AmethystEngine.Forms
 						image.PreviewMouseLeftButtonUp +=
 							new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
+						// Render the BASE RENDER POINT
 						Image renderPointImage = new Image();
 						renderPointImage.Name = "Render_Point_Image";
 						renderPointImage.Source =
 							new BitmapImage(new Uri(
-								String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()),
+								String.Format("{0}/Resources/render_point_crosshair_base.png", Directory.GetCurrentDirectory()),
 								UriKind.Absolute));
 
 						Canvas overlayCanvas = new Canvas() { Width = frame.W, Height = frame.H };
 						overlayCanvas.Children.Add(image);
 						overlayCanvas.Children.Add(renderPointImage);
 
+						// Render all the sub layers render points
+						int subLayerCount = 1;
 						foreach (var subLayerPoint in frame.SubLayerPoints)
 						{
 							Image subPointImage = new Image();
 							subPointImage.Source =
 								new BitmapImage(new Uri(
-									String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()),
+									String.Format("{0}/Resources/render_point_crosshair_{1}.png", Directory.GetCurrentDirectory(), subLayerCount++),
 									UriKind.Absolute));
 
 							overlayCanvas.Children.Add(subPointImage);
@@ -1395,30 +1406,41 @@ namespace AmethystEngine.Forms
 
 						// we need to transfer this image and properties to the canvas we are trying make the new image on
 						String path = SpritesheetEditor_CropImage.GetImagePath();
+						CanvasImageProperties foundFrame = FindCanvasFrame(SpritesheetEditor_CropImage);
 						if (path != null)
 						{
 							Image image = new Image();
-							image.Name = "cropped_image_preview";
-							image.Source = new BitmapImage(new Uri(path));
-							image.Width = _baseImage.PixelWidth;
-							image.Height = _baseImage.PixelHeight;
+
+							// Have we cropped the craoppable image yet?
+							if (SpritesheetEditor_CropImage.GetCroppedBitmap() != null)
+							{
+								image.Source = SpritesheetEditor_CropImage.GetCroppedBitmap();
+							}
+							else
+							{
+								image.Source = new BitmapImage(new Uri(path));
+							}
+
 							image.Stretch = Stretch.Fill;
+							image.Name = "cropped_image_preview";
+							image.Width = SpritesheetEditor_CropImage.Width;
+							image.MaxWidth = SpritesheetEditor_CropImage.Width;
+							image.Height = SpritesheetEditor_CropImage.Height;
+							image.MaxHeight = SpritesheetEditor_CropImage.Height;
 							image.HorizontalAlignment = HorizontalAlignment.Center;
 							image.VerticalAlignment = VerticalAlignment.Center;
 							image.PreviewMouseLeftButtonDown +=
 								new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
-							image.PreviewMouseLeftButtonUp +=
-								new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
-
+							image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
 							Image renderPointImage = new Image();
 							renderPointImage.Name = "Render_Point_Image";
 							renderPointImage.Source =
 								new BitmapImage(new Uri(
-									String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()),
+									String.Format("{0}/Resources/render_point_crosshair_base.png", Directory.GetCurrentDirectory()),
 									UriKind.Absolute));
 
-							Canvas overlayCanvas = new Canvas() { Width = _baseImage.PixelWidth, Height = _baseImage.PixelHeight };
+							Canvas overlayCanvas = new Canvas() {Width = _baseImage.PixelWidth, Height = _baseImage.PixelHeight};
 							overlayCanvas.Children.Add(image);
 							overlayCanvas.Children.Add(renderPointImage);
 
@@ -1426,7 +1448,6 @@ namespace AmethystEngine.Forms
 							parentBorder.Child = overlayCanvas;
 
 							// First we need to find the current frame we linked to the crop control if there is one.
-							CanvasImageProperties foundFrame = FindCanvasFrame(SpritesheetEditor_CropImage);
 							if (foundFrame != null)
 							{
 								foundFrame.LinkedCroppableImage = null;
@@ -1452,12 +1473,12 @@ namespace AmethystEngine.Forms
 							SpritesheetEditor_CropImage.Visibility = Visibility.Hidden;
 						}
 					}
-					else
-					{
-						CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().LinkedCroppableImage =
-							SpritesheetEditor_CropImage;
+					CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().LinkedCroppableImage =
+						SpritesheetEditor_CropImage;
+					CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().SubLayerPoints
+						.Add(new CanvasSubLayerPoint() {LayerName =
+							CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].NamesOfSubLayers.Last()});
 
-					}
 
 
 					//SpritesheetEditor_Canvas.Children.Add(croppable);
@@ -1663,11 +1684,12 @@ namespace AmethystEngine.Forms
 						new MouseButtonEventHandler(LeftMouseDowndOnImageFrame_SpriteSheetEditor_CB);
 					image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
+					// Set up the BASE RENDER POINTS
 					Image renderPointImage = new Image();
 					renderPointImage.Name = "Render_Point_Image";
 					renderPointImage.Source =
 						new BitmapImage(new Uri(
-							String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()),
+							String.Format("{0}/Resources/render_point_crosshair_base.png", Directory.GetCurrentDirectory()),
 							UriKind.Absolute));
 
 					Canvas overlayCanvas = new Canvas()
@@ -1690,13 +1712,18 @@ namespace AmethystEngine.Forms
 						Canvas.SetLeft(renderPointImage, foundFrame.RX);
 						Canvas.SetTop(renderPointImage, foundFrame.RY);
 
-						// We will need to set up the render points now.
+						// We will need to set up the sub layer render points now
+						int subLayerCount = 1;
 						foreach (var subLayerPoint in foundFrame.SubLayerPoints)
 						{
 							Image subPointImage = new Image();
 							subPointImage.Source = new BitmapImage(new Uri(
-									String.Format("{0}/Resources/render_point_crosshair.png", Directory.GetCurrentDirectory()),
+									String.Format("{0}/Resources/render_point_crosshair_{1}.png", Directory.GetCurrentDirectory(), subLayerCount++),
 									UriKind.Absolute));
+
+							// If we add a new frame the sublayer linking needs to be set up.
+							if (subLayerPoint.LinkedImage == null)
+								subLayerPoint.LinkedImage = subPointImage;
 
 							overlayCanvas.Children.Add(subPointImage);
 							Canvas.SetLeft(subPointImage, subLayerPoint.RX);

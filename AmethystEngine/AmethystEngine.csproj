@@ -333,22 +333,22 @@
     <Compile Include="Forms\EngineEditor.LevelEditor.xaml.cs">
       <DependentUpon>EngineEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Forms\EngineEditor.AnimationEditor.xaml.cs" >
+    <Compile Include="Forms\EngineEditor.AnimationEditor.xaml.cs">
       <DependentUpon>EngineEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Forms\EngineEditor.CutSceneEditor.xaml.cs" >
+    <Compile Include="Forms\EngineEditor.CutSceneEditor.xaml.cs">
       <DependentUpon>EngineEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Forms\EngineEditor.DialogueEditor.xaml.cs" >
+    <Compile Include="Forms\EngineEditor.DialogueEditor.xaml.cs">
       <DependentUpon>EngineEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Forms\EngineEditor.ParticleEditor.xaml.cs" >
+    <Compile Include="Forms\EngineEditor.ParticleEditor.xaml.cs">
       <DependentUpon>EngineEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Forms\EngineEditor.SpriteSheetEditor.xaml.cs" >
+    <Compile Include="Forms\EngineEditor.SpriteSheetEditor.xaml.cs">
       <DependentUpon>EngineEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Forms\EngineEditor.UIEditor.xaml.cs" >
+    <Compile Include="Forms\EngineEditor.UIEditor.xaml.cs">
       <DependentUpon>EngineEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Forms\MainWindow.xaml.cs">
@@ -497,10 +497,40 @@
     <Content Include="Resources\PropertyGridEditor.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\render_point_crosshair.png">
+    <None Include="Resources\RenderPointCrosshair.png" />
+    <Content Include="Resources\render_point_crosshair_1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="Resources\RenderPointCrosshair.png" />
+    <Content Include="Resources\render_point_crosshair_10.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\render_point_crosshair_2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\render_point_crosshair_3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\render_point_crosshair_4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\render_point_crosshair_5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\render_point_crosshair_6.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\render_point_crosshair_7.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\render_point_crosshair_8.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\render_point_crosshair_9.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\render_point_crosshair_base.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\TimelinePlayer.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
