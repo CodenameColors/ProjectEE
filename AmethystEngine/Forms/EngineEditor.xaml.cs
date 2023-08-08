@@ -2,12 +2,15 @@
 using AmethystEngine.Components.Tools;
 using BixBite;
 using BixBite.Rendering;
+using BixBite.Resources;
+using PropertyGridEditor;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -18,59 +21,25 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using BixBite.Resources;
-using PropertyGridEditor;
-using BixBite.Rendering.UI;
-using System.Threading;
-using System.Windows.Documents;
-using System.Windows.Forms;
-using TimelinePlayer.Components;
-using BixBite.Characters;
-using BixBite.NodeEditor;
-using BixBite.NodeEditor.Arithmetic;
-using BixBite.NodeEditor.Logic;
-using BixBite.Rendering.Animation;
-using BixBite.Rendering.UI.Button;
-using BixBite.Rendering.UI.TextBlock;
-using CroppingImageLibrary.Services;
-using ImageCropper;
-using ImageCropper.Components;
-using Microsoft.Xna.Framework;
-using NodeEditor;
-using NodeEditor.Components;
-using NodeEditor.Components.Arithmetic;
-using NodeEditor.Components.Logic;
-using Brushes = System.Windows.Media.Brushes;
 using Button = System.Windows.Controls.Button;
-using CanvasImageProperties = AmethystEngine.Components.CanvasImageProperties;
 using CheckBox = System.Windows.Controls.CheckBox;
 using Color = System.Windows.Media.Color;
 using ComboBox = System.Windows.Controls.ComboBox;
 using ContextMenu = System.Windows.Controls.ContextMenu;
 using Control = System.Windows.Controls.Control;
 using Cursors = System.Windows.Input.Cursors;
-using DragEventArgs = System.Windows.DragEventArgs;
-using GameImage = BixBite.Rendering.UI.Image.GameImage;
-using HorizontalAlignment = System.Windows.HorizontalAlignment;
 using Image = System.Windows.Controls.Image;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Label = System.Windows.Controls.Label;
 using ListBox = System.Windows.Controls.ListBox;
-using MenuItem = System.Windows.Controls.MenuItem;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Point = System.Windows.Point;
 using Rectangle = System.Windows.Shapes.Rectangle;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
-using Size = System.Windows.Size;
 using TabControl = System.Windows.Controls.TabControl;
 using TextBox = System.Windows.Controls.TextBox;
 using TreeView = System.Windows.Controls.TreeView;
-using System.Windows.Interop;
-using System.Drawing.Imaging;
-using System.Resources;
-using System.Windows.Media.Converters;
-using SpriteAnimation = BixBite.Rendering.SpriteAnimation;
 
 namespace AmethystEngine.Forms
 {
@@ -100,7 +69,6 @@ namespace AmethystEngine.Forms
 		NONE,
 		Textbox,
 		CheckBox,
-
 	}
 
 
