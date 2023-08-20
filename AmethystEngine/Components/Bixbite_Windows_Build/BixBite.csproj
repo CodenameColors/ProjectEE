@@ -264,9 +264,6 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
-      python .\..\..\BuildScripts\NodeEditorCopyFiles.py py2exe
-      python .\..\..\BuildScripts\BixbiteCopyForAmetheystEngine.py py2exe
-      python .\..\..\BuildScripts\NodeEditorPatchFiles.py py2exe
     </PostBuildEvent>
   </PropertyGroup>
 </Project>

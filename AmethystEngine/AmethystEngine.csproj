@@ -197,6 +197,7 @@
     <Compile Include="Components\Bixbite_Windows_Build\Particles\PEmitter.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Projectiles\projectile.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\Animation.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationEvent.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationFrameInfo.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationState.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationStateConnections.cs" />

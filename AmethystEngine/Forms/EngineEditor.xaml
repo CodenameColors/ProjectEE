@@ -811,7 +811,7 @@
 
 
 						<TreeView.ItemTemplate>
-							<HierarchicalDataTemplate DataType="{x:Type BixRen:SpriteAnimation }" ItemsSource="{Binding .}"  >
+							<HierarchicalDataTemplate DataType="{x:Type BixAnim:AnimationState }" ItemsSource="{Binding .}"  >
 								<StackPanel Orientation="Horizontal" MinWidth="150" MouseEnter="AnimationPreviewThumbnail_Image_Enter" MouseLeave="AnimationPreviewThumbnail_Image_Leave" 
 								            MouseRightButtonUp="Thumbnail_OnMouseRightButtonDown" Loaded="UpdateAnimationStateThumbnail_Event">
 									<Image x:Name="Thumbnail" Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50"
@@ -1064,7 +1064,7 @@
 					<!--SelectedItemChanged="UISceneExplorer_TreeView_SelectedItemChanged" Loaded="UISceneExplorer_TreeView_Loaded"-->
 
 					<TreeView.Resources>
-						<HierarchicalDataTemplate DataType="{x:Type BixRen:SpriteSheet}" ItemsSource="{Binding .}">
+						<HierarchicalDataTemplate DataType="{x:Type BixAnim:AnimationState}" ItemsSource="{Binding .}">
 							<StackPanel Orientation="Horizontal"
 							            PreviewMouseDown="ChangeActiveSpriteSheet_TVI_Click">
 								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
@@ -1072,7 +1072,7 @@
 								<TextBlock Text="{Binding SheetName}" Foreground="White" />
 							</StackPanel>
 						</HierarchicalDataTemplate>
-						<DataTemplate DataType="{x:Type BixRen:SpriteAnimation}">
+						<DataTemplate DataType="{x:Type BixAnim:Animation}">
 							<StackPanel Orientation="Horizontal">
 								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
 								<TextBlock Text="{Binding SheetName}" Foreground="White" />
