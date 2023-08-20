@@ -27,12 +27,12 @@ namespace AmethystEngine.Forms
 		TreeView SpriteSheet_CE_Tree;
 		CanvasImageProperties currentCanvasImagePropertiesSelected = null;
 		CanvasAnimation currentCanvasAnimationPropertiesSelected = null;
-		ObservableCollection<SpriteSheet> ActiveSpriteSheets = new ObservableCollection<SpriteSheet>();
-		SpriteSheet CurrentActiveSpriteSheet;
-		SpriteAnimation CurrentlySelectedAnimation;
+		ObservableCollection<AnimationStateMachine> ActiveAnimationStateMachines = new ObservableCollection<AnimationStateMachine>();
+		AnimationStateMachine CurrentAnimationStateMachine;
+		AnimationState CurrentlySelectedAnimationState;
 		CanvasSpritesheet CurrentSelectedSpriteSheet = null;
 		ObservableCollection<CanvasSpritesheet> ActiveCanvasSpritesheets = new ObservableCollection<CanvasSpritesheet>();
-		LayeredSpriteSheet currentLayeredSpriteSheet;
+		//LayeredSpriteSheet currentLayeredSpriteSheet;
 
 		CanvasImageProperties currentSelectedCanvasFrame = null;
 		//List<String> CurrentLayeredSpriteSheet_SubLayerNames = new List<string>();

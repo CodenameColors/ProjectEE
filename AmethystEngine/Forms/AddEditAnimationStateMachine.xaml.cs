@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using BixBite.Rendering;
+using BixBite.Rendering.Animation;
 using Microsoft.Xna.Framework;
 
 namespace AmethystEngine.Forms
@@ -38,7 +39,7 @@ namespace AmethystEngine.Forms
 
 		#region Delegate
 
-		public delegate void HooKfunction(SpriteAnimation retSpriteAnimation, String name, bool bIsAdding, bool bDefaultChange, String oldkey = "");
+		public delegate void HooKfunction(AnimationState retSpriteAnimation, String name, bool bIsAdding, bool bDefaultChange, String oldkey = "");
 		public HooKfunction AddToStatemachine;
 
 
@@ -60,7 +61,7 @@ namespace AmethystEngine.Forms
 		private bool _bHasChangedDefault = false;
 
 		private BitmapImage _mainImage = new BitmapImage();
-		private SpriteAnimation mainSpriteAnimation = null;
+		private AnimationState  mainAnimationState = null;
 		private Stopwatch AnimationImporterPreview_Stopwatch = new Stopwatch();
 		private Thread animationImportPreviewThread = null;
 		private List<CroppedBitmap> _animationImages_List = new List<CroppedBitmap>();
@@ -165,33 +166,36 @@ namespace AmethystEngine.Forms
 		/// </summary>
 		/// <param name="MainImage"></param>
 		/// <param name="currSpriteAnimation">CAN BE NULL</param>
-		public AddEditAnimationStateMachine(BitmapImage MainImage, SpriteSheet parentSpriteSheet, SpriteAnimation currSpriteAnimation)
+		public AddEditAnimationStateMachine(BitmapImage MainImage, AnimationStateMachine parentStateMachine, AnimationState currSpriteAnimation)
 		{
 			_mainImage = MainImage;
 			if (currSpriteAnimation == null)
 			{
-				mainSpriteAnimation = new SpriteAnimation(parentSpriteSheet, "TempName", 0, 0);
+				mainAnimationState = new AnimationState(parentStateMachine) {StateName = "TempName" };
 
 				
 				_bIsAdding = true;
 			}
 			else
 			{
-				mainSpriteAnimation = currSpriteAnimation;
-				_oldkey = currSpriteAnimation.Name;
+				mainAnimationState = currSpriteAnimation;
+				_oldkey = currSpriteAnimation.StateName;
 
-				//StateName_TB.Text = mainSpriteAnimation.Name;
-				this.Name = mainSpriteAnimation.Name;
-				this.FrameCount = mainSpriteAnimation.FrameCount ;
-				this.FPS = mainSpriteAnimation.FPS;
-				this.bIsDefaultState = mainSpriteAnimation.bIsDefaultState;
+				//StateName_TB.Text = mainAnimationState.Name;
+				this.Name = mainAnimationState.StateName;
+				this.FrameCount = mainAnimationState.NumOfFrames;
+				if (mainAnimationState.AnimationLayers.Count > 0)
+				{
+					this.FPS = mainAnimationState.FPS;
+					this.bIsDefaultState = mainAnimationState.IsDefualtState();
+				}
 				_bIsAdding = false;
 			}
 
 			InitializeComponent();
 
 			this.DataContext = this;
-			CurrentActiveAnimationName_TB.Text = parentSpriteSheet.SheetName;
+			CurrentActiveAnimationName_TB.Text = parentStateMachine.CurrentState.StateName;
 			animationImportPreviewThread = null;
 		}
 
@@ -206,7 +210,7 @@ namespace AmethystEngine.Forms
 			else
 			{
 
-				StateName_TB.Text = mainSpriteAnimation.Name;
+				StateName_TB.Text = mainAnimationState.StateName;
 				EditingIndicator_TB.Visibility = Visibility.Visible;
 				AddingIndicator_TB.Visibility = Visibility.Hidden;
 
@@ -410,10 +414,10 @@ namespace AmethystEngine.Forms
 			}
 
 
-			mainSpriteAnimation.Name = StateName_TB.Text;
-			mainSpriteAnimation.FrameCount = FrameCount;
-			mainSpriteAnimation.FPS = FPS;
-			mainSpriteAnimation.bIsDefaultState = bIsDefaultState;
+			mainAnimationState.StateName = StateName_TB.Text;
+			mainAnimationState.NumOfFrames = FrameCount;
+			mainAnimationState.FPS = FPS;
+			mainAnimationState.SetDefualtState(bIsDefaultState);
 
 			_bAllowImportAnimPreview = false;
 
@@ -429,9 +433,9 @@ namespace AmethystEngine.Forms
 			}
 
 			if(_bIsAdding)
-				AddToStatemachine?.Invoke(mainSpriteAnimation, StateName_TB.Text, bIsDefaultState, true);
+				AddToStatemachine?.Invoke(mainAnimationState, StateName_TB.Text, bIsDefaultState, true);
 			else 
-				AddToStatemachine?.Invoke(mainSpriteAnimation, StateName_TB.Text, false, bIsDefaultState, _oldkey);
+				AddToStatemachine?.Invoke(mainAnimationState, StateName_TB.Text, false, bIsDefaultState, _oldkey);
 			//while (animationImportPreviewThread.IsAlive)
 			//{
 			//	Thread.Sleep(10);

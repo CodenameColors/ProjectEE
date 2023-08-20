@@ -31,16 +31,16 @@ namespace BixBite.Characters
 		{
 			get
 			{
-				if (GetSpriteSheet() != null)
-					return GetSpriteSheet().CurrentAnimation.GetFrameWidth();
+				if (GetAnimationStateMachine() != null)
+					return GetAnimationStateMachine().DrawRectangle.Width;
 				else return base.Width;
 			}
 		}
 		public override int Height
 		{
 			get {
-				if (GetSpriteSheet() != null)
-					return GetSpriteSheet().CurrentAnimation.GetFrameHeight();
+				if (GetAnimationStateMachine() != null)
+					return GetAnimationStateMachine().DrawRectangle.Height;
 				else return base.Height;
 			}
 		}
@@ -49,14 +49,14 @@ namespace BixBite.Characters
 		{
 			get
 			{
-				if (GetSpriteSheet() != null)
-					return GetSpriteSheet().CurrentAnimation.ScalarX;
+				if (GetAnimationStateMachine() != null)
+					return GetAnimationStateMachine().ScaleX;
 				else return base.Width;
 			}
 			set
 			{
-				if (GetSpriteSheet() != null)
-					GetSpriteSheet().CurrentAnimation.ScalarX = value;
+				if (GetAnimationStateMachine() != null)
+					GetAnimationStateMachine().ScaleX = value;
 				else base.ScaleX = value;
 			}
 		}
@@ -65,14 +65,14 @@ namespace BixBite.Characters
 		{
 			get
 			{
-				if (GetSpriteSheet() != null)
-					return GetSpriteSheet().CurrentAnimation.ScalarY;
+				if (GetAnimationStateMachine() != null)
+					return GetAnimationStateMachine().ScaleY;
 				else return base.Width;
 			}
 			set
 			{
-				if (GetSpriteSheet() != null)
-					GetSpriteSheet().CurrentAnimation.ScalarY = value;
+				if (GetAnimationStateMachine() != null)
+					GetAnimationStateMachine().ScaleY= value;
 				else base.ScaleY = value;
 			}
 		}

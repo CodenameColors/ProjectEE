@@ -3,22 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace BixBite.Rendering.Animation
 {
-	public class Spritesheet
+	public class AnimationStateConnections
 	{
 		#region Delegates
 
 		#endregion
 
 		#region Properties
-		public String SpriteSheetPath;
+
+		public AnimationState OriginAnimationState;
+		public AnimationState DestinationAnimationState;
+		public bool bIsForceFinish = false;
+		public float StateChangeThreshold;
+
 		#endregion
 
 		#region fields
-		private Texture2D SpriteSheetImageTexture2D;
 
 		#endregion
 
@@ -28,17 +31,6 @@ namespace BixBite.Rendering.Animation
 
 		#region methods
 
-		public Texture2D GetTexture2D()
-		{
-			if (SpriteSheetImageTexture2D == null)
-			{
-				return null;
-			}
-			else
-			{
-				return SpriteSheetImageTexture2D;
-			}
-		}
 		#endregion
 
 		#region monogame

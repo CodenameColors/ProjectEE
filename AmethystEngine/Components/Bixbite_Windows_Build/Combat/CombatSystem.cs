@@ -763,7 +763,7 @@ namespace BixBite.Combat
 				#region Animation
 				case CombatAnimationAction combatAnimationAction:
 					//Use the queued information to change the requested characters animation.
-					combatAnimationAction.RequestedCharacter.GetSpriteSheet().ChangeAnimation(combatAnimationAction.AnimationNameRequest);
+					combatAnimationAction.RequestedCharacter.GetAnimationStateMachine().ChangeAnimation(combatAnimationAction.AnimationNameRequest);
 					combatActions_Queue.RemoveFirst();
 					retb = true;
 					break;
@@ -1082,7 +1082,7 @@ namespace BixBite.Combat
 					if (em.CurrentHealth == 0)
 					{
 						em.bIsDead = true;
-						em.GetSpriteSheet().ChangeAnimation("Dead_Left");
+						em.GetAnimationStateMachine().ChangeAnimation("Dead_Left");
 					}
 					em.ShaderHitFlash = 2;
 					em.ShaderHitTimer = 6;
@@ -1375,7 +1375,7 @@ namespace BixBite.Combat
 				PartyMembers["Pete"].CurrentHealth -= 10;
 				if (PartyMembers["Pete"].CurrentHealth <= 0)
 				{
-					PartyMembers["Pete"].GetSpriteSheet().ChangeAnimation("Dead_Right");
+					PartyMembers["Pete"].GetAnimationStateMachine().ChangeAnimation("Dead_Right");
 				}
 			}
 
@@ -1383,9 +1383,9 @@ namespace BixBite.Combat
 			{
 				//gpb.IncrementBar(5);
 				PartyMembers["Pete"].CurrentHealth += 20;
-				if (PartyMembers["Pete"].CurrentHealth > 0 && PartyMembers["Pete"].GetSpriteSheet().CurrentAnimation.Name == "Dead_Right")
+				if (PartyMembers["Pete"].CurrentHealth > 0 && PartyMembers["Pete"].GetAnimationStateMachine().CurrentState.StateName == "Dead_Right")
 				{
-					PartyMembers["Pete"].GetSpriteSheet().ChangeAnimation("Idle_Right");
+					PartyMembers["Pete"].GetAnimationStateMachine().ChangeAnimation("Idle_Right");
 				}
 			}
 			if (keyboardState.IsKeyDown(Keys.Z))
@@ -1860,7 +1860,7 @@ EventSkipOver:
 					{
 						//At this point we need to go back to IDLE!
 						String currentIdle = String.Format("{0}_{1}", "IdleRight", Enum.GetName(typeof(EWeaponType), (EWeaponType)CurrentTurnCharacter.CurrentWeapon.Value.Weapon_Type));
-						if(!CurrentTurnCharacter.GetSpriteSheet().CurrentAnimation.Name.Contains("Idle"))
+						if(!CurrentTurnCharacter.GetAnimationStateMachine().CurrentState.StateName.Contains("Idle"))
 							QueueCombatAction(new CombatAnimationAction(this, CurrentPartyMember_turn, currentIdle));
 
 						#region Attack Sticker UI
@@ -2545,7 +2545,7 @@ EventSkipOver:
 								foreach (String name in CurrentPartyMembersNames)
 								{
 									PartyMember partymem = PartyMembers[name];
-									Rectangle r = Rectangle.Intersect(partymem.GetSpriteSheet().CurrentAnimation.GetScreenRectangle(),
+									Rectangle r = Rectangle.Intersect(partymem.GetAnimationStateMachine().DrawRectangle,
 										SelectArrowAreaRange_Rect);
 
 									if (!r.IsEmpty)
@@ -2566,7 +2566,7 @@ EventSkipOver:
 								//Who in the AOE range?
 								foreach (Enemy enemy in BattleEnemyList.Values)
 								{
-									Rectangle r = Rectangle.Intersect(enemy.GetSpriteSheet().CurrentAnimation.GetScreenRectangle(),
+									Rectangle r = Rectangle.Intersect(enemy.GetAnimationStateMachine().DrawRectangle,
 										SelectArrowAreaRange_Rect);
 
 									if (!r.IsEmpty)
@@ -2657,7 +2657,7 @@ EventSkipOver:
 								foreach (String name in CurrentPartyMembersNames)
 								{
 									PartyMember partymem = PartyMembers[name];
-									Rectangle r = Rectangle.Intersect(partymem.GetSpriteSheet().CurrentAnimation.GetScreenRectangle(),
+									Rectangle r = Rectangle.Intersect(partymem.GetAnimationStateMachine().DrawRectangle,
 										SelectArrowAreaRange_Rect);
 
 									if (!r.IsEmpty)
@@ -2678,7 +2678,7 @@ EventSkipOver:
 								//Who in the AOE range?
 								foreach (Enemy enemy in BattleEnemyList.Values)
 								{
-									Rectangle r = Rectangle.Intersect(enemy.GetSpriteSheet().CurrentAnimation.GetScreenRectangle(),
+									Rectangle r = Rectangle.Intersect(enemy.GetAnimationStateMachine().DrawRectangle,
 										SelectArrowAreaRange_Rect);
 
 									if (!r.IsEmpty)
@@ -2814,7 +2814,7 @@ EventSkipOver:
 
 								foreach (Enemy enemy in BattleEnemyList.Values)
 								{
-									Rectangle r = Rectangle.Intersect(enemy.GetSpriteSheet().CurrentAnimation.GetScreenRectangle(),
+									Rectangle r = Rectangle.Intersect(enemy.GetAnimationStateMachine().DrawRectangle,
 										SelectArrowAreaRange_Rect);
 
 									if (!r.IsEmpty)
@@ -3851,7 +3851,7 @@ EventSkipOver:
 				foreach (String pmname in CurrentPartyMembersNames)
 				{
 					PartyMember pm = PartyMembers[pmname];
-					Rectangle r = Rectangle.Intersect(pm.GetSpriteSheet().CurrentAnimation.GetScreenRectangle(), SelectArrowAreaRange_Rect);
+					Rectangle r = Rectangle.Intersect(pm.GetAnimationStateMachine().DrawRectangle, SelectArrowAreaRange_Rect);
 
 					if (!r.IsEmpty)
 					{
@@ -3965,7 +3965,7 @@ EventSkipOver:
 				//Who in the AOE range?
 				foreach (Enemy enemy in BattleEnemyList.Values)
 				{
-					Rectangle r = Rectangle.Intersect(enemy.GetSpriteSheet().CurrentAnimation.GetScreenRectangle(), SelectArrowAreaRange_Rect);
+					Rectangle r = Rectangle.Intersect(enemy.GetAnimationStateMachine().DrawRectangle, SelectArrowAreaRange_Rect);
 
 					if (!r.IsEmpty)
 					{

@@ -697,7 +697,7 @@ namespace AmethystEngine.Forms
 				ControlTemplate cc = (ControlTemplate) this.Resources["AnimationEditorSceneExplorer_Template"];
 				SceneExplorer_TreeView = (TreeView) cc.FindName("AnimationSceneExplorer_TreeView", SceneExplorer_Control);
 
-				SceneExplorer_TreeView.ItemsSource = ActiveSpriteSheets;
+				SceneExplorer_TreeView.ItemsSource = ActiveAnimationStateMachines;
 				Animation_CE_Tree =
 					(TreeView) ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control);
 				AnimationChangeEvents_Properties_Tree =

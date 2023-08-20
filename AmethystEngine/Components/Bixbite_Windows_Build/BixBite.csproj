@@ -128,10 +128,13 @@
     <Compile Include="Particles\PBoxEmitter.cs" />
     <Compile Include="Particles\PEmitter.cs" />
     <Compile Include="Projectiles\projectile.cs" />
+    <Compile Include="Rendering\Animation\Animation.cs" />
     <Compile Include="Rendering\Animation\AnimationEvent.cs" />
-    <Compile Include="Rendering\Animation\LayeredSpriteSheet.cs" />
-    <Compile Include="Rendering\Animation\SpriteAnimation.cs" />
-    <Compile Include="Rendering\Animation\SpriteSheet.cs" />
+    <Compile Include="Rendering\Animation\AnimationFrameInfo.cs" />
+    <Compile Include="Rendering\Animation\AnimationState.cs" />
+    <Compile Include="Rendering\Animation\AnimationStateConnections.cs" />
+    <Compile Include="Rendering\Animation\AnimationStateMachine.cs" />
+    <Compile Include="Rendering\Animation\Spritesheet.cs" />
     <Compile Include="Rendering\Camera.cs" />
     <Compile Include="Rendering\Helpers\CircleUtillties.cs" />
     <Compile Include="Rendering\Helpers\RectangleUtilities.cs" />

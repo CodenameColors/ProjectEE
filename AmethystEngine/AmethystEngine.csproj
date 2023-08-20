@@ -196,9 +196,11 @@
     <Compile Include="Components\Bixbite_Windows_Build\Particles\PBoxEmitter.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Particles\PEmitter.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Projectiles\projectile.cs" />
-    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationEvent.cs" />
-    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\LayeredSpriteSheet.cs" />
-    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\SpriteAnimation.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\Animation.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationFrameInfo.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationState.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationStateConnections.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationStateMachine.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\SpriteSheet.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Rendering\Camera.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Rendering\GameImage.cs" />
@@ -554,4 +556,13 @@
     <Content Include="Components\Bixbite_Windows_Build\Resources\TimelinePlayer.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>python .\..\..\BuildScripts\NodeEditorCopyFiles.py py2exe
+      python .\..\..\BuildScripts\BixbiteCopyForAmetheystEngine.py py2exe
+      python .\..\..\BuildScripts\NodeEditorPatchFiles.py py2exe</PreBuildEvent>
+  </PropertyGroup>
 </Project>

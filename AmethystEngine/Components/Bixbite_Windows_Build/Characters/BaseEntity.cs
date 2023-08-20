@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using BixBite.Combat;
 using BixBite.Rendering;
+using BixBite.Rendering.Animation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -47,13 +48,14 @@ namespace BixBite.Characters
 		{
 			get
 			{
-				if(_spriteAnimationSheet != null) return _spriteAnimationSheet.CurrentAnimation.GetScreenPosition();
+				if(_spriteAnimationStatemachine != null)
+					return new Vector2(_spriteAnimationStatemachine.DrawRectangle.X, _spriteAnimationStatemachine.DrawRectangle.Y);
 				else return Vector2.Zero;
 			}
 			set
 			{
 				_screenPosition = value;
-				_spriteAnimationSheet?.CurrentAnimation.SetScreenPosition((int)value.X, (int)value.Y);
+				_spriteAnimationStatemachine?.SetScreenPosition((int)value.X, (int)value.Y);
 			}
 		}
 		private Vector2 _spawnPosition = new Vector2();
@@ -78,11 +80,11 @@ namespace BixBite.Characters
 		#endregion
 		public List<Tweening.Tweening> interpolationMovement = new List<Tweening.Tweening>();
 
-		private SpriteSheet _spriteAnimationSheet;
+		private AnimationStateMachine _spriteAnimationStatemachine;
 
 		public BaseEntity()
 		{
-			//_spriteAnimationSheet = new SpriteSheet();
+			//_spriteAnimationStatemachine = new SpriteSheet();
 		}
 
 		//public void SetSpawnPosition(int x = 0, int y = 0)
@@ -95,21 +97,21 @@ namespace BixBite.Characters
 			if (x != null)
 			{
 				this._screenPosition.X = (int)x;
-				this._spriteAnimationSheet.CurrentAnimation.SetScreenPosition(x, null);
+				this._spriteAnimationStatemachine.SetScreenPosition(x, null);
 			}
 			if (y != null)
 			{
 				this._screenPosition.Y = (int)y;
-				this._spriteAnimationSheet.CurrentAnimation.SetScreenPosition(null, y);
+				this._spriteAnimationStatemachine.SetScreenPosition(null, y);
 			}
 
 			
 
 		}
 
-		public SpriteSheet GetSpriteSheet()
+		public AnimationStateMachine GetAnimationStateMachine()
 		{
-			return _spriteAnimationSheet;
+			return _spriteAnimationStatemachine;
 		}
 
 		/// <summary>
@@ -117,14 +119,14 @@ namespace BixBite.Characters
 		/// </summary>
 		/// <param name="sheet"></param>
 		/// <param cm="Conent Manager IF the texture is set in the monogame pipleine tool"></param>
-		public void LoadSpriteSheet(SpriteSheet sheet, ContentManager cm, String contentName)
+		public void LoadSpriteSheet(Spritesheet sheet, ContentManager cm, String contentName)
 		{
-			sheet.SetTexture(cm.Load<Texture2D>(contentName));
-			this._spriteAnimationSheet = sheet;
+		//	sheet.SetTexture(cm.Load<Texture2D>(contentName));
+		//	this._spriteAnimationStatemachine = sheet;
 
-			//load the parameters
-			this.Width = _spriteAnimationSheet.CurrentAnimation.GetFrameWidth();
-			this.Height = _spriteAnimationSheet.CurrentAnimation.GetFrameHeight();
+		//	//load the parameters
+		//	this.Width = _spriteAnimationStatemachine.CurrentAnimation.GetFrameWidth();
+		//	this.Height = _spriteAnimationStatemachine.CurrentAnimation.GetFrameHeight();
 
 		}
 
@@ -132,19 +134,21 @@ namespace BixBite.Characters
 		/// Loads the SpriteSheet into memory. And sets up the texture of the sprite sheet
 		/// </summary>
 		/// <param name="sheet"></param>
-		public bool LoadSpriteSheet(SpriteSheet sheet, GraphicsDevice graphicsDevice, String imagepath)
+		public bool LoadSpriteSheet(Spritesheet sheet, GraphicsDevice graphicsDevice, String imagepath)
 		{
-			if (File.Exists(sheet.ImgPathLocation))
-				sheet.SetTexture(sheet.ImgPathLocation, graphicsDevice);
-			else return false;
+			//if (File.Exists(sheet.SpriteSheetPath))
+			//	sheet.SetTexture(sheet.SpriteSheetPath, graphicsDevice);
+			//else return false;
 
 
-			this._spriteAnimationSheet = sheet;
+			//this._spriteAnimationStatemachine = sheet;
 
-			//load the parameters
-			this.Width = _spriteAnimationSheet.CurrentAnimation.GetFrameWidth();
-			this.Height = _spriteAnimationSheet.CurrentAnimation.GetFrameHeight();
-			return true;
+			////load the parameters
+			//this.Width = _spriteAnimationStatemachine.CurrentAnimation.GetFrameWidth();
+			//this.Height = _spriteAnimationStatemachine.CurrentAnimation.GetFrameHeight();
+			//return true;
+
+			return false;
 		}
 		 
 		/// <summary>
@@ -154,20 +158,17 @@ namespace BixBite.Characters
 		/// <param name="sy"></param>
 		public void SetBaseScaling(float sx, float sy)
 		{
-			foreach (SpriteAnimation sa in _spriteAnimationSheet.SpriteAnimations.Values)
-			{
-				sa.ScalarX = sx;
-				sa.ScalarY = sy;
-			}
+			_spriteAnimationStatemachine.ScaleX = sx;
+			_spriteAnimationStatemachine.ScaleY = sy;
 		}
 
 
 		//public void SetSize(int w = 0, int h = 0)
 		//{
-		//	if (_spriteAnimationSheet?.CurrentAnimation != null)
+		//	if (_spriteAnimationStatemachine?.CurrentAnimation != null)
 		//	{
-		//		this.Width = _spriteAnimationSheet.CurrentAnimation.GetFrameWidth();
-		//		this.Height = _spriteAnimationSheet.CurrentAnimation.GetFrameHeight();
+		//		this.Width = _spriteAnimationStatemachine.CurrentAnimation.GetFrameWidth();
+		//		this.Height = _spriteAnimationStatemachine.CurrentAnimation.GetFrameHeight();
 		//	}
 		//	else
 		//	{
@@ -226,7 +227,7 @@ namespace BixBite.Characters
 
 		public virtual void Update(GameTime gameTime)
 		{
-			_spriteAnimationSheet?.Update(gameTime);
+			_spriteAnimationStatemachine?.Update(gameTime);
 
 			for (int i = interpolationMovement.Count - 1; i >= 0; i--)
 			{
@@ -239,13 +240,19 @@ namespace BixBite.Characters
 
 		public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch)
 		{
-			if (_spriteAnimationSheet == null)
+			if (_spriteAnimationStatemachine == null)
 			{
 				//spriteBatch.Draw(Texture, new Vector2((int)Position.X, (int)Position.Y), new Rectangle(0, 0, Width, Height),
 				//	Color.White, 0.0f, Vector2.Zero, new Vector2(ScaleX, ScaleY), SpriteEffects.None, 0);
 
 			}
-			else _spriteAnimationSheet?.Draw(spriteBatch);
+			else
+			{
+				foreach (Animation animationLayer in _spriteAnimationStatemachine.CurrentState.AnimationLayers)
+				{
+					animationLayer.Draw(spriteBatch);
+				}
+			}
 		}
 
 	}
