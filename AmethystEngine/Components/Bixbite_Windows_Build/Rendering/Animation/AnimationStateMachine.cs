@@ -20,6 +20,11 @@ namespace BixBite.Rendering.Animation
 		public Dictionary<String, AnimationState> States = new Dictionary<string, AnimationState>();
 		public AnimationState CurrentState = null;
 
+		public List<AnimationState> ObservableAnimationStates
+		{
+			get => States.Values.ToList();
+		}
+
 		/// <summary>
 		/// The Screen Draw position and size of the animation state machine
 		/// </summary>

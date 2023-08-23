@@ -187,7 +187,7 @@ namespace AmethystEngine.Forms
 				if (mainAnimationState.AnimationLayers.Count > 0)
 				{
 					this.FPS = mainAnimationState.FPS;
-					this.bIsDefaultState = mainAnimationState.IsDefualtState();
+					this.bIsDefaultState = mainAnimationState.bIsDefaultState;
 				}
 				_bIsAdding = false;
 			}
@@ -417,7 +417,7 @@ namespace AmethystEngine.Forms
 			mainAnimationState.StateName = StateName_TB.Text;
 			mainAnimationState.NumOfFrames = FrameCount;
 			mainAnimationState.FPS = FPS;
-			mainAnimationState.SetDefualtState(bIsDefaultState);
+			mainAnimationState.bIsDefaultState = (bIsDefaultState);
 
 			_bAllowImportAnimPreview = false;
 

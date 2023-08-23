@@ -216,7 +216,8 @@ namespace AmethystEngine.Components
 							{
 								//If you are here you have found a new animation. So create one to fill with data.
 								String animName = (reader.GetAttribute("Name"));
-								CanvasAnimation spriteAnimation = new CanvasAnimation(animName);
+								uint numOfFrames = uint.Parse(reader.GetAttribute("NumOfFrames"));
+								CanvasAnimation spriteAnimation = new CanvasAnimation(animName){NumOfFrames = numOfFrames };
 
 								//now we need to fill in all the offset/frame position data.
 								do

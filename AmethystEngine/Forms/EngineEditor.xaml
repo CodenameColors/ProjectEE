@@ -816,7 +816,7 @@
 								            MouseRightButtonUp="Thumbnail_OnMouseRightButtonDown" Loaded="UpdateAnimationStateThumbnail_Event">
 									<Image x:Name="Thumbnail" Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50"
 									       MouseEnter="AnimationPreviewThumbnail_Image_Enter" MouseLeave="AnimationPreviewThumbnail_Image_Leave"  />
-									<TextBlock Text="{Binding Name}" Foreground="White" />
+									<TextBlock Text="{Binding StateName}" Foreground="White" />
 								</StackPanel>
 							</HierarchicalDataTemplate>
 							<!--<DataTemplate DataType="{x:Type BixRen:Sprite}">
@@ -1069,13 +1069,13 @@
 							            PreviewMouseDown="ChangeActiveSpriteSheet_TVI_Click">
 								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
 								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="20" MaxHeight="15" />
-								<TextBlock Text="{Binding SheetName}" Foreground="White" />
+								<TextBlock Text="{Binding .StateName}" Foreground="White" />
 							</StackPanel>
 						</HierarchicalDataTemplate>
 						<DataTemplate DataType="{x:Type BixAnim:Animation}">
 							<StackPanel Orientation="Horizontal">
 								<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/Ame_icon_small.png" MaxWidth="20" MaxHeight="15" />
-								<TextBlock Text="{Binding SheetName}" Foreground="White" />
+								<TextBlock Text="{Binding .AnimationName}" Foreground="White" />
 							</StackPanel>
 						</DataTemplate>
 					</TreeView.Resources>
@@ -1681,7 +1681,7 @@
 							<Button Grid.Row="0" Grid.Column="0" Width="100" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="140,0,0,0"  Content="Browse"
 							        Click="ImportNewSpriteSheetFile_BTN"/>
 
-							<TextBlock Grid.Row="0" Grid.Column="0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="280,0,0,0" Width="80" Text="Sheet Name:"/>
+							<TextBlock Grid.Row="0" Grid.Column="0" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="280,0,0,0" Width="80" Text="State Machine Name:"/>
 							<TextBox Grid.Row="0" Grid.Column="0" IsReadOnly="False" Background="#FF484848" Width="150" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="350,0,10,0" Foreground="White">
 								<TextBox.Style>
 									<Style TargetType="TextBox">
@@ -1854,13 +1854,8 @@
 
 													<!--#region headers-->
 													<TextBlock Grid.Row="0" Grid.Column="0" Foreground="White" HorizontalAlignment="Right" Margin="5,0,5,0" Text="State Name:"/>
-													<TextBlock Grid.Row="1" Grid.Column="0" Foreground="White" HorizontalAlignment="Right" Margin="5,0,5,0" Text="Start X:"/>
-													<TextBlock Grid.Row="2" Grid.Column="0" Foreground="White" HorizontalAlignment="Right" Margin="5,0,5,0" Text="Start Y:"/>
 													<TextBlock Grid.Row="3" Grid.Column="0" Foreground="White" HorizontalAlignment="Right" Margin="5,0,5,0" Text="# of Frames:"/>
-													<TextBlock Grid.Row="1" Grid.Column="2" Foreground="White" HorizontalAlignment="Right" Margin="5,0,5,0" Text="Frame Width:"/>
-													<TextBlock Grid.Row="2" Grid.Column="2" Foreground="White" HorizontalAlignment="Right" Margin="0,0,5,0" Text="Frame Height:"/>
 													<TextBlock Grid.Row="0" Grid.Column="4" Foreground="White" HorizontalAlignment="Right" Margin="0,0,5,0" Text="Default State?:"/>
-													<TextBlock Grid.Row="2" Grid.Column="2" Foreground="White" HorizontalAlignment="Right" Margin="0,0,5,0" Text="Frame Height:"/>
 													<TextBlock Grid.Row="3" Grid.Column="2" Foreground="White" HorizontalAlignment="Right" Margin="0,0,5,0" Text="FPS:"/>
 													<TextBlock Grid.Row="0" Grid.Column="4" Foreground="White" HorizontalAlignment="Right" Margin="0,0,5,0" Text="Default State?:"/>
 													<TextBlock Grid.Row="3" Grid.Column="7" Foreground="White" HorizontalAlignment="Right" Margin="0,0,5,0" Text="1st Frame:"/>
@@ -1870,17 +1865,9 @@
 													<!--#endregion headers-->
 
 													<!--#region Input Textboxes-->
-													<TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding Path=.Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+													<TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding Path= .StateName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
 													         Foreground="White" Background="#FF484848" />
-													<TextBox Grid.Row="1" Grid.Column="1" Foreground="White" Text="{Binding Path=.StartXPos, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-													         Background="#FF484848" KeyUp="RefreshFrameRange_TB_KeydDown"/>
-													<TextBox Grid.Row="2" Grid.Column="1" Foreground="White" Text="{Binding Path=.StartYPos, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-													         Background="#FF484848" KeyUp="RefreshFrameRange_TB_KeydDown" />
-													<TextBox Grid.Row="3" Grid.Column="1" Foreground="White" Text="{Binding Path=.FrameCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-													         Background="#FF484848" KeyUp="RefreshFrameRange_TB_KeydDown" />
-													<TextBox Grid.Row="1" Grid.Column="3" Foreground="White" Text="{Binding Path=.FrameWidth, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-													         Background="#FF484848" KeyUp="RefreshFrameRange_TB_KeydDown" />
-													<TextBox Grid.Row="2" Grid.Column="3" Foreground="White" Text="{Binding Path=.FrameHeight, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+													<TextBox Grid.Row="3" Grid.Column="1" Foreground="White" Text="{Binding Path=.NumOfFrames, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
 													         Background="#FF484848" KeyUp="RefreshFrameRange_TB_KeydDown" />
 													<TextBox Grid.Row="3" Grid.Column="3" Foreground="White" Text="{Binding Path=.FPS, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
 													         Background="#FF484848" />

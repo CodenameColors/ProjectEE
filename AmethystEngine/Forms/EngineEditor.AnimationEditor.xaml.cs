@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using AmethystEngine.Components;
 using BixBite.Rendering;
@@ -154,24 +155,234 @@ namespace AmethystEngine.Forms
 
 		private void ImportNewSpriteSheetFile_BTN(object sender, RoutedEventArgs e)
 		{
-			//String filename = "";
-			//Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
-			//{
-			//	FileName = "SpriteSheet", //default file 
-			//	DefaultExt = "*.spritesheet", //default file extension
-			//	Filter = "spritesheet (*.spritesheet)|*.spritesheet" //filter files by extension
-			//};
+			String filename = "";
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+			{
+				FileName = "SpriteSheet", //default file 
+				DefaultExt = "*.spritesheet", //default file extension
+				Filter = "spritesheet (*.spritesheet)|*.spritesheet" //filter files by extension
+			};
 
-			//// Show save file dialog box
-			//Nullable<bool> result = dlg.ShowDialog();
-			//// Process save file dialog box results kicks out if the user doesn't select an item.
-			//filename = "";
-			//if (result == true)
-			//	filename = dlg.FileName;
-			//else
-			//	return;
+			// Show save file dialog box
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results kicks out if the user doesn't select an item.
+			filename = "";
+			if (result == true)
+				filename = dlg.FileName;
+			else
+				return;
 
-			//Console.WriteLine(filename);
+			Console.WriteLine(filename);
+
+			if (File.Exists(filename))
+			{
+				// Now that we have a valid file path we need to turn the "canvas spritesheet" into Animation State Machine Object
+				CanvasSpritesheet importedCanvasSpritesheet = CanvasSpritesheet.ImportSpriteSheet(filename);
+				CurrentAnimationStateMachine = new AnimationStateMachine();
+
+
+				NewAnimimationStatemachineFileName = importedCanvasSpritesheet.Name;
+				NewAnimimationStatemachineLocation = importedCanvasSpritesheet.ImagePath;
+				NewAnimimationStatemachineTotalWidth = importedCanvasSpritesheet.Width;
+				NewAnimimationStatemachineTotalHeight = importedCanvasSpritesheet.Height;
+
+				foreach (CanvasAnimation canvasAnimation in importedCanvasSpritesheet.AllAnimationOnSheet)
+				{
+					AnimationState newAnimationState = new AnimationState(CurrentAnimationStateMachine);
+					newAnimationState.StateName = canvasAnimation.AnimName;
+					newAnimationState.NumOfFrames = (int) canvasAnimation.NumOfFrames;
+
+					// An animation can have many layers. so we need to add those.
+					// The <= is because of the base layer counts too
+					for (int i = 0; i <= canvasAnimation.NamesOfSubLayers.Count; i++)
+					{
+						newAnimationState.AnimationLayers.Add(new Animation(newAnimationState));
+					}
+
+					// Each animation layer has a set of frames
+					foreach (CanvasImageProperties imageProperties in canvasAnimation.CanvasFrames)
+					{
+						// First add the frame for the 
+						AnimationFrameInfo frameInfo = new AnimationFrameInfo();
+						Microsoft.Xna.Framework.Rectangle drawRectangle =
+							new Microsoft.Xna.Framework.Rectangle(imageProperties.X, imageProperties.Y, imageProperties.W, imageProperties.H);
+						frameInfo.SetRectangle(drawRectangle);
+						frameInfo.RenderPointOffsetX = imageProperties.RX;
+						frameInfo.RenderPointOffsetY = imageProperties.RY;
+
+						newAnimationState.AnimationLayers.First().AnimationFrames.AddLast(frameInfo);
+
+						// We need to set the sublayer animation render points based on base the animation.
+						for (int j = 0; j < imageProperties.SubLayerPoints.Count; j++)
+						{
+							AnimationFrameInfo subframeInfo = new AnimationFrameInfo();
+
+							subframeInfo.RenderPointOffsetX = imageProperties.RX;
+							subframeInfo.RenderPointOffsetY = imageProperties.RY;
+							newAnimationState.AnimationLayers[1 + j].AnimationFrames.AddLast(subframeInfo);
+						}
+					}
+					CurrentAnimationStateMachine.States.Add(canvasAnimation.AnimName, newAnimationState);
+				}
+
+				// Now at this point we should have a BASE state machine imported.
+
+				// What does base mean? it means there are no connections, or sublayer spritesheets mapped yet.
+				// that is done in the GUI editor.
+
+				// Set up the Editor Objects section
+				AE_NewAnimStates_IC.ItemsSource = null;
+
+				ActiveAnimationStateMachines.Add((CurrentAnimationStateMachine));
+
+				Animation_CE_Tree.ItemsSource = CurrentAnimationStateMachine.States.Values;
+				AE_NewAnimStates_IC.ItemsSource = CurrentAnimationStateMachine.States.Values;
+
+				SceneExplorer_TreeView.ItemsSource = ActiveAnimationStateMachines;
+
+				bNewAnimStateMachine = true;
+				bAllowImportAnimPreview = true;
+
+				// WE need to create the stop watch for the preview thread
+				AnimationImporterPreview_Stopwatch = new Stopwatch();
+				AnimationImporterPreview_Stopwatch.Start();
+
+				Image img = new Image();
+				BitmapImage bmi = new BitmapImage();
+
+				bmi.BeginInit();
+				bmi.CacheOption = BitmapCacheOption.OnLoad;
+				bmi.UriSource = new Uri(NewAnimimationStatemachineLocation, UriKind.Absolute);
+				bmi.EndInit();
+				Bitmap pain = BitmapImage2Bitmap(bmi);
+				pain.SetResolution(96.0f, 96.0f);
+				bmi = ToBitmapImage(pain);
+				img.Source = bmi;
+
+				CurrentSpriteSheet_Image = bmi;
+
+				if (animationImportPreviewThread == null)
+				{
+					animationImportPreviewThread = new Thread(() =>
+					{
+						while (true)
+						{
+							try
+							{
+								Thread.Sleep(15);
+							}
+							catch
+							{
+								Console.WriteLine("animation preview thread == interrupted");
+								break;
+							}
+
+							try
+							{
+								if (bAllowImportAnimPreview)
+								{
+									//if (AnimationImporterPreview_Stopwatch.ElapsedMilliseconds > 1000)
+									//	AnimationImporterPreview_Stopwatch.Restart();	//we need to reset the timer.
+
+									//Force update to MainGUI
+									Dispatcher.Invoke(() =>
+										AnimationImporterTime_MS = (int)AnimationImporterPreview_Stopwatch.ElapsedMilliseconds);
+
+									//Okay let's update the animations!
+									for (int i = 0; i < AE_NewAnimStates_IC.Items.Count; i++)
+									{
+										AnimationState animationState = CurrentAnimationStateMachine.States.Values.ToList()[i];
+										if (animationState.AnimationLayers[0].CurrentFrameInfo == null)
+											animationState.AnimationLayers[0].CurrentFrameInfo = animationState.AnimationLayers[0].AnimationFrames.First;
+										Dispatcher.Invoke(() =>
+										{
+											ContentPresenter c =
+												((ContentPresenter)AE_NewAnimStates_IC.ItemContainerGenerator.ContainerFromIndex(i));
+											var v = c.ContentTemplate.FindName("CurrentFrame_TB", c);
+											var v1 = c.ContentTemplate.FindName("CurrentDeltaTime_TB", c);
+
+											int DT = (int.Parse((v1 as TextBox).Text));
+
+											var cb = c.ContentTemplate.FindName("PreviewAnim_CB", c);
+											if ((cb as CheckBox).IsChecked == true)
+											{
+
+												if (animationState.NumOfFrames > 0 && animationState.FPS > 0)
+												{
+													int framenum = (int.Parse((v as TextBox).Text));
+
+													if (((int)(1.0f / animationState.FPS * 1000.0f)) < DT)
+													{
+														framenum++;
+														animationState.AnimationLayers[0].CurrentFrameInfo = animationState.AnimationLayers[0].CurrentFrameInfo.Next;
+														DT = 0; //we need to reset the timer.
+													}
+
+													if (framenum > animationState.NumOfFrames)
+													{
+														framenum = 1;
+														animationState.AnimationLayers[0].CurrentFrameInfo = animationState.AnimationLayers[0].AnimationFrames.First;
+
+													}
+
+													(v as TextBox).Text = framenum.ToString();
+													(v1 as TextBox).Text = (DT + 15).ToString();
+
+													//Increment the Frame
+													var vimg = c.ContentTemplate.FindName("PreviewAnim_IMG", c);
+
+													BitmapImage bmp = bmi;
+
+													//int width2 =
+													//	(int)(currentSpriteAnimation.StartXPos +
+													//		((currentSpriteAnimation.FrameCount) * currentSpriteAnimation.FrameWidth) > bmp.Width
+													//			? bmp.Width - ((currentSpriteAnimation.StartXPos +
+													//											((currentSpriteAnimation.FrameCount - 1) *
+													//											 currentSpriteAnimation.FrameWidth)))
+													//			: currentSpriteAnimation.FrameWidth);
+
+
+													var crop = new CroppedBitmap(bmp, new Int32Rect(
+														(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().X,
+														(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Y,
+														(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Width,
+														(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Height));
+													// using BitmapImage version to prove its created successfully
+													(vimg as Image).Source = crop;
+
+
+												}
+											}
+										});
+
+										//ContentPresenter c =
+										//	((ContentPresenter) AE_NewAnimStates_IC.ItemContainerGenerator.ContainerFromIndex(i));
+										//var v = c.ContentTemplate.FindName("PreviewAnim_IMG", c);
+
+									}
+
+									if (AnimationImporterPreview_Stopwatch.ElapsedMilliseconds > 1000)
+										AnimationImporterPreview_Stopwatch.Restart(); //we need to reset the timer.
+								}
+							}
+							catch (Exception ex)
+							{
+								//Console.WriteLine("Thread mismatch");
+							}
+						}
+					});
+
+				}
+
+				if (!animationImportPreviewThread.IsAlive)
+					animationImportPreviewThread.Start();
+
+				bNewAnimStateMachine = true;
+
+				AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Imported SpriteSheet PNG Success!!";
+
+
+			}
 
 			//// NEW CODE for NEW SPRITESHEET
 			//CanvasSpritesheet tempCanvasSpritesheet = CanvasSpritesheet.ImportSpriteSheet(filename);
@@ -194,145 +405,9 @@ namespace AmethystEngine.Forms
 
 			//CurrentSpriteSheet_Image = bmi;
 
-			//bNewAnimStateMachine = true;
-
-			//// We have created a new WPF spritesheet. GET THE BIXBITE ONE
-			//CurrentAnimationStateMachine = canvaSpriteSheetToAnimationStateMachine(tempCanvasSpritesheet);
-
-			//AE_NewAnimStates_IC.ItemsSource = null;
-
-			//ActiveAnimationStateMachines.Add((CurrentAnimationStateMachine));
-
-			//bAllowImportAnimPreview = true;
-			//AnimationImporterPreview_Stopwatch = new Stopwatch();
-			//AnimationImporterPreview_Stopwatch.Start();
-
-
-			//// Set up the Editor Objects section
-			//Animation_CE_Tree.ItemsSource = CurrentAnimationStateMachine.States.Values;
-			//AE_NewAnimStates_IC.ItemsSource = CurrentAnimationStateMachine.States.Values;
-
 			//SceneExplorer_TreeView.ItemsSource = ActiveAnimationStateMachines;
 
-			//if (animationImportPreviewThread == null)
-			//{
-			//	animationImportPreviewThread = new Thread(() =>
-			//	{
-			//		while (true)
-			//		{
-			//			try
-			//			{
-			//				Thread.Sleep(15);
-			//			}
-			//			catch
-			//			{
-			//				Console.WriteLine("animation preview thread == interrupted");
-			//				break;
-			//			}
 
-			//			try
-			//			{
-			//				if (bAllowImportAnimPreview)
-			//				{
-			//					//if (AnimationImporterPreview_Stopwatch.ElapsedMilliseconds > 1000)
-			//					//	AnimationImporterPreview_Stopwatch.Restart();	//we need to reset the timer.
-
-			//					//Force update to MainGUI
-			//					Dispatcher.Invoke(() =>
-			//						AnimationImporterTime_MS = (int)AnimationImporterPreview_Stopwatch.ElapsedMilliseconds);
-
-			//					//Okay let's update the animations!
-			//					for (int i = 0; i < AE_NewAnimStates_IC.Items.Count; i++)
-			//					{
-			//						AnimationState currentSpriteAnimation = CurrentAnimationStateMachine.States.Values.ToList()[i];
-			//						if (currentSpriteAnimation. == null)
-			//							currentSpriteAnimation.CurrentFrameRect = currentSpriteAnimation.FrameDrawRects.First;
-			//						Dispatcher.Invoke(() =>
-			//						{
-			//							ContentPresenter c =
-			//								((ContentPresenter)AE_NewAnimStates_IC.ItemContainerGenerator.ContainerFromIndex(i));
-			//							var v = c.ContentTemplate.FindName("CurrentFrame_TB", c);
-			//							var v1 = c.ContentTemplate.FindName("CurrentDeltaTime_TB", c);
-
-			//							int DT = (int.Parse((v1 as TextBox).Text));
-
-			//							var cb = c.ContentTemplate.FindName("PreviewAnim_CB", c);
-			//							if ((cb as CheckBox).IsChecked == true)
-			//							{
-
-			//								if (currentSpriteAnimation.FrameCount > 0 && currentSpriteAnimation.FPS > 0)
-			//								{
-			//									int framenum = (int.Parse((v as TextBox).Text));
-
-			//									if (((int)(1.0f / currentSpriteAnimation.FPS * 1000.0f)) < DT)
-			//									{
-			//										framenum++;
-			//										currentSpriteAnimation.CurrentFrameRect = currentSpriteAnimation.CurrentFrameRect.Next;
-			//										DT = 0; //we need to reset the timer.
-			//									}
-
-			//									if (framenum > currentSpriteAnimation.FrameCount)
-			//									{
-			//										framenum = 1;
-			//										currentSpriteAnimation.CurrentFrameRect = currentSpriteAnimation.FrameDrawRects.First;
-
-			//									}
-
-			//									(v as TextBox).Text = framenum.ToString();
-			//									(v1 as TextBox).Text = (DT + 15).ToString();
-
-			//									//Increment the Frame
-			//									var vimg = c.ContentTemplate.FindName("PreviewAnim_IMG", c);
-
-			//									BitmapImage bmp = bmi;
-
-			//									//int width2 =
-			//									//	(int)(currentSpriteAnimation.StartXPos +
-			//									//		((currentSpriteAnimation.FrameCount) * currentSpriteAnimation.FrameWidth) > bmp.Width
-			//									//			? bmp.Width - ((currentSpriteAnimation.StartXPos +
-			//									//											((currentSpriteAnimation.FrameCount - 1) *
-			//									//											 currentSpriteAnimation.FrameWidth)))
-			//									//			: currentSpriteAnimation.FrameWidth);
-
-
-			//									var crop = new CroppedBitmap(bmp, new Int32Rect(
-			//										(int)currentSpriteAnimation.CurrentFrameRect.Value.XPos,
-			//										(int)currentSpriteAnimation.CurrentFrameRect.Value.YPos,
-			//										(int)currentSpriteAnimation.CurrentFrameRect.Value.Width,
-			//										(int)currentSpriteAnimation.CurrentFrameRect.Value.Height));
-			//									// using BitmapImage version to prove its created successfully
-			//									(vimg as Image).Source = crop;
-
-
-			//								}
-			//							}
-			//						});
-
-			//						//ContentPresenter c =
-			//						//	((ContentPresenter) AE_NewAnimStates_IC.ItemContainerGenerator.ContainerFromIndex(i));
-			//						//var v = c.ContentTemplate.FindName("PreviewAnim_IMG", c);
-
-			//					}
-
-			//					if (AnimationImporterPreview_Stopwatch.ElapsedMilliseconds > 1000)
-			//						AnimationImporterPreview_Stopwatch.Restart(); //we need to reset the timer.
-			//				}
-			//			}
-			//			catch (Exception ex)
-			//			{
-			//				//Console.WriteLine("Thread mismatch");
-			//			}
-			//		}
-			//	});
-
-			//}
-
-			//if (!animationImportPreviewThread.IsAlive)
-			//	animationImportPreviewThread.Start();
-
-			//bNewAnimStateMachine = true;
-
-			//AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Imported SpriteSheet PNG Success!!";
 		}
 
 		private void SetupNewAnimation_BTN_Click(object sender, RoutedEventArgs e)
@@ -424,24 +499,24 @@ namespace AmethystEngine.Forms
 
 		private void PreviewAnim_CB_OnChecked(object sender, RoutedEventArgs e)
 		{
-			//AnimationImporterPreview_Stopwatch.Restart();
+			AnimationImporterPreview_Stopwatch.Restart();
 
-			//int index = AE_NewAnimStates_IC.Items.IndexOf((VisualTreeHelper.GetParent(sender as CheckBox) as Grid)
-			//	.DataContext);
+			int index = AE_NewAnimStates_IC.Items.IndexOf((VisualTreeHelper.GetParent(sender as CheckBox) as Grid)
+				.DataContext);
 
-			//ContentPresenter c = ((ContentPresenter)AE_NewAnimStates_IC.ItemContainerGenerator.ContainerFromIndex(index));
-			//var v = c.ContentTemplate.FindName("CurrentFrame_TB", c);
-			//(v as TextBox).Text = "1";
+			ContentPresenter c = ((ContentPresenter)AE_NewAnimStates_IC.ItemContainerGenerator.ContainerFromIndex(index));
+			var v = c.ContentTemplate.FindName("CurrentFrame_TB", c);
+			(v as TextBox).Text = "1";
 
-			//if (CurrentAnimationStateMachine.SpriteAnimations.Values.ToList()[index].FPS == 0)
-			//{
-			//	AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() +
-			//															 ":   FPS CANNOT BE ZERO PREVIEW WILL NOT RUN. Please change";
-			//}
-			//else
-			//{
-			//	AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Valid FPS given. Running animation preview";
-			//}
+			if (CurrentAnimationStateMachine.States.ToList()[index].Value.FPS == 0)
+			{
+				AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() +
+																		 ":   FPS CANNOT BE ZERO PREVIEW WILL NOT RUN. Please change";
+			}
+			else
+			{
+				AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Valid FPS given. Running animation preview";
+			}
 
 		}
 
@@ -454,23 +529,22 @@ namespace AmethystEngine.Forms
 			////In order to deem this as a CORRECT Spritesheet anim State machine... so many words.
 			////We need to make sure every SINGLE State we created has valid data!
 
-			//int numOfDefault = 0;
-			//bool bstartX, bstartY, bwidth, bheight, bframecount, bFPS, bName;
-			//bstartX = bstartY =
-			//	bwidth = bheight = bframecount = bFPS = bName = true; //annoying but simple fix for instant weirdness
-			//foreach (SpriteAnimation anim in CurrentAnimationStateMachine.SpriteAnimations.Values)
-			//{
-			//	if (anim.FrameCount <= 0) bframecount &= false;
-			//	if (anim.FPS <= 0) bFPS &= false;
-			//	if (anim.bIsDefaultState) numOfDefault++;
-			//	if (anim.Name == "") bName &= false;
-			//}
+			int numOfDefault = 0;
+			bool bstartX, bstartY, bwidth, bheight, bframecount, bFPS, bName;
+			bstartX = bstartY = bwidth = bheight = bframecount = bFPS = bName = true; //annoying but simple fix for instant weirdness
+			foreach (AnimationState state in CurrentAnimationStateMachine.States.Values)
+			{
+				if (state.NumOfFrames <= 0) bframecount &= false;
+				if (state.FPS <= 0) bFPS &= false;
+				if (state.bIsDefaultState) numOfDefault++;
+				if (state.StateName == "") bName &= false;
+			}
 
-			//if ((!(bstartX && bstartY && bwidth && bheight && bframecount && bFPS && bName)) || numOfDefault != 1)
-			//{
-			//	AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Failed Import!";
-			//	return;
-			//}
+			if ((!(bframecount && bFPS && bName)) || numOfDefault != 1)
+			{
+				AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Failed Import due to incorrect setting in the states !";
+				return;
+			}
 
 			//if (NewSpriteSheetCharacterName == String.Empty)
 			//{
@@ -479,113 +553,114 @@ namespace AmethystEngine.Forms
 			//	return;
 			//}
 
-			//if (NewAnimimationStatemachineFileName == String.Empty)
-			//{
-			//	AE_ImportStatusLog_TB.Text =
-			//		DateTime.Now.ToLongTimeString() + ":   Failed Import! Need to name the sprite sheet!";
-			//	return;
-			//}
+			if (NewAnimimationStatemachineFileName == String.Empty)
+			{
+				AE_ImportStatusLog_TB.Text =
+					DateTime.Now.ToLongTimeString() + ":   Failed Import! Need to name the sprite sheet!";
+				return;
+			}
 
-			////we need to rename the states to the correct names. So delete and recreate the dictionary entries
+			//we need to rename the states to the correct names. So delete and recreate the dictionary entries
 
-			//AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Import Success!";
+			AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Import Success!";
 
-			//CurrentAnimationStateMachine.SheetName = NewAnimimationStatemachineFileName;
-			//CurrentAnimationStateMachine.ImgPathLocation = NewAnimimationStatemachineLocation;
+			////CurrentAnimationStateMachine.name = NewAnimimationStatemachineFileName;
 			//CurrentAnimationStateMachine.CharacterName = NewSpriteSheetCharacterName;
+			//CurrentAnimationStateMachine.ImgPathLocation = NewAnimimationStatemachineLocation;
 
-			////We need to recreate the dictionary with the correct keys
-			//List<SpriteAnimation> tempsSpriteAnimations =
-			//	new List<SpriteAnimation>(CurrentAnimationStateMachine.SpriteAnimations.Values);
-			//CurrentAnimationStateMachine.SpriteAnimations.Clear();
+			//We need to recreate the dictionary with the correct keys
+			List<AnimationState> tempsSpriteAnimationStates =
+				new List<AnimationState>(CurrentAnimationStateMachine.States.Values);
+			CurrentAnimationStateMachine.States.Clear();
 			//CurrentAnimationStateMachine.Width = NewAnimimationStatemachineTotalWidth;
 			//CurrentAnimationStateMachine.Height = NewAnimimationStatemachineTotalHeight;
 
-			//SceneExplorer_TreeView.ItemsSource = ActiveAnimationStateMachines;
+			SceneExplorer_TreeView.ItemsSource = ActiveAnimationStateMachines;
 
-			//Image img = new Image();
-			//BitmapImage bmi = new BitmapImage();
+			// We need to get the bitmap for the entire spritesheet we are using for the base layer.
+			Image img = new Image();
+			BitmapImage bmi = new BitmapImage();
 
-			//bmi.BeginInit();
-			//bmi.CacheOption = BitmapCacheOption.OnLoad;
-			//bmi.UriSource = new Uri(NewAnimimationStatemachineLocation, UriKind.Absolute);
-			//bmi.EndInit();
-			//Bitmap pain = BitmapImage2Bitmap(bmi);
-			//pain.SetResolution(96.0f, 96.0f);
-			//bmi = ToBitmapImage(pain);
-			//img.Source = bmi;
+			bmi.BeginInit();
+			bmi.CacheOption = BitmapCacheOption.OnLoad;
+			bmi.UriSource = new Uri(NewAnimimationStatemachineLocation, UriKind.Absolute);
+			bmi.EndInit();
+			Bitmap pain = BitmapImage2Bitmap(bmi);
+			pain.SetResolution(96.0f, 96.0f);
+			bmi = ToBitmapImage(pain);
+			img.Source = bmi;
 
-			//CurrentSpriteSheet_Image = bmi;
+			CurrentSpriteSheet_Image = bmi;
 
-			//int count = 0;
-			//foreach (var spriteanim in tempsSpriteAnimations)
-			//{
-			//	// spriteanim.FrameDrawRects.Clear();
-			//	//for (int i = 0; i < spriteanim.FrameCount; i++)
-			//	//{
-			//	//	spriteanim.FrameDrawRects.AddLast(new Rect(
-			//	//		(int)spriteanim.CurrentFrameRect.Value.X,
-			//	//		(int)spriteanim.CurrentFrameRect.Value.Y,
-			//	//		(int)spriteanim.CurrentFrameRect.Value.Width,
-			//	//		(int)spriteanim.CurrentFrameRect.Value.Height
-			//	//		)
-			//	//	);
+			int count = 0;
+			foreach (var animationState in tempsSpriteAnimationStates)
+			{
+				// spriteanim.FrameDrawRects.Clear();
+				//for (int i = 0; i < spriteanim.FrameCount; i++)
+				//{
+				//	spriteanim.FrameDrawRects.AddLast(new Rect(
+				//		(int)spriteanim.CurrentFrameRect.Value.X,
+				//		(int)spriteanim.CurrentFrameRect.Value.Y,
+				//		(int)spriteanim.CurrentFrameRect.Value.Width,
+				//		(int)spriteanim.CurrentFrameRect.Value.Height
+				//		)
+				//	);
 
-			//	//}
+				//}
 
-			//	CurrentAnimationStateMachine.SpriteAnimations.Add(spriteanim.Name, spriteanim);
+				CurrentAnimationStateMachine.States.Add(animationState.StateName, animationState);
 
-			//	TreeView tempTV =
-			//		(TreeView)ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control);
-			//	var vvv = (ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control));
-			//	var vv = tempTV.ItemContainerGenerator.ContainerFromIndex(count++);
+				TreeView tempTV =
+					(TreeView)ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control);
+				var vvv = (ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control));
+				var vv = tempTV.ItemContainerGenerator.ContainerFromIndex(count++);
 
-			//	(vv as TreeViewItem).ExpandSubtree();
-			//	(vv as TreeViewItem).ApplyTemplate();
-			//	//var v = (vv as TreeViewItem).ItemTemplate.FindName("Thumbnail", (vv as TreeViewItem));
-
-
-			//	var v = FindElementByName<Image>((vv as TreeViewItem), "Thumbnail");
+				(vv as TreeViewItem).ExpandSubtree();
+				(vv as TreeViewItem).ApplyTemplate();
+				//var v = (vv as TreeViewItem).ItemTemplate.FindName("Thumbnail", (vv as TreeViewItem));
 
 
-			//	var crop = new CroppedBitmap(bmi, new Int32Rect(
-			//		(int)spriteanim.CurrentFrameRect.Value.XPos,
-			//		(int)spriteanim.CurrentFrameRect.Value.YPos,
-			//		(int)spriteanim.CurrentFrameRect.Value.Width,
-			//		(int)spriteanim.CurrentFrameRect.Value.Height
-			//	));
-			//	// using BitmapImage version to prove its created successfully
-			//	(v as Image).Source = crop;
+				var v = FindElementByName<Image>((vv as TreeViewItem), "Thumbnail");
 
-			//	if (count == 1)
-			//	{
-			//		CurrentlySelectedAnimationState = spriteanim;
-			//	}
 
-			//}
+				var crop = new CroppedBitmap(bmi, new Int32Rect(
+					(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().X,
+					(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Y,
+					(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Width,
+					(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Height
+				));
+				// using BitmapImage version to prove its created successfully
+				(v as Image).Source = crop;
 
-			//// CurrentSpriteSheet_Image = bmi;
+				if (count == 1)
+				{
+					CurrentlySelectedAnimationState = animationState;
+				}
 
-			////dummy binding force because 2 years ago me was DUMB
-			//SceneExplorer_TreeView.ItemsSource = ActiveAnimationStateMachines;
-			//_allowAnimationExporting = true;
+			} // End of for loop for animation states
 
-			////Reset the Animation Importer
-			//_allowAnimationExporting = false;
+			// CurrentSpriteSheet_Image = bmi;
 
-			//AE_NewAnimSM_MainGrid.Visibility = Visibility.Hidden;
-			//AE_CurrentAnimSM_Grid.Visibility = Visibility.Visible;
+			//dummy binding force because 2 years ago me was DUMB
+			SceneExplorer_TreeView.ItemsSource = ActiveAnimationStateMachines;
+			_allowAnimationExporting = true;
 
-			////Reset all the properties!
-			//NewAnimimationStatemachineFileName = "";
-			//NewAnimimationStatemachineLocation = "";
-			//NewSpriteSheetCharacterName = "";
-			//NewAnimimationStatemachineTotalWidth = -1;
-			//NewAnimimationStatemachineTotalHeight = -1;
-			//bNewAnimStateMachine = false;
+			//Reset the Animation Importer
+			_allowAnimationExporting = false;
 
-			//bAllowImportAnimPreview = false;
-			//AE_NewAnimStates_IC.ItemsSource = null;
+			AE_NewAnimSM_MainGrid.Visibility = Visibility.Hidden;
+			AE_CurrentAnimSM_Grid.Visibility = Visibility.Visible;
+
+			//Reset all the properties!
+			NewAnimimationStatemachineFileName = "";
+			NewAnimimationStatemachineLocation = "";
+			NewSpriteSheetCharacterName = "";
+			NewAnimimationStatemachineTotalWidth = -1;
+			NewAnimimationStatemachineTotalHeight = -1;
+			bNewAnimStateMachine = false;
+
+			bAllowImportAnimPreview = false;
+			AE_NewAnimStates_IC.ItemsSource = null;
 
 
 		}
@@ -749,51 +824,51 @@ namespace AmethystEngine.Forms
 		//Called on Load, so this always happens
 		private void SetupPreviewAnimationThread_CE()
 		{
-			//previewAnimThread_CE = new Thread(() =>
-			//{
-			//	while (true)
-			//	{
+			previewAnimThread_CE = new Thread(() =>
+			{
+				while (true)
+				{
 
-			//		try
-			//		{
-			//			Thread.Sleep(15);
-			//		}
-			//		catch
-			//		{
-			//			Console.WriteLine("animation preview thread FOR CE == interrupted");
-			//			break;
-			//		}
+					try
+					{
+						Thread.Sleep(15);
+					}
+					catch
+					{
+						Console.WriteLine("animation preview thread FOR CE == interrupted");
+						break;
+					}
 
-			//		if (PreviewAnimUI_Image_PTR != null)
-			//		{
-			//			//Let's make the image "move"
-			//			if (Animation_CE_Preview_Stopwatch.ElapsedMilliseconds > (1.0f / PreviewAnim_Data_PTR.FPS * 1000.0f))
-			//			{
-			//				Animation_CE_Preview_Stopwatch.Restart(); //Reset
-			//				Dispatcher.Invoke(() =>
-			//				{
-			//					//inc frame
-			//					int? frame = PreviewAnimUI_Image_PTR?.Tag as int?;
-			//					if (frame != null)
-			//					{
-			//						if (frame == PreviewAnim_Data_PTR.FrameCount)
-			//						{
-			//							frame = 1;
-			//						}
-			//						else
-			//						{
-			//							frame++;
-			//						}
+					if (PreviewAnimUI_Image_PTR != null)
+					{
+						//Let's make the image "move"
+						if (Animation_CE_Preview_Stopwatch.ElapsedMilliseconds > (1.0f / PreviewAnim_Data_PTR.FPS * 1000.0f))
+						{
+							Animation_CE_Preview_Stopwatch.Restart(); //Reset
+							Dispatcher.Invoke(() =>
+							{
+								//inc frame
+								int? frame = PreviewAnimUI_Image_PTR?.Tag as int?;
+								if (frame != null)
+								{
+									if (frame == PreviewAnim_Data_PTR.NumOfFrames)
+									{
+										frame = 1;
+									}
+									else
+									{
+										frame++;
+									}
 
-			//						PreviewAnimUI_Image_PTR.Source = CurrentAnimPreviewImages_CE[(int)frame - 1];
-			//						PreviewAnimUI_Image_PTR.Tag = frame;
-			//					}
-			//				});
-			//			}
-			//		}
-			//	}
-			//});
-			//previewAnimThread_CE.Start();
+									PreviewAnimUI_Image_PTR.Source = CurrentAnimPreviewImages_CE[(int)frame - 1];
+									PreviewAnimUI_Image_PTR.Tag = frame;
+								}
+							});
+						}
+					}
+				}
+			});
+			previewAnimThread_CE.Start();
 
 		}
 
@@ -801,148 +876,156 @@ namespace AmethystEngine.Forms
 		// Used to run the animation preview on the canvas
 		private void SetupSelectedAnimationThread()
 		{
-			//selectedAnimThread_CE = new Thread(() =>
-			//{
-			//	while (true)
-			//	{
-			//		try
-			//		{
-			//			Thread.Sleep(15);
-			//		}
-			//		catch
-			//		{
-			//			Console.WriteLine("selected animation thread == interrupted");
-			//			break;
-			//		}
+			selectedAnimThread_CE = new Thread(() =>
+			{
+				while (true)
+				{
+					try
+					{
+						Thread.Sleep(15);
+					}
+					catch
+					{
+						Console.WriteLine("selected animation thread == interrupted");
+						break;
+					}
 
-			//		if (CurrentSelectedAnimImages_List.Count > 0 && AE_CurrentAnimSM_Grid.Visibility == Visibility.Visible &&
-			//				CurrentlySelectedAnimationState != null)
-			//		{
-			//			//Let's make the image "move"
-			//			if (AnimationSelected_Stopwatch.ElapsedMilliseconds > (1.0f / CurrentlySelectedAnimationState.FPS * 1000.0f))
-			//			{
-			//				AnimationSelected_Stopwatch.Restart(); //Reset
-			//				try
-			//				{
-			//					Dispatcher.Invoke(() =>
-			//					{
-			//						//inc frame
-			//						int? frame = CurrentBaseLayerAnimation_Img?.Tag as int?;
-			//						if (frame != null)
-			//						{
+					if (CurrentSelectedAnimImages_List.Count > 0 && AE_CurrentAnimSM_Grid.Visibility == Visibility.Visible &&
+							CurrentlySelectedAnimationState != null)
+					{
+						//Let's make the image "move"
+						if (AnimationSelected_Stopwatch.ElapsedMilliseconds > (1.0f / CurrentlySelectedAnimationState.FPS * 1000.0f))
+						{
+							AnimationSelected_Stopwatch.Restart(); //Reset
+							try
+							{
+								Dispatcher.Invoke(() =>
+								{
+									if (CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo == null)
+									{
+										CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo =
+											CurrentlySelectedAnimationState.AnimationLayers[0].AnimationFrames.First;
+									}
 
-			//							if (frame == CurrentlySelectedAnimationState.FrameCount)
-			//							{
-			//								frame = 1;
-			//							}
-			//							else
-			//							{
-			//								frame++;
-			//							}
+									//inc frame
+									int? frame = CurrentBaseLayerAnimation_Img?.Tag as int?;
+									if (frame != null)
+									{
 
-			//							// CurrentBaseLayerAnimation_Img.Source = CurrentSelectedAnimImages_List[(int) frame - 1];
-			//							AnimationEditor_Canvas.Children.Remove(CurrentBaseLayerAnimation_Img);
-			//							CurrentBaseLayerAnimation_Img = new Image();
-			//							CurrentBaseLayerAnimation_Img.Source = CurrentSelectedAnimImages_List[(int)frame - 1];
-			//							CurrentBaseLayerAnimation_Img.Stretch = Stretch.Fill;
-			//							CurrentBaseLayerAnimation_Img.Width =
-			//								CurrentlySelectedAnimationState.FrameDrawRects.ToList()[((int)frame) - 1].Width;
-			//							CurrentBaseLayerAnimation_Img.MaxWidth =
-			//								CurrentlySelectedAnimationState.FrameDrawRects.ToList()[((int)frame) - 1].Width;
-			//							CurrentBaseLayerAnimation_Img.Height =
-			//								CurrentlySelectedAnimationState.FrameDrawRects.ToList()[((int)frame) - 1].Height;
-			//							CurrentBaseLayerAnimation_Img.MaxHeight =
-			//								CurrentlySelectedAnimationState.FrameDrawRects.ToList()[((int)frame) - 1].Height;
-			//							CurrentBaseLayerAnimation_Img.StretchDirection = StretchDirection.Both;
-			//							AnimationEditor_Canvas.Children.Add(CurrentBaseLayerAnimation_Img);
-			//							CurrentBaseLayerAnimation_Img.UpdateLayout();
-			//							AnimationEditor_Canvas.UpdateLayout();
+										if (frame == CurrentlySelectedAnimationState.NumOfFrames)
+										{
+											frame = 1;
+											CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo =
+												CurrentlySelectedAnimationState.AnimationLayers[0].AnimationFrames.First;
+										}
+										else
+										{
+											frame++;
+											CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo =
+												CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Next;
+										}
 
-
-			//							CurrentBaseLayerAnimation_Img.Tag = frame;
-			//							CurrentActiveAnimationCurrentFrame_TB.Text = frame.ToString();
-
-			//							int middleX = (int)(AnimationEditor_BackCanvas.ActualWidth / 2.0f);
-			//							int middleY = (int)(AnimationEditor_BackCanvas.ActualHeight / 2.0f);
-			//							int newX = middleX - CurrentlySelectedAnimationState.FrameDrawRects.ToList()[((int)frame) - 1]
-			//								.RenderPointX;
-			//							//newX = newX + ((CurrentlySelectedAnimationState.FrameDrawRects.ToList()[((int) frame) - 1].Width -
-			//							//                (int) CurrentBaseLayerAnimation_Img.ActualWidth) / 2);
-
-			//							int newY = middleY - CurrentlySelectedAnimationState.FrameDrawRects.ToList()[((int)frame) - 1]
-			//								.RenderPointY;
-			//							//newY = newY + ((CurrentlySelectedAnimationState.FrameDrawRects.ToList()[((int) frame) - 1].Height -
-			//							//                (int) CurrentBaseLayerAnimation_Img.Height) / 2);
-			//							//Canvas.SetLeft(CurrentBaseLayerAnimation_Img, middleX - ((int)(CurrentBaseLayerAnimation_Img.ActualWidth/ 2.0f)));
-			//							//Canvas.SetTop(CurrentBaseLayerAnimation_Img, middleY - ((int)(CurrentBaseLayerAnimation_Img.ActualHeight/ 2.0f)));
-
-			//							Canvas.SetLeft(CurrentBaseLayerAnimation_Img, newX);
-			//							Canvas.SetTop(CurrentBaseLayerAnimation_Img, newY);
-
-			//							Console.WriteLine(String.Format(
-			//								"w:{0}, h:{1} newX:{2}, newY:{3} | iWidth:{4}, iHeight:{5}, mx:{6}, my:{7}, FRAME:{8}",
-			//								CurrentlySelectedAnimationState.FrameDrawRects.ToList()[((int)frame) - 1].Width,
-			//								CurrentlySelectedAnimationState.FrameDrawRects.ToList()[((int)frame) - 1].Height,
-			//								newX, newY, (int)CurrentBaseLayerAnimation_Img.ActualWidth,
-			//								(int)CurrentBaseLayerAnimation_Img.ActualHeight,
-			//								middleX, middleY, frame - 1));
-
-			//						}
+										// CurrentBaseLayerAnimation_Img.Source = CurrentSelectedAnimImages_List[(int) frame - 1];
+										AnimationEditor_Canvas.Children.Remove(CurrentBaseLayerAnimation_Img);
+										CurrentBaseLayerAnimation_Img = new Image();
+										CurrentBaseLayerAnimation_Img.Source = CurrentSelectedAnimImages_List[(int)frame - 1];
+										CurrentBaseLayerAnimation_Img.Stretch = Stretch.Fill;
+										CurrentBaseLayerAnimation_Img.Width =
+											CurrentlySelectedAnimationState.AnimationLayers [0].CurrentFrameInfo.Value.GetDrawRectangle().Width;
+										CurrentBaseLayerAnimation_Img.MaxWidth =
+											CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Width;
+										CurrentBaseLayerAnimation_Img.Height =
+											CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Height;
+										CurrentBaseLayerAnimation_Img.MaxHeight =
+											CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Height;
+										CurrentBaseLayerAnimation_Img.StretchDirection = StretchDirection.Both;
+										AnimationEditor_Canvas.Children.Add(CurrentBaseLayerAnimation_Img);
+										CurrentBaseLayerAnimation_Img.UpdateLayout();
+										AnimationEditor_Canvas.UpdateLayout();
 
 
+										CurrentBaseLayerAnimation_Img.Tag = frame;
+										CurrentActiveAnimationCurrentFrame_TB.Text = frame.ToString();
 
-			//						for (int i = 0; i < AnimationSubLayerImages_List.Count; i++)
-			//						{
-			//							if (frame > AnimationSubLayerImages_List[i].Count)
-			//								continue;
-			//							(AnimationLayersPreview_Canvas_IC.Children[i] as Image).Source =
-			//								AnimationSubLayerImages_List[i][(int)frame - 1];
-			//							(AnimationLayersPreview_Canvas_IC.Children[i] as Image).Tag = frame.ToString();
-			//						}
+										int middleX = (int)(AnimationEditor_BackCanvas.ActualWidth / 2.0f);
+										int middleY = (int)(AnimationEditor_BackCanvas.ActualHeight / 2.0f);
+										int newX = middleX - CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.RenderPointOffsetX;
+										//newX = newX + ((CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Width -
+										//                (int)CurrentBaseLayerAnimation_Img.ActualWidth) / 2);
 
+										int newY = middleY - CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.RenderPointOffsetY;
+										//newY = newY + ((CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Height -
+										//                (int)CurrentBaseLayerAnimation_Img.Height) / 2);
+										//Canvas.SetLeft(CurrentBaseLayerAnimation_Img, middleX - ((int)(CurrentBaseLayerAnimation_Img.ActualWidth / 2.0f)));
+										//Canvas.SetTop(CurrentBaseLayerAnimation_Img, middleY - ((int)(CurrentBaseLayerAnimation_Img.ActualHeight / 2.0f)));
 
-			//						//int count = 0;
-			//						//foreach (List<CroppedBitmap> anim in AnimationSubLayerImages_List)
-			//						//{
-			//						//	//Step one what frame is it?
-			//						//	int? framesublayer = frame;//(AnimationLayersPreview_Canvas_IC.Children[count] as Image)?.Tag as int?;
+										Canvas.SetLeft(CurrentBaseLayerAnimation_Img, newX);
+										Canvas.SetTop(CurrentBaseLayerAnimation_Img, newY);
 
-			//						//	SpriteSheet sheet = currentLayeredSpriteSheet.ActiveSubLayerSheet
-			//						//		[currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[count]];
+										Console.WriteLine(String.Format(
+											"w:{0}, h:{1} newX:{2}, newY:{3} | iWidth:{4}, iHeight:{5}, mx:{6}, my:{7}, FRAME:{8}",
+											CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Width,
+											CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Height,
+											newX, newY, (int)CurrentBaseLayerAnimation_Img.ActualWidth,
+											(int)CurrentBaseLayerAnimation_Img.ActualHeight,
+											middleX, middleY, frame - 1));
 
-			//						//	//make the image actually appear
-			//						//	//this needs the +1 because of base layer
-			//						//	(AnimationLayersPreview_Canvas_IC.Children[count+1] as Image).Source =
-			//						//		anim[(int)framesublayer];
-
-			//						//	//Check for frames
-			//						//	if (framesublayer == sheet.CurrentAnimation.FrameCount)
-			//						//	{
-			//						//		framesublayer = 1;
-			//						//	}
-			//						//	else
-			//						//	{
-			//						//		framesublayer++;
-			//						//	}
-
-			//						//	//this needs the +1 because of base layer
-			//						//	(AnimationLayersPreview_Canvas_IC.Children[count+1] as Image).Tag = framesublayer.ToString();
-			//						//	count++;
-			//						//}
+									}
 
 
 
-			//					});
-			//				}
-			//				catch
-			//				{
-			//					Console.WriteLine("Error in Anim Preiview Thread");
-			//				}
-			//			}
-			//		}
-			//	}
-			//});
-			//selectedAnimThread_CE.Start();
+									for (int i = 0; i < AnimationSubLayerImages_List.Count; i++)
+									{
+										if (frame > AnimationSubLayerImages_List[i].Count)
+											continue;
+										(AnimationLayersPreview_Canvas_IC.Children[i] as Image).Source =
+											AnimationSubLayerImages_List[i][(int)frame - 1];
+										(AnimationLayersPreview_Canvas_IC.Children[i] as Image).Tag = frame.ToString();
+									}
+
+
+									//int count = 0;
+									//foreach (List<CroppedBitmap> anim in AnimationSubLayerImages_List)
+									//{
+									//	//Step one what frame is it?
+									//	int? framesublayer = frame;//(AnimationLayersPreview_Canvas_IC.Children[count] as Image)?.Tag as int?;
+
+									//	SpriteSheet sheet = currentLayeredSpriteSheet.ActiveSubLayerSheet
+									//		[currentLayeredSpriteSheet.subLayerSpritesheets_Dict.Keys.ToList()[count]];
+
+									//	//make the image actually appear
+									//	//this needs the +1 because of base layer
+									//	(AnimationLayersPreview_Canvas_IC.Children[count+1] as Image).Source =
+									//		anim[(int)framesublayer];
+
+									//	//Check for frames
+									//	if (framesublayer == sheet.CurrentAnimation.FrameCount)
+									//	{
+									//		framesublayer = 1;
+									//	}
+									//	else
+									//	{
+									//		framesublayer++;
+									//	}
+
+									//	//this needs the +1 because of base layer
+									//	(AnimationLayersPreview_Canvas_IC.Children[count+1] as Image).Tag = framesublayer.ToString();
+									//	count++;
+									//}
+
+
+
+								});
+							}
+							catch
+							{
+								Console.WriteLine("Error in Anim Preiview Thread");
+							}
+						}
+					}
+				}
+			});
+			selectedAnimThread_CE.Start();
 
 		}
 
@@ -1304,45 +1387,45 @@ namespace AmethystEngine.Forms
 
 		private void AnimationEditor_CE_TV_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
-			//CurrentSelectedAnimImages_List.Clear();
-			//TreeView tvtemp = sender as TreeView;
-			//if (tvtemp != null)
-			//{
-			//	SpriteAnimation item = tvtemp.SelectedItem as SpriteAnimation;
-			//	item.CurrentFrameRect = item.FrameDrawRects.First;
-			//	if (item == null) return;
+			CurrentSelectedAnimImages_List.Clear();
+			TreeView tvtemp = sender as TreeView;
+			if (tvtemp != null)
+			{
+				AnimationState item = tvtemp.SelectedItem as AnimationState;
+				item.AnimationLayers[0].CurrentFrameInfo = item.AnimationLayers[0].AnimationFrames.First;
+				if (item == null) return;
 
-			//	// First up we need to get all the frames, and create CROPPED images for them!
-			//	for (int i = 0; i < item.FrameCount; i++)
-			//	{
-			//		CurrentSelectedAnimImages_List.Add(
-			//			(new CroppedBitmap(CurrentSpriteSheet_Image, new Int32Rect(
-			//				(int)item.FrameDrawRects.ToList()[i].XPos,
-			//				(int)item.FrameDrawRects.ToList()[i].YPos,
-			//				(int)item.FrameDrawRects.ToList()[i].Width,
-			//				(int)item.FrameDrawRects.ToList()[i].Height
-			//			))));
-			//		item.CurrentFrameRect = item.CurrentFrameRect.Next;
-			//	}
+				// First up we need to get all the frames, and create CROPPED images for them!
+				for (int i = 0; i < item.NumOfFrames; i++)
+				{
+					CurrentSelectedAnimImages_List.Add(
+						(new CroppedBitmap(CurrentSpriteSheet_Image, new Int32Rect(
+							(int)item.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().X,
+							(int)item.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Y,
+							(int)item.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Width,
+							(int)item.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Height
+						))));
+					item.AnimationLayers[0].CurrentFrameInfo = item.AnimationLayers[0].CurrentFrameInfo.Next;
+				}
 
-			//	AnimationSubLayer_CB.ItemsSource = item.NamesOfSubLayers;
-			//	//foreach (var namesOfSubLayer in item.NamesOfSubLayers)
-			//	//{
-			//	//	AnimationSubLayer_CB.Items.Add(namesOfSubLayer);
-			//	//}
+				AnimationSubLayer_CB.ItemsSource = item.AnimationLayers;
+				//foreach (var namesOfSubLayer in item.NamesOfSubLayers)
+				//{
+				//	AnimationSubLayer_CB.Items.Add(namesOfSubLayer);
+				//}
 
-			//	CurrentActiveAnimationName_TB.Text = item.Name;
-			//	CurrentActiveAnimationFPS_TB.Text = item.FPS.ToString();
-			//	CurrentActiveAnimationCurrentFrame_TB.Text = "1";
-			//	CurrentBaseLayerAnimation_Img.Tag = 1;
-			//	CurrentlySelectedAnimationState = item;
-			//}
+				CurrentActiveAnimationName_TB.Text = item.StateName;
+				CurrentActiveAnimationFPS_TB.Text = item.FPS.ToString();
+				CurrentActiveAnimationCurrentFrame_TB.Text = "1";
+				CurrentBaseLayerAnimation_Img.Tag = 1;
+				CurrentlySelectedAnimationState = item;
+			}
 
-			//if (!AnimationSelected_Stopwatch.IsRunning)
-			//	AnimationSelected_Stopwatch.Start();
+			if (!AnimationSelected_Stopwatch.IsRunning)
+				AnimationSelected_Stopwatch.Start();
 
-			//AnimationChangeEvents_Properties_Tree.ItemsSource = null;
-			//AnimationAudioEvents_Properties_Tree.ItemsSource = null;
+			AnimationChangeEvents_Properties_Tree.ItemsSource = null;
+			AnimationAudioEvents_Properties_Tree.ItemsSource = null;
 
 			//AnimationChangeEvents_Properties_Tree.ItemsSource =
 			//	CurrentlySelectedAnimationState.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent);

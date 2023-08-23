@@ -16,10 +16,20 @@ namespace BixBite.Rendering.Animation
 		#region Properties
 
 		public Dictionary<String, AnimationStateConnections> Connections = new Dictionary<string, AnimationStateConnections>();
-		public String StateName;
+		public String StateName {get; set;}
 		public List<Animation> AnimationLayers = new List<Animation>();
 		public int NumOfFrames {get; set;}
-		public int FPS = 60;
+		public int FPS
+		{
+			get => _fps;
+			set => _fps = value;
+		}
+
+		public bool bIsDefaultState
+		{
+			get => _bIsDefaultState;
+			set => _bIsDefaultState = value;
+		}
 
 		// These are checked from the animations tate machine on tick/update.
 		public bool bIsAnimationQueued = false;
@@ -30,6 +40,7 @@ namespace BixBite.Rendering.Animation
 		#region fields
 		private AnimationStateMachine _parentAnimationStateMachine = null;
 		private bool _bIsDefaultState = false;
+		private int _fps = 24;
 
 		#endregion
 
@@ -42,17 +53,6 @@ namespace BixBite.Rendering.Animation
 		#endregion
 
 		#region methods
-
-		public bool SetDefualtState(bool newState)
-		{
-			return _bIsDefaultState = newState;
-		}
-
-
-		public bool IsDefualtState()
-		{
-			return _bIsDefaultState;
-		}
 
 		public AnimationStateMachine GetParentAnimationStateMachine()
 		{

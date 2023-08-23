@@ -1475,10 +1475,17 @@ namespace AmethystEngine.Forms
 					}
 					CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().LinkedCroppableImage =
 						SpritesheetEditor_CropImage;
-					CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().SubLayerPoints
-						.Add(new CanvasSubLayerPoint() {LayerName =
-							CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].NamesOfSubLayers.Last()});
 
+					if(CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().SubLayerPoints.Count > 0)
+					{
+						CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].CanvasFrames.Last().SubLayerPoints?
+							.Add(new CanvasSubLayerPoint()
+							{
+								LayerName =
+									CurrentSelectedSpriteSheet.AllAnimationOnSheet[animationIndex].NamesOfSubLayers?.Last()
+							});
+
+					}
 
 
 					//SpritesheetEditor_Canvas.Children.Add(croppable);
