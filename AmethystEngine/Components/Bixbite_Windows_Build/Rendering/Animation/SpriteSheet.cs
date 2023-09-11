@@ -7,14 +7,14 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BixBite.Rendering.Animation
 {
-	public class Spritesheet
+	public class SpriteSheet
 	{
 		#region Delegates
 
 		#endregion
 
 		#region Properties
-		public String SpriteSheetPath;
+		public String SpriteSheetPath {get; set;}
 		#endregion
 
 		#region fields

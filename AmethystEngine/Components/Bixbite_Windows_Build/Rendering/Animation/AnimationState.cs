@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,9 +16,20 @@ namespace BixBite.Rendering.Animation
 
 		#region Properties
 
-		public Dictionary<String, AnimationStateConnections> Connections = new Dictionary<string, AnimationStateConnections>();
-		public String StateName {get; set;}
-		public List<Animation> AnimationLayers = new List<Animation>();
+		public AnimationStateMachine Parent
+		{
+			get=>_parentAnimationStateMachine;
+			set=>_parentAnimationStateMachine = value;
+		}
+		public List<AnimationStateConnections> Connections = new List<AnimationStateConnections>();
+		public ObservableCollection<AnimationLayer> AnimationLayers
+		{
+			get => _animationLayers;
+			set => _animationLayers = value;
+		}
+		List<AnimationEvent> AnimationEvents =new List<AnimationEvent>(8);
+		public String StateName { get; set; }
+
 		public int NumOfFrames {get; set;}
 		public int FPS
 		{
@@ -38,6 +50,7 @@ namespace BixBite.Rendering.Animation
 		#endregion
 
 		#region fields
+		private ObservableCollection<AnimationLayer> _animationLayers = new ObservableCollection<AnimationLayer>();
 		private AnimationStateMachine _parentAnimationStateMachine = null;
 		private bool _bIsDefaultState = false;
 		private int _fps = 24;
@@ -54,6 +67,12 @@ namespace BixBite.Rendering.Animation
 
 		#region methods
 
+		public bool AttemptToAddAnimationEvent(AnimationEvent animationEvent)
+		{
+			return AnimationEvents.Count >= AnimationEvents.Capacity;
+		}
+
+
 		public AnimationStateMachine GetParentAnimationStateMachine()
 		{
 			return _parentAnimationStateMachine;
@@ -66,7 +85,7 @@ namespace BixBite.Rendering.Animation
 		{
 
 			// Update the Animations.
-			foreach (Animation anim in AnimationLayers)
+			foreach (AnimationLayer anim in AnimationLayers)
 			{
 				anim.Update(gameTime);
 			}

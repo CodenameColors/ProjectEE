@@ -15,7 +15,8 @@ namespace BixBite.Rendering.Animation
 
 		#region Properties
 
-		
+		public int OriginPointOffsetX { get; set; }
+		public int OriginPointOffsetY { get; set; }
 		public int RenderPointOffsetX { get; set; }
 		public int RenderPointOffsetY { get; set; }
 

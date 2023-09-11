@@ -128,7 +128,7 @@
     <Compile Include="Particles\PBoxEmitter.cs" />
     <Compile Include="Particles\PEmitter.cs" />
     <Compile Include="Projectiles\projectile.cs" />
-    <Compile Include="Rendering\Animation\Animation.cs" />
+    <Compile Include="Rendering\Animation\AnimationLayer.cs" />
     <Compile Include="Rendering\Animation\AnimationEvent.cs" />
     <Compile Include="Rendering\Animation\AnimationFrameInfo.cs" />
     <Compile Include="Rendering\Animation\AnimationState.cs" />

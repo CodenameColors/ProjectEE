@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 namespace BixBite.Rendering.Animation
 {
 
-	public class AudioEvent : AnimationEvent
+	public class AnimationAudioEvent : AnimationEvent
 	{
 		public String SoundEffectName { get; set; }
+		public bool		bIsRepeating { get; set; }
+		public bool		BiSPlaying { get; set; }
 
 		private int _frameStart = 0;
 		public int FrameStart
@@ -26,19 +28,45 @@ namespace BixBite.Rendering.Animation
 			set => _frameEnd = value;
 		}
 
-		public AudioEvent(int fstart, int fend, String filename)
+		public AnimationAudioEvent(bool bImmediate, int fstart, int fend, String filename) : base(bImmediate)
 		{
 			this.FrameEnd = fend;
 			this.FrameStart = fstart;
 			this.SoundEffectName = filename;
 		}
+
+		public void StartPlayingAudioEvent()
+		{
+			Console.WriteLine("StartPlayingAudioEvent NOT IMPLEMENTED");
+		}
+
+		public void StopPlayingAudioEvent()
+		{
+			Console.WriteLine("StopPlayingAudioEvent NOT IMPLEMENTED");
+		}
+
 	}
 
-	public class ChangeLayeredAnimationEvent : AnimationEvent
+	/// <summary>
+	/// This class is here for when we need to change the AnimationLayer Layer.
+	/// An example is X Character is in Idle, and we need to switch from sword to staff.
+	/// </summary>
+	public class ChangeAnimationLayerEvent : AnimationEvent
 	{
+		public String LayerName {get;set;}
+		public String SheetToReplaceOnLayerName;
 
-		public bool bImmediate = true;
+		public ChangeAnimationLayerEvent(bool immediate, String layerName, String newSheetName) : base(immediate)
+		{
+			this.bIsImmediate = immediate;
+			this.LayerName = layerName;
+			this.SheetToReplaceOnLayerName = newSheetName;
+		}
 
+	}
+
+	public class ChangeAnimationStateEvent : AnimationEvent
+	{
 		private String _fromAnimationName = String.Empty;
 
 		public String FromAnimationName
@@ -54,47 +82,22 @@ namespace BixBite.Rendering.Animation
 			set => _toAnimationName = value;
 		}
 
-		public Dictionary<String, String> SubLayerAnimationChangeEvents = new Dictionary<string, String>();
-
-		public ChangeLayeredAnimationEvent(string FromName, string ToName)
+		public ChangeAnimationStateEvent(bool bImmediate, String FromName, String ToName) : base(bImmediate)
 		{
 			this.FromAnimationName = FromName;
 			this.ToAnimationName = ToName;
-
-		}
-	}
-
-	public class ChangeAnimationEvent : AnimationEvent
-	{
-		private String _fromAnimationName = String.Empty;
-
-		public String FromAnimationName
-		{
-			get => _fromAnimationName;
-			set => _fromAnimationName = value;
-		}
-		private String _toAnimationName = String.Empty;
-
-		public String ToAnimationName
-		{
-			get => _toAnimationName;
-			set => _toAnimationName = value;
-		}
-
-
-		public bool bImmediate = true;
-		//public List<String> ConnectedAnimationNames_List = new List<string>();
-
-		public ChangeAnimationEvent(String FromName, String ToName, bool bImmediate)
-		{
-			this.FromAnimationName = FromName;
-			this.ToAnimationName = ToName;
-			this.bImmediate = bImmediate;
+			this.bIsImmediate = bImmediate;
 		}
 
 	}
 
 	public class AnimationEvent
 	{
+		public bool bIsImmediate = true;
+
+		public AnimationEvent(bool bIsImmediate)
+		{
+			this.bIsImmediate = bIsImmediate;
+		}
 	}
 }

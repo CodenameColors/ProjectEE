@@ -666,10 +666,16 @@ namespace AmethystEngine.Forms
 			else if (((TabItem) EditorWindows_TC.SelectedItem).Header.ToString().Contains("Spritesheet"))
 			{
 				ContentLibrary_Control.Template = (ControlTemplate) this.Resources["SpriteSheetObjects_Template"];
-				//SceneExplorer_Control.Template = (ControlTemplate)this.Resources["AnimationEditorSceneExplorer_Template"];
+				SceneExplorer_Control.Template = (ControlTemplate)this.Resources["AnimationEditorSceneExplorer_Template"];
 				EditorToolBar_CC.Template = (ControlTemplate) this.Resources["SpritesheetEditorObjectExplorer_Template"];
 				ObjectProperties_Control.Template = (ControlTemplate) this.Resources["SpritesheetEditorProperties_Template"];
 				UpdateLayout();
+
+				ControlTemplate cc = (ControlTemplate)this.Resources["SpriteSheetObjects_Template"];
+
+
+				SpriteSheet_CE_Tree = (TreeView)cc.FindName("SpriteSheetEditor_CE_TV", ContentLibrary_Control);
+				
 			}
 			else if (((TabItem) EditorWindows_TC.SelectedItem).Header.ToString().Contains("Animation"))
 			{
@@ -677,6 +683,7 @@ namespace AmethystEngine.Forms
 				SceneExplorer_Control.Template = (ControlTemplate) this.Resources["AnimationEditorSceneExplorer_Template"];
 				EditorToolBar_CC.Template = (ControlTemplate) this.Resources["AnimationEditorObjectExplorer_Template"];
 				ObjectProperties_Control.Template = (ControlTemplate) this.Resources["AnimationEditorProperties_Template"];
+				
 				UpdateLayout();
 
 
@@ -700,15 +707,21 @@ namespace AmethystEngine.Forms
 				SceneExplorer_TreeView.ItemsSource = ActiveAnimationStateMachines;
 				Animation_CE_Tree =
 					(TreeView) ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control);
-				AnimationChangeEvents_Properties_Tree =
-					(TreeView) ObjectProperties_Control.Template.FindName("AnimationEditor_ChangeEvents_TV",
+				Animation_CE_Tree.ItemsSource = CurrentAnimationStateMachine?.States?.Values;
+				AnimationStateProperties_ItemsControl =
+					(ItemsControl) ObjectProperties_Control.Template.FindName("AnimationEditor_Events_IC",
 						ObjectProperties_Control);
-				AnimationAudioEvents_Properties_Tree =
-					(TreeView) ObjectProperties_Control.Template.FindName("AnimationEditor_AudioEvents_TV",
+				AnimationLayerProperties_ItemsControl =
+					(ItemsControl)ObjectProperties_Control.Template.FindName("AnimationEditor_Layer_Events_IC",
 						ObjectProperties_Control);
+				AnimationProperties_ItemsControl =
+					(ItemsControl)ObjectProperties_Control.Template.FindName("AnimationEditor_Animation_Events_IC",
+						ObjectProperties_Control);
+				AnimationChangeEvents_Properties_ScrollViewer = 
+					(ScrollViewer)ObjectProperties_Control.Template.FindName("AnimationEditor_Events_SV",
+					ObjectProperties_Control);
+
 			}
-
-
 		}
 
 		#endregion
@@ -1604,9 +1617,6 @@ namespace AmethystEngine.Forms
 				return bitmapImage;
 			}
 		}
-
-
-
 	}
 }
 

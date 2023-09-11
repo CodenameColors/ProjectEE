@@ -23,6 +23,7 @@
 				xmlns:timelinePlayer="clr-namespace:TimelinePlayer;assembly=TimelinePlayer"
 				xmlns:textBlock="clr-namespace:BixBite.Rendering.UI.TextBlock"
 				xmlns:imagecropper="clr-namespace:ImageCropper;assembly=ImageCropper"
+				xmlns:converters="clr-namespace:AmethystEngine.Converters"
 				mc:Ignorable="d" Background="#FF0E0D0D"
 				KeyDown="EngineEditor_OnKeyDown"
         Title="AmethystEngine" Height="800" Width="1200" Loaded="Window_Loaded" AllowsTransparency="True" WindowStyle="None">
@@ -45,6 +46,7 @@
 				<ResourceDictionary Source="/AmethystEngine;component/Resources/DesignerItem.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 
+			<converters:EndOfPathConverter x:Key="EndOfPathConverter" />
 
 			<Style x:Key="LeditorLV_Style" TargetType="{x:Type GridViewColumnHeader}">
 				<Setter Property="Template">
@@ -374,157 +376,381 @@
 				</Grid>
 			</ControlTemplate>
 
-					<ControlTemplate x:Key="AnimationEditorProperties_Template">
-			<Grid>
-				<Grid.RowDefinitions>
-					<RowDefinition Height="30"/>
-					<RowDefinition Height="2"/>
-					<RowDefinition Height="30"/>
-					<RowDefinition Height="*"/>
-					<RowDefinition Height="30"/>
-					<RowDefinition Height="*"/>
-				</Grid.RowDefinitions>
+		<ControlTemplate x:Key="AnimationEditorProperties_Template">
+				<Grid>
+					<Grid x:Name="AnimationEditorProperties_State_Grid" Visibility="Visible">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="2"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="*"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+						</Grid.RowDefinitions>
 
-				<GridSplitter Grid.Row="1" Grid.RowSpan="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter2" Background="#FF868686" ResizeDirection="Rows"/>
+						<StackPanel Grid.Row="1" Orientation="Horizontal">
+							<TextBlock Grid.Row="1" Grid.Column="0" Text="State: " Foreground="White" VerticalAlignment="Center" Margin="5,0,0,0" />
+							<TextBlock x:Name="StateName_TB" Grid.Row="1" Grid.Column="0" Text="[STATE NAME HERE]" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" Margin="5,0,0,0" />
+						</StackPanel>
 
-				<TextBlock Grid.Row="2" Grid.Column="1" Text="Animation Change Events:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
-				<Button Grid.Row="2" Content="+" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="156,5,0,5" Height="20" VerticalContentAlignment="Top" Width="20" RenderTransformOrigin="1.5,0.5" 
-				        Click="AddNewAnimationChangeEvent_BTN_Click"/>
-				<TextBlock Grid.Row="4" Grid.Column="1" Text="Audio Events:" Foreground="White"  VerticalAlignment="Bottom" Margin="5" />
-				<Button Grid.Row="4" Content="+" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="156,5,0,5" Height="20" VerticalContentAlignment="Top" Width="20" RenderTransformOrigin="1.5,0.5" 
-				        Click="AddAnimationAudioEvent_BTN_Click"/>
+						<GridSplitter Grid.Row="2" Grid.RowSpan="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter2" Background="#FF868686" ResizeDirection="Rows"/>
 
-					<!--<Button Grid.Row="0" Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="100,0,10,0"  Content="Test"
+						<TextBlock Grid.Row="3" Grid.Column="1" Text="Animation State Connection:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<Button Grid.Row="3" Content="+" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="156,5,5,5" Height="20" 
+						        VerticalContentAlignment="Top" Width="20" RenderTransformOrigin="1.5,0.5" 
+				        Click="AddNewStateConnection_BTN_Click"/>
+
+						<!--<Button Grid.Row="0" Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="100,0,10,0"  Content="Test"
 				        Click="TestingAnimProperties_BTN_Click"/>-->
+						<ScrollViewer x:Name="AnimationEditor_Events_SV" Grid.Row="4" Background="#FF383838" Margin="5,0,5,0" 
+					              VerticalScrollBarVisibility="Auto">
+							<ItemsControl x:Name="AnimationEditor_Events_IC" >
+								<ItemsControl.Resources>
+									<DataTemplate DataType="{x:Type BixAnim:AnimationStateConnections}">
+										<Grid MinWidth="170" >
+											<Grid.RowDefinitions>
+												<RowDefinition Height="20"/>
+												<RowDefinition Height="25"/>
+												<RowDefinition Height="2"/>
+												<RowDefinition Height="25"/>
+												<RowDefinition Height="25"/>
+												<RowDefinition Height="25"/>
+												<RowDefinition Height="2"/>
+												<RowDefinition Height="2"/>
+											</Grid.RowDefinitions>
 
-					<TreeView x:Name="AnimationEditor_ChangeEvents_TV" Grid.Row="3" Background="#FF383838">
-					<TreeView.ItemContainerStyle>
-						<Style TargetType="TreeViewItem">
-							<Style.Triggers>
-								<Trigger Property="IsSelected" Value="True" >
-									<Setter Property="FontWeight" Value="Normal" />
-									<Setter Property="FontStyle" Value="Normal" />
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="10"/>
+												<ColumnDefinition Width="80"/>
+												<ColumnDefinition Width="50"/>
+												<ColumnDefinition Width="32"/>
+												<ColumnDefinition Width="50"/>
+												<ColumnDefinition Width="*"/>
+											</Grid.ColumnDefinitions>
+											<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan ="5"  Text="State Connection: " Foreground="White" />
+											<!--<Image Grid.Row="1" Grid.Column="1"  Grid.RowSpan="3" x:Name="Thumbnail" Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50" />-->
+											<TextBlock Grid.Row="1" Grid.Column="1" Text="Origin         :" Foreground="White"  VerticalAlignment="Center" />
+											<TextBox Grid.Row="1" Grid.ColumnSpan="4" Grid.Column="2" Background="#FF484848" IsReadOnly="True" VerticalContentAlignment="Center" Margin="0,0,5,0" IsEnabled="True"
+									         Text="{Binding Path=OriginAnimationState.StateName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay  }" Foreground="White" />
 
-									<Setter Property="Background" Value="LightBlue" />
-									<Setter Property="Foreground" Value="Black" />
-								</Trigger>
-							</Style.Triggers>
-							<Style.Resources>
-								<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
-								<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Transparent" />
-							</Style.Resources>
-						</Style>
-					</TreeView.ItemContainerStyle>
+											<TextBlock Grid.Row="3" Grid.Column="1" Text="Destination :" Foreground="White"  VerticalAlignment="Center" />
+											<ComboBox x:Name="AnimationStateDestination_CB" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="4" VerticalContentAlignment="Center" Margin="0,0,5,0" 
+											          ItemsSource="{Binding Path=OriginAnimationState.Parent.ObservableAnimationStates }"
+											          SelectionChanged="AnimationStateDestination_CB_OnSelectionChanged">
+												<ComboBox.ItemTemplate>
+													<DataTemplate DataType="{x:Type BixAnim:AnimationState}">
+														<Grid>
+															<Grid.RowDefinitions>
+																<RowDefinition />
+															</Grid.RowDefinitions>
+															<TextBlock Text="{Binding Path=.StateName}"></TextBlock>
+														</Grid>
+													</DataTemplate>
+												</ComboBox.ItemTemplate>
+											</ComboBox>
+
+											<TextBlock Grid.Row="4" Grid.Column="1" Text="Threshold% :" Foreground="White"  VerticalAlignment="Center" />
+											<TextBox Grid.Row="4" Grid.ColumnSpan="4" Grid.Column="2" Background="#FF484848" IsReadOnly="False" VerticalContentAlignment="Center" Margin="0,0,5,0" IsEnabled="True"
+											         Text="{Binding Path=.StateChangeThreshold, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay  }" Foreground="White" />
+
+											<TextBlock Grid.Row="5" Grid.Column="1" Text="Finish First   :" Foreground="White"  VerticalAlignment="Center" />
+											<CheckBox Grid.Row="5" Grid.ColumnSpan="4" Grid.Column="2" Background="#FF484848"  VerticalContentAlignment="Center" Margin="0,0,5,0" IsEnabled="True"
+											         IsChecked="{Binding Path=.bIsForceFinish, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay  }" Foreground="White" />
 
 
-					<TreeView.ItemTemplate>
-						<HierarchicalDataTemplate DataType="{x:Type BixAnim:ChangeAnimationEvent }" ItemsSource="{Binding .}"  >
-								<Grid MinWidth="170" Loaded="AnimationChangeEventItem_Loaded"
+											<GridSplitter Grid.Row="7" Grid.RowSpan="1" Grid.ColumnSpan="6" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter2" Background="#FF868686" ResizeDirection="Rows"/>
+										</Grid>
+
+									</DataTemplate>
+								</ItemsControl.Resources>
+							</ItemsControl>
+						</ScrollViewer>
+					</Grid>
+
+					<Grid x:Name="AnimationEditorProperties_Layer_Grid" Visibility="Hidden">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="2"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="*"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+						</Grid.RowDefinitions>
+
+						<StackPanel Grid.Row="1" Orientation="Horizontal">
+							<TextBlock Grid.Row="1" Grid.Column="0" Text="Layer: " Foreground="White" VerticalAlignment="Center" Margin="5,0,0,0" />
+							<TextBlock x:Name="LayerName_TB" Grid.Row="1" Grid.Column="0" Text="[STATE NAME HERE]" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" Margin="5,0,0,0" />
+						</StackPanel>
+
+						<GridSplitter Grid.Row="2" Grid.RowSpan="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter3" Background="#FF868686" ResizeDirection="Rows"/>
+
+						<TextBlock Grid.Row="3" Grid.Column="1" Text="Linked Layer SpriteSheets:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+
+						<Button Grid.Row="3" Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Right" Width="20" Margin="100,0,10,0"  Content="+"
+				        Click="AddNewLayerLinkedSpriteSheetFile_BTN_Click"/>
+						<ScrollViewer x:Name="AnimationEditor_Layer_Events_SV" Grid.Row="4" Background="#FF383838" Margin="5,0,5,0" 
+					              VerticalScrollBarVisibility="Auto">
+							<ItemsControl x:Name="AnimationEditor_Layer_Events_IC" >
+								<ItemsControl.Resources>
+									<DataTemplate DataType="{x:Type BixAnim:AnimationState}">
+										<Grid MinWidth="170" >
+											<Grid.RowDefinitions>
+												<RowDefinition Height="20"/>
+												<RowDefinition Height="25"/>
+												<RowDefinition Height="2"/>
+												<RowDefinition Height="25"/>
+												<RowDefinition Height="2"/>
+												<RowDefinition Height="2"/>
+												<RowDefinition Height="2"/>
+											</Grid.RowDefinitions>
+
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="10"/>
+												<ColumnDefinition Width="80"/>
+												<ColumnDefinition Width="50"/>
+												<ColumnDefinition Width="32"/>
+												<ColumnDefinition Width="50"/>
+												<ColumnDefinition Width="*"/>
+											</Grid.ColumnDefinitions>
+											<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan ="5"  Text="Linked SpriteSheet" Foreground="White" />
+											<!--<Image Grid.Row="1" Grid.Column="1"  Grid.RowSpan="3" x:Name="Thumbnail" Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50" />-->
+											<TextBlock Grid.Row="1" Grid.Column="1" Text="Animations :" Foreground="White"  VerticalAlignment="Center" />
+
+											<ComboBox x:Name="AnimationLayerPossibleAnimation_CB" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="4" VerticalContentAlignment="Center" Margin="0,0,5,0" 
+											          ItemsSource="{Binding Path=Parent.ObservableAnimationStates }"
+											          SelectionChanged="AnimationLayerPossibleAnimation_CB_OnSelectionChanged">
+												<ComboBox.ItemTemplate>
+													<DataTemplate DataType="{x:Type BixAnim:AnimationState}">
+														<Grid>
+															<Grid.RowDefinitions>
+																<RowDefinition />
+															</Grid.RowDefinitions>
+															<TextBlock Text="{Binding Path=.StateName}"></TextBlock>
+														</Grid>
+													</DataTemplate>
+												</ComboBox.ItemTemplate>
+											</ComboBox>
+
+											<TextBlock Grid.Row="3" Grid.Column="1" Text="Path:" Foreground="White"  VerticalAlignment="Center" />
+											<TextBox Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="4" VerticalContentAlignment="Stretch" Margin="0,0,5,0" 
+											         Text="{Binding Path=AnimationLayers[0].ReferenceSpriteSheet.SpriteSheetPath}" 
+															 ToolTip="{Binding Path=AnimationLayers[0].ReferenceSpriteSheet.SpriteSheetPath}" 
+											         PreviewKeyUp="AnimationAudioEvent_TB_KeyUp" />
+
+											<GridSplitter Grid.Row="5" Grid.RowSpan="1" Grid.ColumnSpan="6" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter4" Background="#FF868686" ResizeDirection="Rows"/>
+										</Grid>
+
+									</DataTemplate>
+									<DataTemplate DataType="{x:Type BixAnim:SpriteSheet}">
+										<Grid>
+											<Grid.RowDefinitions>
+												<RowDefinition Height="20"/>
+												<RowDefinition Height="2"/>
+												<RowDefinition Height="2"/>
+											</Grid.RowDefinitions>
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="72"/>
+												<ColumnDefinition Width="*"/>
+											</Grid.ColumnDefinitions>
+											<TextBlock Grid.Row="0" Grid.Column="0" Text="Sheet Image:" Foreground="White" />
+											<TextBlock Grid.Row="0" Grid.Column="1" Foreground="White" 
+											           Text="{Binding Path=SpriteSheetPath,  Converter={StaticResource EndOfPathConverter}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay  }"
+											           ToolTip="{Binding Path=SpriteSheetPath , UpdateSourceTrigger=PropertyChanged, Mode=TwoWay  }"
+											           />
+											<GridSplitter Grid.Row="6" Grid.RowSpan="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter2" Background="#FF868686" ResizeDirection="Rows"/>
+
+										</Grid>
+
+									</DataTemplate>
+
+									<DataTemplate DataType="{x:Type BixAnim:ChangeAnimationStateEvent}">
+										<!--<TextBlock Grid.Row="2" Grid.Column="1" Text="State" Foreground="White" />-->
+
+										<Grid MinWidth="170" Loaded="AnimationChangeEventItem_Loaded"
 								      MouseLeave="AnimationPreviewThumbnail_Image_Leave" 
 								      MouseEnter="AnimationPreviewThumbnail_EVENT_Image_Enter"
-								      >
-									<Grid.RowDefinitions>
-										<RowDefinition Height="25"/>
-										<RowDefinition Height="2"/>
-										<RowDefinition Height="25"/>
-										<RowDefinition Height="2"/>
-										<RowDefinition Height="2"/>
-										<RowDefinition Height="2"/>
-									</Grid.RowDefinitions>
+								>
+											<Grid.RowDefinitions>
+												<RowDefinition Height="20"/>
+												<RowDefinition Height="25"/>
+												<RowDefinition Height="2"/>
+												<RowDefinition Height="25"/>
+												<RowDefinition Height="2"/>
+												<RowDefinition Height="2"/>
+												<RowDefinition Height="2"/>
+											</Grid.RowDefinitions>
 
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="50"/>
-										<ColumnDefinition Width="30"/>
-										<ColumnDefinition Width="*"/>
-									</Grid.ColumnDefinitions>
-									<!--MouseEnter="AnimationPreviewThumbnail_Image_Enter">
-									MouseLeave="AnimationPreviewThumbnail_Image_Leave" 
-								  MouseRightButtonUp="Thumbnail_OnMouseRightButtonDown" Loaded="UpdateAnimationStateThumbnail_Event">-->
-									<Image Grid.RowSpan="3" x:Name="Thumbnail" Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50" />
-									<TextBlock Grid.Column="1" Text="From:" Foreground="White" />
-									<TextBox Grid.Column="2" Background="#FF484848" IsReadOnly="True" Text="{Binding FromAnimationName }" Foreground="White" />
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="10"/>
+												<ColumnDefinition Width="50"/>
+												<ColumnDefinition Width="30"/>
+												<ColumnDefinition Width="*"/>
+											</Grid.ColumnDefinitions>
+											<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan ="5"  Text="Event: State" Foreground="White" />
+											<Image Grid.Row="1"  Grid.Column="1" Grid.RowSpan="3" x:Name="Thumbnail" Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50" />
+											<TextBlock Grid.Row="1" Grid.Column="2" Text="From:" Foreground="White" />
+											<TextBox Grid.Row="1" Grid.Column="3" Background="#FF484848" IsReadOnly="True" Text="{Binding FromAnimationName }" Foreground="White" />
 
-									<TextBlock Grid.Row="2" Grid.Column="1" Text="To:" Foreground="White" />
-									<ComboBox Grid.Row="2" Grid.Column="2"
+											<TextBlock Grid.Row="3" Grid.Column="2" Text="To:" Foreground="White" />
+											<ComboBox Grid.Row="3" Grid.Column="3"
 									          Text="{Binding ToAnimationName , UpdateSourceTrigger=PropertyChanged, Mode=TwoWay  }"></ComboBox>
-									<GridSplitter Grid.Row="5" Grid.RowSpan="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter2" Background="#FF868686" ResizeDirection="Rows"/>
-								</Grid>
-						</HierarchicalDataTemplate>
-						<!--<DataTemplate DataType="{x:Type BixRen:Sprite}">
-								<StackPanel Orientation="Horizontal">
-									<Image Margin="0,0,5,0" Source="{Binding ImgPathLocation}" Width="50" Height="50"  />
-									<TextBlock Text="{Binding Name}" Foreground="White" />
-								</StackPanel>
-							</DataTemplate>-->
-					</TreeView.ItemTemplate>
-					</TreeView>
+											<GridSplitter Grid.Row="6" Grid.RowSpan="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter2" Background="#FF868686" ResizeDirection="Rows"/>
+										</Grid>
 
-					<TreeView x:Name="AnimationEditor_AudioEvents_TV" Grid.Row="5" Background="#FF383838"
-					         >
-						<TreeView.ItemContainerStyle>
-							<Style TargetType="TreeViewItem">
-								<Style.Triggers>
-									<Trigger Property="IsSelected" Value="True" >
-										<Setter Property="FontWeight" Value="Bold" />
-										<Setter Property="FontStyle" Value="Italic" />
+									</DataTemplate>
+								</ItemsControl.Resources>
+							</ItemsControl>
+						</ScrollViewer>
+					</Grid>
 
-										<Setter Property="Background" Value="LightBlue" />
-										<Setter Property="Foreground" Value="Black" />
-									</Trigger>
-								</Style.Triggers>
-								<Style.Resources>
-									<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
-									<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Transparent" />
-								</Style.Resources>
-							</Style>
-						</TreeView.ItemContainerStyle>
+					<Grid x:Name="AnimationEditorProperties_Animation_Grid" Visibility="Hidden">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="2"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="*"/>
+							<RowDefinition Height="30"/>
+							<RowDefinition Height="30"/>
+						</Grid.RowDefinitions>
+
+						<StackPanel Grid.Row="1" Orientation="Horizontal">
+							<TextBlock Grid.Row="1" Grid.Column="0" Text="Animation: Name" Foreground="White" VerticalAlignment="Center" Margin="5,0,0,0" />
+							<TextBlock x:Name="AnimationName_TB" Grid.Row="1" Grid.Column="0" Text="[STATE NAME HERE]" FontWeight="Bold" Foreground="White" VerticalAlignment="Center" Margin="5,0,0,0" />
+						</StackPanel>
 
 
-						<TreeView.ItemTemplate>
-							<HierarchicalDataTemplate DataType="{x:Type BixAnim:AudioEvent }" ItemsSource="{Binding .}"  >
-								<Grid MinWidth="170" >
-									<Grid.RowDefinitions>
-										<RowDefinition Height="25"/>
-										<RowDefinition Height="2"/>
-										<RowDefinition Height="25"/>
-										<RowDefinition Height="2"/>
-										<RowDefinition Height="2"/>
-										<RowDefinition Height="2"/>
-									</Grid.RowDefinitions>
+						<TextBlock Grid.Row="2" Grid.Column="0" Text="SpriteSheet: " Foreground="White" VerticalAlignment="Center" Margin="5,0,0,0" />
+						<ComboBox x:Name="PossibleSpriteSheets_CB" Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="4" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Margin="80,0,5,0" 
+						          SelectionChanged="AnimationChooseSpriteSheets_CB_OnSelectionChanged">
+							<ComboBox.ItemTemplate>
+								<DataTemplate DataType="{x:Type BixAnim:SpriteSheet}">
+									<Grid>
+										<Grid.RowDefinitions>
+											<RowDefinition />
+										</Grid.RowDefinitions>
+										<TextBlock Text="{Binding Path=SpriteSheetPath, Converter={StaticResource EndOfPathConverter}}"/>
+									</Grid>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>
 
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="32"/>
-										<ColumnDefinition Width="50"/>
-										<ColumnDefinition Width="32"/>
-										<ColumnDefinition Width="50"/>
-									</Grid.ColumnDefinitions>
-									<!--MouseEnter="AnimationPreviewThumbnail_Image_Enter">
-									MouseLeave="AnimationPreviewThumbnail_Image_Leave" 
-								  MouseRightButtonUp="Thumbnail_OnMouseRightButtonDown" Loaded="UpdateAnimationStateThumbnail_Event">-->
-									<!--<Image Grid.RowSpan="3" x:Name="Thumbnail" Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50" />-->
-									<TextBlock Grid.Column="0" Text="Value:" Foreground="White"  VerticalAlignment="Center" />
-									<TextBox Grid.ColumnSpan="4" Grid.Column="1" Background="#FF484848" IsReadOnly="False" VerticalContentAlignment="Center" 
+						<TextBlock Grid.Row="3" Grid.Column="0" Text="Animation: " Foreground="White" VerticalAlignment="Center" Margin="5,0,0,0" />
+						<ComboBox x:Name="AnimationSet_CB" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="4" VerticalContentAlignment="Center" Margin="80,0,5,0" 
+						          ItemsSource="{Binding Path=.}"
+						          SelectionChanged="AnimationSetSpriteSheetAndAnimation_OnSelectionChanged">
+							<ComboBox.ItemTemplate>
+								<DataTemplate DataType="{x:Type BixAnim:AnimationState}">
+									<Grid>
+										<Grid.RowDefinitions>
+											<RowDefinition />
+										</Grid.RowDefinitions>
+										<TextBlock Text="{Binding Path=.StateName}"></TextBlock>
+									</Grid>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>
+
+						<GridSplitter Grid.Row="5" Grid.RowSpan="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter5" Background="#FF868686" ResizeDirection="Rows"/>
+
+						<TextBlock Grid.Row="6" Grid.Column="1" Text="Animation Change Events:" Foreground="White" VerticalAlignment="Bottom" Margin="5" />
+						<!--<Button Grid.Row="3" Content="+" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="156,5,0,5" Height="20" VerticalContentAlignment="Top" Width="20" RenderTransformOrigin="1.5,0.5" 
+				        Click="AddNewStateConnection_BTN_Click"/>-->
+						<TextBlock Grid.Row="5" Grid.Column="1" Text="Audio Events:" Foreground="White"  VerticalAlignment="Bottom" Margin="5" />
+
+						<Button Grid.Row="5" Content="+" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="156,5,0,5" Height="20" VerticalContentAlignment="Top" Width="20" RenderTransformOrigin="1.5,0.5" 
+				        Click="AddAnimationAudioEvent_BTN_Click"/>
+
+						<!--<Button Grid.Row="0" Grid.Column="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="100,0,10,0"  Content="Test"
+				        Click="TestingAnimProperties_BTN_Click"/>-->
+						<ScrollViewer x:Name="AnimationEditor_Animation_Events_SV" Grid.Row="4" Background="#FF383838" Margin="5,0,5,0" 
+					              VerticalScrollBarVisibility="Auto">
+							<ItemsControl x:Name="AnimationEditor_Animation_Events_IC" >
+								<ItemsControl.Resources>
+									<DataTemplate DataType="{x:Type BixAnim:AnimationAudioEvent}">
+										<Grid MinWidth="170" >
+											<Grid.RowDefinitions>
+												<RowDefinition Height="20"/>
+												<RowDefinition Height="25"/>
+												<RowDefinition Height="2"/>
+												<RowDefinition Height="25"/>
+												<RowDefinition Height="2"/>
+												<RowDefinition Height="2"/>
+												<RowDefinition Height="2"/>
+											</Grid.RowDefinitions>
+
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="10"/>
+												<ColumnDefinition Width="80"/>
+												<ColumnDefinition Width="50"/>
+												<ColumnDefinition Width="32"/>
+												<ColumnDefinition Width="50"/>
+												<ColumnDefinition Width="*"/>
+											</Grid.ColumnDefinitions>
+											<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan ="5"  Text="Event: Audio" Foreground="White" />
+											<!--<Image Grid.Row="1" Grid.Column="1"  Grid.RowSpan="3" x:Name="Thumbnail" Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50" />-->
+											<TextBlock Grid.Row="1" Grid.Column="1" Text="Audio Name:" Foreground="White"  VerticalAlignment="Center" />
+											<TextBox Grid.Row="1" Grid.ColumnSpan="4" Grid.Column="2" Background="#FF484848" IsReadOnly="False" VerticalContentAlignment="Center" 
 									         Text="{Binding SoundEffectName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay  }" Foreground="White" />
 
-									<TextBlock Grid.Row="2" Grid.Column="0" Text="Start:" Foreground="White"  VerticalAlignment="Center" />
-									<TextBox Grid.Row="2" Grid.Column="1" VerticalContentAlignment="Center" Text="{Binding FrameStart }" PreviewKeyUp="AnimationAudioEvent_TB_KeyUp" ></TextBox>
+											<TextBlock Grid.Row="3" Grid.Column="1" Text="Start:" Foreground="White"  VerticalAlignment="Center" />
+											<TextBox Grid.Row="3" Grid.Column="2" VerticalContentAlignment="Center" Text="{Binding FrameStart }" PreviewKeyUp="AnimationAudioEvent_TB_KeyUp" ></TextBox>
 
-									<TextBlock Grid.Row="2" Grid.Column="2" Text="End:" Foreground="White" VerticalAlignment="Center" />
-									<TextBox Grid.Row="2" Grid.Column="4" VerticalContentAlignment="Center" Text="{Binding FrameEnd }" PreviewKeyUp="AnimationAudioEvent_TB_KeyUp" ></TextBox>
+											<TextBlock Grid.Row="3" Grid.Column="3" Text="End:" Foreground="White" Margin="5,0,0,0"  VerticalAlignment="Center" />
+											<TextBox Grid.Row="3" Grid.Column="4" HorizontalContentAlignment="Left"  VerticalContentAlignment="Center" Text="{Binding FrameEnd }" PreviewKeyUp="AnimationAudioEvent_TB_KeyUp" ></TextBox>
 
-									<GridSplitter Grid.Row="5" Grid.RowSpan="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter2" Background="#FF868686" ResizeDirection="Rows"/>
-								</Grid>
-							</HierarchicalDataTemplate>
-							<!--<DataTemplate DataType="{x:Type BixRen:Sprite}">
-								<StackPanel Orientation="Horizontal">
-									<Image Margin="0,0,5,0" Source="{Binding ImgPathLocation}" Width="50" Height="50"  />
-									<TextBlock Text="{Binding Name}" Foreground="White" />
-								</StackPanel>
-							</DataTemplate>-->
-						</TreeView.ItemTemplate>
-					</TreeView>
+											<GridSplitter Grid.Row="5" Grid.RowSpan="1" Grid.ColumnSpan="6" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter2" Background="#FF868686" ResizeDirection="Rows"/>
+										</Grid>
 
+									</DataTemplate>
+									<DataTemplate DataType="{x:Type BixAnim:ChangeAnimationLayerEvent}">
+										<TextBlock Grid.Row="2" Grid.Column="1" Text="Layer" Foreground="White" />
 
+									</DataTemplate>
+
+									<DataTemplate DataType="{x:Type BixAnim:ChangeAnimationStateEvent}">
+										<!--<TextBlock Grid.Row="2" Grid.Column="1" Text="State" Foreground="White" />-->
+
+										<Grid MinWidth="170" Loaded="AnimationChangeEventItem_Loaded"
+								      MouseLeave="AnimationPreviewThumbnail_Image_Leave" 
+								      MouseEnter="AnimationPreviewThumbnail_EVENT_Image_Enter"
+								>
+											<Grid.RowDefinitions>
+												<RowDefinition Height="20"/>
+												<RowDefinition Height="25"/>
+												<RowDefinition Height="2"/>
+												<RowDefinition Height="25"/>
+												<RowDefinition Height="2"/>
+												<RowDefinition Height="2"/>
+												<RowDefinition Height="2"/>
+											</Grid.RowDefinitions>
+
+											<Grid.ColumnDefinitions>
+												<ColumnDefinition Width="10"/>
+												<ColumnDefinition Width="50"/>
+												<ColumnDefinition Width="30"/>
+												<ColumnDefinition Width="*"/>
+											</Grid.ColumnDefinitions>
+											<TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan ="5"  Text="Event: State" Foreground="White" />
+											<Image Grid.Row="1"  Grid.Column="1" Grid.RowSpan="3" x:Name="Thumbnail" Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50" />
+											<TextBlock Grid.Row="1" Grid.Column="2" Text="From:" Foreground="White" />
+											<TextBox Grid.Row="1" Grid.Column="3" Background="#FF484848" IsReadOnly="True" Text="{Binding FromAnimationName }" Foreground="White" />
+
+											<TextBlock Grid.Row="3" Grid.Column="2" Text="To:" Foreground="White" />
+											<ComboBox Grid.Row="3" Grid.Column="3"
+									          Text="{Binding ToAnimationName , UpdateSourceTrigger=PropertyChanged, Mode=TwoWay  }"></ComboBox>
+											<GridSplitter Grid.Row="8" Grid.RowSpan="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="gridSplitter2" Background="#FF868686" ResizeDirection="Rows"/>
+										</Grid>
+
+									</DataTemplate>
+								</ItemsControl.Resources>
+							</ItemsControl>
+						</ScrollViewer>
+					</Grid>
 
 				</Grid>
 			</ControlTemplate>
@@ -650,7 +876,7 @@
 			</ControlTemplate>
 
 
-			<!--<BixRes:ObservablePropertyDictionary x:Key="PropertyStyles"/>-->
+			<!-- <BixRes:ObservablePropertyDictionary x:Key="PropertyStyles"/> !-->
 			<!--#region EdtiorToolbars-->
 			<ControlTemplate x:Key="LevelEditorTileMapToolBar_Template">
 				<Grid x:Name="LevelEditorTileMap_ToolBar_Grid" Grid.Column="1" Height="25" VerticalAlignment="Top" Margin="10,4,123,0">
@@ -791,6 +1017,46 @@
 
 					<TreeView x:Name="AnimationEditor_CE_TV" Grid.Row="1" Background="#FF383838"
 					          SelectedItemChanged="AnimationEditor_CE_TV_OnSelectedItemChanged" >
+						<TreeView.Resources>
+							<HierarchicalDataTemplate DataType="{x:Type BixAnim:AnimationState }" ItemsSource="{Binding Path=.AnimationLayers}"  >
+								<StackPanel Orientation="Horizontal" MinWidth="150" MouseEnter="AnimationPreviewThumbnail_Image_Enter" MouseLeave="AnimationPreviewThumbnail_Image_Leave" 
+								            MouseRightButtonUp="Thumbnail_OnMouseRightButtonDown" Loaded="UpdateAnimationStateThumbnail_Event">
+									<Image x:Name="Thumbnail" Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50"
+									       MouseEnter="AnimationPreviewThumbnail_Image_Enter" MouseLeave="AnimationPreviewThumbnail_Image_Leave"  />
+									<TextBlock Text="{Binding StateName}" Foreground="White" />
+								</StackPanel>
+							</HierarchicalDataTemplate>
+							<HierarchicalDataTemplate DataType="{x:Type BixAnim:AnimationLayer}" ItemsSource="{Binding Path=PossibleAnimationsForThisLayer.Values}">
+								<Grid>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="*"/>
+										<ColumnDefinition Width="20"/>
+										<ColumnDefinition Width="*"/>
+									</Grid.ColumnDefinitions>
+									<StackPanel Grid.Column="0"  Orientation="Horizontal" Height="30">
+										<TextBlock Text="Layer:  " Foreground="White" />
+										<TextBlock Text="{Binding Path=AnimationLayerName}" Foreground="White" />
+									</StackPanel>
+									<Button Grid.Column="2" Content=" Add Animation! " Margin="0,0,4,0" VerticalAlignment="Top" HorizontalAlignment="Right"
+									        Background="#FF484848" Foreground="White" VerticalContentAlignment="Center" Click="AddAnimationToLayer_BTN_Click"  />
+								</Grid>
+							</HierarchicalDataTemplate>
+							<HierarchicalDataTemplate DataType="{x:Type BixAnim:Animation}" >
+								<Grid>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="*"/>
+										<ColumnDefinition Width="20"/>
+										<ColumnDefinition Width="*"/>
+									</Grid.ColumnDefinitions>
+									<StackPanel Grid.Column="0"  Orientation="Horizontal" Height="30">
+										<TextBlock Text="Animation:  " Foreground="White" />
+										<TextBlock Text="{Binding Path=AnimationName}" Foreground="White" />
+									</StackPanel>
+									<Button Grid.Column="2" Content=" Remove " Margin="0,0,4,0" VerticalAlignment="Top" HorizontalAlignment="Right"
+									        Background="#FF484848" Foreground="White" VerticalContentAlignment="Center" Click="RemoveAnimationFromLayer_BTN_Click"  />
+								</Grid>
+							</HierarchicalDataTemplate>
+						</TreeView.Resources>
 						<TreeView.ItemContainerStyle>
 							<Style TargetType="TreeViewItem">
 								<Style.Triggers>
@@ -808,25 +1074,7 @@
 								</Style.Resources>
 							</Style>
 						</TreeView.ItemContainerStyle>
-
-
-						<TreeView.ItemTemplate>
-							<HierarchicalDataTemplate DataType="{x:Type BixAnim:AnimationState }" ItemsSource="{Binding .}"  >
-								<StackPanel Orientation="Horizontal" MinWidth="150" MouseEnter="AnimationPreviewThumbnail_Image_Enter" MouseLeave="AnimationPreviewThumbnail_Image_Leave" 
-								            MouseRightButtonUp="Thumbnail_OnMouseRightButtonDown" Loaded="UpdateAnimationStateThumbnail_Event">
-									<Image x:Name="Thumbnail" Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50"
-									       MouseEnter="AnimationPreviewThumbnail_Image_Enter" MouseLeave="AnimationPreviewThumbnail_Image_Leave"  />
-									<TextBlock Text="{Binding StateName}" Foreground="White" />
-								</StackPanel>
-							</HierarchicalDataTemplate>
-							<!--<DataTemplate DataType="{x:Type BixRen:Sprite}">
-								<StackPanel Orientation="Horizontal">
-									<Image Margin="0,0,5,0" Source="{Binding ImgPathLocation}" Width="50" Height="50"  />
-									<TextBlock Text="{Binding Name}" Foreground="White" />
-								</StackPanel>
-							</DataTemplate>-->
-						</TreeView.ItemTemplate>
-
+						
 					</TreeView>
 
 
@@ -881,8 +1129,6 @@
 					          ItemsSource="{Binding SpritesheetAnimationDictionary}">
 
 						<TreeView.Resources>
-
-
 
 							<HierarchicalDataTemplate DataType="{x:Type comp:CanvasAnimation}" ItemsSource="{Binding Path=CanvasFrames}">
 								<Grid>
@@ -1467,17 +1713,17 @@
 			</Button>
 			
 			<ContentControl x:Name="ContentLibrary_Control" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch"
-               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" Margin="0,46,0,-1" Template="{DynamicResource SpriteSheetObjects_Template}">
+               Background="#FF2B2B2B" BorderBrush="Transparent" BorderThickness="0" Margin="0,46,0,-1" Template="{DynamicResource AnimationEditorObjects_Template}">
 				<Expander Header="Expander" Height="100" Width="100">
 					<Grid Background="#FFE5E5E5"/>
 				</Expander>
 			</ContentControl>
 
 			<!--The properties window-->
-			<Label x:Name="label4" Content="Properties" Foreground="White" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+			<Label x:Name="label4" Content="Properties For:" Foreground="White" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Top"/>
 
 
-			<ContentControl x:Name="ObjectProperties_Control" Template="{DynamicResource SpritesheetEditorProperties_Template}" Grid.Column="2" Grid.ColumnSpan="2"/>
+			<ContentControl x:Name="ObjectProperties_Control" Template="{DynamicResource AnimationEditorProperties_Template}" Grid.Column="2" Grid.ColumnSpan="2"/>
 
 			<ContentControl x:Name="EditorToolBar_CC" Grid.Column="1" Height="25" VerticalAlignment="Top" Margin="10,4,123,0"
 											Template="{DynamicResource SpritesheetEditorObjectExplorer_Template}"/>
@@ -1668,7 +1914,7 @@
 						<GridSplitter Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="3"  Background="#FF868686"/>
 						
 						
-						<Grid x:Name="AE_NewAnimSM_MainGrid" Background="#FF3C3C3C" Visibility="Visible">
+						<Grid x:Name="AE_NewAnimSM_MainGrid" Background="#FF3C3C3C" Visibility="Hidden">
 							<Grid.RowDefinitions>
 								<RowDefinition Height="30"/>
 								<RowDefinition Height="30"/>
@@ -1911,15 +2157,26 @@
 
 						</Grid>
 
-						<Grid x:Name="AE_CurrentAnimSM_Grid" Visibility="Hidden" Background="#FF3C3C3C">
+						<Grid x:Name="AE_CurrentAnimSM_Grid" Visibility="Visible" Background="#FF3C3C3C">
 
 							<Grid.RowDefinitions>
+								<RowDefinition Height="20"/>
 								<RowDefinition Height="3*"/>
 								<RowDefinition Height="2"/>
 								<RowDefinition Height="*"/>
 							</Grid.RowDefinitions>
 
-							<ScrollViewer x:Name="AnimationEditor_ScrollViewer" 
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Grid.Row="0" Text="Render Point X:" Foreground="White" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+								<TextBox Grid.Row="0" Width=" 50" Background="#FF383838" Foreground="White" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"
+								         Text="{Binding Path=.AnimationPreviewGridRenderPointX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged }"/>
+								<TextBlock Grid.Row="0" Text="Render Point Y:" Foreground="White" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+								<TextBox Grid.Row="0" Width=" 50" Foreground="White" Background="#FF383838" Margin="10,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"
+								         Text="{Binding Path=.AnimationPreviewGridRenderPointY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged }"/>
+							</StackPanel>
+
+
+							<ScrollViewer Grid.Row="1" x:Name="AnimationEditor_ScrollViewer" 
 							              HorizontalScrollBarVisibility="Visible"
 							              VerticalScrollBarVisibility="Visible"
 							              MouseDown="ScrollViewer_MouseDown"
@@ -1948,7 +2205,7 @@
 							</ScrollViewer>
 
 							
-							<Grid x:Name="AnimationLayersPreview_Canvas_IC">
+							<Grid Grid.Row="1" x:Name="AnimationLayersPreview_Canvas_IC">
 								<!--<ItemsControl.ItemContainerStyle>
 									<Style>
 										<Setter Property="Canvas.ZIndex" Value="{Binding Canvas.ZIndex}" />
@@ -1957,7 +2214,7 @@
 							</Grid>
 
 
-							<Grid Grid.Row="2" Background="#FF171717">
+							<Grid Grid.Row="3" Background="#FF171717">
 
 								<Grid.RowDefinitions>
 									<RowDefinition Height="30"/>
@@ -2002,7 +2259,7 @@
 							</Grid>
 
 
-							<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#FF868686" ResizeDirection="Rows"/>
+							<GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#FF868686" ResizeDirection="Rows"/>
 
 						</Grid>
 
@@ -2092,7 +2349,7 @@
 
 
 								<TreeView.ItemTemplate>
-									<HierarchicalDataTemplate DataType="{x:Type BixAnim:ChangeAnimationEvent }" ItemsSource="{Binding .}"  >
+									<HierarchicalDataTemplate DataType="{x:Type BixAnim:ChangeAnimationStateEvent }" ItemsSource="{Binding .}"  >
 										<Grid MinWidth="170" Loaded="AnimationChangeEventItem_Loaded"
 								      MouseLeave="AnimationPreviewThumbnail_Image_Leave" 
 								      MouseEnter="AnimationPreviewThumbnail_SubLayer_EVENT_Image_Enter"

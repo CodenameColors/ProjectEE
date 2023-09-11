@@ -501,9 +501,14 @@ namespace AmethystEngine.Forms
 						{
 							if (foundFrame.LinkedBorderImage != null)
 							{
-								foundFrame.LinkedBorderImage.Width = val;
-								(foundFrame.LinkedBorderImage.Child as Canvas).Width = val;
-								((foundFrame.LinkedBorderImage.Child as Canvas).Children[0] as Image).Width = val;
+								int index = Array.FindIndex<Image>((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children.OfType<Image>().ToArray(),
+									x => (x as Image).Name.IndexOf("preview") > 0);
+								if (index >= 0)
+								{
+									foundFrame.LinkedBorderImage.Width = val;
+									(foundFrame.LinkedBorderImage.Child as Canvas).Width = val;
+									((foundFrame.LinkedBorderImage.Child as Canvas).Children[index] as Image).Width = val;
+								}
 							}
 							else if (foundFrame.LinkedCroppableImage != null)
 							{
@@ -515,9 +520,14 @@ namespace AmethystEngine.Forms
 						{
 							if (foundFrame.LinkedBorderImage != null)
 							{
-								foundFrame.LinkedBorderImage.Width = val;
-								(foundFrame.LinkedBorderImage.Child as Canvas).Height = val;
-								((foundFrame.LinkedBorderImage.Child as Canvas).Children[0] as Image).Height = val;
+								int index = Array.FindIndex<Image>((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children.OfType<Image>().ToArray(),
+									x => (x as Image).Name.IndexOf("preview") > 0);
+								if (index >= 0)
+								{
+									foundFrame.LinkedBorderImage.Width = val;
+									(foundFrame.LinkedBorderImage.Child as Canvas).Width = val;
+									((foundFrame.LinkedBorderImage.Child as Canvas).Children[index] as Image).Height = val;
+								}
 
 							}
 							else if (foundFrame.LinkedCroppableImage != null)
@@ -620,10 +630,15 @@ namespace AmethystEngine.Forms
 						currentCanvasImagePropertiesSelected.W = dataVal;
 						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
 						{
-							currentCanvasImagePropertiesSelected.LinkedBorderImage.Width = dataVal;
-							(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Width = dataVal;
-							((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[0] as Image).Width =
-								dataVal;
+							int index = Array.FindIndex<Image>((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children.OfType<Image>().ToArray(),
+								x => (x as Image).Name.IndexOf("preview") > 0);
+							if (index >= 0)
+							{
+								currentCanvasImagePropertiesSelected.LinkedBorderImage.Width = dataVal;
+								(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Width = dataVal;
+								((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[index] as Image).Width =
+									dataVal;
+							}
 						}
 						else if (currentCanvasImagePropertiesSelected.LinkedCroppableImage != null)
 						{
@@ -647,10 +662,18 @@ namespace AmethystEngine.Forms
 						currentCanvasImagePropertiesSelected.H = dataVal;
 						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
 						{
-							currentCanvasImagePropertiesSelected.LinkedBorderImage.Height = dataVal;
-							(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Height = dataVal;
-							((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[0] as Image).Height =
-								dataVal;
+							int index = Array.FindIndex<Image>((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children.OfType<Image>().ToArray(),
+								x => (x as Image).Name.IndexOf("preview") > 0);
+							if (index >= 0)
+							{
+								currentCanvasImagePropertiesSelected.LinkedBorderImage.Height = dataVal;
+								(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Height = dataVal;
+								((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[index] as Image).Height =
+									dataVal;
+							}
+
+
+							
 						}
 						else if (currentCanvasImagePropertiesSelected.LinkedCroppableImage != null)
 						{
@@ -674,9 +697,14 @@ namespace AmethystEngine.Forms
 						currentCanvasImagePropertiesSelected.RX = dataVal;
 						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
 						{
-							Canvas.SetLeft(
-								((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1] as Image),
-								dataVal);
+							int index = Array.FindIndex<Image>((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children.OfType<Image>().ToArray(),
+								x => (x as Image).Name.IndexOf("Base") > 0);
+							if (index >= 0)
+							{
+								Canvas.SetLeft(
+									((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[index] as Image),
+									dataVal);
+							}
 						}
 						else if (currentCanvasImagePropertiesSelected.LinkedCroppableImage != null)
 						{
@@ -699,9 +727,14 @@ namespace AmethystEngine.Forms
 						currentCanvasImagePropertiesSelected.RY = dataVal;
 						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
 						{
-							Canvas.SetTop(
-								((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1] as Image),
-								dataVal);
+							int index = Array.FindIndex<Image>((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children.OfType<Image>().ToArray(),
+								x => (x as Image).Name.IndexOf("Base") > 0);
+							if (index >= 0)
+							{
+								Canvas.SetTop(
+									((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[index] as Image),
+									dataVal);
+							}
 						}
 						else if (currentCanvasImagePropertiesSelected.LinkedCroppableImage != null)
 						{
@@ -746,21 +779,25 @@ namespace AmethystEngine.Forms
 			{
 				if (checkBox.IsChecked == true)
 				{
-					if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
-						(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1].Visibility =
-							Visibility.Visible;
-					//else
-					//	currentCanvasImagePropertiesSelected.LinkedCroppableImage.BorderThickness = new Thickness(1);
-
+					if (currentCanvasImagePropertiesSelected?.LinkedBorderImage != null)
+					{
+						int index = Array.FindIndex<Image>((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children.OfType<Image>().ToArray(),
+							x => (x as Image).Name.IndexOf("Base") > 0);
+						if (index >= 0)
+						{
+							(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[index].Visibility =
+								Visibility.Visible;
+						}
+					}
 				}
 				else
 				{
+					int index = Array.FindIndex<Image>((currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children.OfType<Image>().ToArray(),
+						x => (x as Image).Name.IndexOf("Base") > 0);
+					if (index >= 0)
 					{
-						if (currentCanvasImagePropertiesSelected.LinkedBorderImage != null)
-							(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[1].Visibility =
-								Visibility.Hidden;
-						//else
-						//	currentCanvasImagePropertiesSelected.LinkedCroppableImage.BorderThickness = new Thickness(0);
+						(currentCanvasImagePropertiesSelected.LinkedBorderImage.Child as Canvas).Children[index].Visibility =
+							Visibility.Hidden;
 					}
 				}
 			}
@@ -797,7 +834,7 @@ namespace AmethystEngine.Forms
 			foreach (var frame in currentCanvasAnimationPropertiesSelected.CanvasFrames)
 			{
 				Image renderPointImage = new Image();
-				renderPointImage.Name = "Render_Point_Image";
+				renderPointImage.Name = String.Format( "Render_Sub_Point_Image{0}", (SubLayerIC.Items.Count + 1));
 				renderPointImage.Source =
 					new BitmapImage(new Uri(
 						String.Format("{0}/Resources/render_point_crosshair_{1}.png", Directory.GetCurrentDirectory(),
@@ -1034,7 +1071,7 @@ namespace AmethystEngine.Forms
 
 						// Render the BASE RENDER POINT
 						Image renderPointImage = new Image();
-						renderPointImage.Name = "Render_Point_Image";
+						renderPointImage.Name = "Render_Base_Point_Image";
 						renderPointImage.Source =
 							new BitmapImage(new Uri(
 								String.Format("{0}/Resources/render_point_crosshair_base.png", Directory.GetCurrentDirectory()),
@@ -1049,6 +1086,7 @@ namespace AmethystEngine.Forms
 						foreach (var subLayerPoint in frame.SubLayerPoints)
 						{
 							Image subPointImage = new Image();
+							subPointImage.Name = String.Format("Render_SubPoint_Image_{0}", subLayerCount);
 							subPointImage.Source =
 								new BitmapImage(new Uri(
 									String.Format("{0}/Resources/render_point_crosshair_{1}.png", Directory.GetCurrentDirectory(), subLayerCount++),
@@ -1111,7 +1149,17 @@ namespace AmethystEngine.Forms
 			{
 				foreach (var frame in anim.CanvasFrames)
 				{
+					// This is the Cross hair for the render point
 					(frame.LinkedBorderImage?.Child as Canvas).Children[1].Visibility = Visibility.Hidden;
+
+					foreach (CanvasSubLayerPoint subLayerPoint in frame.SubLayerPoints)
+					{
+						if (subLayerPoint.LinkedImage != null)
+						{
+							subLayerPoint.LinkedImage.Visibility = Visibility.Hidden;
+						}
+							
+					}
 				}
 			}
 
@@ -1434,7 +1482,7 @@ namespace AmethystEngine.Forms
 							image.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LeftMouseUpdOnImageFrame_SpriteSheetEditor_CB);
 
 							Image renderPointImage = new Image();
-							renderPointImage.Name = "Render_Point_Image";
+							renderPointImage.Name = "Render_Base_Point_Image";
 							renderPointImage.Source =
 								new BitmapImage(new Uri(
 									String.Format("{0}/Resources/render_point_crosshair_base.png", Directory.GetCurrentDirectory()),
@@ -1549,7 +1597,7 @@ namespace AmethystEngine.Forms
 					{
 						if (childImage is Image img)
 						{
-							if (img.Name == "Render_Point_Image")
+							if (img.Name.Contains("Base"))
 							{
 								Canvas.SetLeft(img, x);
 								Canvas.SetTop(img, y);
@@ -1693,7 +1741,7 @@ namespace AmethystEngine.Forms
 
 					// Set up the BASE RENDER POINTS
 					Image renderPointImage = new Image();
-					renderPointImage.Name = "Render_Point_Image";
+					renderPointImage.Name = "Render_Base_Point_Image";
 					renderPointImage.Source =
 						new BitmapImage(new Uri(
 							String.Format("{0}/Resources/render_point_crosshair_base.png", Directory.GetCurrentDirectory()),

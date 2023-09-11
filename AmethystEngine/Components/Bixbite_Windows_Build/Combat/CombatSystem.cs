@@ -760,7 +760,7 @@ namespace BixBite.Combat
 
 				#endregion
 
-				#region Animation
+				#region AnimationLayer
 				case CombatAnimationAction combatAnimationAction:
 					//Use the queued information to change the requested characters animation.
 					combatAnimationAction.RequestedCharacter.GetAnimationStateMachine().ChangeAnimation(combatAnimationAction.AnimationNameRequest);
@@ -2427,7 +2427,7 @@ EventSkipOver:
 
 						//Get the location of the Entity that we will attack.
 
-						//Load the Animation that need to play when attacking.
+						//Load the AnimationLayer that need to play when attacking.
 
 						//Move the character forward to show they attacked something.
 						QueueCombatAction(new CombatMoveAction(this, CurrentTurnCharacter, (int)(CurrentPartyMember_turn).Position.X + 50, (int)(CurrentPartyMember_turn).Position.Y - 10, 8, true));
@@ -2716,7 +2716,7 @@ EventSkipOver:
 
 						//Get the location of the Entity that we use an item on.
 
-						//Load the Animation that need to play when attacking.
+						//Load the AnimationLayer that need to play when attacking.
 
 						//Move the character.
 

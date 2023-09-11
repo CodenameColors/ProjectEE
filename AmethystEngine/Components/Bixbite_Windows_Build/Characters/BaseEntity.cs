@@ -119,7 +119,7 @@ namespace BixBite.Characters
 		/// </summary>
 		/// <param name="sheet"></param>
 		/// <param cm="Conent Manager IF the texture is set in the monogame pipleine tool"></param>
-		public void LoadSpriteSheet(Spritesheet sheet, ContentManager cm, String contentName)
+		public void LoadSpriteSheet(SpriteSheet sheet, ContentManager cm, String contentName)
 		{
 		//	sheet.SetTexture(cm.Load<Texture2D>(contentName));
 		//	this._spriteAnimationStatemachine = sheet;
@@ -134,7 +134,7 @@ namespace BixBite.Characters
 		/// Loads the SpriteSheet into memory. And sets up the texture of the sprite sheet
 		/// </summary>
 		/// <param name="sheet"></param>
-		public bool LoadSpriteSheet(Spritesheet sheet, GraphicsDevice graphicsDevice, String imagepath)
+		public bool LoadSpriteSheet(SpriteSheet sheet, GraphicsDevice graphicsDevice, String imagepath)
 		{
 			//if (File.Exists(sheet.SpriteSheetPath))
 			//	sheet.SetTexture(sheet.SpriteSheetPath, graphicsDevice);
@@ -248,7 +248,7 @@ namespace BixBite.Characters
 			}
 			else
 			{
-				foreach (Animation animationLayer in _spriteAnimationStatemachine.CurrentState.AnimationLayers)
+				foreach (AnimationLayer animationLayer in _spriteAnimationStatemachine.CurrentState.AnimationLayers)
 				{
 					animationLayer.Draw(spriteBatch);
 				}

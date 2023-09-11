@@ -699,7 +699,7 @@ namespace BixBite.Combat
 
 	#endregion
 
-	#region Animation
+	#region AnimationLayer
 	public class CombatAnimationAction : CombatActions
 	{
 

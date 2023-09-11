@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using AmethystEngine.Components;
 using BixBite.Rendering;
 using BixBite.Rendering.Animation;
+using Microsoft.Build.BuildEngine;
 using Image = System.Windows.Controls.Image;
 
 namespace AmethystEngine.Forms
@@ -34,18 +35,24 @@ namespace AmethystEngine.Forms
 		private int _newAnimimationStatemachineTotalWidth = -1;
 		private int _newAnimimationStatemachineTotalHeight = -1;
 
+		private int _animationPreviewGridRenderPointX = -1;
+		private int _animationPreviewGridRenderPointY = -1;
+
 		private Image PreviewAnimUI_Image_PTR = null;
 		private AnimationState PreviewAnim_Data_PTR = null;
 		private Thread previewAnimThread_CE;
 		private Thread selectedAnimThread_CE;
 		private List<CroppedBitmap> CurrentAnimPreviewImages_CE = new List<CroppedBitmap>();
-		private List<CroppedBitmap> CurrentSelectedAnimImages_List = new List<CroppedBitmap>();
+		private List<List<CroppedBitmap>> CurrentSelectedAnimImages_List = new List<List<CroppedBitmap>>();
 		private List<List<CroppedBitmap>> AnimationSubLayerImages_List = new List<List<CroppedBitmap>>();
 
 
 		TreeView Animation_CE_Tree;
-		TreeView AnimationChangeEvents_Properties_Tree;
-		TreeView AnimationAudioEvents_Properties_Tree;
+		ItemsControl AnimationStateProperties_ItemsControl;
+		ItemsControl AnimationLayerProperties_ItemsControl;
+		ItemsControl AnimationProperties_ItemsControl;
+		ScrollViewer AnimationChangeEvents_Properties_ScrollViewer;
+		//TreeView AnimationAudioEvents_Properties_Tree;
 		private Thread animationImportPreviewThread;
 		public Stopwatch AnimationImporterPreview_Stopwatch = new Stopwatch();
 		public Stopwatch Animation_CE_Preview_Stopwatch = new Stopwatch();
@@ -146,6 +153,25 @@ namespace AmethystEngine.Forms
 			}
 		}
 
+		public int AnimationPreviewGridRenderPointX
+		{
+			get => _animationPreviewGridRenderPointX;
+			set
+			{
+				_animationPreviewGridRenderPointX = value;
+				OnPropertyChanged("AnimationPreviewGridRenderPointX");
+			}
+		}
+
+		public int AnimationPreviewGridRenderPointY
+		{
+			get => _animationPreviewGridRenderPointY;
+			set
+			{
+				_animationPreviewGridRenderPointY = value;
+				OnPropertyChanged("AnimationPreviewGridRenderPointY");
+			}
+		}
 
 
 		private void AnimationEditorLoaded()
@@ -155,236 +181,173 @@ namespace AmethystEngine.Forms
 
 		private void ImportNewSpriteSheetFile_BTN(object sender, RoutedEventArgs e)
 		{
-			String filename = "";
-			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+
+			CurrentAnimationStateMachine = GetAnimationStateMachineFromFile();
+
+
+			// Now at this point we should have a BASE state machine imported.
+
+			// What does base mean? it means there are no connections, or sublayer spritesheets mapped yet.
+			// that is done in the GUI editor.
+
+			// Set up the Editor Objects section
+			AE_NewAnimStates_IC.ItemsSource = null;
+
+			ActiveAnimationStateMachines.Add((CurrentAnimationStateMachine));
+
+			Animation_CE_Tree.ItemsSource = CurrentAnimationStateMachine.States.Values;
+			AE_NewAnimStates_IC.ItemsSource = CurrentAnimationStateMachine.States.Values;
+
+			SceneExplorer_TreeView.ItemsSource = ActiveAnimationStateMachines;
+
+			bNewAnimStateMachine = true;
+			bAllowImportAnimPreview = true;
+
+			// WE need to create the stop watch for the preview thread
+			AnimationImporterPreview_Stopwatch = new Stopwatch();
+			AnimationImporterPreview_Stopwatch.Start();
+
+			Image img = new Image();
+			BitmapImage bmi = new BitmapImage();
+
+			bmi.BeginInit();
+			bmi.CacheOption = BitmapCacheOption.OnLoad;
+			bmi.UriSource = new Uri(NewAnimimationStatemachineLocation, UriKind.Absolute);
+			bmi.EndInit();
+
+			CurrentSpriteSheet_Image = bmi;
+
+			if (animationImportPreviewThread == null)
 			{
-				FileName = "SpriteSheet", //default file 
-				DefaultExt = "*.spritesheet", //default file extension
-				Filter = "spritesheet (*.spritesheet)|*.spritesheet" //filter files by extension
-			};
-
-			// Show save file dialog box
-			Nullable<bool> result = dlg.ShowDialog();
-			// Process save file dialog box results kicks out if the user doesn't select an item.
-			filename = "";
-			if (result == true)
-				filename = dlg.FileName;
-			else
-				return;
-
-			Console.WriteLine(filename);
-
-			if (File.Exists(filename))
-			{
-				// Now that we have a valid file path we need to turn the "canvas spritesheet" into Animation State Machine Object
-				CanvasSpritesheet importedCanvasSpritesheet = CanvasSpritesheet.ImportSpriteSheet(filename);
-				CurrentAnimationStateMachine = new AnimationStateMachine();
-
-
-				NewAnimimationStatemachineFileName = importedCanvasSpritesheet.Name;
-				NewAnimimationStatemachineLocation = importedCanvasSpritesheet.ImagePath;
-				NewAnimimationStatemachineTotalWidth = importedCanvasSpritesheet.Width;
-				NewAnimimationStatemachineTotalHeight = importedCanvasSpritesheet.Height;
-
-				foreach (CanvasAnimation canvasAnimation in importedCanvasSpritesheet.AllAnimationOnSheet)
+				animationImportPreviewThread = new Thread(() =>
 				{
-					AnimationState newAnimationState = new AnimationState(CurrentAnimationStateMachine);
-					newAnimationState.StateName = canvasAnimation.AnimName;
-					newAnimationState.NumOfFrames = (int) canvasAnimation.NumOfFrames;
-
-					// An animation can have many layers. so we need to add those.
-					// The <= is because of the base layer counts too
-					for (int i = 0; i <= canvasAnimation.NamesOfSubLayers.Count; i++)
+					while (true)
 					{
-						newAnimationState.AnimationLayers.Add(new Animation(newAnimationState));
-					}
-
-					// Each animation layer has a set of frames
-					foreach (CanvasImageProperties imageProperties in canvasAnimation.CanvasFrames)
-					{
-						// First add the frame for the 
-						AnimationFrameInfo frameInfo = new AnimationFrameInfo();
-						Microsoft.Xna.Framework.Rectangle drawRectangle =
-							new Microsoft.Xna.Framework.Rectangle(imageProperties.X, imageProperties.Y, imageProperties.W, imageProperties.H);
-						frameInfo.SetRectangle(drawRectangle);
-						frameInfo.RenderPointOffsetX = imageProperties.RX;
-						frameInfo.RenderPointOffsetY = imageProperties.RY;
-
-						newAnimationState.AnimationLayers.First().AnimationFrames.AddLast(frameInfo);
-
-						// We need to set the sublayer animation render points based on base the animation.
-						for (int j = 0; j < imageProperties.SubLayerPoints.Count; j++)
+						try
 						{
-							AnimationFrameInfo subframeInfo = new AnimationFrameInfo();
-
-							subframeInfo.RenderPointOffsetX = imageProperties.RX;
-							subframeInfo.RenderPointOffsetY = imageProperties.RY;
-							newAnimationState.AnimationLayers[1 + j].AnimationFrames.AddLast(subframeInfo);
+							Thread.Sleep(15);
 						}
-					}
-					CurrentAnimationStateMachine.States.Add(canvasAnimation.AnimName, newAnimationState);
-				}
-
-				// Now at this point we should have a BASE state machine imported.
-
-				// What does base mean? it means there are no connections, or sublayer spritesheets mapped yet.
-				// that is done in the GUI editor.
-
-				// Set up the Editor Objects section
-				AE_NewAnimStates_IC.ItemsSource = null;
-
-				ActiveAnimationStateMachines.Add((CurrentAnimationStateMachine));
-
-				Animation_CE_Tree.ItemsSource = CurrentAnimationStateMachine.States.Values;
-				AE_NewAnimStates_IC.ItemsSource = CurrentAnimationStateMachine.States.Values;
-
-				SceneExplorer_TreeView.ItemsSource = ActiveAnimationStateMachines;
-
-				bNewAnimStateMachine = true;
-				bAllowImportAnimPreview = true;
-
-				// WE need to create the stop watch for the preview thread
-				AnimationImporterPreview_Stopwatch = new Stopwatch();
-				AnimationImporterPreview_Stopwatch.Start();
-
-				Image img = new Image();
-				BitmapImage bmi = new BitmapImage();
-
-				bmi.BeginInit();
-				bmi.CacheOption = BitmapCacheOption.OnLoad;
-				bmi.UriSource = new Uri(NewAnimimationStatemachineLocation, UriKind.Absolute);
-				bmi.EndInit();
-				Bitmap pain = BitmapImage2Bitmap(bmi);
-				pain.SetResolution(96.0f, 96.0f);
-				bmi = ToBitmapImage(pain);
-				img.Source = bmi;
-
-				CurrentSpriteSheet_Image = bmi;
-
-				if (animationImportPreviewThread == null)
-				{
-					animationImportPreviewThread = new Thread(() =>
-					{
-						while (true)
+						catch
 						{
-							try
-							{
-								Thread.Sleep(15);
-							}
-							catch
-							{
-								Console.WriteLine("animation preview thread == interrupted");
-								break;
-							}
+							Console.WriteLine("animation preview thread == interrupted");
+							break;
+						}
 
-							try
+						try
+						{
+							if (bAllowImportAnimPreview)
 							{
-								if (bAllowImportAnimPreview)
+								//if (AnimationImporterPreview_Stopwatch.ElapsedMilliseconds > 1000)
+								//	AnimationImporterPreview_Stopwatch.Restart();	//we need to reset the timer.
+
+								//Force update to MainGUI
+								Dispatcher.Invoke(() =>
+									AnimationImporterTime_MS = (int) AnimationImporterPreview_Stopwatch.ElapsedMilliseconds);
+
+								//Okay let's update the animations!
+								for (int i = 0; i < AE_NewAnimStates_IC.Items.Count; i++)
 								{
-									//if (AnimationImporterPreview_Stopwatch.ElapsedMilliseconds > 1000)
-									//	AnimationImporterPreview_Stopwatch.Restart();	//we need to reset the timer.
-
-									//Force update to MainGUI
+									AnimationState animationState = CurrentAnimationStateMachine.States.Values.ToList()[i];
+									if (animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame == null)
+										animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame =
+											animationState.AnimationLayers[0].CurrentFrameProperties.GetFirstFrame();
 									Dispatcher.Invoke(() =>
-										AnimationImporterTime_MS = (int)AnimationImporterPreview_Stopwatch.ElapsedMilliseconds);
-
-									//Okay let's update the animations!
-									for (int i = 0; i < AE_NewAnimStates_IC.Items.Count; i++)
 									{
-										AnimationState animationState = CurrentAnimationStateMachine.States.Values.ToList()[i];
-										if (animationState.AnimationLayers[0].CurrentFrameInfo == null)
-											animationState.AnimationLayers[0].CurrentFrameInfo = animationState.AnimationLayers[0].AnimationFrames.First;
-										Dispatcher.Invoke(() =>
+										ContentPresenter c =
+											((ContentPresenter) AE_NewAnimStates_IC.ItemContainerGenerator.ContainerFromIndex(i));
+										var v = c.ContentTemplate.FindName("CurrentFrame_TB", c);
+										var v1 = c.ContentTemplate.FindName("CurrentDeltaTime_TB", c);
+
+										int DT = (int.Parse((v1 as TextBox).Text));
+
+										var cb = c.ContentTemplate.FindName("PreviewAnim_CB", c);
+										if ((cb as CheckBox).IsChecked == true)
 										{
-											ContentPresenter c =
-												((ContentPresenter)AE_NewAnimStates_IC.ItemContainerGenerator.ContainerFromIndex(i));
-											var v = c.ContentTemplate.FindName("CurrentFrame_TB", c);
-											var v1 = c.ContentTemplate.FindName("CurrentDeltaTime_TB", c);
 
-											int DT = (int.Parse((v1 as TextBox).Text));
-
-											var cb = c.ContentTemplate.FindName("PreviewAnim_CB", c);
-											if ((cb as CheckBox).IsChecked == true)
+											if (animationState.NumOfFrames > 0 && animationState.FPS > 0)
 											{
+												int framenum = (int.Parse((v as TextBox).Text));
 
-												if (animationState.NumOfFrames > 0 && animationState.FPS > 0)
+												if (((int) (1.0f / animationState.FPS * 1000.0f)) < DT)
 												{
-													int framenum = (int.Parse((v as TextBox).Text));
+													framenum++;
+													animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame =
+														animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Next;
+													DT = 0; //we need to reset the timer.
+												}
 
-													if (((int)(1.0f / animationState.FPS * 1000.0f)) < DT)
-													{
-														framenum++;
-														animationState.AnimationLayers[0].CurrentFrameInfo = animationState.AnimationLayers[0].CurrentFrameInfo.Next;
-														DT = 0; //we need to reset the timer.
-													}
-
-													if (framenum > animationState.NumOfFrames)
-													{
-														framenum = 1;
-														animationState.AnimationLayers[0].CurrentFrameInfo = animationState.AnimationLayers[0].AnimationFrames.First;
-
-													}
-
-													(v as TextBox).Text = framenum.ToString();
-													(v1 as TextBox).Text = (DT + 15).ToString();
-
-													//Increment the Frame
-													var vimg = c.ContentTemplate.FindName("PreviewAnim_IMG", c);
-
-													BitmapImage bmp = bmi;
-
-													//int width2 =
-													//	(int)(currentSpriteAnimation.StartXPos +
-													//		((currentSpriteAnimation.FrameCount) * currentSpriteAnimation.FrameWidth) > bmp.Width
-													//			? bmp.Width - ((currentSpriteAnimation.StartXPos +
-													//											((currentSpriteAnimation.FrameCount - 1) *
-													//											 currentSpriteAnimation.FrameWidth)))
-													//			: currentSpriteAnimation.FrameWidth);
-
-
-													var crop = new CroppedBitmap(bmp, new Int32Rect(
-														(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().X,
-														(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Y,
-														(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Width,
-														(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Height));
-													// using BitmapImage version to prove its created successfully
-													(vimg as Image).Source = crop;
-
+												if (framenum > animationState.NumOfFrames)
+												{
+													framenum = 1;
+													animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame =
+														animationState.AnimationLayers[0].CurrentFrameProperties.GetFirstFrame();
 
 												}
+
+												(v as TextBox).Text = framenum.ToString();
+												(v1 as TextBox).Text = (DT + 15).ToString();
+
+												//Increment the Frame
+												var vimg = c.ContentTemplate.FindName("PreviewAnim_IMG", c);
+
+												BitmapImage bmp = bmi;
+
+												//int width2 =
+												//	(int)(currentSpriteAnimation.StartXPos +
+												//		((currentSpriteAnimation.FrameCount) * currentSpriteAnimation.FrameWidth) > bmp.Width
+												//			? bmp.Width - ((currentSpriteAnimation.StartXPos +
+												//											((currentSpriteAnimation.FrameCount - 1) *
+												//											 currentSpriteAnimation.FrameWidth)))
+												//			: currentSpriteAnimation.FrameWidth);
+
+
+												var crop = new CroppedBitmap(bmp, new Int32Rect(
+													(int) animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Value
+														.GetDrawRectangle().X,
+													(int) animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Value
+														.GetDrawRectangle().Y,
+													(int) animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Value
+														.GetDrawRectangle().Width,
+													(int) animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Value
+														.GetDrawRectangle().Height));
+												// using BitmapImage version to prove its created successfully
+												(vimg as Image).Source = crop;
+
+
 											}
-										});
+										}
+									});
 
-										//ContentPresenter c =
-										//	((ContentPresenter) AE_NewAnimStates_IC.ItemContainerGenerator.ContainerFromIndex(i));
-										//var v = c.ContentTemplate.FindName("PreviewAnim_IMG", c);
+									//ContentPresenter c =
+									//	((ContentPresenter) AE_NewAnimStates_IC.ItemContainerGenerator.ContainerFromIndex(i));
+									//var v = c.ContentTemplate.FindName("PreviewAnim_IMG", c);
 
-									}
-
-									if (AnimationImporterPreview_Stopwatch.ElapsedMilliseconds > 1000)
-										AnimationImporterPreview_Stopwatch.Restart(); //we need to reset the timer.
 								}
-							}
-							catch (Exception ex)
-							{
-								//Console.WriteLine("Thread mismatch");
+
+								if (AnimationImporterPreview_Stopwatch.ElapsedMilliseconds > 1000)
+									AnimationImporterPreview_Stopwatch.Restart(); //we need to reset the timer.
 							}
 						}
-					});
-
-				}
-
-				if (!animationImportPreviewThread.IsAlive)
-					animationImportPreviewThread.Start();
-
-				bNewAnimStateMachine = true;
-
-				AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Imported SpriteSheet PNG Success!!";
-
+						catch (Exception ex)
+						{
+							//Console.WriteLine("Thread mismatch");
+						}
+					}
+				});
 
 			}
 
-			//// NEW CODE for NEW SPRITESHEET
+			if (!animationImportPreviewThread.IsAlive)
+				animationImportPreviewThread.Start();
+
+			bNewAnimStateMachine = true;
+
+			AE_ImportStatusLog_TB.Text = DateTime.Now.ToLongTimeString() + ":   Imported SpriteSheet PNG Success!!";
+
+
+		}
+
+		//// NEW CODE for NEW SPRITESHEET
 			//CanvasSpritesheet tempCanvasSpritesheet = CanvasSpritesheet.ImportSpriteSheet(filename);
 			//NewAnimimationStatemachineFileName = tempCanvasSpritesheet.Name;
 			//NewAnimimationStatemachineLocation = tempCanvasSpritesheet.ImagePath;
@@ -398,17 +361,13 @@ namespace AmethystEngine.Forms
 			//bmi.CacheOption = BitmapCacheOption.OnLoad;
 			//bmi.UriSource = new Uri(NewAnimimationStatemachineLocation, UriKind.Absolute);
 			//bmi.EndInit();
-			//Bitmap pain = BitmapImage2Bitmap(bmi);
-			//pain.SetResolution(96.0f, 96.0f);
-			//bmi = ToBitmapImage(pain);
-			//img.Source = bmi;
 
 			//CurrentSpriteSheet_Image = bmi;
 
 			//SceneExplorer_TreeView.ItemsSource = ActiveAnimationStateMachines;
 
 
-		}
+		//}
 
 		private void SetupNewAnimation_BTN_Click(object sender, RoutedEventArgs e)
 		{
@@ -585,10 +544,6 @@ namespace AmethystEngine.Forms
 			bmi.CacheOption = BitmapCacheOption.OnLoad;
 			bmi.UriSource = new Uri(NewAnimimationStatemachineLocation, UriKind.Absolute);
 			bmi.EndInit();
-			Bitmap pain = BitmapImage2Bitmap(bmi);
-			pain.SetResolution(96.0f, 96.0f);
-			bmi = ToBitmapImage(pain);
-			img.Source = bmi;
 
 			CurrentSpriteSheet_Image = bmi;
 
@@ -624,10 +579,10 @@ namespace AmethystEngine.Forms
 
 
 				var crop = new CroppedBitmap(bmi, new Int32Rect(
-					(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().X,
-					(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Y,
-					(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Width,
-					(int)animationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Height
+					(int)animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Value.GetDrawRectangle().X,
+					(int)animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Value.GetDrawRectangle().Y,
+					(int)animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Value.GetDrawRectangle().Width,
+					(int)animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Value.GetDrawRectangle().Height
 				));
 				// using BitmapImage version to prove its created successfully
 				(v as Image).Source = crop;
@@ -636,6 +591,9 @@ namespace AmethystEngine.Forms
 				{
 					CurrentlySelectedAnimationState = animationState;
 				}
+
+				AnimationPreviewGridRenderPointX = (int) (AnimationEditor_BackCanvas.ActualWidth / 2.0f);
+				AnimationPreviewGridRenderPointY = (int) (AnimationEditor_BackCanvas.ActualHeight / 2.0f);
 
 			} // End of for loop for animation states
 
@@ -901,90 +859,139 @@ namespace AmethystEngine.Forms
 							{
 								Dispatcher.Invoke(() =>
 								{
-									if (CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo == null)
-									{
-										CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo =
-											CurrentlySelectedAnimationState.AnimationLayers[0].AnimationFrames.First;
-									}
 
 									//inc frame
 									int? frame = CurrentBaseLayerAnimation_Img?.Tag as int?;
+									int layerIndex = 0;
 									if (frame != null)
 									{
 
 										if (frame == CurrentlySelectedAnimationState.NumOfFrames)
 										{
 											frame = 1;
-											CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo =
-												CurrentlySelectedAnimationState.AnimationLayers[0].AnimationFrames.First;
+											layerIndex = 0;
 										}
 										else
 										{
 											frame++;
-											CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo =
-												CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Next;
+											layerIndex = 0;
+											CurrentBaseLayerAnimation_Img.Tag = frame;
+
+										}
+									}
+									else
+									{
+										frame = 1;
+										layerIndex = 0;
+										CurrentBaseLayerAnimation_Img.Tag = frame;
+									}
+
+									// CurrentBaseLayerAnimation_Img.Source = CurrentSelectedAnimImages_List[(int) frame - 1];
+									AnimationEditor_Canvas.Children.Remove(CurrentBaseLayerAnimation_Img);
+
+										AnimationEditor_Canvas.Children.Clear();
+										int baseXPos = 0;
+										int baseYPos = 0;
+										foreach (AnimationLayer layer in CurrentlySelectedAnimationState.AnimationLayers)
+										{
+											if (frame == 1)
+											{
+												layer.CurrentFrameProperties.CurrentAnimationFrame = layer.CurrentFrameProperties.GetFirstFrame();
+											}
+
+											if (layerIndex < CurrentSelectedAnimImages_List.Count)
+											{
+
+												CurrentBaseLayerAnimation_Img = new Image();
+												CurrentBaseLayerAnimation_Img.Source =
+													CurrentSelectedAnimImages_List[layerIndex++][(int) frame - 1];
+												CurrentBaseLayerAnimation_Img.Stretch = Stretch.Fill;
+												CurrentBaseLayerAnimation_Img.Width =
+													layer.CurrentFrameProperties.CurrentAnimationFrame.Value.GetDrawRectangle().Width;
+												CurrentBaseLayerAnimation_Img.MaxWidth =
+													layer.CurrentFrameProperties.CurrentAnimationFrame.Value.GetDrawRectangle().Width;
+												CurrentBaseLayerAnimation_Img.Height =
+													layer.CurrentFrameProperties.CurrentAnimationFrame.Value.GetDrawRectangle().Height;
+												CurrentBaseLayerAnimation_Img.MaxHeight =
+													layer.CurrentFrameProperties.CurrentAnimationFrame.Value.GetDrawRectangle().Height;
+												CurrentBaseLayerAnimation_Img.StretchDirection = StretchDirection.Both;
+												AnimationEditor_Canvas.Children.Add(CurrentBaseLayerAnimation_Img);
+												CurrentBaseLayerAnimation_Img.UpdateLayout();
+												AnimationEditor_Canvas.UpdateLayout();
+												CurrentBaseLayerAnimation_Img.Tag = frame;
+
+												CurrentActiveAnimationCurrentFrame_TB.Text = frame.ToString();
+
+
+												// Keep track of the base image location
+												int middleX, middleY, newX, newY = 0;
+												middleX = middleY = newX = newY = 0;
+												if (layerIndex == 1)
+												{
+													middleX = (int)(AnimationPreviewGridRenderPointX);
+													middleY = (int)(AnimationPreviewGridRenderPointY);
+													newX = middleX -
+													           layer.CurrentFrameProperties.CurrentAnimationFrame.Value.RenderPointOffsetX
+														;
+													//newX = newX + ((CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Value.GetDrawRectangle().Width -
+													//                (int)CurrentBaseLayerAnimation_Img.ActualWidth) / 2);
+
+													newY = middleY -
+													           layer.CurrentFrameProperties.CurrentAnimationFrame.Value.RenderPointOffsetY;
+													//newY = newY + ((CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Value.GetDrawRectangle().Height -
+													//                (int)CurrentBaseLayerAnimation_Img.Height) / 2);
+													//Canvas.SetLeft(CurrentBaseLayerAnimation_Img, middleX - ((int)(CurrentBaseLayerAnimation_Img.ActualWidth / 2.0f)));
+													//Canvas.SetTop(CurrentBaseLayerAnimation_Img, middleY - ((int)(CurrentBaseLayerAnimation_Img.ActualHeight / 2.0f)));
+
+													Canvas.SetLeft(CurrentBaseLayerAnimation_Img, newX);
+													Canvas.SetTop(CurrentBaseLayerAnimation_Img, newY);
+
+
+													baseXPos = (int)Canvas.GetLeft(CurrentBaseLayerAnimation_Img);
+													baseYPos = (int)Canvas.GetTop(CurrentBaseLayerAnimation_Img);
+												}
+												else
+												{
+													middleX = baseXPos;
+													middleY = baseYPos;
+													newX += middleX + layer.CurrentFrameProperties.CurrentAnimationFrame.Value.OriginPointOffsetX;
+													newY += middleY + layer.CurrentFrameProperties.CurrentAnimationFrame.Value.OriginPointOffsetY;
+													newX -= layer.CurrentFrameProperties.CurrentAnimationFrame.Value.RenderPointOffsetX;
+													//newX = newX + ((CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Value.GetDrawRectangle().Width -
+													//                (int)CurrentBaseLayerAnimation_Img.ActualWidth) / 2);
+
+													newY -= layer.CurrentFrameProperties.CurrentAnimationFrame.Value.RenderPointOffsetY;
+												Canvas.SetLeft(CurrentBaseLayerAnimation_Img, newX);
+													Canvas.SetTop(CurrentBaseLayerAnimation_Img, newY);
+											}
+
+												
+												
+
+											Console.WriteLine(String.Format(
+												"LAYER {9}: w:{0}, h:{1} newX:{2}, newY:{3} | iWidth:{4}, iHeight:{5}, mx:{6}, my:{7}, FRAME:{8}",
+												layer.CurrentFrameProperties
+													.CurrentAnimationFrame.Value.GetDrawRectangle().Width,
+												layer.CurrentFrameProperties
+													.CurrentAnimationFrame.Value.GetDrawRectangle().Height,
+												newX, newY, (int) CurrentBaseLayerAnimation_Img.ActualWidth,
+												(int) CurrentBaseLayerAnimation_Img.ActualHeight,
+												middleX, middleY, frame - 1, layerIndex-1));
+
+												layer.CurrentFrameProperties.CurrentAnimationFrame = layer.CurrentFrameProperties.CurrentAnimationFrame.Next;
+
+											for (int i = 0; i < AnimationSubLayerImages_List.Count; i++)
+												{
+													if (frame > AnimationSubLayerImages_List[i].Count)
+														continue;
+													(AnimationLayersPreview_Canvas_IC.Children[i] as Image).Source =
+														AnimationSubLayerImages_List[i][(int) frame - 1];
+													(AnimationLayersPreview_Canvas_IC.Children[i] as Image).Tag = frame.ToString();
+												}
+											}
 										}
 
-										// CurrentBaseLayerAnimation_Img.Source = CurrentSelectedAnimImages_List[(int) frame - 1];
-										AnimationEditor_Canvas.Children.Remove(CurrentBaseLayerAnimation_Img);
-										CurrentBaseLayerAnimation_Img = new Image();
-										CurrentBaseLayerAnimation_Img.Source = CurrentSelectedAnimImages_List[(int)frame - 1];
-										CurrentBaseLayerAnimation_Img.Stretch = Stretch.Fill;
-										CurrentBaseLayerAnimation_Img.Width =
-											CurrentlySelectedAnimationState.AnimationLayers [0].CurrentFrameInfo.Value.GetDrawRectangle().Width;
-										CurrentBaseLayerAnimation_Img.MaxWidth =
-											CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Width;
-										CurrentBaseLayerAnimation_Img.Height =
-											CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Height;
-										CurrentBaseLayerAnimation_Img.MaxHeight =
-											CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Height;
-										CurrentBaseLayerAnimation_Img.StretchDirection = StretchDirection.Both;
-										AnimationEditor_Canvas.Children.Add(CurrentBaseLayerAnimation_Img);
-										CurrentBaseLayerAnimation_Img.UpdateLayout();
-										AnimationEditor_Canvas.UpdateLayout();
-
-
-										CurrentBaseLayerAnimation_Img.Tag = frame;
-										CurrentActiveAnimationCurrentFrame_TB.Text = frame.ToString();
-
-										int middleX = (int)(AnimationEditor_BackCanvas.ActualWidth / 2.0f);
-										int middleY = (int)(AnimationEditor_BackCanvas.ActualHeight / 2.0f);
-										int newX = middleX - CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.RenderPointOffsetX;
-										//newX = newX + ((CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Width -
-										//                (int)CurrentBaseLayerAnimation_Img.ActualWidth) / 2);
-
-										int newY = middleY - CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.RenderPointOffsetY;
-										//newY = newY + ((CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Height -
-										//                (int)CurrentBaseLayerAnimation_Img.Height) / 2);
-										//Canvas.SetLeft(CurrentBaseLayerAnimation_Img, middleX - ((int)(CurrentBaseLayerAnimation_Img.ActualWidth / 2.0f)));
-										//Canvas.SetTop(CurrentBaseLayerAnimation_Img, middleY - ((int)(CurrentBaseLayerAnimation_Img.ActualHeight / 2.0f)));
-
-										Canvas.SetLeft(CurrentBaseLayerAnimation_Img, newX);
-										Canvas.SetTop(CurrentBaseLayerAnimation_Img, newY);
-
-										Console.WriteLine(String.Format(
-											"w:{0}, h:{1} newX:{2}, newY:{3} | iWidth:{4}, iHeight:{5}, mx:{6}, my:{7}, FRAME:{8}",
-											CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Width,
-											CurrentlySelectedAnimationState.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Height,
-											newX, newY, (int)CurrentBaseLayerAnimation_Img.ActualWidth,
-											(int)CurrentBaseLayerAnimation_Img.ActualHeight,
-											middleX, middleY, frame - 1));
-
-									}
-
-
-
-									for (int i = 0; i < AnimationSubLayerImages_List.Count; i++)
-									{
-										if (frame > AnimationSubLayerImages_List[i].Count)
-											continue;
-										(AnimationLayersPreview_Canvas_IC.Children[i] as Image).Source =
-											AnimationSubLayerImages_List[i][(int)frame - 1];
-										(AnimationLayersPreview_Canvas_IC.Children[i] as Image).Tag = frame.ToString();
-									}
-
-
-									//int count = 0;
+										//int count = 0;
 									//foreach (List<CroppedBitmap> anim in AnimationSubLayerImages_List)
 									//{
 									//	//Step one what frame is it?
@@ -1111,7 +1118,6 @@ namespace AmethystEngine.Forms
 			//bmi.CacheOption = BitmapCacheOption.OnLoad;
 			//bmi.UriSource = new Uri(CurrentAnimationStateMachine.ImgPathLocation, UriKind.Absolute);
 			//bmi.EndInit();
-			//CurrentSpriteSheet_Image = bmi;
 
 			////Set up the first frame thumbnails for animation states
 			//int count = 0;
@@ -1184,7 +1190,6 @@ namespace AmethystEngine.Forms
 			//bmi.CacheOption = BitmapCacheOption.OnLoad;
 			//bmi.UriSource = new Uri(CurrentAnimationStateMachine.ImgPathLocation, UriKind.Absolute);
 			//bmi.EndInit();
-			//CurrentSpriteSheet_Image = bmi;
 
 			////Set up the first frame thumbnails for animation states
 			//int count = 0;
@@ -1368,66 +1373,132 @@ namespace AmethystEngine.Forms
 
 		private void PlayCurrentSelectedAnimation_BTN_Click(object sender, RoutedEventArgs e)
 		{
-			//	if (!AnimationSelected_Stopwatch.IsRunning)
-			//		AnimationSelected_Stopwatch.Start();
+			if (!AnimationSelected_Stopwatch.IsRunning)
+				AnimationSelected_Stopwatch.Start();
 		}
 
 		private void PauseCurrentSelectedAnimation_BTN_Click(object sender, RoutedEventArgs e)
 		{
-			//AnimationSelected_Stopwatch.Stop();
+			AnimationSelected_Stopwatch.Stop();
 		}
 
 		private void ResetCurrentSelectedAnimation_BTN_Click(object sender, RoutedEventArgs e)
 		{
-			////throw new NotImplementedException();
-			//CurrentActiveAnimationCurrentFrame_TB.Text = "1";
-			//AnimationSelected_Stopwatch.Restart();
+			CurrentActiveAnimationCurrentFrame_TB.Text = "1";
+			AnimationSelected_Stopwatch.Restart();
 
 		}
 
 		private void AnimationEditor_CE_TV_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
-			CurrentSelectedAnimImages_List.Clear();
 			TreeView tvtemp = sender as TreeView;
 			if (tvtemp != null)
 			{
-				AnimationState item = tvtemp.SelectedItem as AnimationState;
-				item.AnimationLayers[0].CurrentFrameInfo = item.AnimationLayers[0].AnimationFrames.First;
-				if (item == null) return;
-
-				// First up we need to get all the frames, and create CROPPED images for them!
-				for (int i = 0; i < item.NumOfFrames; i++)
+				
+				if(tvtemp.SelectedItem is AnimationState animationState)
 				{
-					CurrentSelectedAnimImages_List.Add(
-						(new CroppedBitmap(CurrentSpriteSheet_Image, new Int32Rect(
-							(int)item.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().X,
-							(int)item.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Y,
-							(int)item.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Width,
-							(int)item.AnimationLayers[0].CurrentFrameInfo.Value.GetDrawRectangle().Height
-						))));
-					item.AnimationLayers[0].CurrentFrameInfo = item.AnimationLayers[0].CurrentFrameInfo.Next;
+					CurrentSelectedAnimImages_List.Clear();
+					
+					ControlTemplate currentObjectTemplate = (ControlTemplate)this.Resources["AnimationEditorProperties_Template"];
+					Grid stateGrid = (Grid)currentObjectTemplate.FindName("AnimationEditorProperties_State_Grid", ObjectProperties_Control);
+					Grid LayerGrid = (Grid)currentObjectTemplate.FindName("AnimationEditorProperties_Layer_Grid", ObjectProperties_Control);
+					Grid animationGrid = (Grid)currentObjectTemplate.FindName("AnimationEditorProperties_Animation_Grid", ObjectProperties_Control);
+
+					TextBlock stateNameTextBlock = (TextBlock)currentObjectTemplate.FindName("StateName_TB", ObjectProperties_Control);
+					stateNameTextBlock.Text = animationState.StateName;
+					stateGrid.Visibility = Visibility.Visible;
+					LayerGrid.Visibility = Visibility.Hidden;
+					animationGrid.Visibility = Visibility.Hidden;
+
+					foreach (AnimationLayer animLayer in animationState.AnimationLayers)
+					{
+						if (animLayer.ReferenceSpriteSheets.Count == 0)
+							continue;
+
+						// We need to get the bitmap of the current animation
+						Image img = new Image();
+						BitmapImage bmi = new BitmapImage();
+
+						bmi.BeginInit();
+						bmi.CacheOption = BitmapCacheOption.OnLoad;
+						bmi.UriSource = new Uri(
+								animLayer.ReferenceSpriteSheets[animLayer.CurrentFrameProperties.ReferenceSpritesheetIndex].SpriteSheetPath,
+								UriKind.Absolute);
+						bmi.EndInit();
+						CurrentSpriteSheet_Image = bmi;
+
+						animLayer.CurrentFrameProperties.CurrentAnimationFrame = animLayer.CurrentFrameProperties.GetFirstFrame();
+
+						// First up we need to get all the frames, and create CROPPED images for them!
+						List<CroppedBitmap> listOfFrames = new List<CroppedBitmap>();
+						for (int i = 0; i < animationState.NumOfFrames; i++)
+						{
+							listOfFrames.Add(
+								(new CroppedBitmap(CurrentSpriteSheet_Image, new Int32Rect(
+									(int)animLayer.CurrentFrameProperties.CurrentAnimationFrame.Value
+										.GetDrawRectangle().X,
+									(int)animLayer.CurrentFrameProperties.CurrentAnimationFrame.Value
+										.GetDrawRectangle().Y,
+									(int)animLayer.CurrentFrameProperties.CurrentAnimationFrame.Value
+										.GetDrawRectangle().Width,
+									(int)animLayer.CurrentFrameProperties.CurrentAnimationFrame.Value
+										.GetDrawRectangle().Height
+								))));
+							animLayer.CurrentFrameProperties.CurrentAnimationFrame = animLayer.CurrentFrameProperties.CurrentAnimationFrame.Next;
+						}
+						CurrentSelectedAnimImages_List.Add(listOfFrames);
+
+						AnimationStateProperties_ItemsControl.ItemsSource = animationState.Connections;
+
+						CurrentActiveAnimationName_TB.Text = animationState.StateName;
+						CurrentActiveAnimationFPS_TB.Text = animationState.FPS.ToString();
+						CurrentActiveAnimationCurrentFrame_TB.Text = "1";
+						CurrentBaseLayerAnimation_Img.Tag = 1;
+						CurrentlySelectedAnimationState = animationState;
+					}
 				}
+				else if (tvtemp.SelectedItem is AnimationLayer animationLayer)
+				{
+					ControlTemplate currentObjectTemplate = (ControlTemplate)this.Resources["AnimationEditorProperties_Template"];
+					Grid stateGrid = (Grid)currentObjectTemplate.FindName("AnimationEditorProperties_State_Grid", ObjectProperties_Control);
+					Grid LayerGrid = (Grid)currentObjectTemplate.FindName("AnimationEditorProperties_Layer_Grid", ObjectProperties_Control);
+					Grid animationGrid = (Grid)currentObjectTemplate.FindName("AnimationEditorProperties_Animation_Grid", ObjectProperties_Control);
 
-				AnimationSubLayer_CB.ItemsSource = item.AnimationLayers;
-				//foreach (var namesOfSubLayer in item.NamesOfSubLayers)
-				//{
-				//	AnimationSubLayer_CB.Items.Add(namesOfSubLayer);
-				//}
+					TextBlock stateNameTextBlock = (TextBlock)currentObjectTemplate.FindName("LayerName_TB", ObjectProperties_Control);
+					AnimationLayerProperties_ItemsControl.ItemsSource = animationLayer.ReferenceSpriteSheets;
+					stateNameTextBlock.Text = animationLayer.AnimationLayerName;
+					stateGrid.Visibility = Visibility.Hidden;
+					LayerGrid.Visibility = Visibility.Visible;
+					animationGrid.Visibility = Visibility.Hidden;
 
-				CurrentActiveAnimationName_TB.Text = item.StateName;
-				CurrentActiveAnimationFPS_TB.Text = item.FPS.ToString();
-				CurrentActiveAnimationCurrentFrame_TB.Text = "1";
-				CurrentBaseLayerAnimation_Img.Tag = 1;
-				CurrentlySelectedAnimationState = item;
+
+					AnimationStateProperties_ItemsControl.ItemsSource = animationLayer.CurrentFrameProperties.AnimationEvents;
+
+				}
+				else if (tvtemp.SelectedItem is Animation animation)
+				{
+					ControlTemplate currentObjectTemplate = (ControlTemplate)this.Resources["AnimationEditorProperties_Template"];
+					Grid stateGrid = (Grid)currentObjectTemplate.FindName("AnimationEditorProperties_State_Grid", ObjectProperties_Control);
+					Grid LayerGrid = (Grid)currentObjectTemplate.FindName("AnimationEditorProperties_Layer_Grid", ObjectProperties_Control);
+					Grid animationGrid = (Grid)currentObjectTemplate.FindName("AnimationEditorProperties_Animation_Grid", ObjectProperties_Control);
+
+					TextBlock stateNameTextBlock = (TextBlock)currentObjectTemplate.FindName("AnimationName_TB", ObjectProperties_Control);
+					ComboBox spriteSheets = (ComboBox)currentObjectTemplate.FindName("PossibleSpriteSheets_CB", ObjectProperties_Control);
+					spriteSheets.ItemsSource = animation.ParentAnimationLayer.ReferenceSpriteSheets;
+					stateNameTextBlock.Text = animation.AnimationName;
+					stateGrid.Visibility = Visibility.Hidden;
+					LayerGrid.Visibility = Visibility.Hidden;
+					animationGrid.Visibility = Visibility.Visible;
+					spriteSheets.UpdateLayout();
+
+				}
 			}
 
 			if (!AnimationSelected_Stopwatch.IsRunning)
 				AnimationSelected_Stopwatch.Start();
 
-			AnimationChangeEvents_Properties_Tree.ItemsSource = null;
-			AnimationAudioEvents_Properties_Tree.ItemsSource = null;
 
-			//AnimationChangeEvents_Properties_Tree.ItemsSource =
+			//AnimationChangeEvents_Properties_ItemsControl.ItemsSource =
 			//	CurrentlySelectedAnimationState.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent);
 			//AnimationAudioEvents_Properties_Tree.ItemsSource =
 			//	CurrentlySelectedAnimationState.GetAnimationEvents().FindAll(x => x is AudioEvent);
@@ -1528,38 +1599,98 @@ namespace AmethystEngine.Forms
 
 		private void TestingAnimProperties_BTN_Click(object sender, RoutedEventArgs e)
 		{
-			//AnimationChangeEvents_Properties_Tree.ItemsSource = null;
+			//AnimationChangeEvents_Properties_ItemsControl.ItemsSource = null;
 
 			//List<ChangeAnimationEvent> testing = new List<ChangeAnimationEvent>();
 
 			//testing.Add(new ChangeAnimationEvent("This guy", "other dude", true));
 
-			//AnimationChangeEvents_Properties_Tree.Items.Add(testing[0]);
+			//AnimationChangeEvents_Properties_ItemsControl.Items.Add(testing[0]);
 
 
-			//AnimationChangeEvents_Properties_Tree.UpdateLayout();
+			//AnimationChangeEvents_Properties_ItemsControl.UpdateLayout();
 		}
 
-		private void AddNewAnimationChangeEvent_BTN_Click(object sender, RoutedEventArgs e)
+		private void AddNewStateConnection_BTN_Click(object sender, RoutedEventArgs e)
 		{
-			//if (CurrentlySelectedAnimationState == null || CurrentAnimationStateMachine == null) return;
+			if (CurrentlySelectedAnimationState == null || CurrentAnimationStateMachine == null) return;
+			if (!(Animation_CE_Tree.SelectedItem is AnimationState)) return;
 
-			//AnimationChangeEvents_Properties_Tree.ItemsSource = null;
-			//CurrentlySelectedAnimationState.AddAnimationEvents(
-			//	new ChangeAnimationEvent(CurrentlySelectedAnimationState.Name, "NONE", true));
-			//AnimationChangeEvents_Properties_Tree.ItemsSource =
-			//	CurrentlySelectedAnimationState.GetAnimationEvents().FindAll(x => x is ChangeAnimationEvent);
+			ControlTemplate currentObjectTemplate = (ControlTemplate)this.Resources["AnimationEditorProperties_Template"];
+			ComboBox destinationComboBox = (ComboBox)currentObjectTemplate.FindName("AnimationStateDestination_CB", ObjectProperties_Control);
+			// destinationComboBox.ItemsSource = CurrentAnimationStateMachine.States.Values;
+
+			//int index = CurrentlySelectedAnimationState.AnimationLayers.IndexOf(Animation_CE_Tree.SelectedItem as AnimationState);
+			AnimationStateProperties_ItemsControl.ItemsSource = null;
+			CurrentlySelectedAnimationState.Connections.Add(
+				new AnimationStateConnections(){ OriginAnimationState = CurrentlySelectedAnimationState});
+			AnimationStateProperties_ItemsControl.ItemsSource = CurrentlySelectedAnimationState.Connections; //.FindAll;(x => x is ChangeAnimationStateEvent);
+		}
+
+		private void AddNewLayerLinkedSpriteSheetFile_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			if (AnimationLayerProperties_ItemsControl == null || CurrentAnimationStateMachine == null) return;
+			if (!(Animation_CE_Tree.SelectedItem is AnimationLayer)) return;
+
+			List<SpriteSheet> spriteSheetsFromNewStateMachine = new List<SpriteSheet>();
+			AnimationStateMachine newStateMachine = GetAnimationStateMachineFromFile(out spriteSheetsFromNewStateMachine);
+
+			if (newStateMachine != null)
+			{
+				AnimationLayerProperties_ItemsControl.ItemsSource = null;
+
+				foreach (SpriteSheet spriteSheet in spriteSheetsFromNewStateMachine)
+				{
+					if ((Animation_CE_Tree.SelectedItem as AnimationLayer).ReferenceSpriteSheets.ToList()
+						.FindIndex(x => x.SpriteSheetPath == spriteSheet.SpriteSheetPath) == -1)
+					{
+						// ONLY ADD THE SPRITESHEETS WE NEED NO DUPLICATES
+						(Animation_CE_Tree.SelectedItem as AnimationLayer).ReferenceSpriteSheets.Add(
+							new SpriteSheet() { SpriteSheetPath = spriteSheet.SpriteSheetPath });
+					}
+				}
+
+				//(Animation_CE_Tree.SelectedItem as AnimationLayer).ReferenceSpriteSheets.Add(newStateMachine.States.First().Value.);
+				AnimationLayerProperties_ItemsControl.ItemsSource = (Animation_CE_Tree.SelectedItem as AnimationLayer).ReferenceSpriteSheets;
+			}
 		}
 
 		private void AddAnimationAudioEvent_BTN_Click(object sender, RoutedEventArgs e)
 		{
-			//if (CurrentlySelectedAnimationState == null || CurrentAnimationStateMachine == null) return;
+			if (CurrentlySelectedAnimationState == null || CurrentAnimationStateMachine == null) return;
+			if (!(Animation_CE_Tree.SelectedItem is AnimationLayer)) return;
 
-			//AnimationAudioEvents_Properties_Tree.ItemsSource = null;
-			////CurrentAudioEvent_List.Add(new SoundEffectAnimationEvent(0, 0, "None"));
-			//CurrentlySelectedAnimationState.AddAnimationEvents(new AudioEvent(0, 0, "None"));
-			//AnimationAudioEvents_Properties_Tree.ItemsSource = CurrentlySelectedAnimationState.GetAnimationEvents()
-			//	.FindAll(x => x is AudioEvent);
+			AnimationStateMachine newStateMachine = GetAnimationStateMachineFromFile();
+
+			if (newStateMachine != null)
+			{
+
+				int index = CurrentlySelectedAnimationState.AnimationLayers.IndexOf(Animation_CE_Tree.SelectedItem as AnimationLayer);
+
+				AnimationStateProperties_ItemsControl.ItemsSource = null;
+				//CurrentAudioEvent_List.Add(new SoundEffectAnimationEvent(0, 0, "None"));
+				CurrentlySelectedAnimationState.AnimationLayers[index].CurrentFrameProperties.AnimationEvents.Add( new AnimationAudioEvent (false, 0, 0, "None"));
+				AnimationStateProperties_ItemsControl.ItemsSource = CurrentlySelectedAnimationState.AnimationLayers[index]
+					.CurrentFrameProperties.AnimationEvents;
+				//.FindAll(x => x is AnimationAudioEvent);
+			}
+		}
+
+
+		private void AnimationStateDestination_CB_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (sender is ComboBox comboBox)
+			{
+				if (comboBox.DataContext is AnimationStateConnections connection)
+				{
+					int index = CurrentAnimationStateMachine.States.Values.ToList().IndexOf(connection.OriginAnimationState);
+					if (index >= 0)
+					{
+						connection.DestinationAnimationState = CurrentAnimationStateMachine.States[connection.OriginAnimationState.StateName];
+					}
+				}
+			}
+
 		}
 
 		private void AnimationAudioEvent_TB_KeyUp(object sender, KeyEventArgs e)
@@ -2015,5 +2146,405 @@ namespace AmethystEngine.Forms
 		}
 
 
+		private void AddAnimationToLayer_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			if (sender is Button)
+			{
+				// We need to play WPF games... aka find the template, and then with that find the acutal control (treeview)
+				ControlTemplate spriteSheeControlTemplate = (ControlTemplate)this.Resources["AnimationEditorObjects_Template"];
+				TreeView spritesheetTreeView =
+					(TreeView)spriteSheeControlTemplate.FindName("AnimationEditor_CE_TV", ContentLibrary_Control);
+				TreeViewItem tvi = FindParentTreeViewItem(sender as Button);
+
+				if (tvi.DataContext is AnimationLayer animationLayer)
+				{
+					var oldItemsSource = spritesheetTreeView.ItemsSource;
+					spritesheetTreeView.ItemsSource = null;
+
+					int newNumber = animationLayer.PossibleAnimationsForThisLayer.Count;
+					String animationName = String.Format("Animation_{0}:", newNumber);
+					animationLayer.PossibleAnimationsForThisLayer.Add(animationName, new Animation(animationLayer,animationName));
+
+					spritesheetTreeView.ItemsSource = CurrentAnimationStateMachine.States.Values;
+				}
+			}
+		}
+
+		private void RemoveAnimationFromLayer_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			if (sender is Button)
+			{
+				// We need to play WPF games... aka find the template, and then with that find the acutal control (treeview)
+				ControlTemplate spriteSheeControlTemplate = (ControlTemplate)this.Resources["AnimationEditorObjects_Template"];
+				TreeView spritesheetTreeView =
+					(TreeView)spriteSheeControlTemplate.FindName("AnimationEditor_CE_TV", ContentLibrary_Control);
+				TreeViewItem tvi = FindParentTreeViewItem(sender as Button);
+
+
+				if (tvi.DataContext is Animation animation)
+				{
+					var oldItemsSource = spritesheetTreeView.ItemsSource;
+					spritesheetTreeView.ItemsSource = null;
+					//animation.PossibleAnimationsForThisLayer.Remove();
+
+					Console.WriteLine("REMOVE ANIMATION FROM LAYER NOT IMPLEMENTED YET");
+
+					spritesheetTreeView.ItemsSource = CurrentAnimationStateMachine.States.Values;
+				}
+			}
+		}
+
+		private AnimationStateMachine GetAnimationStateMachineFromFile(out List<SpriteSheet> outputSpriteSheets)
+		{
+			AnimationStateMachine returnAnimationStateMachine = null;
+			outputSpriteSheets = new List<SpriteSheet>();
+			String filename = "";
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+			{
+				FileName = "SpriteSheet", //default file 
+				DefaultExt = "*.spritesheet", //default file extension
+				Filter = "spritesheet (*.spritesheet)|*.spritesheet" //filter files by extension
+			};
+
+			// Show save file dialog box
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results kicks out if the user doesn't select an item.
+			filename = "";
+			if (result == true)
+				filename = dlg.FileName;
+			else
+				return null;
+
+			Console.WriteLine(filename);
+
+			if (File.Exists(filename))
+			{
+				// Now that we have a valid file path we need to turn the "canvas spritesheet" into Animation State Machine Object
+				CanvasSpritesheet importedCanvasSpritesheet = CanvasSpritesheet.ImportSpriteSheet(filename);
+				returnAnimationStateMachine = new AnimationStateMachine();
+
+
+				NewAnimimationStatemachineFileName = importedCanvasSpritesheet.Name;
+				NewAnimimationStatemachineLocation = importedCanvasSpritesheet.ImagePath;
+				NewAnimimationStatemachineTotalWidth = importedCanvasSpritesheet.Width;
+				NewAnimimationStatemachineTotalHeight = importedCanvasSpritesheet.Height;
+
+				foreach (CanvasAnimation canvasAnimation in importedCanvasSpritesheet.AllAnimationOnSheet)
+				{
+					AnimationState newAnimationState = new AnimationState(returnAnimationStateMachine);
+					newAnimationState.StateName = canvasAnimation.AnimName;
+					newAnimationState.NumOfFrames = (int)canvasAnimation.NumOfFrames;
+
+					// An animation can have many layers. so we need to add those.
+					// The <= is because of the base layer counts too
+					for (int i = 0; i <= canvasAnimation.NamesOfSubLayers.Count; i++)
+					{
+						// Why? because there's always a base layer. other than that is the named layers
+						if (i == 0)
+						{
+							newAnimationState.AnimationLayers.Add(new AnimationLayer(newAnimationState, "base_layer"));
+
+							// Create the animation so we can link to it
+							newAnimationState.AnimationLayers.First().PossibleAnimationsForThisLayer.Add(
+								canvasAnimation.AnimName, new Animation(newAnimationState.AnimationLayers.First(), canvasAnimation.AnimName));
+							newAnimationState.AnimationLayers.Last().CurrentLayerInformationName = canvasAnimation.AnimName;
+
+						}
+						else
+						{
+							newAnimationState.AnimationLayers.Add(new AnimationLayer(newAnimationState,
+								canvasAnimation.NamesOfSubLayers[i - 1]));
+
+							// Create the animation so we can link to it
+							newAnimationState.AnimationLayers.Last().PossibleAnimationsForThisLayer.Add(
+								"default", new Animation(newAnimationState.AnimationLayers.Last(),"default"));
+							newAnimationState.AnimationLayers.Last().CurrentLayerInformationName = "default";
+						}
+					}
+
+					// Each animation layer has a set of frames
+					foreach (CanvasImageProperties imageProperties in canvasAnimation.CanvasFrames)
+					{
+						// First add the frame for the 
+						AnimationFrameInfo frameInfo = new AnimationFrameInfo();
+						Microsoft.Xna.Framework.Rectangle drawRectangle =
+							new Microsoft.Xna.Framework.Rectangle(imageProperties.X, imageProperties.Y, imageProperties.W,
+								imageProperties.H);
+						frameInfo.SetRectangle(drawRectangle);
+						frameInfo.RenderPointOffsetX = imageProperties.RX;
+						frameInfo.RenderPointOffsetY = imageProperties.RY;
+
+						// we need to add the sprite sheet reference 
+						newAnimationState.AnimationLayers.First().CurrentFrameProperties.AddFrame(frameInfo);
+						if (newAnimationState.AnimationLayers.First().ReferenceSpriteSheets.ToList()
+							.FindIndex(x => x.SpriteSheetPath == importedCanvasSpritesheet.ImagePath) == -1)
+						{
+							// ONLY ADD THE SPRITESHEETS WE NEED NO DUPLICATES
+							newAnimationState.AnimationLayers.First().ReferenceSpriteSheets.Add(new SpriteSheet()
+								{ SpriteSheetPath = importedCanvasSpritesheet.ImagePath });
+						}
+
+						// Save spritesheet for the output
+						outputSpriteSheets.Add(newAnimationState.AnimationLayers.First().ReferenceSpriteSheets.Last());
+
+						// Set the animation index
+						newAnimationState.AnimationLayers.First().CurrentFrameProperties.ReferenceSpritesheetIndex = 0;
+
+
+						// We need to set the sublayer animation render points based on base the animation.
+						for (int j = 0; j < imageProperties.SubLayerPoints.Count; j++)
+						{
+							AnimationFrameInfo subframeInfo = new AnimationFrameInfo();
+
+							subframeInfo.RenderPointOffsetX = imageProperties.RX;
+							subframeInfo.RenderPointOffsetY = imageProperties.RY;
+							newAnimationState.AnimationLayers[1 + j].CurrentFrameProperties.AddFrame(subframeInfo);
+
+							if (newAnimationState.AnimationLayers[1 + j].ReferenceSpriteSheet == null)
+							{
+								if (newAnimationState.AnimationLayers.First().ReferenceSpriteSheets.ToList()
+									.FindIndex(x => x.SpriteSheetPath == importedCanvasSpritesheet.ImagePath) == -1)
+								{
+									// ONLY ADD THE SPRITESHEETS WE NEED NO DUPLICATES
+									newAnimationState.AnimationLayers[1 + j].ReferenceSpriteSheets.Add(new SpriteSheet()
+										{ SpriteSheetPath = importedCanvasSpritesheet.ImagePath });
+								}
+
+								// Set the animation index
+								newAnimationState.AnimationLayers[1 + j].CurrentFrameProperties.ReferenceSpritesheetIndex = 0;
+
+							}
+						}
+					}
+
+					returnAnimationStateMachine.States.Add(canvasAnimation.AnimName, newAnimationState);
+				}
+			}
+
+			return returnAnimationStateMachine;
+		}
+
+
+		private AnimationStateMachine GetAnimationStateMachineFromFile(String importPath = "")
+		{
+			AnimationStateMachine returnAnimationStateMachine = null;
+			String filename = "";
+			if(importPath == "")
+			{
+				Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+				{
+					FileName = "SpriteSheet", //default file 
+					DefaultExt = "*.spritesheet", //default file extension
+					Filter = "spritesheet (*.spritesheet)|*.spritesheet" //filter files by extension
+				};
+
+				// Show save file dialog box
+				Nullable<bool> result = dlg.ShowDialog();
+				// Process save file dialog box results kicks out if the user doesn't select an item.
+				filename = "";
+				if (result == true)
+					filename = dlg.FileName;
+				else
+					return null;
+
+				Console.WriteLine(filename);
+			}
+			else
+			{
+				filename = importPath;
+			}
+			if (File.Exists(filename))
+			{
+				// Now that we have a valid file path we need to turn the "canvas spritesheet" into Animation State Machine Object
+				CanvasSpritesheet importedCanvasSpritesheet = CanvasSpritesheet.ImportSpriteSheet(filename);
+				returnAnimationStateMachine = new AnimationStateMachine();
+
+
+				NewAnimimationStatemachineFileName = importedCanvasSpritesheet.Name;
+				NewAnimimationStatemachineLocation = importedCanvasSpritesheet.ImagePath;
+				NewAnimimationStatemachineTotalWidth = importedCanvasSpritesheet.Width;
+				NewAnimimationStatemachineTotalHeight = importedCanvasSpritesheet.Height;
+
+				foreach (CanvasAnimation canvasAnimation in importedCanvasSpritesheet.AllAnimationOnSheet)
+				{
+					AnimationState newAnimationState = new AnimationState(returnAnimationStateMachine);
+					newAnimationState.StateName = canvasAnimation.AnimName;
+					newAnimationState.NumOfFrames = (int) canvasAnimation.NumOfFrames;
+
+					// An animation can have many layers. so we need to add those.
+					// The <= is because of the base layer counts too
+					for (int i = 0; i <= canvasAnimation.NamesOfSubLayers.Count; i++)
+					{
+						// Why? because there's always a base layer. other than that is the named layers
+						if (i == 0)
+						{
+							newAnimationState.AnimationLayers.Add(new AnimationLayer(newAnimationState, "base_layer"));
+
+							// Create the animation so we can link to it
+							newAnimationState.AnimationLayers.First().PossibleAnimationsForThisLayer.Add(
+								canvasAnimation.AnimName, new Animation(newAnimationState.AnimationLayers.First(), canvasAnimation.AnimName));
+							newAnimationState.AnimationLayers.Last().CurrentLayerInformationName = canvasAnimation.AnimName;
+
+						}
+						else
+						{
+							newAnimationState.AnimationLayers.Add(new AnimationLayer(newAnimationState,
+								canvasAnimation.NamesOfSubLayers[i - 1]));
+
+							// Create the animation so we can link to it
+							newAnimationState.AnimationLayers.Last().PossibleAnimationsForThisLayer.Add(
+								"default", new Animation(newAnimationState.AnimationLayers.Last(),"default"));
+							newAnimationState.AnimationLayers.Last().CurrentLayerInformationName = "default";
+						}
+					}
+
+					// Each animation layer has a set of frames
+					foreach (CanvasImageProperties imageProperties in canvasAnimation.CanvasFrames)
+					{
+						// First add the frame for the 
+						AnimationFrameInfo frameInfo = new AnimationFrameInfo();
+						Microsoft.Xna.Framework.Rectangle drawRectangle =
+							new Microsoft.Xna.Framework.Rectangle(imageProperties.X, imageProperties.Y, imageProperties.W,
+								imageProperties.H);
+						frameInfo.SetRectangle(drawRectangle);
+						frameInfo.RenderPointOffsetX = imageProperties.RX;
+						frameInfo.RenderPointOffsetY = imageProperties.RY;
+
+						// we need to add the sprite sheet reference 
+						newAnimationState.AnimationLayers.First().CurrentFrameProperties.AddFrame(frameInfo);
+						if (newAnimationState.AnimationLayers.First().ReferenceSpriteSheets.ToList()
+							.FindIndex(x => x.SpriteSheetPath == importedCanvasSpritesheet.ImagePath) == -1)
+						{
+							// ONLY ADD THE SPRITESHEETS WE NEED NO DUPLICATES
+							newAnimationState.AnimationLayers.First().ReferenceSpriteSheets.Add(new SpriteSheet()
+								{ SpriteSheetPath = importedCanvasSpritesheet.ImagePath });
+						}
+
+						// Set the animation index
+						newAnimationState.AnimationLayers.First().CurrentFrameProperties.ReferenceSpritesheetIndex = 0;
+
+						// We need to set the sublayer animation render points based on base the animation.
+						for (int j = 0; j < imageProperties.SubLayerPoints.Count; j++)
+						{
+							AnimationFrameInfo subframeInfo = new AnimationFrameInfo();
+
+							subframeInfo.OriginPointOffsetX = imageProperties.SubLayerPoints[j].RX;
+							subframeInfo.OriginPointOffsetY = imageProperties.SubLayerPoints[j].RY;
+
+							
+
+							newAnimationState.AnimationLayers[1 + j].CurrentFrameProperties.AddFrame(subframeInfo);
+
+							if (newAnimationState.AnimationLayers[1 + j].ReferenceSpriteSheet == null)
+							{
+								if (newAnimationState.AnimationLayers.First().ReferenceSpriteSheets.ToList()
+									.FindIndex(x => x.SpriteSheetPath == importedCanvasSpritesheet.ImagePath) == -1)
+								{
+									// ONLY ADD THE SPRITESHEETS WE NEED NO DUPLICATES
+									newAnimationState.AnimationLayers[1 + j].ReferenceSpriteSheets.Add(new SpriteSheet()
+										{ SpriteSheetPath = importedCanvasSpritesheet.ImagePath });
+								}
+
+								// Set the animation index
+								newAnimationState.AnimationLayers[1 + j].CurrentFrameProperties.ReferenceSpritesheetIndex = 0;
+
+							}
+						}
+					}
+
+					returnAnimationStateMachine.States.Add(canvasAnimation.AnimName, newAnimationState);
+				}
+			}
+
+			return returnAnimationStateMachine;
+		}
+
+		private void AnimationLayerPossibleAnimation_CB_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (sender is ComboBox comboBox)
+			{
+				if (comboBox.DataContext is AnimationState animationState)
+				{
+					// WHEN DEALING WITH ANIMATION LAYERS (NOT ON BASE)
+					// IT IS SAFE TO ASSUME A COUNT OF 1 LAYER
+					if (Animation_CE_Tree.SelectedItem is AnimationLayer animationLayer)
+					{
+						if(animationState.AnimationLayers.Count >= 1 && animationState.AnimationLayers[0].PossibleAnimationsForThisLayer.Count == 1)
+						{
+							animationLayer.PossibleAnimationsForThisLayer.Add(
+								string.Format("{0}_{1}", animationLayer.AnimationLayerName, animationState.StateName),
+								animationState.AnimationLayers[0].PossibleAnimationsForThisLayer.Values.First());
+
+							if (!animationLayer.ReferenceSpriteSheets.Contains(animationState.AnimationLayers[0].ReferenceSpriteSheet))
+							{
+								animationLayer.ReferenceSpriteSheets.Add(animationState.AnimationLayers[0].ReferenceSpriteSheet);
+							}
+
+						}
+					}
+				}
+			}
+
+		}
+
+		private void AnimationChooseSpriteSheets_CB_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (sender is ComboBox comboBox)
+			{
+				if (comboBox.SelectedItem != null && Animation_CE_Tree.SelectedItem is Animation animation)
+				{
+					SpriteSheet linkedSpriteSheet = animation.ParentAnimationLayer.ReferenceSpriteSheets[comboBox.SelectedIndex];
+					AnimationStateMachine newStateMachine = GetAnimationStateMachineFromFile(linkedSpriteSheet.
+						SpriteSheetPath.Replace(".png", ".spritesheet"));
+
+					ControlTemplate currentObjectTemplate = (ControlTemplate)this.Resources["AnimationEditorProperties_Template"];
+					ComboBox spriteSheets = (ComboBox)currentObjectTemplate.FindName("AnimationSet_CB", ObjectProperties_Control);
+					spriteSheets.ItemsSource = newStateMachine.States.Values;
+				}
+			}
+		}
+
+		private void AnimationSetSpriteSheetAndAnimation_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+
+			if (sender is ComboBox comboBox)
+			{
+				if (comboBox.SelectedItem is AnimationState animationState && Animation_CE_Tree.SelectedItem is Animation animation)
+				{
+					// We have chose an animation to set. so let's do that.
+					animation.ReferenceSpritesheetIndex = comboBox.SelectedIndex;
+					animation.AnimationName = String.Format("{0}_{1}", animation.ParentAnimationLayer.AnimationLayerName, animationState.StateName);
+
+					// NOTE: by this point the animation ONLY has render points set. we need to set everything else
+					LinkedListNode<AnimationFrameInfo> currenttNodeOriginal = animation.GetFirstFrame();
+					LinkedListNode<AnimationFrameInfo> currenttNodeToCopy = animationState.AnimationLayers[0].CurrentFrameProperties.GetFirstFrame();
+					while (currenttNodeOriginal != null && currenttNodeToCopy != null)
+					{
+
+						// TODO: Fix the render point override problem...
+
+						currenttNodeOriginal.Value.SetRectangle(
+							new Microsoft.Xna.Framework.Rectangle(currenttNodeToCopy.Value.GetDrawRectangle().Left,
+								currenttNodeToCopy.Value.GetDrawRectangle().Top,
+								currenttNodeToCopy.Value.GetDrawRectangle().Width,
+								currenttNodeToCopy.Value.GetDrawRectangle().Height));
+						currenttNodeOriginal.Value.RenderPointOffsetX = currenttNodeToCopy.Value.RenderPointOffsetX;
+						currenttNodeOriginal.Value.RenderPointOffsetY = currenttNodeToCopy.Value.RenderPointOffsetY;
+
+
+						currenttNodeOriginal = currenttNodeOriginal.Next;
+						currenttNodeToCopy = currenttNodeToCopy.Next;
+					}
+
+
+				}
+				else
+				{
+					comboBox.SelectedIndex = -1;
+				}
+			}
+
+
+		}
 	}
 }

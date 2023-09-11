@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.RightsManagement;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -99,6 +100,11 @@ namespace BixBite.Rendering.Animation
 
 		#region methods
 
+		public bool AttemptToAddAnimationEvent(AnimationEvent animationEvent)
+		{
+			return (this.CurrentState != null && this.CurrentState.AttemptToAddAnimationEvent(animationEvent));
+		}
+
 		public void SetScreenPosition(int? x, int? y)
 		{
 			if (x != null)
@@ -110,20 +116,25 @@ namespace BixBite.Rendering.Animation
 		public bool ChangeAnimation(String nextDesiredAnimationState)
 		{
 			bool returnStatus = false;
-			if (CurrentState.Connections.ContainsKey(nextDesiredAnimationState))
+			if (CurrentState.Connections.Count > 0)
 			{
 				// we have the connection but do we need to wait to change it?
-				if (CurrentState.Connections[nextDesiredAnimationState].bIsForceFinish)
+				AnimationStateConnections desiredConnection =
+					CurrentState.Connections.Find(x => x.DestinationAnimationState.StateName == nextDesiredAnimationState);
+				if(desiredConnection != null)
 				{
-					// We will be queuing up the animation state.
-					CurrentState.bIsAnimationQueued = true;
-					CurrentState.NextState = CurrentState.Connections[nextDesiredAnimationState].DestinationAnimationState;
-					returnStatus = true;
-				}
-				else
-				{
-					this.CurrentState = CurrentState.Connections[nextDesiredAnimationState].DestinationAnimationState;
-					returnStatus = true;
+					if (desiredConnection.bIsForceFinish)
+					{
+						// We will be queuing up the animation state.
+						CurrentState.bIsAnimationQueued = true;
+						CurrentState.NextState = desiredConnection.DestinationAnimationState;
+						returnStatus = true;
+					}
+					else
+					{
+						this.CurrentState = desiredConnection.DestinationAnimationState;
+						returnStatus = true;
+					}
 				}
 			}
 			return returnStatus;

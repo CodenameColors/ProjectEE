@@ -196,9 +196,9 @@
     <Compile Include="Components\Bixbite_Windows_Build\Particles\PBoxEmitter.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Particles\PEmitter.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Projectiles\projectile.cs" />
-    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\Animation.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationEvent.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationFrameInfo.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationLayer.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationState.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationStateConnections.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Rendering\Animation\AnimationStateMachine.cs" />
@@ -266,6 +266,7 @@
     <Compile Include="Components\DialogueScene.cs" />
     <Compile Include="Components\PropertyBag.cs" />
     <Compile Include="Components\Tools\Cuprite.cs" />
+    <Compile Include="Converters\EndOfPathConverter.cs" />
     <Compile Include="DesignerItemDecorator.cs" />
     <Compile Include="Forms\AddCharacterForm.xaml.cs">
       <DependentUpon>AddCharacterForm.xaml</DependentUpon>

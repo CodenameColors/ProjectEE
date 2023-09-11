@@ -14,10 +14,10 @@ namespace BixBite.Rendering.Animation
 
 		#region Properties
 
-		public AnimationState OriginAnimationState;
-		public AnimationState DestinationAnimationState;
-		public bool bIsForceFinish = false;
-		public float StateChangeThreshold;
+		public AnimationState OriginAnimationState {get;set;}
+		public AnimationState DestinationAnimationState {get;set;}
+		public bool bIsForceFinish {get;set;}
+		public float StateChangeThreshold {get; set;}
 
 		#endregion
 
