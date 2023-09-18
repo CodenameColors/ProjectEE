@@ -192,7 +192,7 @@ namespace BixBite.Rendering
 				}
 				else
 				{
-					Console.WriteLine("Others... Saved should be enabled= false...");
+					Console.WriteLine(@"Others... Saved should be enabled= false...");
 				}
 
 
@@ -256,7 +256,7 @@ namespace BixBite.Rendering
 				if(((Array)LayerObjects).GetLength(0) >= xcell && ((Array)LayerObjects).GetLength(1) >= ycell)
 					((Array)LayerObjects).SetValue(tiledata, xcell, ycell);
 			}
-			else Console.WriteLine("Invalid defined Layerobject type. Not a List of Tiles");
+			else Console.WriteLine(@"Invalid defined Layerobject type. Not a List of Tiles");
 			return;
 		}
 	
@@ -268,7 +268,7 @@ namespace BixBite.Rendering
 			if (layerType == LayerType.Sprite) {
 				if (LayerObjects is List<Sprite>)
 					((List<Sprite>)LayerObjects).Add(new Sprite(SpriteName, imglogc, x, y, w, h));
-				else Console.WriteLine("incorrect layer type!");
+				else Console.WriteLine(@"incorrect layer type!");
 			return;
 			}
 		}
@@ -281,7 +281,7 @@ namespace BixBite.Rendering
 			{
 				if (LayerObjects is List<Sprite>)
 					((List<Sprite>)LayerObjects).Add(s);
-				else Console.WriteLine("incorrect layer type!");
+				else Console.WriteLine(@"incorrect layer type!");
 				return;
 			}
 			SetProperty("#LayerObjects", (int)(GetPropertyData("#LayerObjects")));
