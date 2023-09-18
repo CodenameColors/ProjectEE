@@ -669,7 +669,7 @@ namespace BixBite
 							writer.WriteAttributeString(null, "Ind", null, ind.ToString());
 					}
 					if(ind == -1)
-						Console.WriteLine(@"Incorrect!! No node found during saving.");
+						Console.WriteLine("Incorrect!! No node found during saving.");
 					writer.WriteEndElement(); //end of the Connection Tag
 					writer.WriteEndElement(); //end of the EntryNode Tag
 				}
@@ -806,7 +806,7 @@ namespace BixBite
 						writer.WriteEndElement(); //end of the Sprite Tag
 
 					}
-					else Console.WriteLine(@"No Sprite Data found for this dialogue block!!!");
+					else Console.WriteLine("No Sprite Data found for this dialogue block!!!");
 
 					//DialogueChoice
 					writer.WriteStartElement(null, "DialogueText", null);

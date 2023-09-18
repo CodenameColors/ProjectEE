@@ -172,11 +172,11 @@
 					</Grid.ColumnDefinitions>
 
 					<Menu DockPanel.Dock="Top" Grid.Column="0" Background="Transparent" Foreground="White" VerticalAlignment="Top" Margin="0,4,0,3" Height="18">
-						<MenuItem Header="Sprite Sheet" Foreground="White">
+						<MenuItem Header="State Machine" Foreground="White">
 							<MenuItem x:Name="NewSpriteSheetMachine_MenuItem" Header="New Sprite Sheet Machine" Foreground="Black" Click="NewSpriteSheetMachine_MenuItem_OnClick"/>
 							<MenuItem Header="Open Sprite sheet Machine file" Foreground="Black" Click="OpenSpriteSheetFile_MI_Click"/>
-							<MenuItem Header="Open Layered Sprite sheet file" Foreground="Black" Click="OpenLayeredSpriteSheetFile_MI_Click"/>
-							<MenuItem x:Name="SaveSpriteSheet_MI" Header="Save Sprite sheet Machine file" Foreground="Black"/>
+							<MenuItem Header="Open Animation State Machine File" Foreground="Black" Click="OpenAnimationStateMachineFile_MI_Click"/>
+							<MenuItem x:Name="SaveSpriteSheet_MI" Header="Save State Machine" Foreground="Black" Click="SaveAnimationStateMachine_MI_Click"/>
 							<MenuItem x:Name="SaveSpriteSheetAs_MI" Header="Save Sprite sheet Machine file As" Foreground="Black" Click="SaveSpriteSheetFileAs_MI_Click" />
 						</MenuItem>
 						<MenuItem Header="Test layers" Grid.Column="1" Foreground="White" Click="AnimTestLayer_BTN_Click"/>
@@ -437,6 +437,7 @@
 											<TextBlock Grid.Row="3" Grid.Column="1" Text="Destination :" Foreground="White"  VerticalAlignment="Center" />
 											<ComboBox x:Name="AnimationStateDestination_CB" Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="4" VerticalContentAlignment="Center" Margin="0,0,5,0" 
 											          ItemsSource="{Binding Path=OriginAnimationState.Parent.ObservableAnimationStates }"
+																SelectedValue="{Binding Path=DestinationAnimationState, Mode=OneWay}"
 											          SelectionChanged="AnimationStateDestination_CB_OnSelectionChanged">
 												<ComboBox.ItemTemplate>
 													<DataTemplate DataType="{x:Type BixAnim:AnimationState}">
@@ -1129,7 +1130,6 @@
 					          ItemsSource="{Binding SpritesheetAnimationDictionary}">
 
 						<TreeView.Resources>
-
 							<HierarchicalDataTemplate DataType="{x:Type comp:CanvasAnimation}" ItemsSource="{Binding Path=CanvasFrames}">
 								<Grid>
 									<Grid.RowDefinitions>
@@ -1188,7 +1188,7 @@
 												 ToolTip="{Binding ImageLocation}" 
 									       Source="{Binding ImageLocation}" MaxWidth="50" MaxHeight="50"/>
 									<TextBlock Grid.Row="0" Grid.Column="2" Background="#FF383838" KeyDown="SpritesheetCanvasFrame_KeyDown" Tag="x"
-										Text="{Binding ImageLocation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+										Text="{Binding ImageLocation, Converter={StaticResource EndOfPathConverter}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
 										ToolTip="{Binding ImageLocation, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
 										Foreground="White" />
 									<!--<TextBlock Grid.Row="0" Grid.ColumnSpan="10" Grid.Column="1"  Text="{Binding ImageLocation}" Foreground="White" />-->
@@ -1208,6 +1208,23 @@
 							<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
 							                 Color="Black" />
 						</TreeView.Resources>
+						<TreeView.ItemContainerStyle>
+							<Style TargetType="TreeViewItem">
+								<Style.Triggers>
+									<Trigger Property="IsSelected" Value="True" >
+										<Setter Property="FontWeight" Value="Bold" />
+										<Setter Property="FontStyle" Value="Italic" />
+
+										<Setter Property="Background" Value="LightBlue" />
+										<Setter Property="Foreground" Value="Black" />
+									</Trigger>
+								</Style.Triggers>
+								<Style.Resources>
+									<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+									<SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Transparent" />
+								</Style.Resources>
+							</Style>
+						</TreeView.ItemContainerStyle>
 					</TreeView>
 
 				</Grid>

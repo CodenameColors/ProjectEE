@@ -1151,6 +1151,8 @@ namespace AmethystEngine.Forms
 				{
 					// This is the Cross hair for the render point
 					(frame.LinkedBorderImage?.Child as Canvas).Children[1].Visibility = Visibility.Hidden;
+					((Border) frame.LinkedBorderImage).Visibility = Visibility.Visible;
+					((Border) frame.LinkedBorderImage).BorderThickness = new Thickness(0);
 
 					foreach (CanvasSubLayerPoint subLayerPoint in frame.SubLayerPoints)
 					{

@@ -445,7 +445,7 @@ namespace BixBite
 							{
 								if (!reader.IsEmptyElement)
 								{
-									Console.WriteLine("SpriteLayer");
+									Console.WriteLine(@"SpriteLayer");
 									String SLName = reader.GetAttribute("Name");
 									while (reader.Name.Trim() != "Sprite" || (reader.Name.Trim() == "Sprites" && reader.NodeType == XmlNodeType.EndElement)) //ignore whitespace
 										reader.Read();
@@ -482,7 +482,7 @@ namespace BixBite
 							//gameevent int[,]
 							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameEventsLayer")
 							{
-								Console.WriteLine("GameEventLayer");
+								Console.WriteLine(@"GameEventLayer");
 								TempLevel.AddLayer(reader.GetAttribute("Name"), LayerType.GameEvent);
 
 								while (reader.Name.Trim() != "Row") //ignore whitespace
@@ -525,7 +525,7 @@ namespace BixBite
 							while ((reader.NodeType != XmlNodeType.EndElement && reader.Name.Trim() == "GameEvents") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Event")) //loop through all the TileSets
 																																																																																										 //while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameEvents")
 							{
-								Console.WriteLine("GameEvents Found");
+								Console.WriteLine(@"GameEvents Found");
 								reader.Read();
 								reader.Read();
 
@@ -692,7 +692,7 @@ namespace BixBite
 							{
 								if (!reader.IsEmptyElement)
 								{
-									Console.WriteLine("SpriteLayer");
+									Console.WriteLine(@"SpriteLayer");
 									while (reader.Name.Trim() != "Sprite" || (reader.Name.Trim() == "Sprites" && reader.NodeType == XmlNodeType.EndElement)) //ignore whitespace
 										await reader.ReadAsync();
 
@@ -727,7 +727,7 @@ namespace BixBite
 							//gameevent int[,]
 							while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameEventsLayer")
 							{
-								Console.WriteLine("GameEventLayer");
+								Console.WriteLine(@"GameEventLayer");
 								TempLevel.AddLayer(reader.GetAttribute("Name"), LayerType.GameEvent);
 
 								while (reader.Name.Trim() != "Row") //ignore whitespace
@@ -772,7 +772,7 @@ namespace BixBite
 							while ((reader.NodeType != XmlNodeType.EndElement && reader.Name.Trim() == "GameEvents") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Event")) //loop through all the TileSets
 																																																																																										 //while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameEvents")
 							{
-								Console.WriteLine("GameEvents Found");
+								Console.WriteLine(@"GameEvents Found");
 								await reader.ReadAsync();
 								await reader.ReadAsync();
 

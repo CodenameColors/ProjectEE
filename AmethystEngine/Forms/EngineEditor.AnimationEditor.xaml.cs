@@ -183,7 +183,7 @@ namespace AmethystEngine.Forms
 		{
 
 			CurrentAnimationStateMachine = GetAnimationStateMachineFromFile();
-
+			if (CurrentAnimationStateMachine == null) return;
 
 			// Now at this point we should have a BASE state machine imported.
 
@@ -619,8 +619,6 @@ namespace AmethystEngine.Forms
 
 			bAllowImportAnimPreview = false;
 			AE_NewAnimStates_IC.ItemsSource = null;
-
-
 		}
 
 		/// <summary>
@@ -1448,6 +1446,11 @@ namespace AmethystEngine.Forms
 						}
 						CurrentSelectedAnimImages_List.Add(listOfFrames);
 
+						foreach (AnimationStateConnections connection in animationState.Connections)
+						{
+							
+						}
+
 						AnimationStateProperties_ItemsControl.ItemsSource = animationState.Connections;
 
 						CurrentActiveAnimationName_TB.Text = animationState.StateName;
@@ -1623,7 +1626,7 @@ namespace AmethystEngine.Forms
 			//int index = CurrentlySelectedAnimationState.AnimationLayers.IndexOf(Animation_CE_Tree.SelectedItem as AnimationState);
 			AnimationStateProperties_ItemsControl.ItemsSource = null;
 			CurrentlySelectedAnimationState.Connections.Add(
-				new AnimationStateConnections(){ OriginAnimationState = CurrentlySelectedAnimationState});
+				new AnimationStateConnections(CurrentlySelectedAnimationState) { OriginStateName = CurrentlySelectedAnimationState.StateName});
 			AnimationStateProperties_ItemsControl.ItemsSource = CurrentlySelectedAnimationState.Connections; //.FindAll;(x => x is ChangeAnimationStateEvent);
 		}
 
@@ -1683,10 +1686,11 @@ namespace AmethystEngine.Forms
 			{
 				if (comboBox.DataContext is AnimationStateConnections connection)
 				{
-					int index = CurrentAnimationStateMachine.States.Values.ToList().IndexOf(connection.OriginAnimationState);
-					if (index >= 0)
+					int originIndex = CurrentAnimationStateMachine.States.Values.ToList().IndexOf(connection.OriginAnimationState);
+					int index = comboBox.SelectedIndex;
+					if (index >= 0 && index != originIndex && comboBox.SelectedItem is AnimationState state)
 					{
-						connection.DestinationAnimationState = CurrentAnimationStateMachine.States[connection.OriginAnimationState.StateName];
+						connection.DestinationStateName = state.StateName;
 					}
 				}
 			}
@@ -2500,6 +2504,7 @@ namespace AmethystEngine.Forms
 					ControlTemplate currentObjectTemplate = (ControlTemplate)this.Resources["AnimationEditorProperties_Template"];
 					ComboBox spriteSheets = (ComboBox)currentObjectTemplate.FindName("AnimationSet_CB", ObjectProperties_Control);
 					spriteSheets.ItemsSource = newStateMachine.States.Values;
+					animation.ReferenceSpritesheetIndex = comboBox.SelectedIndex;
 				}
 			}
 		}
@@ -2512,7 +2517,6 @@ namespace AmethystEngine.Forms
 				if (comboBox.SelectedItem is AnimationState animationState && Animation_CE_Tree.SelectedItem is Animation animation)
 				{
 					// We have chose an animation to set. so let's do that.
-					animation.ReferenceSpritesheetIndex = comboBox.SelectedIndex;
 					animation.AnimationName = String.Format("{0}_{1}", animation.ParentAnimationLayer.AnimationLayerName, animationState.StateName);
 
 					// NOTE: by this point the animation ONLY has render points set. we need to set everything else
@@ -2543,6 +2547,157 @@ namespace AmethystEngine.Forms
 					comboBox.SelectedIndex = -1;
 				}
 			}
+
+
+		}
+
+		private void SaveAnimationStateMachine_MI_Click(object sender, RoutedEventArgs e)
+		{
+			Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
+			{
+				Title = "Save Animation State Machine",
+				FileName = "", //default file name
+				Filter = "Sprite Sheet (*.animachine)|*.animachine|All files (*.*)|*.*",
+				FilterIndex = 2,
+				InitialDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\Animations"),
+				RestoreDirectory = true
+			};
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
+			}
+			else return; //invalid name
+
+			Console.WriteLine(dlg.FileName);
+			Console.WriteLine("Saving Animation State Machine");
+
+			CurrentAnimationStateMachine.ExportAnimationStateMachine(dlg.FileName.Replace(".animachine", ""));
+
+		}
+
+		private void OpenAnimationStateMachineFile_MI_Click(object sender, RoutedEventArgs e)
+		{
+			// Get a new image file
+			Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+			{
+				Title = "Import Animation State Machine",
+				FileName = "", //default file name
+				Filter = "Sprite Sheet files (*.animachine)|*.animachine",
+				RestoreDirectory = true
+			};
+
+			Nullable<bool> result = dlg.ShowDialog();
+			// Process save file dialog box results
+			string filename = "";
+			if (result == true)
+			{
+				// Save document
+				filename = dlg.FileName;
+				// filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] {'/', '\\'}));
+			}
+			else return; //invalid name
+
+			Console.WriteLine(dlg.FileName);
+
+			AnimationStateMachine stateMachine = AnimationStateMachine.ImportAnimationStateMachine(dlg.FileName);
+
+			//We need to recreate the dictionary with the correct keys
+			List<AnimationState> tempsSpriteAnimationStates = stateMachine.States.Values.ToList();
+			CurrentAnimationStateMachine = stateMachine;
+			CurrentAnimationStateMachine.States.Clear();
+			//CurrentAnimationStateMachine.Width = NewAnimimationStatemachineTotalWidth;
+			//CurrentAnimationStateMachine.Height = NewAnimimationStatemachineTotalHeight;
+
+			ActiveAnimationStateMachines.Add(stateMachine);
+			SceneExplorer_TreeView.ItemsSource = ActiveAnimationStateMachines;
+
+			int count = 0;
+			foreach (var animationState in tempsSpriteAnimationStates)
+			{
+				// spriteanim.FrameDrawRects.Clear();
+				//for (int i = 0; i < spriteanim.FrameCount; i++)
+				//{
+				//	spriteanim.FrameDrawRects.AddLast(new Rect(
+				//		(int)spriteanim.CurrentFrameRect.Value.X,
+				//		(int)spriteanim.CurrentFrameRect.Value.Y,
+				//		(int)spriteanim.CurrentFrameRect.Value.Width,
+				//		(int)spriteanim.CurrentFrameRect.Value.Height
+				//		)
+				//	);
+
+				//}
+
+				CurrentAnimationStateMachine.States.Add(animationState.StateName, animationState);
+				//TreeView tempTV = (TreeView)ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control);
+				//tempTV.ItemsSource = CurrentAnimationStateMachine.States.Values;
+				//var vv = tempTV.ItemContainerGenerator.ContainerFromIndex(count++);
+
+				//(vv as TreeViewItem).ExpandSubtree();
+				//(vv as TreeViewItem).ApplyTemplate();
+				//var v = (vv as TreeViewItem).ItemTemplate.FindName("Thumbnail", (vv as TreeViewItem));
+
+				// We need to get the bitmap for the entire spritesheet we are using for the base layer.
+				Image img = new Image();
+				BitmapImage bmi = new BitmapImage();
+
+				bmi.BeginInit();
+				bmi.CacheOption = BitmapCacheOption.OnLoad;
+				bmi.UriSource = new Uri(animationState.AnimationLayers[0].ReferenceSpriteSheet.SpriteSheetPath, UriKind.Absolute);
+				bmi.EndInit();
+				CurrentSpriteSheet_Image = bmi;
+
+				// var v = FindElementByName<Image>((vv as TreeViewItem), "Thumbnail");
+
+
+				var crop = new CroppedBitmap(bmi, new Int32Rect(
+					(int)animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Value.GetDrawRectangle().X,
+					(int)animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Value.GetDrawRectangle().Y,
+					(int)animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Value.GetDrawRectangle().Width,
+					(int)animationState.AnimationLayers[0].CurrentFrameProperties.CurrentAnimationFrame.Value.GetDrawRectangle().Height
+				));
+				// using BitmapImage version to prove its created successfully
+				//(v as Image).Source = crop;
+
+				if (count == 1)
+				{
+					CurrentlySelectedAnimationState = animationState;
+				}
+
+				AnimationPreviewGridRenderPointX = (int)(AnimationEditor_BackCanvas.ActualWidth / 2.0f);
+				AnimationPreviewGridRenderPointY = (int)(AnimationEditor_BackCanvas.ActualHeight / 2.0f);
+
+			} // End of for loop for animation states
+
+			TreeView tempTV = (TreeView)ContentLibrary_Control.Template.FindName("AnimationEditor_CE_TV", ContentLibrary_Control);
+			tempTV.ItemsSource = CurrentAnimationStateMachine.States.Values;
+
+			//dummy binding force because 2 years ago me was DUMB
+			SceneExplorer_TreeView.ItemsSource = ActiveAnimationStateMachines;
+			_allowAnimationExporting = true;
+
+			//Reset the Animation Importer
+			_allowAnimationExporting = false;
+
+			AE_NewAnimSM_MainGrid.Visibility = Visibility.Hidden;
+			AE_CurrentAnimSM_Grid.Visibility = Visibility.Visible;
+
+			//Reset all the properties!
+			NewAnimimationStatemachineFileName = "";
+			NewAnimimationStatemachineLocation = "";
+			NewSpriteSheetCharacterName = "";
+			NewAnimimationStatemachineTotalWidth = -1;
+			NewAnimimationStatemachineTotalHeight = -1;
+			bNewAnimStateMachine = false;
+
+			bAllowImportAnimPreview = false;
+			AE_NewAnimStates_IC.ItemsSource = null;
+
 
 
 		}
