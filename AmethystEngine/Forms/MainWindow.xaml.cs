@@ -143,8 +143,8 @@ namespace AmethystEngine.Forms
       {
         EngineEditor f = new EngineEditor(TFiles[RecentProj_LB.SelectedIndex]);
         f.Show();
-        this.Hide();
-      }
+				this.Hide();
+			}
       else
       {
         MessageBox.Show("Click on a recent project!");

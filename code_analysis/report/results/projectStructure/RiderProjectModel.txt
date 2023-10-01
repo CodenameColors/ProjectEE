@@ -1,0 +1,1036 @@
+Project [Name:&, GUID:f300dc1b-e643-4ccb-80ee-a7f840b07500]
+  Child items:
+    ProjectFileImpl(Path : Monogame_AmethystEngine.sln)[]
+  Referenced projects:
+  Referenced assemblies:
+
+Project [Name:AmethystEngine, GUID:bcd504f8-6823-4816-a235-437271bfe14e]
+  CSharp Properties:
+    Active configuration for '.NETFramework,Version=v4.6.1':
+        AllowUnsafeCode:False
+        BaseAddress:4194304
+        CheckForOverflowUnderflow:False
+        FileAlignment:512
+        DebugSymbols:True
+        IncrementalBuild:True
+        WarningsAsErrors:
+        LanguageVersion:CSharp71
+        NullableContextKind:Disable
+        ImplicitUsingsKind:Disable
+        DefineConstants:DEBUG;TRACE
+        EnableUnmanagedCodeDebugging:False
+        GenerateSerializationAssemblies :False
+        RelativeIntermediateDirectory:obj/Debug/
+        Optimize:False
+        RegisterForCOMInterop:False
+        RemoveIntegerChecks:False
+        NoWarn:;1701;1702
+        TreatWarningsAsErrors:False
+        WarningLevel:4
+        DocumentationFile:
+        OutputType:WIN_EXE
+        StartupObject:
+        OutputAssemblyName:AmethystEngine
+        OutputAssemblyExtension:.exe
+        HasRunCommand:False
+      Name:Debug
+      RelativeOutputDirectory:bin/Debug/
+      RelativeIntermediateDirectory:obj/Debug/
+      Properties:AndroidUseManagedDesignTimeResourceGenerator=True, AssemblyName=AmethystEngine, BaseIntermediateOutputPath=obj/, CSharpCoreTargetsPath=/usr/share/dotnet/sdk/7.0.400/Roslyn/Microsoft.CSharp.Core.targets, LangVersion=7.1, MSBuildProjectExtensionsPath=/data/project/AmethystEngine/obj/, NoWarn=;1701;1702, OutputPath=bin/Debug/, PlatformTarget=AnyCPU, PreBuildEvent=python .\..\..\BuildScripts\NodeEditorCopyFiles.py py2exe
+      python .\..\..\BuildScripts\BixbiteCopyForAmetheystEngine.py py2exe
+      python .\..\..\BuildScripts\NodeEditorPatchFiles.py py2exe, ProduceReferenceAssembly=false, RootNamespace=AmethystEngine, RoslynTargetsPath=/usr/share/dotnet/sdk/7.0.400/Roslyn, TargetExt=.exe, TargetPath=/data/project/AmethystEngine/bin/Debug/AmethystEngine.exe
+    Build Settings:
+        PreBuildEvent:
+        PostBuildEvent:
+        ApplicationType:
+        DefaultNamespace:AmethystEngine
+        ImportedNamespaces:
+        RunPostBuildEventType:ALWAYS
+        IsBuildable:True
+        IsDeployable:False
+        Configuration:Debug
+        PlatformTarget:AnyCPU
+    ProjectTypeGuid:60dc8134-eba5-43b8-bcc9-bb4bc16c2548
+    ProjectTypeGuid:fae04ec0-301f-11d3-bf4b-00c04f79efbc
+  Child items:
+    ProjectFileImpl(Path : AmethystEngine.csproj)[]
+    ProjectFileImpl(Path : App.config)[NONE ]
+    ProjectFileImpl(Path : App.xaml)[APPLICATIONDEFINITION Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+    ProjectFileImpl(Path : App.xaml.cs)[COMPILE Subtype:CODE DependsUpon:App.xaml ]
+    ProjectFileImpl(Path : BaseMonogame.zip)[RESOURCE ]
+    ProjectFileImpl(Path : Bmg.zip)[EMBEDDEDRESOURCE ]
+    Folder [Name:Components]
+      Child items:
+        Folder [Name:Bixbite_Windows_Build]
+          Child items:
+            Folder [Name:Audio]
+              Child items:
+                Folder [Name:FMod]
+                  Child items:
+                    Folder [Name:FMODLibrary]
+                      Child items:
+                        ProjectFileImpl(Path : Channel.cs)[COMPILE ]
+                        ProjectFileImpl(Path : ChannelGroup.cs)[COMPILE ]
+                        ProjectFileImpl(Path : ConeSettings3D.cs)[COMPILE ]
+                        ProjectFileImpl(Path : CoreSystem.cs)[COMPILE ]
+                        ProjectFileImpl(Path : DistanceFilter3D.cs)[COMPILE ]
+                        Folder [Name:FMOD]
+                          Child items:
+                            Folder [Name:Studio]
+                              Child items:
+                                ProjectFileImpl(Path : fmod_studio.cs)[COMPILE ]
+                            ProjectFileImpl(Path : fmod.cs)[COMPILE ]
+                            ProjectFileImpl(Path : fmod_dsp.cs)[COMPILE ]
+                        ProjectFileImpl(Path : FMODManager.cs)[COMPILE ]
+                        ProjectFileImpl(Path : FileLoader.cs)[COMPILE ]
+                        ProjectFileImpl(Path : I3DControl.cs)[COMPILE ]
+                        ProjectFileImpl(Path : IChannelControl.cs)[COMPILE ]
+                        ProjectFileImpl(Path : Listener3D.cs)[COMPILE ]
+                        ProjectFileImpl(Path : Occlusion3D.cs)[COMPILE ]
+                        Folder [Name:PlatformLoader]
+                          Child items:
+                            ProjectFileImpl(Path : NativeLibraryLoader.cs)[COMPILE ]
+                        ProjectFileImpl(Path : PointerLinker.cs)[COMPILE ]
+                        ProjectFileImpl(Path : Sound.cs)[COMPILE ]
+                        ProjectFileImpl(Path : SoundGroup.cs)[COMPILE ]
+                        Folder [Name:Studio]
+                          Child items:
+                            ProjectFileImpl(Path : Attributes3D.cs)[COMPILE ]
+                            ProjectFileImpl(Path : Bank.cs)[COMPILE ]
+                            ProjectFileImpl(Path : Bus.cs)[COMPILE ]
+                            ProjectFileImpl(Path : EventDescription.cs)[COMPILE ]
+                            ProjectFileImpl(Path : EventInstance.cs)[COMPILE ]
+                            ProjectFileImpl(Path : StudioSystem.cs)[COMPILE ]
+                            ProjectFileImpl(Path : VCA.cs)[COMPILE ]
+                        ProjectFileImpl(Path : VectorExtensions.cs)[COMPILE ]
+                        ProjectFileImpl(Path : readme.txt)[RESOURCE ]
+            ProjectFileImpl(Path : BixBiteTypes.cs)[COMPILE ]
+            Folder [Name:Characters]
+              Child items:
+                ProjectFileImpl(Path : BaseEntity.cs)[COMPILE ]
+                ProjectFileImpl(Path : BattleEntity.cs)[COMPILE ]
+                ProjectFileImpl(Path : Commander.cs)[COMPILE ]
+                ProjectFileImpl(Path : Enemy.cs)[COMPILE ]
+                ProjectFileImpl(Path : Grunt.cs)[COMPILE ]
+                ProjectFileImpl(Path : NPC.cs)[COMPILE ]
+                ProjectFileImpl(Path : PartyMember.cs)[COMPILE ]
+                ProjectFileImpl(Path : Player.cs)[COMPILE ]
+                ProjectFileImpl(Path : SceneEntity.cs)[COMPILE ]
+            Folder [Name:Combat]
+              Child items:
+                ProjectFileImpl(Path : CharacterStats.cs)[COMPILE ]
+                ProjectFileImpl(Path : CombatActions.cs)[COMPILE ]
+                Folder [Name:CombatDelegates]
+                  Child items:
+                    ProjectFileImpl(Path : FollowUpAttacksDelegates.cs)[COMPILE ]
+                    ProjectFileImpl(Path : ItemDelegates.cs)[COMPILE ]
+                    ProjectFileImpl(Path : ModifierDelegates.cs)[COMPILE ]
+                    ProjectFileImpl(Path : SkillDelegates.cs)[COMPILE ]
+                ProjectFileImpl(Path : CombatEnums.cs)[COMPILE ]
+                ProjectFileImpl(Path : CombatHelpers.cs)[COMPILE ]
+                ProjectFileImpl(Path : CombatSystem.cs)[COMPILE ]
+                Folder [Name:Equipables]
+                  Child items:
+                    ProjectFileImpl(Path : Accessory.cs)[COMPILE ]
+                    ProjectFileImpl(Path : Clothes.cs)[COMPILE ]
+                    ProjectFileImpl(Path : Equipable.cs)[COMPILE ]
+                    ProjectFileImpl(Path : Item.cs)[COMPILE ]
+                    Folder [Name:Weapons]
+                      Child items:
+                        ProjectFileImpl(Path : MagicWeapon.cs)[COMPILE ]
+                        ProjectFileImpl(Path : RangedWeapons.cs)[COMPILE ]
+                        ProjectFileImpl(Path : Weapons.cs)[COMPILE ]
+                ProjectFileImpl(Path : GamePlayModifiers.cs)[COMPILE ]
+                ProjectFileImpl(Path : Job.cs)[COMPILE ]
+                ProjectFileImpl(Path : MagicSpell.cs)[COMPILE ]
+                ProjectFileImpl(Path : PhysicalSkill.cs)[COMPILE ]
+                ProjectFileImpl(Path : Skill.cs)[COMPILE ]
+                ProjectFileImpl(Path : Stances.cs)[COMPILE ]
+                ProjectFileImpl(Path : WeakStrength.cs)[COMPILE ]
+            Folder [Name:Crafting]
+              Child items:
+                ProjectFileImpl(Path : CraftingHelpers.cs)[COMPILE ]
+                ProjectFileImpl(Path : CraftingMinigame.cs)[COMPILE ]
+                Folder [Name:HexGrid]
+                  Child items:
+                    ProjectFileImpl(Path : HexCell.cs)[COMPILE ]
+                    ProjectFileImpl(Path : HexGrid2D.cs)[COMPILE ]
+                    ProjectFileImpl(Path : PuzzlePieceHexCell.cs)[COMPILE ]
+                ProjectFileImpl(Path : PuzzlePiece.cs)[COMPILE ]
+                ProjectFileImpl(Path : PuzzlePieceCreationHelper.cs)[COMPILE ]
+                ProjectFileImpl(Path : Recipe.cs)[COMPILE ]
+            Folder [Name:Effects]
+              Child items:
+                ProjectFileImpl(Path : ImageEffect.cs)[COMPILE ]
+            ProjectFileImpl(Path : GameEvent.cs)[COMPILE ]
+            Folder [Name:Input]
+              Child items:
+                ProjectFileImpl(Path : InputController.cs)[COMPILE ]
+            ProjectFileImpl(Path : Inventory.cs)[COMPILE ]
+            ProjectFileImpl(Path : Level.cs)[COMPILE ]
+            Folder [Name:NodeEditor]
+              Child items:
+                Folder [Name:Arithmetic]
+                  Child items:
+                    ProjectFileImpl(Path : AddBlock.cs)[COMPILE ]
+                    ProjectFileImpl(Path : BaseArithmeticBlock.cs)[COMPILE ]
+                    ProjectFileImpl(Path : DivisionBlock.cs)[COMPILE ]
+                    ProjectFileImpl(Path : ModuloBlock.cs)[COMPILE ]
+                    ProjectFileImpl(Path : MultiplyBlock.cs)[COMPILE ]
+                    ProjectFileImpl(Path : SubtractBlock.cs)[COMPILE ]
+                ProjectFileImpl(Path : BaseNodeBlock.cs)[COMPILE ]
+                ProjectFileImpl(Path : ConditionalNodeBlock.cs)[COMPILE ]
+                ProjectFileImpl(Path : ConnectionNode.cs)[COMPILE ]
+                ProjectFileImpl(Path : ConstantNodeBlock.cs)[COMPILE ]
+                ProjectFileImpl(Path : DialogueNodeBlock.cs)[COMPILE ]
+                ProjectFileImpl(Path : ExitNodeBlock.cs)[COMPILE ]
+                Folder [Name:Logic]
+                  Child items:
+                    ProjectFileImpl(Path : ANDBlock.cs)[COMPILE ]
+                    ProjectFileImpl(Path : BaseLogicNodeBlock.cs)[COMPILE ]
+                    ProjectFileImpl(Path : NOTBlock.cs)[COMPILE ]
+                    ProjectFileImpl(Path : ORBlock.cs)[COMPILE ]
+                ProjectFileImpl(Path : StartNodeBlock.cs)[COMPILE ]
+            Folder [Name:Particles]
+              Child items:
+                ProjectFileImpl(Path : HitSparkPEmitter.cs)[COMPILE ]
+                ProjectFileImpl(Path : PBoxEmitter.cs)[COMPILE ]
+                ProjectFileImpl(Path : PEmitter.cs)[COMPILE ]
+                ProjectFileImpl(Path : Particle.cs)[COMPILE ]
+            Folder [Name:Projectiles]
+              Child items:
+                ProjectFileImpl(Path : projectile.cs)[COMPILE ]
+            Folder [Name:Rendering]
+              Child items:
+                Folder [Name:Animation]
+                  Child items:
+                    ProjectFileImpl(Path : AnimationEvent.cs)[COMPILE ]
+                    ProjectFileImpl(Path : AnimationFrameInfo.cs)[COMPILE ]
+                    ProjectFileImpl(Path : AnimationLayer.cs)[COMPILE ]
+                    ProjectFileImpl(Path : AnimationState.cs)[COMPILE ]
+                    ProjectFileImpl(Path : AnimationStateConnections.cs)[COMPILE ]
+                    ProjectFileImpl(Path : AnimationStateMachine.cs)[COMPILE ]
+                    ProjectFileImpl(Path : SpriteSheet.cs)[COMPILE ]
+                ProjectFileImpl(Path : Camera.cs)[COMPILE ]
+                ProjectFileImpl(Path : GameImage.cs)[COMPILE ]
+                Folder [Name:Helpers]
+                  Child items:
+                    ProjectFileImpl(Path : CircleUtillties.cs)[COMPILE ]
+                    ProjectFileImpl(Path : RectangleUtilities.cs)[COMPILE ]
+                ProjectFileImpl(Path : Map.cs)[COMPILE ]
+                ProjectFileImpl(Path : SplashImage.cs)[COMPILE ]
+                ProjectFileImpl(Path : Sprite.cs)[COMPILE ]
+                ProjectFileImpl(Path : SpriteLayer.cs)[COMPILE ]
+                ProjectFileImpl(Path : Tile.cs)[COMPILE ]
+                Folder [Name:UI]
+                  Child items:
+                    ProjectFileImpl(Path : BaseUI.cs)[COMPILE ]
+                    ProjectFileImpl(Path : BaseUIComponent.cs)[COMPILE ]
+                    Folder [Name:Button]
+                      Child items:
+                        ProjectFileImpl(Path : BaseButtonUI.cs)[COMPILE ]
+                        ProjectFileImpl(Path : EngineButton.cs)[COMPILE ]
+                        ProjectFileImpl(Path : GameButton.cs)[COMPILE ]
+                    Folder [Name:Checkbox]
+                      Child items:
+                        ProjectFileImpl(Path : BaseCheckBoxUI.cs)[COMPILE ]
+                        ProjectFileImpl(Path : EngineCheckBox.cs)[COMPILE ]
+                        ProjectFileImpl(Path : GameCheckBox.cs)[COMPILE ]
+                    Folder [Name:Image]
+                      Child items:
+                        ProjectFileImpl(Path : BaseImage.cs)[COMPILE ]
+                        ProjectFileImpl(Path : EngineImage.cs)[COMPILE ]
+                        ProjectFileImpl(Path : GameImage.cs)[COMPILE ]
+                    Folder [Name:ListBox]
+                      Child items:
+                        ProjectFileImpl(Path : BaseListBox.cs)[COMPILE ]
+                        ProjectFileImpl(Path : EngineCustomListBox.cs)[COMPILE ]
+                        ProjectFileImpl(Path : EngineListBox.cs)[COMPILE ]
+                        ProjectFileImpl(Path : GameCustomListBox.cs)[COMPILE ]
+                        ProjectFileImpl(Path : GameListBox.cs)[COMPILE ]
+                        ProjectFileImpl(Path : GameMultiSelectionListbox.cs)[COMPILE ]
+                        Folder [Name:ListBoxItems]
+                          Child items:
+                            ProjectFileImpl(Path : BaseListBoxItem.cs)[COMPILE ]
+                            ProjectFileImpl(Path : EngineListBoxItem.cs)[COMPILE ]
+                            ProjectFileImpl(Path : GameListBoxItem.cs)[COMPILE ]
+                            ProjectFileImpl(Path : GameListBoxItemSelectable.cs)[COMPILE ]
+                    Folder [Name:ProgressBar]
+                      Child items:
+                        ProjectFileImpl(Path : BaseProgressBar.cs)[COMPILE ]
+                        ProjectFileImpl(Path : EngineCustomProgressBar.cs)[COMPILE ]
+                        ProjectFileImpl(Path : EngineProgressBar.cs)[COMPILE ]
+                        ProjectFileImpl(Path : GameCustomProgressBar.cs)[COMPILE ]
+                        ProjectFileImpl(Path : GameProgressBar.cs)[COMPILE ]
+                    Folder [Name:TabControl]
+                      Child items:
+                        ProjectFileImpl(Path : BaseTabControl.cs)[COMPILE ]
+                        ProjectFileImpl(Path : EngineTabControl.cs)[COMPILE ]
+                        ProjectFileImpl(Path : GameTabControl.cs)[COMPILE ]
+                    Folder [Name:TextBlock]
+                      Child items:
+                        ProjectFileImpl(Path : BaseTextBlock.cs)[COMPILE ]
+                        ProjectFileImpl(Path : EngineTextBlock.cs)[COMPILE ]
+                        ProjectFileImpl(Path : GameTextBlock.cs)[COMPILE ]
+                    Folder [Name:Textbox]
+            Folder [Name:Resources]
+              Child items:
+                ProjectFileImpl(Path : EE_Exceptions.cs)[COMPILE ]
+                Folder [Name:FMOD]
+                  Child items:
+                    Folder [Name:x64]
+                      Child items:
+                        ProjectFileImpl(Path : fmod.dll)[CONTENT ]
+                        ProjectFileImpl(Path : fmodstudio.dll)[CONTENT ]
+                        ProjectFileImpl(Path : libfmod.so)[NONE ]
+                        ProjectFileImpl(Path : libfmod.so.11)[NONE ]
+                        ProjectFileImpl(Path : libfmod.so.11.8)[NONE ]
+                        ProjectFileImpl(Path : libfmodstudio.so)[NONE ]
+                        ProjectFileImpl(Path : libfmodstudio.so.11)[NONE ]
+                        ProjectFileImpl(Path : libfmodstudio.so.11.8)[NONE ]
+                    Folder [Name:x86]
+                      Child items:
+                        ProjectFileImpl(Path : fmod.dll)[CONTENT ]
+                        ProjectFileImpl(Path : fmodstudio.dll)[CONTENT ]
+                        ProjectFileImpl(Path : libfmod.so)[NONE ]
+                        ProjectFileImpl(Path : libfmod.so.11)[NONE ]
+                        ProjectFileImpl(Path : libfmod.so.11.8)[NONE ]
+                        ProjectFileImpl(Path : libfmodstudio.so)[NONE ]
+                        ProjectFileImpl(Path : libfmodstudio.so.11)[NONE ]
+                        ProjectFileImpl(Path : libfmodstudio.so.11.8)[NONE ]
+                ProjectFileImpl(Path : IProperties.cs)[COMPILE ]
+                ProjectFileImpl(Path : IStateMachineTraversal.cs)[COMPILE ]
+                ProjectFileImpl(Path : NodeEditorExceptions.cs)[COMPILE ]
+                ProjectFileImpl(Path : ObservableDictionary.cs)[COMPILE ]
+                ProjectFileImpl(Path : ObservablePropertyDictionary.cs)[COMPILE ]
+                ProjectFileImpl(Path : ObservableSortedDictionary.cs)[COMPILE ]
+                ProjectFileImpl(Path : Resources.cs)[COMPILE ]
+                ProjectFileImpl(Path : SQLite.cs)[COMPILE ]
+                ProjectFileImpl(Path : TimelinePlayer.dll)[CONTENT ]
+            Folder [Name:SceneObject]
+              Child items:
+                ProjectFileImpl(Path : GameObject.cs)[COMPILE ]
+                ProjectFileImpl(Path : Prop.cs)[COMPILE ]
+                ProjectFileImpl(Path : Spawner.cs)[COMPILE ]
+                ProjectFileImpl(Path : Transistion.cs)[COMPILE ]
+            ProjectFileImpl(Path : TileCollisionChecker.cs)[COMPILE ]
+            Folder [Name:TimelinePlayer]
+              Child items:
+                ProjectFileImpl(Path : ChoiceTimeBlock.cs)[COMPILE ]
+                ProjectFileImpl(Path : TimeBlock.cs)[COMPILE ]
+                ProjectFileImpl(Path : Timeline.cs)[COMPILE ]
+            Folder [Name:Tweening]
+              Child items:
+                ProjectFileImpl(Path : Tweening.cs)[COMPILE ]
+            Folder [Name:bin]
+              Child items:
+                Folder [Name:Debug]
+                  Child items:
+                    ProjectFileImpl(Path : BixBite.dll)[CONTENT ]
+                    ProjectFileImpl(Path : BixBite.pdb)[CONTENT ]
+                    ProjectFileImpl(Path : MonoGame.Framework.dll)[CONTENT ]
+                    ProjectFileImpl(Path : MonoGame.Framework.dll.config)[NONE ]
+                    Folder [Name:Resources]
+                      Child items:
+                        Folder [Name:FMOD]
+                          Child items:
+                            Folder [Name:x64]
+                              Child items:
+                                ProjectFileImpl(Path : fmod.dll)[CONTENT ]
+                                ProjectFileImpl(Path : fmodstudio.dll)[CONTENT ]
+                                ProjectFileImpl(Path : libfmod.so)[NONE ]
+                                ProjectFileImpl(Path : libfmod.so.11)[NONE ]
+                                ProjectFileImpl(Path : libfmod.so.11.8)[NONE ]
+                                ProjectFileImpl(Path : libfmodstudio.so)[NONE ]
+                                ProjectFileImpl(Path : libfmodstudio.so.11)[NONE ]
+                                ProjectFileImpl(Path : libfmodstudio.so.11.8)[NONE ]
+                            Folder [Name:x86]
+                              Child items:
+                                ProjectFileImpl(Path : fmod.dll)[CONTENT ]
+                                ProjectFileImpl(Path : fmodstudio.dll)[CONTENT ]
+                                ProjectFileImpl(Path : libfmod.so)[NONE ]
+                                ProjectFileImpl(Path : libfmod.so.11)[NONE ]
+                                ProjectFileImpl(Path : libfmod.so.11.8)[NONE ]
+                                ProjectFileImpl(Path : libfmodstudio.so)[NONE ]
+                                ProjectFileImpl(Path : libfmodstudio.so.11)[NONE ]
+                                ProjectFileImpl(Path : libfmodstudio.so.11.8)[NONE ]
+                    ProjectFileImpl(Path : SQLite.Interop.dll)[CONTENT ]
+                    ProjectFileImpl(Path : TimelinePlayer.dll)[CONTENT ]
+                    ProjectFileImpl(Path : sqlite3.dll)[CONTENT ]
+                Folder [Name:Release]
+            Folder [Name:obj]
+              Child items:
+                Folder [Name:Debug]
+                  Child items:
+                    ProjectFileImpl(Path : BixBite.csproj.CopyComplete)[NONE ]
+                    ProjectFileImpl(Path : BixBite.csproj.CoreCompileInputs.cache)[NONE ]
+                    ProjectFileImpl(Path : BixBite.dll)[CONTENT ]
+                    ProjectFileImpl(Path : BixBite.pdb)[CONTENT ]
+                    ProjectFileImpl(Path : DesignTimeResolveAssemblyReferencesInput.cache)[NONE ]
+                    Folder [Name:TempPE]
+        ProjectFileImpl(Path : CanvasSpritesheet.cs)[COMPILE ]
+        ProjectFileImpl(Path : DialogueScene.cs)[COMPILE ]
+        ProjectFileImpl(Path : EditorObect.cs)[COMPILE ]
+        ProjectFileImpl(Path : Item.cs)[COMPILE ]
+        ProjectFileImpl(Path : PropertyBag.cs)[COMPILE ]
+        ProjectFileImpl(Path : SplashScreen.cs)[COMPILE ]
+        Folder [Name:Tools]
+          Child items:
+            ProjectFileImpl(Path : Cuprite.cs)[COMPILE ]
+            ProjectFileImpl(Path : SelectTool.cs)[COMPILE ]
+        ProjectFileImpl(Path : XMLManager.cs)[COMPILE ]
+    ProjectFileImpl(Path : Connected Services)[Hidden WCFMETADATA ]
+    Folder [Name:Converters]
+      Child items:
+        ProjectFileImpl(Path : EndOfPathConverter.cs)[COMPILE ]
+    ProjectFileImpl(Path : DesignerItemDecorator.cs)[COMPILE ]
+    Folder [Name:Forms]
+      Child items:
+        ProjectFileImpl(Path : AddCharacterForm.xaml)[PAGE Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+        ProjectFileImpl(Path : AddCharacterForm.xaml.cs)[COMPILE DependsUpon:AddCharacterForm.xaml ]
+        ProjectFileImpl(Path : AddEditAnimationStateMachine.xaml)[PAGE Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+        ProjectFileImpl(Path : AddEditAnimationStateMachine.xaml.cs)[COMPILE DependsUpon:AddEditAnimationStateMachine.xaml ]
+        ProjectFileImpl(Path : EngineEditor.AnimationEditor.xaml.cs)[COMPILE DependsUpon:EngineEditor.xaml ]
+        ProjectFileImpl(Path : EngineEditor.CutSceneEditor.xaml.cs)[COMPILE DependsUpon:EngineEditor.xaml ]
+        ProjectFileImpl(Path : EngineEditor.DialogueEditor.xaml.cs)[COMPILE DependsUpon:EngineEditor.xaml ]
+        ProjectFileImpl(Path : EngineEditor.LevelEditor.xaml.cs)[COMPILE DependsUpon:EngineEditor.xaml ]
+        ProjectFileImpl(Path : EngineEditor.ParticleEditor.xaml.cs)[COMPILE DependsUpon:EngineEditor.xaml ]
+        ProjectFileImpl(Path : EngineEditor.SpriteSheetEditor.xaml.cs)[COMPILE DependsUpon:EngineEditor.xaml ]
+        ProjectFileImpl(Path : EngineEditor.UIEditor.xaml.cs)[COMPILE DependsUpon:EngineEditor.xaml ]
+        ProjectFileImpl(Path : EngineEditor.xaml)[PAGE Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+        ProjectFileImpl(Path : EngineEditor.xaml.cs)[COMPILE DependsUpon:EngineEditor.xaml ]
+        ProjectFileImpl(Path : GameEventsSettings.xaml)[PAGE Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+        ProjectFileImpl(Path : GameEventsSettings.xaml.cs)[COMPILE DependsUpon:GameEventsSettings.xaml ]
+        ProjectFileImpl(Path : MainWindow.xaml)[PAGE Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+        ProjectFileImpl(Path : MainWindow.xaml.cs)[COMPILE DependsUpon:MainWindow.xaml ]
+        ProjectFileImpl(Path : NewMapChange.xaml)[PAGE Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+        ProjectFileImpl(Path : NewMapChange.xaml.cs)[COMPILE DependsUpon:NewMapChange.xaml ]
+        ProjectFileImpl(Path : NewProject_Form.xaml)[PAGE Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+        ProjectFileImpl(Path : NewProject_Form.xaml.cs)[COMPILE DependsUpon:NewProject_Form.xaml ]
+        ProjectFileImpl(Path : ProjectSettings.xaml)[PAGE Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+        ProjectFileImpl(Path : ProjectSettings.xaml.cs)[COMPILE DependsUpon:ProjectSettings.xaml ]
+        ProjectFileImpl(Path : ResizeSpritesheet.xaml)[PAGE Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+        ProjectFileImpl(Path : ResizeSpritesheet.xaml.cs)[COMPILE DependsUpon:ResizeSpritesheet.xaml ]
+    ProjectFileImpl(Path : MoveThumb.cs)[COMPILE ]
+    Folder [Name:Properties, IsAppDesigner:true]
+      Child items:
+        ProjectFileImpl(Path : AssemblyInfo.cs)[COMPILE Subtype:CODE ]
+        ProjectFileImpl(Path : Resources.Designer.cs)[COMPILE Properties:AutoGen=True, DesignTime=TrueDependsUpon:Resources.resx ]
+        ProjectFileImpl(Path : Resources.resx)[EMBEDDEDRESOURCE Properties:Generator=ResXFileCodeGenerator, LastGenOutput=Resources.Designer.csSubtype:DESIGNER CustomTool:ResXFileCodeGenerator CustomToolOutput:Resources.Designer.cs ]
+        ProjectFileImpl(Path : Settings.Designer.cs)[COMPILE Properties:AutoGen=TrueDependsUpon:Settings.settings ]
+        ProjectFileImpl(Path : Settings.settings)[NONE Properties:Generator=SettingsSingleFileGenerator, LastGenOutput=Settings.Designer.csCustomTool:SettingsSingleFileGenerator CustomToolOutput:Settings.Designer.cs ]
+    ProjectFileImpl(Path : ResizeThumb.cs)[COMPILE ]
+    Folder [Name:Resources]
+      Child items:
+        Folder [Name:Adorners]
+          Child items:
+            ProjectFileImpl(Path : ResizeRotateAdorner.cs)[COMPILE ]
+            ProjectFileImpl(Path : ResizeRotateChrome.cs)[COMPILE ]
+            ProjectFileImpl(Path : SizeAdorner.cs)[COMPILE ]
+            ProjectFileImpl(Path : SizeChrome.cs)[COMPILE ]
+        ProjectFileImpl(Path : CollapsedPropertyGrid.dll)[CONTENT ]
+        ProjectFileImpl(Path : CustomColorPicker.dll)[CONTENT ]
+        ProjectFileImpl(Path : DesignerItem.xaml)[PAGE Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+        Folder [Name:ErrorDocs]
+          Child items:
+            ProjectFileImpl(Path : List of ErrorCodes.txt)[RESOURCE ]
+        ProjectFileImpl(Path : ImageCropper.dll)[CONTENT ]
+        ProjectFileImpl(Path : MoveThumb.xaml)[PAGE Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+        ProjectFileImpl(Path : NodeEditor.dll)[CONTENT ]
+        ProjectFileImpl(Path : ObservableStyleDictionary.cs)[COMPILE ]
+        ProjectFileImpl(Path : OutputLog.dll)[CONTENT ]
+        ProjectFileImpl(Path : PropertyGridEditor.dll)[CONTENT ]
+        ProjectFileImpl(Path : RenderPointCrosshair.png)[NONE ]
+        ProjectFileImpl(Path : ResizeDecorator.xaml)[PAGE Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+        ProjectFileImpl(Path : ResizeRotateChrome.xaml)[PAGE Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+        ProjectFileImpl(Path : RotateDecorator.xaml)[PAGE Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+        ProjectFileImpl(Path : SizeChrome.xaml)[PAGE Properties:Generator=MSBuild:CompileSubtype:DESIGNER CustomTool:MSBuild:Compile ]
+        ProjectFileImpl(Path : TimelinePlayer.dll)[CONTENT ]
+        ProjectFileImpl(Path : render_point_crosshair_1.png)[CONTENT ]
+        ProjectFileImpl(Path : render_point_crosshair_10.png)[CONTENT ]
+        ProjectFileImpl(Path : render_point_crosshair_2.png)[CONTENT ]
+        ProjectFileImpl(Path : render_point_crosshair_3.png)[CONTENT ]
+        ProjectFileImpl(Path : render_point_crosshair_4.png)[CONTENT ]
+        ProjectFileImpl(Path : render_point_crosshair_5.png)[CONTENT ]
+        ProjectFileImpl(Path : render_point_crosshair_6.png)[CONTENT ]
+        ProjectFileImpl(Path : render_point_crosshair_7.png)[CONTENT ]
+        ProjectFileImpl(Path : render_point_crosshair_8.png)[CONTENT ]
+        ProjectFileImpl(Path : render_point_crosshair_9.png)[CONTENT ]
+        ProjectFileImpl(Path : render_point_crosshair_base.png)[CONTENT ]
+    ProjectFileImpl(Path : RotateThumb.cs)[COMPILE ]
+    ProjectFileImpl(Path : favicon.ico)[RESOURCE ]
+    Folder [Name:images]
+      Child items:
+        ProjectFileImpl(Path : 500px-Mcol_money_bag.svg.png)[RESOURCE ]
+        ProjectFileImpl(Path : 522019a1q4bjrol3.jpg)[RESOURCE ]
+        ProjectFileImpl(Path : Ame_icon_small.png)[RESOURCE ]
+        ProjectFileImpl(Path : SmallTextBubble_Orange.png)[RESOURCE ]
+        ProjectFileImpl(Path : SmallTextBubble_Purple.png)[RESOURCE ]
+        ProjectFileImpl(Path : __pluse_and_minun___by_celsius_ice_rose.jpg)[RESOURCE ]
+        ProjectFileImpl(Path : a50afebd-a3e7-42bb-9c0b-33d394d33334.gif)[RESOURCE ]
+        ProjectFileImpl(Path : emma_colors_oc.png)[RESOURCE ]
+        ProjectFileImpl(Path : folder.png)[RESOURCE ]
+        ProjectFileImpl(Path : smol megumin.jpg)[RESOURCE ]
+        ProjectFileImpl(Path : winter.png)[RESOURCE ]
+  Target framework: .NETFramework,Version=v4.6.1
+    Referenced projects:
+    Referenced assemblies:
+      CollapsedPropertyGrid, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (/data/project/AmethystEngine/Resources/CollapsedPropertyGrid.dll), Resolved [CopyLocal=True, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      CustomColorPicker, Version=1.0.7142.36104, Culture=neutral, PublicKeyToken=null (/data/project/AmethystEngine/Resources/CustomColorPicker.dll), Resolved [CopyLocal=True, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      ImageCropper, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (/data/project/AmethystEngine/Resources/ImageCropper.dll), Resolved [CopyLocal=True, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      MonoGame.Framework, Version=3.7.1.189, Culture=neutral, PublicKeyToken=null (/data/project/AmethystEngine/Components/Bixbite_Windows_Build/bin/Debug/MonoGame.Framework.dll, /data/project/BixBite/bin/Debug/MonoGame.Framework.dll, /data/project/ProjectE_E/bin/DesktopGL/AnyCPU/Debug/MonoGame.Framework.dll), Resolved [CopyLocal=True, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      mscorlib, Version=null, Unresolved [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=True, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      NodeEditor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (/data/project/AmethystEngine/Resources/NodeEditor.dll), Resolved [CopyLocal=True, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      OutputLog, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (/data/project/AmethystEngine/Resources/OutputLog.dll), Resolved [CopyLocal=True, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      PropertyGridEditor, Version=1.1.1.8, Culture=neutral, PublicKeyToken=null (/data/project/AmethystEngine/Resources/PropertyGridEditor.dll), Resolved [CopyLocal=True, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      TimelinePlayer, Version=1.0.4.0, Culture=neutral, PublicKeyToken=null (/data/project/AmethystEngine/Resources/TimelinePlayer.dll), Resolved [CopyLocal=True, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      Microsoft.Build, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "Microsoft.Build". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "Microsoft.Build.Conversion.v4.0". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "Microsoft.Build.Engine". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "Microsoft.Build.Framework". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      Microsoft.Build.Conversion.v4.0, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "Microsoft.Build.Conversion.v4.0". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      Microsoft.Build.Engine, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "Microsoft.Build.Engine". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      Microsoft.Build.Framework, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "Microsoft.Build.Framework". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      Microsoft.CSharp, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "Microsoft.CSharp". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      PresentationCore, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "PresentationCore". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      PresentationFramework, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "PresentationFramework". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Data". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Drawing". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.IO.Compression.FileSystem". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Windows.Forms". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Xml". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Xml.Linq". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Data.DataSetExtensions". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Net.Http". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Xaml". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Core". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Core, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Core". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=True, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Data, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Data". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Data.DataSetExtensions". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Data.DataSetExtensions, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Data.DataSetExtensions". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Drawing, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Drawing". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.IO.Compression.FileSystem, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.IO.Compression.FileSystem". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Net.Http, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Net.Http". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Windows.Forms, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Windows.Forms". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Xaml, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Xaml". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Xml, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Xml". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Xml.Linq". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Xml.Linq, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Xml.Linq". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      UIAutomationProvider, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "UIAutomationProvider". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      WindowsBase, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "WindowsBase". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      WindowsFormsIntegration, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "WindowsFormsIntegration". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+
+Project [Name:BixBite, GUID:d50deef5-20be-4a57-b0f8-6cb460f71d82]
+  CSharp Properties:
+    Active configuration for '.NETFramework,Version=v4.6.1':
+        AllowUnsafeCode:False
+        BaseAddress:4194304
+        CheckForOverflowUnderflow:False
+        FileAlignment:512
+        DebugSymbols:True
+        IncrementalBuild:True
+        WarningsAsErrors:
+        LanguageVersion:Latest
+        NullableContextKind:Disable
+        ImplicitUsingsKind:Disable
+        DefineConstants:TRACE;DEBUG;Monogame;Engine;
+        EnableUnmanagedCodeDebugging:False
+        GenerateSerializationAssemblies :False
+        RelativeIntermediateDirectory:obj/Debug/
+        Optimize:False
+        RegisterForCOMInterop:False
+        RemoveIntegerChecks:False
+        NoWarn:;1701;1702
+        TreatWarningsAsErrors:False
+        WarningLevel:4
+        DocumentationFile:
+        OutputType:LIBRARY
+        StartupObject:
+        OutputAssemblyName:BixBite
+        OutputAssemblyExtension:.dll
+        HasRunCommand:False
+      Name:Debug
+      RelativeOutputDirectory:bin/Debug/
+      RelativeIntermediateDirectory:obj/Debug/
+      Properties:AndroidUseManagedDesignTimeResourceGenerator=True, AssemblyName=BixBite, BaseIntermediateOutputPath=obj/, CSharpCoreTargetsPath=/usr/share/dotnet/sdk/7.0.400/Roslyn/Microsoft.CSharp.Core.targets, LangVersion=latest, MSBuildProjectExtensionsPath=/data/project/BixBite/obj/, NoWarn=;1701;1702, OutputPath=bin/Debug/, ProduceReferenceAssembly=false, RootNamespace=BixBite, RoslynTargetsPath=/usr/share/dotnet/sdk/7.0.400/Roslyn, TargetExt=.dll, TargetPath=/data/project/BixBite/bin/Debug/BixBite.dll
+    Build Settings:
+        PreBuildEvent:
+        PostBuildEvent:
+        ApplicationType:
+        DefaultNamespace:BixBite
+        ImportedNamespaces:
+        RunPostBuildEventType:ALWAYS
+        IsBuildable:True
+        IsDeployable:False
+        Configuration:Debug
+        PlatformTarget:AnyCPU
+    ProjectTypeGuid:fae04ec0-301f-11d3-bf4b-00c04f79efbc
+  Child items:
+    ProjectFileImpl(Path : BixBite.csproj)[]
+    ProjectFileImpl(Path : BixBiteTypes.cs)[COMPILE ]
+    Folder [Name:BuildScripts]
+      Child items:
+        ProjectFileImpl(Path : BixbiteCopyForAmetheystEngine.py)[CONTENT ]
+        ProjectFileImpl(Path : NodeEditorCopyFiles.py)[CONTENT ]
+        ProjectFileImpl(Path : NodeEditorPatchFiles.py)[CONTENT ]
+    Folder [Name:Characters]
+      Child items:
+        ProjectFileImpl(Path : BaseEntity.cs)[COMPILE ]
+        ProjectFileImpl(Path : BattleEntity.cs)[COMPILE ]
+        ProjectFileImpl(Path : Commander.cs)[COMPILE ]
+        ProjectFileImpl(Path : Enemy.cs)[COMPILE ]
+        ProjectFileImpl(Path : Grunt.cs)[COMPILE ]
+        ProjectFileImpl(Path : NPC.cs)[COMPILE ]
+        ProjectFileImpl(Path : PartyMember.cs)[COMPILE ]
+        ProjectFileImpl(Path : Player.cs)[COMPILE ]
+        ProjectFileImpl(Path : SceneEntity.cs)[COMPILE ]
+    Folder [Name:Combat]
+      Child items:
+        ProjectFileImpl(Path : CharacterStats.cs)[COMPILE ]
+        ProjectFileImpl(Path : CombatActions.cs)[COMPILE ]
+        Folder [Name:CombatDelegates]
+          Child items:
+            ProjectFileImpl(Path : FollowUpAttacksDelegates.cs)[COMPILE ]
+            ProjectFileImpl(Path : ItemDelegates.cs)[COMPILE ]
+            ProjectFileImpl(Path : ModifierDelegates.cs)[COMPILE ]
+            ProjectFileImpl(Path : SkillDelegates.cs)[COMPILE ]
+        ProjectFileImpl(Path : CombatEnums.cs)[COMPILE ]
+        ProjectFileImpl(Path : CombatHelpers.cs)[COMPILE ]
+        ProjectFileImpl(Path : CombatSystem.cs)[COMPILE ]
+        Folder [Name:Equipables]
+          Child items:
+            ProjectFileImpl(Path : Accessory.cs)[COMPILE ]
+            ProjectFileImpl(Path : Clothes.cs)[COMPILE ]
+            ProjectFileImpl(Path : Equipable.cs)[COMPILE ]
+            ProjectFileImpl(Path : Item.cs)[COMPILE ]
+            Folder [Name:Weapons]
+              Child items:
+                ProjectFileImpl(Path : MagicWeapon.cs)[COMPILE ]
+                ProjectFileImpl(Path : RangedWeapons.cs)[COMPILE ]
+                ProjectFileImpl(Path : Weapons.cs)[COMPILE ]
+        ProjectFileImpl(Path : GamePlayModifiers.cs)[COMPILE ]
+        ProjectFileImpl(Path : Job.cs)[COMPILE ]
+        ProjectFileImpl(Path : MagicSpell.cs)[COMPILE ]
+        ProjectFileImpl(Path : PhysicalSkill.cs)[COMPILE ]
+        ProjectFileImpl(Path : Skill.cs)[COMPILE ]
+        ProjectFileImpl(Path : Stances.cs)[COMPILE ]
+        ProjectFileImpl(Path : WeakStrength.cs)[COMPILE ]
+    Folder [Name:Crafting]
+      Child items:
+        ProjectFileImpl(Path : CraftingHelpers.cs)[COMPILE ]
+        ProjectFileImpl(Path : CraftingMinigame.cs)[COMPILE ]
+        Folder [Name:HexGrid]
+          Child items:
+            ProjectFileImpl(Path : HexCell.cs)[COMPILE ]
+            ProjectFileImpl(Path : HexGrid2D.cs)[COMPILE ]
+            ProjectFileImpl(Path : PuzzlePieceHexCell.cs)[COMPILE ]
+        ProjectFileImpl(Path : PuzzlePiece.cs)[COMPILE ]
+        ProjectFileImpl(Path : PuzzlePieceCreationHelper.cs)[COMPILE ]
+        ProjectFileImpl(Path : Recipe.cs)[COMPILE ]
+    ProjectFileImpl(Path : DialogueScene.cs)[COMPILE ]
+    Folder [Name:Effects]
+      Child items:
+        ProjectFileImpl(Path : ImageEffect.cs)[COMPILE ]
+    ProjectFileImpl(Path : GameEvent.cs)[COMPILE ]
+    Folder [Name:Input]
+      Child items:
+        ProjectFileImpl(Path : InputController.cs)[COMPILE ]
+    ProjectFileImpl(Path : Inventory.cs)[COMPILE ]
+    ProjectFileImpl(Path : Level.cs)[COMPILE ]
+    Folder [Name:NodeEditor]
+      Child items:
+        Folder [Name:Arithmetic]
+          Child items:
+            ProjectFileImpl(Path : AddBlock.cs)[COMPILE ]
+            ProjectFileImpl(Path : BaseArithmeticBlock.cs)[COMPILE ]
+            ProjectFileImpl(Path : DivisionBlock.cs)[COMPILE ]
+            ProjectFileImpl(Path : ModuloBlock.cs)[COMPILE ]
+            ProjectFileImpl(Path : MultiplyBlock.cs)[COMPILE ]
+            ProjectFileImpl(Path : SubtractBlock.cs)[COMPILE ]
+        ProjectFileImpl(Path : BaseNodeBlock.cs)[COMPILE ]
+        ProjectFileImpl(Path : ConditionalNodeBlock.cs)[COMPILE ]
+        ProjectFileImpl(Path : ConnectionNode.cs)[COMPILE ]
+        ProjectFileImpl(Path : ConstantNodeBlock.cs)[COMPILE ]
+        ProjectFileImpl(Path : DialogueNodeBlock.cs)[COMPILE ]
+        ProjectFileImpl(Path : ExitNodeBlock.cs)[COMPILE ]
+        Folder [Name:Logic]
+          Child items:
+            ProjectFileImpl(Path : ANDBlock.cs)[COMPILE ]
+            ProjectFileImpl(Path : BaseLogicNodeBlock.cs)[COMPILE ]
+            ProjectFileImpl(Path : NOTBlock.cs)[COMPILE ]
+            ProjectFileImpl(Path : ORBlock.cs)[COMPILE ]
+        ProjectFileImpl(Path : StartNodeBlock.cs)[COMPILE ]
+    Folder [Name:Particles]
+      Child items:
+        ProjectFileImpl(Path : HitSparkPEmitter.cs)[COMPILE ]
+        ProjectFileImpl(Path : PBoxEmitter.cs)[COMPILE ]
+        ProjectFileImpl(Path : PEmitter.cs)[COMPILE ]
+        ProjectFileImpl(Path : Particle.cs)[COMPILE ]
+    Folder [Name:Projectiles]
+      Child items:
+        ProjectFileImpl(Path : projectile.cs)[COMPILE ]
+    Folder [Name:Properties, IsAppDesigner:true]
+      Child items:
+        ProjectFileImpl(Path : AssemblyInfo.cs)[COMPILE ]
+    Folder [Name:Rendering]
+      Child items:
+        Folder [Name:Animation]
+          Child items:
+            ProjectFileImpl(Path : AnimationEvent.cs)[COMPILE ]
+            ProjectFileImpl(Path : AnimationFrameInfo.cs)[COMPILE ]
+            ProjectFileImpl(Path : AnimationLayer.cs)[COMPILE ]
+            ProjectFileImpl(Path : AnimationState.cs)[COMPILE ]
+            ProjectFileImpl(Path : AnimationStateConnections.cs)[COMPILE ]
+            ProjectFileImpl(Path : AnimationStateMachine.cs)[COMPILE ]
+            ProjectFileImpl(Path : Spritesheet.cs)[COMPILE ]
+        ProjectFileImpl(Path : Camera.cs)[COMPILE ]
+        ProjectFileImpl(Path : GameImage.cs)[COMPILE ]
+        Folder [Name:Helpers]
+          Child items:
+            ProjectFileImpl(Path : CircleUtillties.cs)[COMPILE ]
+            ProjectFileImpl(Path : RectangleUtilities.cs)[COMPILE ]
+        ProjectFileImpl(Path : Map.cs)[COMPILE ]
+        ProjectFileImpl(Path : SplashImage.cs)[COMPILE ]
+        ProjectFileImpl(Path : Sprite.cs)[COMPILE ]
+        ProjectFileImpl(Path : SpriteLayer.cs)[COMPILE ]
+        ProjectFileImpl(Path : Tile.cs)[COMPILE ]
+        Folder [Name:UI]
+          Child items:
+            ProjectFileImpl(Path : BaseUI.cs)[COMPILE ]
+            ProjectFileImpl(Path : BaseUIComponent.cs)[COMPILE ]
+            Folder [Name:Button]
+              Child items:
+                ProjectFileImpl(Path : BaseButtonUI.cs)[COMPILE ]
+                ProjectFileImpl(Path : EngineButton.cs)[COMPILE ]
+                ProjectFileImpl(Path : GameButton.cs)[COMPILE ]
+            Folder [Name:Checkbox]
+              Child items:
+                ProjectFileImpl(Path : BaseCheckBoxUI.cs)[COMPILE ]
+                ProjectFileImpl(Path : EngineCheckBox.cs)[COMPILE ]
+                ProjectFileImpl(Path : GameCheckBox.cs)[COMPILE ]
+            Folder [Name:Image]
+              Child items:
+                ProjectFileImpl(Path : BaseImage.cs)[COMPILE ]
+                ProjectFileImpl(Path : EngineImage.cs)[COMPILE ]
+                ProjectFileImpl(Path : GameImage.cs)[COMPILE ]
+            Folder [Name:ListBox]
+              Child items:
+                ProjectFileImpl(Path : BaseListBox.cs)[COMPILE ]
+                ProjectFileImpl(Path : EngineCustomListBox.cs)[COMPILE ]
+                ProjectFileImpl(Path : EngineListBox.cs)[COMPILE ]
+                ProjectFileImpl(Path : GameCustomListBox.cs)[COMPILE ]
+                ProjectFileImpl(Path : GameListBox.cs)[COMPILE ]
+                ProjectFileImpl(Path : GameMultiSelectionListbox.cs)[COMPILE ]
+                Folder [Name:ListBoxItems]
+                  Child items:
+                    ProjectFileImpl(Path : BaseListBoxItem.cs)[COMPILE ]
+                    ProjectFileImpl(Path : EngineListBoxItem.cs)[COMPILE ]
+                    ProjectFileImpl(Path : GameListBoxItem.cs)[COMPILE ]
+                    ProjectFileImpl(Path : GameListBoxItemSelectable.cs)[COMPILE ]
+            Folder [Name:ProgressBar]
+              Child items:
+                ProjectFileImpl(Path : BaseProgressBar.cs)[COMPILE ]
+                ProjectFileImpl(Path : EngineCustomProgressBar.cs)[COMPILE ]
+                ProjectFileImpl(Path : EngineProgressBar.cs)[COMPILE ]
+                ProjectFileImpl(Path : GameCustomProgressBar.cs)[COMPILE ]
+                ProjectFileImpl(Path : GameProgressBar.cs)[COMPILE ]
+            Folder [Name:TabControl]
+              Child items:
+                ProjectFileImpl(Path : BaseTabControl.cs)[COMPILE ]
+                ProjectFileImpl(Path : EngineTabControl.cs)[COMPILE ]
+                ProjectFileImpl(Path : GameTabControl.cs)[COMPILE ]
+            Folder [Name:TextBlock]
+              Child items:
+                ProjectFileImpl(Path : BaseTextBlock.cs)[COMPILE ]
+                ProjectFileImpl(Path : EngineTextBlock.cs)[COMPILE ]
+                ProjectFileImpl(Path : GameTextBlock.cs)[COMPILE ]
+            Folder [Name:Textbox]
+    Folder [Name:Resources]
+      Child items:
+        ProjectFileImpl(Path : EE_Exceptions.cs)[COMPILE ]
+        Folder [Name:FMOD]
+          Child items:
+            Folder [Name:x64]
+              Child items:
+                ProjectFileImpl(Path : fmod.dll)[CONTENT ]
+                ProjectFileImpl(Path : fmodstudio.dll)[CONTENT ]
+                ProjectFileImpl(Path : libfmod.so)[NONE ]
+                ProjectFileImpl(Path : libfmod.so.11)[NONE ]
+                ProjectFileImpl(Path : libfmod.so.11.8)[NONE ]
+                ProjectFileImpl(Path : libfmodstudio.so)[NONE ]
+                ProjectFileImpl(Path : libfmodstudio.so.11)[NONE ]
+                ProjectFileImpl(Path : libfmodstudio.so.11.8)[NONE ]
+            Folder [Name:x86]
+              Child items:
+                ProjectFileImpl(Path : fmod.dll)[CONTENT ]
+                ProjectFileImpl(Path : fmodstudio.dll)[CONTENT ]
+                ProjectFileImpl(Path : libfmod.so)[NONE ]
+                ProjectFileImpl(Path : libfmod.so.11)[NONE ]
+                ProjectFileImpl(Path : libfmod.so.11.8)[NONE ]
+                ProjectFileImpl(Path : libfmodstudio.so)[NONE ]
+                ProjectFileImpl(Path : libfmodstudio.so.11)[NONE ]
+                ProjectFileImpl(Path : libfmodstudio.so.11.8)[NONE ]
+        ProjectFileImpl(Path : IProperties.cs)[COMPILE ]
+        ProjectFileImpl(Path : IStateMachineTraversal.cs)[COMPILE ]
+        ProjectFileImpl(Path : NodeEditorExceptions.cs)[COMPILE ]
+        ProjectFileImpl(Path : ObservableDictionary.cs)[COMPILE ]
+        ProjectFileImpl(Path : ObservablePropertyDictionary.cs)[COMPILE ]
+        ProjectFileImpl(Path : ObservableSortedDictionary.cs)[COMPILE ]
+        ProjectFileImpl(Path : Resources.cs)[COMPILE ]
+        ProjectFileImpl(Path : SQLite.cs)[COMPILE ]
+    ProjectFileImpl(Path : SQLite.Interop.dll)[CONTENT ]
+    Folder [Name:SceneObject]
+      Child items:
+        ProjectFileImpl(Path : GameObject.cs)[COMPILE ]
+        ProjectFileImpl(Path : Prop.cs)[COMPILE ]
+        ProjectFileImpl(Path : Spawner.cs)[COMPILE ]
+        ProjectFileImpl(Path : Transistion.cs)[COMPILE ]
+    ProjectFileImpl(Path : TileCollisionChecker.cs)[COMPILE ]
+    Folder [Name:TimelinePlayer]
+      Child items:
+        ProjectFileImpl(Path : ChoiceTimeBlock.cs)[COMPILE ]
+        ProjectFileImpl(Path : TimeBlock.cs)[COMPILE ]
+        ProjectFileImpl(Path : Timeline.cs)[COMPILE ]
+    Folder [Name:Tweening]
+      Child items:
+        ProjectFileImpl(Path : Tweening.cs)[COMPILE ]
+    ProjectFileImpl(Path : sqlite3.dll)[CONTENT ]
+  Target framework: .NETFramework,Version=v4.6.1
+    Referenced projects:
+    Referenced assemblies:
+      MonoGame.Framework, Version=3.7.1.189, Culture=neutral, PublicKeyToken=null (/data/project/AmethystEngine/Components/Bixbite_Windows_Build/bin/Debug/MonoGame.Framework.dll, /data/project/BixBite/bin/Debug/MonoGame.Framework.dll, /data/project/ProjectE_E/bin/DesktopGL/AnyCPU/Debug/MonoGame.Framework.dll), Resolved [CopyLocal=True, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      mscorlib, Version=null, Unresolved [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=True, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      TimelinePlayer, Version=1.0.4.0, Culture=neutral, PublicKeyToken=null (/data/project/AmethystEngine/Resources/TimelinePlayer.dll), Resolved [CopyLocal=True, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      Microsoft.CSharp, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "Microsoft.CSharp". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      PresentationCore, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "PresentationCore". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      PresentationFramework, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "PresentationFramework". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Drawing". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Xml.Linq". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Data.DataSetExtensions". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Data". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Xml". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Core". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Core, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Core". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=True, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Data, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Data.DataSetExtensions". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Data". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Data.DataSetExtensions, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Data.DataSetExtensions". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Drawing, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Drawing". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Xml, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Xml.Linq". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Xml". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Xml.Linq, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Xml.Linq". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      WindowsBase, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "WindowsBase". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+
+Project [Name:Miscellaneous Files, GUID:7020124f-9ffc-4ac3-8f3d-aab8e0240759]
+  Sub items count: 0  Referenced projects:
+  Referenced assemblies:
+
+Project [Name:MonogameEngineTesting, GUID:ef66e055-5b8b-4990-bbe8-a890f12189f6]
+  CSharp Properties:
+    Active configuration for '.NETFramework,Version=v4.6.1':
+        AllowUnsafeCode:False
+        BaseAddress:4194304
+        CheckForOverflowUnderflow:False
+        FileAlignment:512
+        DebugSymbols:True
+        IncrementalBuild:True
+        WarningsAsErrors:
+        LanguageVersion:CSharp73
+        NullableContextKind:Disable
+        ImplicitUsingsKind:Disable
+        DefineConstants:DEBUG;TRACE;LINUX
+        EnableUnmanagedCodeDebugging:False
+        GenerateSerializationAssemblies :False
+        RelativeIntermediateDirectory:obj/Debug/
+        Optimize:False
+        RegisterForCOMInterop:False
+        RemoveIntegerChecks:False
+        NoWarn:;1701;1702
+        TreatWarningsAsErrors:False
+        WarningLevel:4
+        DocumentationFile:
+        OutputType:WIN_EXE
+        StartupObject:
+        OutputAssemblyName:ProjectE_E
+        OutputAssemblyExtension:.exe
+        HasRunCommand:False
+      Name:Debug
+      RelativeOutputDirectory:bin/DesktopGL/AnyCPU/Debug/
+      RelativeIntermediateDirectory:obj/Debug/
+      Properties:AndroidUseManagedDesignTimeResourceGenerator=True, AssemblyName=ProjectE_E, BaseIntermediateOutputPath=obj/, CSharpCoreTargetsPath=/usr/share/dotnet/sdk/7.0.400/Roslyn/Microsoft.CSharp.Core.targets, LangVersion=7.3, MSBuildProjectExtensionsPath=/data/project/ProjectE_E/obj/, NoWarn=;1701;1702, OutputPath=bin/DesktopGL/AnyCPU/Debug/, PlatformTarget=AnyCPU, ProduceReferenceAssembly=false, RootNamespace=ProjectE_E, RoslynTargetsPath=/usr/share/dotnet/sdk/7.0.400/Roslyn, TargetExt=.exe, TargetPath=/data/project/ProjectE_E/bin/DesktopGL/AnyCPU/Debug/ProjectE_E.exe
+    Build Settings:
+        PreBuildEvent:
+        PostBuildEvent:
+        ApplicationType:
+        DefaultNamespace:ProjectE_E
+        ImportedNamespaces:
+        RunPostBuildEventType:ALWAYS
+        IsBuildable:True
+        IsDeployable:False
+        Configuration:Debug
+        PlatformTarget:AnyCPU
+    ProjectTypeGuid:fae04ec0-301f-11d3-bf4b-00c04f79efbc
+  Child items:
+    Folder [Name:Components]
+      Child items:
+        ProjectFileImpl(Path : Camera.cs)[COMPILE ]
+        Folder [Name:Cuprite]
+          Child items:
+            ProjectFileImpl(Path : MapEvents.cs)[COMPILE ]
+        ProjectFileImpl(Path : Map.cs)[COMPILE ]
+        ProjectFileImpl(Path : Tile.cs)[COMPILE ]
+    Folder [Name:Content]
+      Child items:
+        ProjectFileImpl(Path : Content.mgcb)[MONOGAMECONTENTREFERENCE ]
+        Folder [Name:Images]
+          Child items:
+            ProjectFileImpl(Path : smolmegumin.jpg)[CONTENT ]
+    ProjectFileImpl(Path : EngineTester.cs)[COMPILE ]
+    ProjectFileImpl(Path : Icon.bmp)[EMBEDDEDRESOURCE ]
+    ProjectFileImpl(Path : Icon.ico)[EMBEDDEDRESOURCE ]
+    ProjectFileImpl(Path : MonoGame.Framework.dll.config (..\..\..\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll.config))[NONE ]
+    ProjectFileImpl(Path : MonogameEngineTesting.csproj)[]
+    ProjectFileImpl(Path : Program.cs)[COMPILE ]
+    Folder [Name:Properties, IsAppDesigner:true]
+      Child items:
+        ProjectFileImpl(Path : AssemblyInfo.cs)[COMPILE ]
+    ProjectFileImpl(Path : app.config)[NONE ]
+    ProjectFileImpl(Path : app.manifest)[NONE ]
+    ProjectFileImpl(Path : libSDL2-2.0.0.dylib (..\..\..\MonoGame\v3.0\Assemblies\DesktopGL\libSDL2-2.0.0.dylib))[NONE ]
+    ProjectFileImpl(Path : libopenal.1.dylib (..\..\..\MonoGame\v3.0\Assemblies\DesktopGL\libopenal.1.dylib))[NONE ]
+    Folder [Name:x64, Virtual:..\..\..\MonoGame\v3.0\Assemblies\DesktopGL\x64, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : SDL2.dll)[NONE ]
+        ProjectFileImpl(Path : libSDL2-2.0.so.0)[NONE ]
+        ProjectFileImpl(Path : libopenal.so.1)[NONE ]
+        ProjectFileImpl(Path : soft_oal.dll)[NONE ]
+    Folder [Name:x86, Virtual:..\..\..\MonoGame\v3.0\Assemblies\DesktopGL\x86, AllowsNonExistence:true]
+      Child items:
+        ProjectFileImpl(Path : SDL2.dll)[NONE ]
+        ProjectFileImpl(Path : libSDL2-2.0.so.0)[NONE ]
+        ProjectFileImpl(Path : libopenal.so.1)[NONE ]
+        ProjectFileImpl(Path : soft_oal.dll)[NONE ]
+  Target framework: .NETFramework,Version=v4.6.1
+    Referenced projects:
+      BixBite (BixBite) [CopyLocal=True, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+    Referenced assemblies:
+      MonoGame.Framework, Version=3.7.1.189, Culture=neutral, PublicKeyToken=null (/data/project/AmethystEngine/Components/Bixbite_Windows_Build/bin/Debug/MonoGame.Framework.dll, /data/project/BixBite/bin/Debug/MonoGame.Framework.dll, /data/project/ProjectE_E/bin/DesktopGL/AnyCPU/Debug/MonoGame.Framework.dll), Resolved [CopyLocal=True, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      mscorlib, Version=null, Unresolved [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=True, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      NodeEditor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null (/data/project/AmethystEngine/Resources/NodeEditor.dll), Resolved [CopyLocal=True, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Xml". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Core". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+      System.Xml, Unresolved (Reason: Reference was not resolved by MsBuild:
+[MSB3245] Could not resolve this reference. Could not locate the assembly "System.Xml". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors. at (2364:5)) [CopyLocal=False, AutoReferenced=False, AliasList=, EmbedInteropTypes=False, IsHidden=False, IsOutputAssembly=False, ReferenceOutputAssembly=True]
+
+Assembly: 'CollapsedPropertyGrid, Version=1', PlatformId: '.NETFramework,Version=v4.6.1', Files Count:1
+	/data/project/AmethystEngine/Resources/CollapsedPropertyGrid.dll
+  Reference target AssemblyName: mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: PresentationCore, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: PropertyGridEditor, Version=1.1.0.4, Culture=neutral, PublicKeyToken=null, HintLocation:  in Universal contexts
+  Reference target AssemblyName: System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System.Xaml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: WindowsBase, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+
+Assembly: 'CustomColorPicker, Version=1', PlatformId: '', Files Count:1
+	/data/project/AmethystEngine/Resources/CustomColorPicker.dll
+  Reference target AssemblyName: mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: PresentationCore, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: PresentationFramework, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: WindowsBase, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+
+Assembly: 'ImageCropper, Version=1', PlatformId: '.NETFramework,Version=v4.6.1', Files Count:1
+	/data/project/AmethystEngine/Resources/ImageCropper.dll
+  Reference target AssemblyName: mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: PresentationCore, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System.Xaml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: WindowsBase, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+
+Assembly: 'MonoGame.Framework, Version=3', PlatformId: '.NETFramework,Version=v4.5', Files Count:3
+	/data/project/AmethystEngine/Components/Bixbite_Windows_Build/bin/Debug/MonoGame.Framework.dll
+	/data/project/BixBite/bin/Debug/MonoGame.Framework.dll
+	/data/project/ProjectE_E/bin/DesktopGL/AnyCPU/Debug/MonoGame.Framework.dll
+  Reference target AssemblyName: mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System.Runtime.Serialization, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+
+Assembly: 'NodeEditor, Version=1', PlatformId: '.NETFramework,Version=v4.6.1', Files Count:1
+	/data/project/AmethystEngine/Resources/NodeEditor.dll
+  Reference target AssemblyName: mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: PresentationCore, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System.Xaml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: WindowsBase, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+
+Assembly: 'OutputLog, Version=1', PlatformId: '.NETFramework,Version=v4.6.1', Files Count:1
+	/data/project/AmethystEngine/Resources/OutputLog.dll
+  Reference target AssemblyName: mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: PresentationCore, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System.Xaml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: WindowsBase, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+
+Assembly: 'PropertyGridEditor, Version=1', PlatformId: '.NETFramework,Version=v4.6.1', Files Count:1
+	/data/project/AmethystEngine/Resources/PropertyGridEditor.dll
+  Reference target AssemblyName: CustomColorPicker, Version=1.0.7142.36104, Culture=neutral, PublicKeyToken=null, HintLocation:  in Universal contexts
+  Reference target AssemblyName: mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: PresentationCore, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System.Xaml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: WindowsBase, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+
+Assembly: 'TimelinePlayer, Version=1', PlatformId: '.NETFramework,Version=v4.6.1', Files Count:1
+	/data/project/AmethystEngine/Resources/TimelinePlayer.dll
+  Reference target AssemblyName: mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: PresentationCore, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: System.Xaml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, HintLocation: [Unresolved] in Universal contexts
+  Reference target AssemblyName: WindowsBase, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, HintLocation: [Unresolved] in Universal contexts
+

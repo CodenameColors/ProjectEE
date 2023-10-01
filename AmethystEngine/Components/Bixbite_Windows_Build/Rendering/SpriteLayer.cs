@@ -299,7 +299,7 @@ namespace BixBite.Rendering
 					if(g != null)
 						((Tuple<int[,], List<GameEvent>>)LayerObjects).Item2.Add(g); //add the game event data!
 				}
-				else Console.WriteLine("Incorrect Layer type!");
+				else Console.WriteLine(@"Incorrect Layer type!");
 				return;
 			}
 		}

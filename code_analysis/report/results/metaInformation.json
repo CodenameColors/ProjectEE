@@ -1,0 +1,19 @@
+{
+  "total": 17734,
+  "tools inspection": {
+    "Code Inspection": 17734
+  },
+  "linter": "QDNET",
+  "attributes": {
+    "vcs": {
+      "sarifIdea": {
+        "repositoryUri": "https://github.com/CodenameColors/ProjectEE.git",
+        "revisionId": "609747b911e186d1288bdf64b98ccdb99f8bea04",
+        "branch": "Animation"
+      }
+    },
+    "deviceId": "200820300000000-adbc-7923-32b1-fe0d9e53d009",
+    "jobUrl": "",
+    "repoUrl": "https://github.com/CodenameColors/ProjectEE.git"
+  }
+}

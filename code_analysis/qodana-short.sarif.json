@@ -1,0 +1,200 @@
+{
+  "$schema": "https://raw.githubusercontent.com/schemastore/schemastore/master/src/schemas/json/sarif-2.1.0-rtm.5.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "QDNET",
+          "fullName": "Qodana for .NET",
+          "version": "232.9881.19.143",
+          "rules": [],
+          "taxa": [],
+          "language": "en-US",
+          "contents": [
+            "localizedData",
+            "nonLocalizedData"
+          ],
+          "isComprehensive": false
+        },
+        "extensions": []
+      },
+      "invocations": [
+        {
+          "exitCode": 0,
+          "toolExecutionNotifications": [
+            {
+              "message": {
+                "text": "Reporting from [] 'sanity' inspections was suspended due to high problems count."
+              },
+              "level": "error"
+            }
+          ],
+          "executionSuccessful": true
+        }
+      ],
+      "language": "en-US",
+      "versionControlProvenance": [
+        {
+          "repositoryUri": "https://github.com/CodenameColors/ProjectEE.git",
+          "revisionId": "609747b911e186d1288bdf64b98ccdb99f8bea04",
+          "branch": "Animation",
+          "properties": {
+            "repoUrl": "https://github.com/CodenameColors/ProjectEE.git",
+            "lastAuthorName": "CodenameColors",
+            "vcsType": "Git",
+            "lastAuthorEmail": "calling911x@gmail.com"
+          }
+        }
+      ],
+      "results": [],
+      "automationDetails": {
+        "id": "Monogame_AmethystEngine/qodana/2023-09-21",
+        "guid": "f0de2abd-f44a-4a50-bcbf-96c9e04859ad",
+        "properties": {
+          "jobUrl": ""
+        }
+      },
+      "newlineSequences": [
+        "\r\n",
+        "\n"
+      ],
+      "properties": {
+        "qodana.sanity.results": [
+          {
+            "ruleId": "RiderSolutionErrorsInspection",
+            "kind": "fail",
+            "level": "error",
+            "message": {
+              "text": "MSBuild cannot find TargetFramework assemblies for .NETFramework,Version=v4.6.1",
+              "markdown": "MSBuild cannot find TargetFramework assemblies for .NETFramework,Version=v4.6.1"
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "AmethystEngine/AmethystEngine.csproj",
+                    "uriBaseId": "SRCROOT"
+                  }
+                }
+              }
+            ],
+            "partialFingerprints": {
+              "equalIndicator/v1": "3b849ae38226a4b39434208edb98ca14105a0dcda4357aa213aa6d6845c21de2"
+            },
+            "properties": {
+              "ideaSeverity": "ERROR",
+              "qodanaSeverity": "Critical"
+            }
+          },
+          {
+            "ruleId": "RiderSolutionErrorsInspection",
+            "kind": "fail",
+            "level": "error",
+            "message": {
+              "text": "MSBuild cannot find TargetFramework assemblies for .NETFramework,Version=v4.6.1",
+              "markdown": "MSBuild cannot find TargetFramework assemblies for .NETFramework,Version=v4.6.1"
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "BixBite/BixBite.csproj",
+                    "uriBaseId": "SRCROOT"
+                  }
+                }
+              }
+            ],
+            "partialFingerprints": {
+              "equalIndicator/v1": "3c256e1acdb23794e59fcb6c9219d0f4be486751d378b9ee00c6bfb3bd39eb7d"
+            },
+            "properties": {
+              "ideaSeverity": "ERROR",
+              "qodanaSeverity": "Critical"
+            }
+          },
+          {
+            "ruleId": "RiderSolutionErrorsInspection",
+            "kind": "fail",
+            "level": "error",
+            "message": {
+              "text": "[MSB4019] The imported project \"/usr/share/dotnet/sdk/7.0.400/MonoGame/v3.0/MonoGame.Content.Builder.targets\" was not found. Confirm that the expression in the Import declaration \"/usr/share/dotnet/sdk/7.0.400/MonoGame/v3.0/MonoGame.Content.Builder.targets\" is correct, and that the file exists on disk. $PROJECT_DIR$/ProjectE_E/MonogameEngineTesting.csproj at (130:3)",
+              "markdown": "\\[[MSB4019](http://www.google.com/search?q=MSB4019)\\] The imported project \"/usr/share/dotnet/sdk/7.0.400/MonoGame/v3.0/MonoGame.Content.Builder.targets\" was not found. Confirm that the expression in the Import declaration \"/usr/share/dotnet/sdk/7.0.400/MonoGame/v3.0/MonoGame.Content.Builder.targets\" is correct, and that the file exists on disk. $PROJECT_DIR$/ProjectE_E/MonogameEngineTesting.csproj at (130:3)"
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "ProjectE_E/MonogameEngineTesting.csproj",
+                    "uriBaseId": "SRCROOT"
+                  }
+                }
+              }
+            ],
+            "partialFingerprints": {
+              "equalIndicator/v1": "5d13d64f2ad6f1151ff43d6856c9661a695cce8a2d55028be5828abc51d42fa9"
+            },
+            "properties": {
+              "ideaSeverity": "ERROR",
+              "qodanaSeverity": "Critical"
+            }
+          },
+          {
+            "ruleId": "RiderSolutionErrorsInspection",
+            "kind": "fail",
+            "level": "error",
+            "message": {
+              "text": "MSBuild cannot find TargetFramework assemblies for .NETFramework,Version=v4.6.1",
+              "markdown": "MSBuild cannot find TargetFramework assemblies for .NETFramework,Version=v4.6.1"
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "ProjectE_E/MonogameEngineTesting.csproj",
+                    "uriBaseId": "SRCROOT"
+                  }
+                }
+              }
+            ],
+            "partialFingerprints": {
+              "equalIndicator/v1": "70098f94360fdc802a64c08b573a675f124ecda95fd69215b6a8d92d0efc6a08"
+            },
+            "properties": {
+              "ideaSeverity": "ERROR",
+              "qodanaSeverity": "Critical"
+            }
+          },
+          {
+            "ruleId": "RiderSolutionErrorsInspection",
+            "kind": "fail",
+            "level": "error",
+            "message": {
+              "text": "Make sure that all SDKs and components required for project 'MonogameEngineTesting' are installed. Missing import: /usr/share/dotnet/sdk/7.0.400/MonoGame/v3.0/MonoGame.Content.Builder.targets",
+              "markdown": "Make sure that all SDKs and components required for project 'MonogameEngineTesting' are installed.   \nMissing import: /usr/share/dotnet/sdk/7.0.400/MonoGame/v3.0/MonoGame.Content.Builder.targets"
+            },
+            "locations": [
+              {
+                "physicalLocation": {
+                  "artifactLocation": {
+                    "uri": "ProjectE_E/MonogameEngineTesting.csproj",
+                    "uriBaseId": "SRCROOT"
+                  }
+                }
+              }
+            ],
+            "partialFingerprints": {
+              "equalIndicator/v1": "91234696fe89aefbb913af34e34fe28304a02277160642f12ea51c961280c04c"
+            },
+            "properties": {
+              "ideaSeverity": "ERROR",
+              "qodanaSeverity": "Critical"
+            }
+          }
+        ],
+        "configProfile": "absent",
+        "deviceId": "200820300000000-adbc-7923-32b1-fe0d9e53d009"
+      }
+    }
+  ]
+}

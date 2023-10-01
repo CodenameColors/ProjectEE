@@ -14,10 +14,12 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -77,6 +79,46 @@ namespace AmethystEngine.Forms
 	/// </summary>
 	public partial class EngineEditor : Window, INotifyPropertyChanged
 	{
+		[DllImport("user32.dll")]
+		private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+		[DllImport("user32.dll", SetLastError = true)]
+		private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+		[DllImport("user32")]
+		private static extern IntPtr SetParent(IntPtr hWnd, IntPtr hWndParent);
+
+		[DllImport("user32")]
+		private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
+
+		// Define Win32 API functions and constants
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+		[DllImport("user32.dll")]
+		public static extern IntPtr SetFocus(IntPtr hWnd);
+
+		[DllImport("user32.dll")]
+		public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+		[DllImport("user32.dll")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		private static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
+
+		// Constants for show commands (used with ShowWindow)
+		public const int SW_RESTORE = 9;
+		public const int SW_SHOW = 5;
+
+		private const int SWP_NOZORDER = 0x0004;
+		private const int SWP_NOACTIVATE = 0x0010;
+		private const int GWL_STYLE = -16;
+		private const int WS_CAPTION = 0x00C00000;
+		private const int WS_THICKFRAME = 0x00040000;
+		private const int WS_EX_LAYERED = 0x80000;
+		private const int GWL_EXSTYLE = -20;
+		private const int LWA_ALPHA = 0x2;
+
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -98,6 +140,7 @@ namespace AmethystEngine.Forms
 		TreeView CurrentProjectTreeView = new TreeView();
 
 		#region Fields
+		private Process linkedGameProcess;
 
 		#endregion
 
@@ -152,11 +195,6 @@ namespace AmethystEngine.Forms
 			TileMap_Canvas = (Canvas) (ContentLibrary_Control.Template.FindName("TileMap_Canvas", ContentLibrary_Control));
 			TileSets_CB = (ComboBox) (ContentLibrary_Control.Template.FindName("TileSetSelector_CB", ContentLibrary_Control));
 
-
-
-
-
-
 			this.DataContext = this;
 
 			SetupPreviewAnimationThread_CE();
@@ -165,6 +203,9 @@ namespace AmethystEngine.Forms
 			// Set up the tab control
 			AE_CurrentAnimSM_Grid.Visibility = Visibility.Hidden;
 			AE_NewAnimSM_MainGrid.Visibility = Visibility.Visible;
+
+
+			InitializeComponent();
 
 		}
 
@@ -178,6 +219,7 @@ namespace AmethystEngine.Forms
 		/// <param name="LevelPath"></param>
 		public EngineEditor(String FilePath, String ProjectName = "", String LevelPath = "")
 		{
+			DataContext = this;
 			InitializeComponent();
 			ProjectFilePath = FilePath;
 
@@ -187,9 +229,6 @@ namespace AmethystEngine.Forms
 			LoadInitalVars();
 			LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\"));
 			CurrentWorkingDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\");
-
-			this.DataContext = this;
-
 		}
 
 		/// <summary>
@@ -1382,6 +1421,78 @@ namespace AmethystEngine.Forms
 		}
 
 
+		private void SetOpacityForChildWindow(IntPtr childWindowHandle, byte opacity, int style)
+		{
+			// Enable WS_EX_LAYERED style to make the window layered (supports transparency)
+			int extendedStyle = 0; // = style;
+			extendedStyle |= GetWindowLong(childWindowHandle, GWL_EXSTYLE);
+			extendedStyle |= (extendedStyle | WS_EX_LAYERED);
+			extendedStyle &= ~WS_CAPTION & ~WS_THICKFRAME;
+			SetWindowLong(childWindowHandle, GWL_EXSTYLE, extendedStyle);
+
+			// Set the window opacity using SetLayeredWindowAttributes
+			SetLayeredWindowAttributes(childWindowHandle, 0, opacity, LWA_ALPHA);
+			
+			style = style & ~WS_CAPTION & ~WS_THICKFRAME;
+			SetWindowLong(linkedGameProcess.MainWindowHandle, GWL_STYLE, style);
+		}
+
+		private void LaunchChildProcess()
+		{
+			string path =ProjectFilePath.Replace(".gem", "");
+			path += String.Format( "{0}",  "_Game") ;
+			path += String.Format("\\{0}\\{1}\\{2}\\{3}\\Game1.exe", "bin", "DesktopGL", "AnyCPU", "Debug");
+			
+			Console.WriteLine( File.Exists(path));
+			linkedGameProcess = new Process();
+			linkedGameProcess.StartInfo = new ProcessStartInfo(path)
+			{
+				WorkingDirectory = path,
+			};
+			linkedGameProcess.Start();
+			Thread.Sleep(2000);
+			linkedGameProcess.WaitForInputIdle();
+
+			var helper = new WindowInteropHelper(this);
+
+			SetParent(linkedGameProcess.MainWindowHandle, helper.Handle);
+			Thread.Sleep(1000);
+
+			// remove control box
+			int style = GetWindowLong(linkedGameProcess.MainWindowHandle, GWL_STYLE);
+			style = style & ~WS_CAPTION & ~WS_THICKFRAME;
+			SetOpacityForChildWindow(linkedGameProcess.MainWindowHandle, Byte.MaxValue, style);
+
+			ResizeEmbeddedApp();
+		}
+
+		private void ResizeEmbeddedApp()
+		{
+			if (linkedGameProcess == null)
+				return;
+
+			// Assuming you have a reference to the DockPanel you want to get the position of
+			DockPanel dockPanel = Game_DockPanel; // Replace with your actual DockPanel reference
+
+			// Get the position of the DockPanel relative to its parent container
+			Point positionRelativeToParent = dockPanel.TransformToAncestor(this).Transform(new Point(0, 0));
+
+
+			// The positionRelativeToParent now contains the X and Y coordinates of the DockPanel
+			int x = (int)positionRelativeToParent.X;
+			int y = (int)positionRelativeToParent.Y;
+
+			SetWindowPos(linkedGameProcess.MainWindowHandle, IntPtr.Zero, x, y, (int)dockPanel.ActualWidth, (int)dockPanel.ActualHeight, SWP_NOZORDER | SWP_NOACTIVATE);
+		}
+
+		protected override System.Windows.Size MeasureOverride(System.Windows.Size availableSize)
+		{
+			System.Windows.Size size = base.MeasureOverride(availableSize);
+			ResizeEmbeddedApp();
+			return size;
+		}
+
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -1389,6 +1500,18 @@ namespace AmethystEngine.Forms
 		/// <param name="e"></param>
 		private void GameTestRun_BTN_Click(object sender, RoutedEventArgs e)
 		{
+			try
+			{
+				EditorWindows_TC.SelectedIndex = 7;
+				LaunchChildProcess();
+				//SetOpacityForChildWindow(linkedGameProcess.MainWindowHandle, Byte.MaxValue);
+
+			}
+			catch (Exception ex)
+			{
+				// Handle any exceptions that occurred during assembly loading or type retrieval
+				Console.WriteLine("An error occurred: " + ex.Message);
+			}
 
 		}
 

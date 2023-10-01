@@ -403,7 +403,7 @@ namespace BixBite.Rendering
 
 		public void Draw(SpriteBatch sb)
 		{
-			sb.Draw(text, Screen_pos);
+			// sb.Draw(text, Screen_pos);
 		}
 
 		public virtual void Draw_Crop(SpriteBatch sb, int posx, int posy, int x, int y, int w, int h)

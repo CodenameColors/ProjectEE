@@ -1,0 +1,156 @@
+{"version":"3","listProblem":[{
+  "tool": "Code Inspection",
+  "category": "General",
+  "type": "Rider toolset and environment errors",
+  "tags": [
+    "Sanity"
+  ],
+  "severity": "Critical",
+  "comment": "MSBuild cannot find TargetFramework assemblies for .NETFramework,Version=v4.6.1",
+  "detailsInfo": "Reports toolset and environment errors detected by Rider.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "AmethystEngine/AmethystEngine.csproj",
+      "language": "",
+      "line": 0,
+      "offset": 0,
+      "length": 0,
+      "code": {
+        "startLine": 0,
+        "length": 0,
+        "offset": 0,
+        "surroundingCode": ""
+      }
+    }
+  ],
+  "attributes": {
+    "module": "",
+    "inspectionName": "RiderSolutionErrorsInspection"
+  },
+  "hash": "3b849ae38226a4b39434208edb98ca14105a0dcda4357aa213aa6d6845c21de2"
+},{
+  "tool": "Code Inspection",
+  "category": "General",
+  "type": "Rider toolset and environment errors",
+  "tags": [
+    "Sanity"
+  ],
+  "severity": "Critical",
+  "comment": "MSBuild cannot find TargetFramework assemblies for .NETFramework,Version=v4.6.1",
+  "detailsInfo": "Reports toolset and environment errors detected by Rider.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "BixBite/BixBite.csproj",
+      "language": "",
+      "line": 0,
+      "offset": 0,
+      "length": 0,
+      "code": {
+        "startLine": 0,
+        "length": 0,
+        "offset": 0,
+        "surroundingCode": ""
+      }
+    }
+  ],
+  "attributes": {
+    "module": "",
+    "inspectionName": "RiderSolutionErrorsInspection"
+  },
+  "hash": "3c256e1acdb23794e59fcb6c9219d0f4be486751d378b9ee00c6bfb3bd39eb7d"
+},{
+  "tool": "Code Inspection",
+  "category": "General",
+  "type": "Rider toolset and environment errors",
+  "tags": [
+    "Sanity"
+  ],
+  "severity": "Critical",
+  "comment": "[MSB4019] The imported project \"/usr/share/dotnet/sdk/7.0.400/MonoGame/v3.0/MonoGame.Content.Builder.targets\" was not found. Confirm that the expression in the Import declaration \"/usr/share/dotnet/sdk/7.0.400/MonoGame/v3.0/MonoGame.Content.Builder.targets\" is correct, and that the file exists on disk. $PROJECT_DIR$/ProjectE_E/MonogameEngineTesting.csproj at (130:3)",
+  "detailsInfo": "Reports toolset and environment errors detected by Rider.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "ProjectE_E/MonogameEngineTesting.csproj",
+      "language": "",
+      "line": 0,
+      "offset": 0,
+      "length": 0,
+      "code": {
+        "startLine": 0,
+        "length": 0,
+        "offset": 0,
+        "surroundingCode": ""
+      }
+    }
+  ],
+  "attributes": {
+    "module": "",
+    "inspectionName": "RiderSolutionErrorsInspection"
+  },
+  "hash": "5d13d64f2ad6f1151ff43d6856c9661a695cce8a2d55028be5828abc51d42fa9"
+},{
+  "tool": "Code Inspection",
+  "category": "General",
+  "type": "Rider toolset and environment errors",
+  "tags": [
+    "Sanity"
+  ],
+  "severity": "Critical",
+  "comment": "MSBuild cannot find TargetFramework assemblies for .NETFramework,Version=v4.6.1",
+  "detailsInfo": "Reports toolset and environment errors detected by Rider.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "ProjectE_E/MonogameEngineTesting.csproj",
+      "language": "",
+      "line": 0,
+      "offset": 0,
+      "length": 0,
+      "code": {
+        "startLine": 0,
+        "length": 0,
+        "offset": 0,
+        "surroundingCode": ""
+      }
+    }
+  ],
+  "attributes": {
+    "module": "",
+    "inspectionName": "RiderSolutionErrorsInspection"
+  },
+  "hash": "70098f94360fdc802a64c08b573a675f124ecda95fd69215b6a8d92d0efc6a08"
+},{
+  "tool": "Code Inspection",
+  "category": "General",
+  "type": "Rider toolset and environment errors",
+  "tags": [
+    "Sanity"
+  ],
+  "severity": "Critical",
+  "comment": "Make sure that all SDKs and components required for project 'MonogameEngineTesting' are installed. Missing import: /usr/share/dotnet/sdk/7.0.400/MonoGame/v3.0/MonoGame.Content.Builder.targets",
+  "detailsInfo": "Reports toolset and environment errors detected by Rider.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "ProjectE_E/MonogameEngineTesting.csproj",
+      "language": "",
+      "line": 0,
+      "offset": 0,
+      "length": 0,
+      "code": {
+        "startLine": 0,
+        "length": 0,
+        "offset": 0,
+        "surroundingCode": ""
+      }
+    }
+  ],
+  "attributes": {
+    "module": "",
+    "inspectionName": "RiderSolutionErrorsInspection"
+  },
+  "hash": "91234696fe89aefbb913af34e34fe28304a02277160642f12ea51c961280c04c"
+}]}
