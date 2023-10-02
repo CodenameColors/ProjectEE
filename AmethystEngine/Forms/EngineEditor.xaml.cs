@@ -4,6 +4,7 @@ using BixBite;
 using BixBite.Rendering;
 using BixBite.Resources;
 using PropertyGridEditor;
+using BixBite.Dolomite; // This is the asset to monogame XNB file builder
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -141,7 +142,7 @@ namespace AmethystEngine.Forms
 
 		#region Fields
 		private Process linkedGameProcess;
-
+		private MonoGameContentBuilder _monoGameContentBuilder;
 		#endregion
 
 		#region Properties
@@ -229,6 +230,9 @@ namespace AmethystEngine.Forms
 			LoadInitalVars();
 			LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\"));
 			CurrentWorkingDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\");
+
+			_monoGameContentBuilder = new MonoGameContentBuilder(ProjectFilePath.Substring(0, ProjectFilePath.LastIndexOf("\\")));
+
 		}
 
 		/// <summary>
@@ -867,6 +871,65 @@ namespace AmethystEngine.Forms
 			{
 				ListDirectory(ProjectContentExplorer, Path);
 			}
+		}
+
+		static bool ContainsFolder(string directoryPath, string targetFolderName)
+		{
+			// Check if the directory itself has the target folder
+			if (Directory.Exists(Path.Combine(directoryPath, targetFolderName)))
+			{
+				return true;
+			}
+
+			// Check subdirectories recursively
+			string[] subdirectories = Directory.GetDirectories(directoryPath);
+			foreach (string subdirectory in subdirectories)
+			{
+				if (ContainsFolder(subdirectory, targetFolderName))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		private void ContentImportAndBuildXNB_BTN_OnClick(object sender, RoutedEventArgs e)
+		{
+			// Are we in the right directory...?
+			if (ContainsFolder(CurrentWorkingDirectory, "Content"))
+			{
+				// Are we in the right directory...?
+				if (ContainsFolder(CurrentWorkingDirectory, "Images"))
+				{
+					// We are going to be handling an image build here.
+					Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+					{
+						FileName = "images", //default file 
+						Title = "Import and build new Image file",
+						DefaultExt = "All files (*.png)|*.png", //default file extension
+						Filter = "png file (*.png)|*.png"
+					};
+
+					// Show save file dialog box
+					Nullable<bool> result = dlg.ShowDialog();
+					// Process save file dialog box results kicks out if the user doesn't select an item.
+					String importfilename, destfilename = "";
+					if (result == true)
+					{
+						importfilename = dlg.FileName;
+					}
+					else
+						return;
+
+
+					_monoGameContentBuilder.AttemptToBuildPNGToXNBFile(importfilename,
+						ProjectFilePath.Replace(".gem", "_Game\\Content\\Content.mgcb"));
+				}
+
+
+			}
+
 		}
 
 		/// <summary>
@@ -1740,6 +1803,8 @@ namespace AmethystEngine.Forms
 				return bitmapImage;
 			}
 		}
+
+
 	}
 }
 

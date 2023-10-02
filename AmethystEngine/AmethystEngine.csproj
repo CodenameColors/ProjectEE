@@ -79,6 +79,9 @@
     <Reference Include="MonoGame.Framework, Version=3.8.0.1641, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.8.0.1641\lib\net452\MonoGame.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="MonoGame.Framework.Content.Pipeline">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\MSBuild\MonoGame\v3.0\Tools\MonoGame.Framework.Content.Pipeline.dll</HintPath>
+    </Reference>
     <Reference Include="MonoGame.Framework.WpfInterop, Version=1.9.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MonoGame.Framework.WpfInterop.1.9.2\lib\net452\MonoGame.Framework.WpfInterop.dll</HintPath>
     </Reference>
@@ -215,6 +218,7 @@
     <Compile Include="Components\Bixbite_Windows_Build\Crafting\PuzzlePiece.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Crafting\PuzzlePieceCreationHelper.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Crafting\Recipe.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\Dolomite\MonoGameContentBuilder.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Effects\ImageEffect.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\GameEvent.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Input\InputController.cs" />

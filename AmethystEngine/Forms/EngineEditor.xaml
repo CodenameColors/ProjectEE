@@ -2382,9 +2382,12 @@
 			<GridSplitter x:Name="Pro_Cont_GS" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="3" Background="#FF868686"/>
 
 			<Label x:Name="label1" Content="Content Explorer" Grid.Column="1" HorizontalAlignment="Left" Margin="41,0,0,0" VerticalAlignment="Top" Foreground="White"/>
-			<Button x:Name="ContentExplorerImport_BTN"  Content="Import" Grid.Column="1" HorizontalAlignment="Right" Width="50" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373" Click="ContentExplorerImport_BTN_Click"/>
-			<Button x:Name="ContentExplorerNewFolder_BTN"  Content="New Folder" Grid.Column="1" HorizontalAlignment="Right" Width="65" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373" Click="ContentExplorerImport_BTN_Click" Margin="0,0,103,0"/>
-			<Button x:Name="ContentExplorerNewFile_BTN"  Content="New File" Grid.Column="1" HorizontalAlignment="Right" Width="53" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373" Click="ContentExplorerImport_BTN_Click" Margin="0,0,50,0"/>
+			<Button x:Name="ContentImportAndBuildXNB_BTN"  Content="Import and Build" Grid.Column="1" HorizontalAlignment="Right" Width="100" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373"
+			        Margin="0,0,0,0" Click="ContentImportAndBuildXNB_BTN_OnClick"/>
+			<Button x:Name="ContentExplorerImport_BTN"  Content="Import" Grid.Column="1" HorizontalAlignment="Right" Width="50" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373"
+							Margin="0,0,102,0" Click="ContentExplorerImport_BTN_Click"/>
+			<Button x:Name="ContentExplorerNewFolder_BTN"  Content="New Folder" Grid.Column="1" HorizontalAlignment="Right" Width="65" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373" Click="ContentExplorerImport_BTN_Click" Margin="0,0,211,0"/>
+			<Button x:Name="ContentExplorerNewFile_BTN"  Content="New File" Grid.Column="1" HorizontalAlignment="Right" Width="53" Foreground="Black" VerticalAlignment="Top" Height="25" Background="#FF4F4F4F" BorderThickness="0" BorderBrush="#FF767373" Click="ContentExplorerImport_BTN_Click" Margin="0,0,155,0"/>
 
 
 			<GridSplitter x:Name="Cont_Scene_GS" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="3" Background="#FF868686"/>

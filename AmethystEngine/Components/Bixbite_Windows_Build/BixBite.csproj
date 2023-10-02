@@ -44,6 +44,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>
     </Reference>
+    <Reference Include="MonoGame.Framework.Content.Pipeline">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\MSBuild\MonoGame\v3.0\Tools\MonoGame.Framework.Content.Pipeline.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -101,6 +104,7 @@
     <Compile Include="Crafting\PuzzlePieceCreationHelper.cs" />
     <Compile Include="Crafting\Recipe.cs" />
     <Compile Include="DialogueScene.cs" />
+    <Compile Include="Dolomite\MonoGameContentBuilder.cs" />
     <Compile Include="Effects\ImageEffect.cs" />
     <Compile Include="GameEvent.cs" />
     <Compile Include="Combat\Equipables\Item.cs" />
