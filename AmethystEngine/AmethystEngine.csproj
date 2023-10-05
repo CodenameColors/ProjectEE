@@ -35,7 +35,7 @@
     </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -69,6 +69,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Resources\CustomColorPicker.dll</HintPath>
     </Reference>
+    <Reference Include="FreeImageNET, Version=3.15.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\MSBuild\MonoGame\v3.0\Tools\FreeImageNET.dll</HintPath>
+    </Reference>
     <Reference Include="ImageCropper">
       <HintPath>..\..\..\Visual Studio 2019\Projects\MyWPFControls\CroppableImage\ImageCropper\bin\Debug\ImageCropper.dll</HintPath>
     </Reference>
@@ -76,8 +80,9 @@
     <Reference Include="Microsoft.Build.Conversion.v4.0" />
     <Reference Include="Microsoft.Build.Engine" />
     <Reference Include="Microsoft.Build.Framework" />
-    <Reference Include="MonoGame.Framework, Version=3.8.0.1641, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.8.0.1641\lib\net452\MonoGame.Framework.dll</HintPath>
+    <Reference Include="MonoGame.Framework, Version=3.7.1.189, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="MonoGame.Framework.Content.Pipeline">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\MSBuild\MonoGame\v3.0\Tools\MonoGame.Framework.Content.Pipeline.dll</HintPath>
@@ -218,7 +223,6 @@
     <Compile Include="Components\Bixbite_Windows_Build\Crafting\PuzzlePiece.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Crafting\PuzzlePieceCreationHelper.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Crafting\Recipe.cs" />
-    <Compile Include="Components\Bixbite_Windows_Build\Dolomite\MonoGameContentBuilder.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Effects\ImageEffect.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\GameEvent.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Input\InputController.cs" />
@@ -314,6 +318,7 @@
     <Compile Include="Components\Bixbite_Windows_Build\Tweening\Tweening.cs" />
     <Compile Include="Components\CanvasSpritesheet.cs" />
     <Compile Include="Components\DialogueScene.cs" />
+    <Compile Include="Components\Dolomite\MonoGameContentBuilder.cs" />
     <Compile Include="Components\PropertyBag.cs" />
     <Compile Include="Components\Tools\Cuprite.cs" />
     <Compile Include="Converters\EndOfPathConverter.cs" />
@@ -538,6 +543,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\CustomColorPicker.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\FreeImage.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\FreeImageNET.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\ImageCropper.dll">

@@ -4,7 +4,6 @@ using BixBite;
 using BixBite.Rendering;
 using BixBite.Resources;
 using PropertyGridEditor;
-using BixBite.Dolomite; // This is the asset to monogame XNB file builder
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,6 +23,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using AmethystEngine.Components.Dolomite;
 using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
 using Color = System.Windows.Media.Color;
@@ -923,7 +923,7 @@ namespace AmethystEngine.Forms
 						return;
 
 
-					_monoGameContentBuilder.AttemptToBuildPNGToXNBFile(importfilename,
+					_monoGameContentBuilder.AttemptToBuildPNGToXNBFile(importfilename, ProjectFilePath.Replace(".gem", "_Game\\Content\\Images"),
 						ProjectFilePath.Replace(".gem", "_Game\\Content\\Content.mgcb"));
 				}
 
