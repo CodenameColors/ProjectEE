@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<GameUI Name="NewUITool" Width="458" Height="156" Background="#00000000" ShowBorder="False" Zindex="1">
+  <GameTextBlock Name="NewTextBox" Width="130" Height="130" Background="#00000000" ShowBorder="False" Zindex="2" Xoffset="98" YOffset="7" ContentText="" Font="Ariel" FontSize="24" FontColor="Black" FontStyle="Normal" TextSpeed="1" TextTime="1" Image="C:/Users/Antonio/Documents/CreateTest/test2/test2_Game/Content/Images/Persona5_TB.png" />
+  <GameIMG Name="NewImgBox" Width="50" Height="50" Background="#00000000" ShowBorder="False" Zindex="1" Xoffset="5" YOffset="20" Image="" />
+</GameUI>

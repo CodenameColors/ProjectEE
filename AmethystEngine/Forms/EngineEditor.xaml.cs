@@ -162,7 +162,8 @@ namespace AmethystEngine.Forms
 
 		String ProjectFilePath = "";
 		String MainLevelPath = "";
-		String CurrentWorkingDirectory = "";
+		String ProjectDirectory = "";
+		String ProjectContentDirectory = "";
 
 		ObservablePropertyDictionary EditorObjectProperties = new ObservablePropertyDictionary();
 
@@ -229,7 +230,8 @@ namespace AmethystEngine.Forms
 			MainLevelPath = LevelPath;
 			LoadInitalVars();
 			LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\"));
-			CurrentWorkingDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\");
+			ProjectDirectory = ProjectFilePath;
+			ProjectContentDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\");
 
 			_monoGameContentBuilder = new MonoGameContentBuilder(ProjectFilePath.Substring(0, ProjectFilePath.LastIndexOf("\\")));
 
@@ -789,7 +791,7 @@ namespace AmethystEngine.Forms
 			ContentLibaryObjList.Clear();
 			if (CurrentProjectTreeView.Items.Count == 0) return;
 			((TreeViewItem) (CurrentProjectTreeView.SelectedItem)).IsExpanded = true;
-			CurrentWorkingDirectory = ProjectFilePath.Replace(".gem",
+			ProjectDirectory = ProjectFilePath.Replace(".gem",
 				"_Game\\Content\\" + ((TreeViewItem) (CurrentProjectTreeView.SelectedItem)).Header + "\\");
 			AmethystEngine.Components.EObjectType EType = EObjectType.File;
 			foreach (TreeViewItem tvi in ((TreeViewItem) (CurrentProjectTreeView.SelectedItem)).Items)
@@ -900,10 +902,10 @@ namespace AmethystEngine.Forms
 		private void ContentImportAndBuildXNB_BTN_OnClick(object sender, RoutedEventArgs e)
 		{
 			// Are we in the right directory...?
-			if (ContainsFolder(CurrentWorkingDirectory, "Content"))
+			if (ContainsFolder(ProjectDirectory, "Content"))
 			{
 				// Are we in the right directory...?
-				if (ContainsFolder(CurrentWorkingDirectory, "Images"))
+				if (ContainsFolder(ProjectDirectory, "Images"))
 				{
 					// We are going to be handling an image build here.
 					Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
@@ -968,7 +970,7 @@ namespace AmethystEngine.Forms
 
 			//filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] { '/', '\\' }));
 			int len = importstartlocation.Length - importstartlocation.LastIndexOfAny(new char[] {'/', '\\'});
-			destfilename = CurrentWorkingDirectory + importstartlocation.Substring(
+			destfilename = ProjectDirectory + importstartlocation.Substring(
 				importstartlocation.LastIndexOfAny(new char[] {'\\', '/'}) + 1, len - 1);
 
 			//copy the file
@@ -1020,7 +1022,7 @@ namespace AmethystEngine.Forms
 				case (EObjectType.File):
 					return;
 				case (EObjectType.Folder):
-					CurrentWorkingDirectory = ProjectFilePath.Replace(".gem",
+					ProjectDirectory = ProjectFilePath.Replace(".gem",
 						"_Game\\Content\\" + ((EditorObject) ((ListBox) sender).SelectedItem).Name + "\\");
 					((TreeViewItem) (((TreeViewItem) (ProjectContentExplorer.SelectedItem)).Items[
 						((ListBox) sender).SelectedIndex])).IsSelected = true;

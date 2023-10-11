@@ -1,0 +1,440 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DialogueScene Name="Dialogue1">
+  <Characters>
+    <Character Name="Emma" UI="C:\Users\Antonio\Documents\CreateTest\test2\test2_Game\Content\UI\Persona_work.UI" LinkedImgBox="NewImgBox" Horizontal="Left" Vertical="Bottom">
+      <Images>
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/500px-Mcol_money_bag.svg.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/522019a1q4bjrol3.jpg" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/a50afebd-a3e7-42bb-9c0b-33d394d33334.gif" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Ame_icon_small.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/folder.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/PathAndObjects.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Persona5_TB.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/SmallTextBubble_Orange.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/SmallTextBubble_Purple.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/smol%20megumin.jpg" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Splatoon%20TB_Back.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/text_bubbles.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/winter.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/__pluse_and_minun___by_celsius_ice_rose.jpg" />
+        <Image Path="file:///C:/Users/Antonio/Documents/CreateTest/test2/test2_Game/Content/Images/emma_colors_oc.png" />
+      </Images>
+    </Character>
+    <Character Name="PC" UI="C:\Users\Antonio\Documents\CreateTest\test2\test2_Game\Content\UI\Persona_work.UI" LinkedImgBox="NewImgBox" Horizontal="Right" Vertical="Bottom">
+      <Images>
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/500px-Mcol_money_bag.svg.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/522019a1q4bjrol3.jpg" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/a50afebd-a3e7-42bb-9c0b-33d394d33334.gif" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Ame_icon_small.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/folder.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/PathAndObjects.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Persona5_TB.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/SmallTextBubble_Orange.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/SmallTextBubble_Purple.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/smol%20megumin.jpg" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Splatoon%20TB_Back.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/text_bubbles.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/winter.png" />
+        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/__pluse_and_minun___by_celsius_ice_rose.jpg" />
+        <Image Path="file:///C:/Users/Antonio/Documents/CreateTest/test2/test2_Game/Content/Images/emma_colors_oc.png" />
+      </Images>
+    </Character>
+  </Characters>
+  <NodeEditor>
+    <Params>
+      <Var Name="ChoiceVar" Type="System.Int32" DefaultVal="0" />
+      <Var Name="EmmaFP" Type="System.Int32" DefaultVal="0" />
+    </Params>
+    <BlockNodes>
+      <NodeEditor.StartBlockNode Key="Start_0" LocX="-655.166666666667" LocY="112.166666666667" DataType="Enter">
+        <Nodes>
+          <ExitNode Type="Exit">
+            <Connection ToBlock="Dialogue_Emma_0" Node="Enter" Ind="0" />
+          </ExitNode>
+        </Nodes>
+      </NodeEditor.StartBlockNode>
+      <NodeEditor.ExitBlockNode Key="End_0" LocX="1442.83333333333" LocY="167.166666666667" DataType="Exit">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_Emma_8" Node="Exit" Ind="0" />
+          </EntryNode>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_PC_13" Node="Exit" Ind="0" />
+          </EntryNode>
+        </Nodes>
+      </NodeEditor.ExitBlockNode>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_0" LocX="-529.166666666667" LocY="131.166666666667" Character="Emma">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Start_0" Node="Exit" Ind="0" />
+          </EntryNode>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_PC_1" Node="NONE" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="0" End="2" LinkedTextBox="NewTextBox" />
+        <Data>
+          <DiaChoice>
+            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <DialogueText Text="Heya!" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_1" LocX="-350.166666666667" LocY="133.166666666667" Character="PC">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_Emma_0" Node="Exit" Ind="0" />
+          </EntryNode>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_Emma_2" Node="NONE" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="2.1" End="4.1" LinkedTextBox="NewTextBox" />
+        <Data>
+          <DiaChoice>
+            <Sprite Name="/Agent8.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" Width="0" Height="0" x="0" y="0" />
+            <DialogueText Text="Yo, what's up?" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_2" LocX="-165.166666666667" LocY="166.166666666667" Character="Emma">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_PC_1" Node="Exit" Ind="0" />
+          </EntryNode>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_Emma_3" Node="NONE" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="4" End="6" LinkedTextBox="NewTextBox" />
+        <Data>
+          <DiaChoice>
+            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <DialogueText Text="chilling, how about you?" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_3" LocX="28.8333333333333" LocY="142.166666666667" Character="Dialogue Choice">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_Emma_2" Node="Exit" Ind="0" />
+          </EntryNode>
+          <Inputs>
+            <InputNode Type="Int">
+              <Connection FromBlock="GetVar_ChoiceVar_1" Node="Int" Ind="0" />
+            </InputNode>
+          </Inputs>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_Emma_4" Node="NONE" Ind="0" />
+            </OutputNode>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_Emma_9" Node="NONE" Ind="1" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="6.00833333333334" End="8.38333333333335" LinkedTextBox="" />
+        <Data>
+          <DiaChoice>
+            <DialogueText Text="honestly, same" />
+          </DiaChoice>
+          <DiaChoice>
+            <DialogueText Text="I wanna go home!" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.Components.GetConstantNodeBlock Key="GetVar_ChoiceVar_1" LocX="-118.5" LocY="98.6152380952382" DataType="Int">
+        <Nodes>
+          <Outputs>
+            <OutputNode Type="Int">
+              <Connection ToNode="Dialogue_Emma_3" Node="NONE" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+      </NodeEditor.Components.GetConstantNodeBlock>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_4" LocX="239.833333333333" LocY="127.166666666667" Character="Emma">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_Emma_3" Node="Exit" Ind="0" />
+          </EntryNode>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_PC_5" Node="NONE" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="8.375" End="10.375" LinkedTextBox="NewTextBox" />
+        <Data>
+          <DiaChoice>
+            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <DialogueText Text="Just gotta pass time, huh?" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_5" LocX="410.833333333333" LocY="164.166666666667" Character="PC">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_Emma_4" Node="Exit" Ind="0" />
+          </EntryNode>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_Emma_7" Node="NONE" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="10.425" End="12.425" LinkedTextBox="NewTextBox" />
+        <Data>
+          <DiaChoice>
+            <Sprite Name="/Agent8.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" Width="0" Height="0" x="0" y="0" />
+            <DialogueText Text="Yea, pretty much" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_6" LocX="802.833333333333" LocY="142.166666666667" Character="Dialogue Choice">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_Emma_7" Node="Exit" Ind="0" />
+          </EntryNode>
+          <Inputs>
+            <InputNode Type="Int">
+              <Connection FromBlock="GetVar_ChoiceVar_1" Node="Int" Ind="0" />
+            </InputNode>
+          </Inputs>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_Emma_8" Node="NONE" Ind="0" />
+            </OutputNode>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_Emma_12" Node="NONE" Ind="1" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="14.4083333333333" End="16.4083333333333" LinkedTextBox="" />
+        <Data>
+          <DiaChoice>
+            <DialogueText Text="not really, no" />
+          </DiaChoice>
+          <DiaChoice>
+            <DialogueText Text="yea... " />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.Components.GetConstantNodeBlock Key="GetVar_ChoiceVar_1" LocX="603.5" LocY="96.6152380952382" DataType="Int">
+        <Nodes>
+          <Outputs>
+            <OutputNode Type="Int">
+              <Connection ToNode="Dialogue_Emma_6" Node="NONE" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+      </NodeEditor.Components.GetConstantNodeBlock>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_7" LocX="596.833333333333" LocY="179.166666666667" Character="Emma">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_PC_5" Node="Exit" Ind="0" />
+          </EntryNode>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_Emma_6" Node="NONE" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="12.425" End="14.425" LinkedTextBox="NewTextBox" />
+        <Data>
+          <DiaChoice>
+            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <DialogueText Text="Anything else?" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_8" LocX="1034.83333333333" LocY="118.166666666667" Character="Emma">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_Emma_6" Node="Exit" Ind="0" />
+          </EntryNode>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="End_0" Node="Exit" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="16.4" End="18.4" LinkedTextBox="" />
+        <Data>
+          <DiaChoice>
+            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <DialogueText Text="ight... good talk" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_9" LocX="242.833333333333" LocY="289.166666666667" Character="Emma">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_Emma_3" Node="Exit" Ind="1" />
+          </EntryNode>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_Emma_10" Node="NONE" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="8.4" End="10.4" LinkedTextBox="NewTextBox" />
+        <Data>
+          <DiaChoice>
+            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <DialogueText Text="Duuuddee saaamme" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_10" LocX="440.833333333333" LocY="325.166666666667" Character="Emma">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_Emma_9" Node="Exit" Ind="0" />
+          </EntryNode>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_PC_11" Node="NONE" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="10.425" End="12.425" LinkedTextBox="NewTextBox" />
+        <Data>
+          <DiaChoice>
+            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <DialogueText Text="ughhh it's been a LONG day" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_11" LocX="665.833333333333" LocY="344.166666666667" Character="PC">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_Emma_10" Node="Exit" Ind="0" />
+          </EntryNode>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_PC_14" Node="NONE" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="12.5" End="14.5" LinkedTextBox="NewTextBox" />
+        <Data>
+          <DiaChoice>
+            <Sprite Name="/Agent8.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" Width="0" Height="0" x="0" y="0" />
+            <DialogueText Text="haha, don't i know it" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_12" LocX="1030.83333333333" LocY="239.166666666667" Character="Emma">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_Emma_6" Node="Exit" Ind="1" />
+          </EntryNode>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_PC_13" Node="NONE" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="16.45" End="18.45" LinkedTextBox="NewTextBox" />
+        <Data>
+          <DiaChoice>
+            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <DialogueText Text="Wanna talk about it?" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_13" LocX="1235.83333333333" LocY="241.166666666667" Character="PC">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_Emma_12" Node="Exit" Ind="0" />
+          </EntryNode>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="End_0" Node="Exit" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="18.55" End="20.55" LinkedTextBox="NewTextBox" />
+        <Data>
+          <DiaChoice>
+            <Sprite Name="/Agent8.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" Width="0" Height="0" x="0" y="0" />
+            <DialogueText Text="Not today... sorry" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.ExitBlockNode Key="EndBlock_0" LocX="1468.58333333333" LocY="387.416666666667" DataType="Exit">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_Emma_16" Node="Exit" Ind="0" />
+          </EntryNode>
+        </Nodes>
+      </NodeEditor.ExitBlockNode>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_14" LocX="848.583333333333" LocY="353.416666666667" Character="PC">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_PC_11" Node="Exit" Ind="0" />
+          </EntryNode>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_PC_15" Node="NONE" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="14.525" End="16.525" LinkedTextBox="" />
+        <Data>
+          <DiaChoice>
+            <Sprite Name="/Agent8.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" Width="0" Height="0" x="0" y="0" />
+            <DialogueText Text="But im sure it will be over" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_15" LocX="1036.58333333333" LocY="356.416666666667" Character="PC">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_PC_14" Node="Exit" Ind="0" />
+          </EntryNode>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="Dialogue_Emma_16" Node="NONE" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="16.55" End="18.55" LinkedTextBox="NewTextBox" />
+        <Data>
+          <DiaChoice>
+            <Sprite Name="/Agent8.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" Width="0" Height="0" x="0" y="0" />
+            <DialogueText Text="before we know it" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_16" LocX="1230.58333333333" LocY="366.416666666667" Character="Emma">
+        <Nodes>
+          <EntryNode Type="Enter">
+            <Connection FromBlock="Dialogue_PC_15" Node="Exit" Ind="0" />
+          </EntryNode>
+          <Outputs>
+            <OutputNode Type="Exit">
+              <Connection ToNode="EndBlock_0" Node="Exit" Ind="0" />
+            </OutputNode>
+          </Outputs>
+        </Nodes>
+        <Timeblock Start="0" End="2" LinkedTextBox="NewTextBox" />
+        <Data>
+          <DiaChoice>
+            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <DialogueText Text="yea... sure, totally" />
+          </DiaChoice>
+        </Data>
+      </NodeEditor.Components.DialogueNodeBlock>
+    </BlockNodes>
+  </NodeEditor>
+</DialogueScene>

@@ -1,28 +1,18 @@
-﻿using System;
+﻿using AmethystEngine.Components;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
+using System.IO.Compression;
 using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using AmethystEngine.Components;
-using System.IO.Compression;
 
 namespace AmethystEngine.Forms
 {
-  /// <summary>
-  /// Interaction logic for MainWindow.xaml
-  /// </summary>
-  public partial class MainWindow : Window
+	/// <summary>
+	/// Interaction logic for MainWindow.xaml
+	/// </summary>
+	public partial class MainWindow : Window
   {
     //List<projdata> recentprojs = new List<projdata>();
   public List<EditorObject> recentprojs = new List<EditorObject>();
