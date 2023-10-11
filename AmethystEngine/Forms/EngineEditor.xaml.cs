@@ -286,7 +286,7 @@ namespace AmethystEngine.Forms
 		/// <param name="prompt">What the File Explorer Window will display</param>
 		/// <param name="Open">Either a OpenFIleExplorer or a SaveFileExplorer</param>
 		/// <returns>File path as a String</returns>
-		public static String GetFilePath(String prompt, bool Open = false)
+		public static String GetFilePath(String prompt, bool Open = false, bool wholeFilePath = false)
 		{
 			if (!Open)
 			{
@@ -313,7 +313,7 @@ namespace AmethystEngine.Forms
 				// Prepare a dummy string, thos would appear in the dialog
 				string dummyFileName = "";
 
-				SaveFileDialog sf = new SaveFileDialog
+				Microsoft.Win32.OpenFileDialog sf = new Microsoft.Win32.OpenFileDialog
 				{
 					// Feed the dummy name to the save dialog
 					Title = "OpenFileRoot",
@@ -324,7 +324,10 @@ namespace AmethystEngine.Forms
 				if (result == true)
 				{
 					// Now here's our save folder
-					string savePath = System.IO.Path.GetDirectoryName(sf.FileName);
+					String savePath = "";
+					if (!wholeFilePath)
+						savePath = System.IO.Path.GetDirectoryName(sf.FileName);
+					else savePath = sf.FileName;
 					Console.WriteLine(savePath);
 					return savePath;
 					// Do whatever

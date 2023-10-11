@@ -74,7 +74,8 @@
 
 		<Label Content="Open Recent Project:" HorizontalAlignment="Left" Margin="10,10,0,0" Grid.Row="1" VerticalAlignment="Top" Background="#00000000" Foreground="White" Height="26" Width="127"/>
 		<Button x:Name="OpenProj_BTN" Content="Open Project" HorizontalAlignment="Left" Margin="398,272,0,0" Grid.Row="1" VerticalAlignment="Top" Width="84" Foreground="White" Background="#FF484848" BorderBrush="#00000000" RenderTransformOrigin="-1.378,1.067" Height="20" Click="OpenProj_BTN_Click"/>
-		<!--<Button x:Name="RemoveProj_BTN" Content="Remove Project" HorizontalAlignment="Left" Margin="301,272,0,0" Grid.Row="1" VerticalAlignment="Top" Width="92" Foreground="White" Background="#FF484848" BorderBrush="#00000000" RenderTransformOrigin="-1.378,1.067" Height="20" Click="RemoveProj_BTN_Click"/>-->
+		<Button x:Name="AddExistingProj_BTN" Content="Add Existing Project" HorizontalAlignment="Left" Margin="10,272,0,0" Grid.Row="1" VerticalAlignment="Top" Width="130" Foreground="White" Background="#FF484848" BorderBrush="#00000000" RenderTransformOrigin="-1.378,1.067" Height="20" 
+						Click="AddExistingProj_BTN_Click"/>
 
 
 		<Button x:Name="Create_BTN" Content="Create" HorizontalAlignment="Left" Margin="444,62,0,0" Grid.Row="2" VerticalAlignment="Top" Width="46" Foreground="White" Background="#FF484848" BorderBrush="#00000000" RenderTransformOrigin="-1.378,1.067" Height="23" Click="CreateNewProject_BTN"/>

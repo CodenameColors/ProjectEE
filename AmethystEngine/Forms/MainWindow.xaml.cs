@@ -39,61 +39,61 @@ namespace AmethystEngine.Forms
       LBind_close(sender, e);
     }
 
-    private void Window_Loaded(object sender, RoutedEventArgs e)
-    {
-      //String pathString = System.Environment.CurrentDirectory + "\\rpj.txt";
-      String pathString = String.Format("{0}/AmethystEngine/{1}", Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
-	      "rpj.txt");
-      List<String> EditedOutputList = new List<string>();
-      if (!System.IO.File.Exists(pathString))
-      {
-        using (System.IO.FileStream fs = System.IO.File.Create(pathString))
-        {
+		private void LoadRecentProjectsToMainWindow()
+		{
+			//String pathString = System.Environment.CurrentDirectory + "\\rpj.txt";
+			String pathString = String.Format("{0}/AmethystEngine/{1}", Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
+				"rpj.txt");
+			List<String> EditedOutputList = new List<string>();
+			if (!System.IO.File.Exists(pathString))
+			{
+				using (System.IO.FileStream fs = System.IO.File.Create(pathString))
+				{
 
-        }
-      }
+				}
+			}
 
-      //read the file to a list 
-      RpjFileToList(ref TFiles, pathString);
+			//read the file to a list 
+			RpjFileToList(ref TFiles, pathString);
 
-      //each string in the list is a file. so we need to read that file.
-      foreach (String tempFile in TFiles)
-      {
-        System.IO.StreamReader file;
-        try
-        {
-          file = new System.IO.StreamReader(tempFile);
-          EditedOutputList.Add(tempFile);
+			//each string in the list is a file. so we need to read that file.
+			foreach (String tempFile in TFiles)
+			{
+				System.IO.StreamReader file;
+				try
+				{
+					file = new System.IO.StreamReader(tempFile);
+					EditedOutputList.Add(tempFile);
 
-        }
-        catch (DirectoryNotFoundException)
-        {
-          MessageBox.Show("Project not found. Have you deleted a project without using the editor to delete? " +
-            "The unfound project has been removed from recent projects for the future");
-          using (System.IO.FileStream fs = System.IO.File.Create(pathString))
-          {
-            foreach (String ss in EditedOutputList)
-            {
-              fs.Write((byte[])new UTF8Encoding(true).GetBytes(ss.ToString()), 0, ss.Length + 1);
-            }
-          }
-          continue;
-        }
-        catch (FileNotFoundException)
-        {
-          MessageBox.Show("Project not found. Have you deleted a project without using the editor to delete? " +
-            "The unfound project has been removed from recent projects for the future");
-          using (System.IO.FileStream fs = System.IO.File.Create(pathString))
-          {
-            foreach (String ss in EditedOutputList)
-            {
-              fs.Write((byte[])new UTF8Encoding(true).GetBytes(ss.ToString()), 0, ss.Length + 1);
-            }
-          }
-          continue;
-        }
-				
-        String tline = "";
+				}
+				catch (DirectoryNotFoundException)
+				{
+					MessageBox.Show("Project not found. Have you deleted a project without using the editor to delete? " +
+						"The unfound project has been removed from recent projects for the future");
+					using (System.IO.FileStream fs = System.IO.File.Create(pathString))
+					{
+						foreach (String ss in EditedOutputList)
+						{
+							fs.Write((byte[])new UTF8Encoding(true).GetBytes(ss.ToString()), 0, ss.Length + 1);
+						}
+					}
+					continue;
+				}
+				catch (FileNotFoundException)
+				{
+					MessageBox.Show("Project not found. Have you deleted a project without using the editor to delete? " +
+						"The unfound project has been removed from recent projects for the future");
+					using (System.IO.FileStream fs = System.IO.File.Create(pathString))
+					{
+						foreach (String ss in EditedOutputList)
+						{
+							fs.Write((byte[])new UTF8Encoding(true).GetBytes(ss.ToString()), 0, ss.Length + 1);
+						}
+					}
+					continue;
+				}
+
+				String tline = "";
 				EditorObject TempEO = new EditorObject();
 				while ((tline = file.ReadLine()) != null)
 				{
@@ -109,18 +109,27 @@ namespace AmethystEngine.Forms
 						tline = file.ReadLine();
 						if (tline.Contains(";"))
 							TempEO.SetThumbnail(tline);
-						else {
-							if (File.Exists(tline)) {
+						else
+						{
+							if (File.Exists(tline))
+							{
 								TempEO.SetThumbnail(tline, false);
 							}
 							else { TempEO.SetThumbnail("/AmethystEngine;component/images/Ame_icon_small.png", true); }
 						}
-							//recentprojs.Add(new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png", tline));
+						//recentprojs.Add(new EditorObject("/AmethystEngine;component/images/Ame_icon_small.png", tline));
 					}
 				}
 				recentprojs.Add(TempEO);
-      }
-      RecentProj_LB.ItemsSource = recentprojs;
+			}
+			RecentProj_LB.ItemsSource = recentprojs;
+
+
+		}
+
+		private void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+			LoadRecentProjectsToMainWindow();
     }
 
     private void RpjFileToList(ref List<String> TFiles, String pathString)
@@ -329,8 +338,55 @@ namespace AmethystEngine.Forms
     }
 
 
-    #endregion
-  }
+		#endregion
+
+		private void AddExistingProj_BTN_Click(object sender, RoutedEventArgs e)
+		{
+			String path = EngineEditor.GetFilePath("Create New Project", true, true);
+
+			if (path == String.Empty || path == null)
+			{
+				MessageBox.Show("could not retrieve file path. Please try a different path");
+				return;
+			}
+			else if(!File.Exists(path))
+			{
+				MessageBox.Show("Given File doesn't Exist please try again.");
+				return;
+			}
+			else
+			{
+				if(System.IO.Path.GetExtension(path) == ".gem")
+				{
+					// get the app data file that holds that list of project locations.
+					String pathString = String.Format("{0}/AmethystEngine/{1}", Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
+					"rpj.txt");
+					if (!System.IO.File.Exists(pathString))
+					{
+						MessageBox.Show("your RPJ file isn't created doesn't exist. so i'm going to make it for you.");
+						using (System.IO.FileStream fs = System.IO.File.Create(pathString))
+						{
+
+						}
+						TFiles.Clear();
+					}
+
+					TFiles.Add(path);
+					System.IO.File.WriteAllLines(pathString, TFiles.ToArray());
+
+					// Hot reload
+					LoadRecentProjectsToMainWindow();
+					MessageBox.Show("File Added to the Recent Projects. Please Restart to take effect");
+
+				}
+				else
+				{
+					MessageBox.Show("File type MUST BE a \".gem\" file. please try try again.");
+					return;
+				}
+			}
+		}
+	}
 }
 
 
