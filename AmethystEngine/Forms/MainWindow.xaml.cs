@@ -192,6 +192,13 @@ namespace AmethystEngine.Forms
 
       CreateGameFiles(path + "\\" + pname + "\\" + pname + "_Game" + "\\");
 
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Editor" + "\\Content\\Images");
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Editor" + "\\Content\\Levels");
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Editor" + "\\Content\\Config");
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Editor" + "\\Content\\Dialogue");
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Editor" + "\\Content\\UI");
+			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Editor" + "\\Content\\Animations");
+
 			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Images");
 			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Levels");
 			System.IO.Directory.CreateDirectory(path + "\\" + pname + "\\" + pname + "_Game" + "\\Content\\Config");

@@ -39,7 +39,6 @@ namespace AmethystEngine.Forms
 
 		#region Properties
 
-
 		#region LevelEditorVars
 
 		#region Vars
@@ -1910,9 +1909,17 @@ namespace AmethystEngine.Forms
 					//find out the thresholds per tile map.
 					foreach (Tuple<String, String, int, int> tilesetstuple in CurrentLevel.TileSet)
 					{
+						String tileSetPath = tilesetstuple.Item2;
+						tileSetPath = tileSetPath.Replace("{Content}", EditorProjectContentDirectory);
+						if (!System.IO.File.Exists(tileSetPath))
+						{
+							EngineOutputLog.AddErrorLogItem(-1, String.Format("Tile Set image doesn't exist: {0}", tileSetPath), "Level Editor", false);
+							return;
+						}
+
 						//find out the next tile data number using the tuple
 						//this is wrong. It needs to be (imgwidth / tilewidth) * (imgHeight / tileHieght)
-						System.Drawing.Image imgTemp = System.Drawing.Image.FromFile(tilesetstuple.Item2);
+						System.Drawing.Image imgTemp = System.Drawing.Image.FromFile(tileSetPath);
 						TileMapThresholds.Add((TileMapThresholds.Count == 0
 							? (imgTemp.Width / tilesetstuple.Item3) * (imgTemp.Height / tilesetstuple.Item4)
 							: (int)TileMapThresholds.Last() +
@@ -1935,7 +1942,15 @@ namespace AmethystEngine.Forms
 							while (CurTileData > TileMapThresholds[TilesetInc]) //if cur is greater than move to the next tileset.
 							{
 								Tilesetpath = CurrentLevel.TileSet[TilesetInc].Item2;
+								
 								TilesetInc++;
+							}
+
+							Tilesetpath = Tilesetpath.Replace("{Content}", EditorProjectContentDirectory);
+							if (!System.IO.File.Exists(Tilesetpath))
+							{
+								EngineOutputLog.AddErrorLogItem(-1, String.Format("Tile Set image doesn't exist: {0}", Tilesetpath), "Level Editor", false);
+								return;
 							}
 
 							//create/get the tilebrush of the current tile.
@@ -2016,7 +2031,15 @@ namespace AmethystEngine.Forms
 					//the current layer is a spritelayer which contains a list of sprite objects
 					foreach (Sprite sprite in ((List<Sprite>)layer.LayerObjects))
 					{
-						BitmapImage bitmap = new BitmapImage(new Uri(sprite.ImgPathLocation, UriKind.Absolute));
+						String spritePath = sprite.ImgPathLocation.Replace("{Content}", EditorProjectContentDirectory);
+						if (!System.IO.File.Exists(spritePath))
+						{
+							EngineOutputLog.AddErrorLogItem(-1, String.Format("Tile Set image doesn't exist: {0}", spritePath), "Level Editor", false);
+							return;
+						}
+
+
+						BitmapImage bitmap = new BitmapImage(new Uri(spritePath, UriKind.Absolute));
 						Image img = new Image
 						{
 							Source = bitmap
@@ -2205,13 +2228,21 @@ namespace AmethystEngine.Forms
 			foreach (Tuple<String, String, int, int> tilesetTuples in CurrentLevel.TileSet)
 			{
 
+				String tileSetPath = tilesetTuples.Item2;
+				tileSetPath = tileSetPath.Replace("{Content}", EditorProjectContentDirectory);
+				if (!System.IO.File.Exists(tileSetPath))
+				{
+					EngineOutputLog.AddErrorLogItem(-1, String.Format("Tile Set image doesn't exist: {0}", tileSetPath), "Level Editor", false);
+					return;
+				}
+
 				Image image = new Image();
 				var pic = new System.Windows.Media.Imaging.BitmapImage();
 				pic.BeginInit();
-				pic.UriSource = new Uri(tilesetTuples.Item2); // url is from the xml
+				pic.UriSource = new Uri(tileSetPath); // url is from the xml
 				pic.EndInit();
 
-				System.Drawing.Image img = System.Drawing.Image.FromFile(tilesetTuples.Item2);
+				System.Drawing.Image img = System.Drawing.Image.FromFile(tileSetPath);
 				image.Source = pic;
 				image.Width = img.Width;
 				image.Height = img.Height;

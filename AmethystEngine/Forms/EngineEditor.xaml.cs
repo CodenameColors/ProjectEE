@@ -163,7 +163,8 @@ namespace AmethystEngine.Forms
 		String ProjectFilePath = "";
 		String MainLevelPath = "";
 		String ProjectDirectory = "";
-		String ProjectContentDirectory = "";
+		String MonoGameProjectContentDirectory = "";
+		String EditorProjectContentDirectory = "";
 
 		ObservablePropertyDictionary EditorObjectProperties = new ObservablePropertyDictionary();
 
@@ -229,9 +230,11 @@ namespace AmethystEngine.Forms
 			ProjectName_LBL.Content = ProjectName;
 			MainLevelPath = LevelPath;
 			LoadInitalVars();
-			LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\"));
 			ProjectDirectory = ProjectFilePath;
-			ProjectContentDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\");
+			MonoGameProjectContentDirectory = ProjectFilePath.Replace(".gem", "_Game\\Content\\");
+			EditorProjectContentDirectory = ProjectFilePath.Replace(".gem", "_Editor\\Content\\");
+
+			LoadFileTree(Path.GetDirectoryName(ProjectFilePath));//.Replace(".gem", "_Game\\Content\\"));
 
 			_monoGameContentBuilder = new MonoGameContentBuilder(ProjectFilePath.Substring(0, ProjectFilePath.LastIndexOf("\\")));
 
@@ -1213,14 +1216,22 @@ namespace AmethystEngine.Forms
 			if (TileSets_CB.SelectedIndex >= 0)
 			{
 
+				String tileSetPath = CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item2;
+				tileSetPath = tileSetPath.Replace("{Content}", EditorProjectContentDirectory);
+				if (!System.IO.File.Exists(tileSetPath))
+				{
+					EngineOutputLog.AddErrorLogItem(-1, String.Format("Tile Set image doesn't exist: {0}", tileSetPath), "Level Editor", false);
+					return;
+				}
+
 				Canvas TileMap = (Canvas) ContentLibrary_Control.Template.FindName("TileMap_Canvas", ContentLibrary_Control);
 
 				BitmapImage pic = new BitmapImage();
 				pic.BeginInit();
-				pic.UriSource = new Uri(CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item2);
+				pic.UriSource = new Uri(tileSetPath);
 				pic.EndInit();
 
-				System.Drawing.Image img = System.Drawing.Image.FromFile(CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item2);
+				System.Drawing.Image img = System.Drawing.Image.FromFile(tileSetPath);
 
 				//TODO: MAKE THIS WORK WITH VARIABLE SIZES NOT JUST 32x32
 				Image Timg = new Image
