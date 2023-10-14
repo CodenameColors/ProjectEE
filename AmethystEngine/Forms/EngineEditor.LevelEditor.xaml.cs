@@ -149,7 +149,15 @@ namespace AmethystEngine.Forms
 			Console.WriteLine(String.Format("x: {0},  y: {1}", x, y));
 			Console.WriteLine("");
 
-			BitmapImage bmp = new BitmapImage(new Uri(CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item2));
+			string tileSetPath = CurrentLevel.TileSet[TileSets_CB.SelectedIndex].Item2;
+			tileSetPath = tileSetPath.Replace("{Content}", EditorProjectContentDirectory);
+			if (!System.IO.File.Exists(tileSetPath))
+			{
+				Console.WriteLine("Tile Set image doesn't exist.");
+				return;
+			}
+
+			BitmapImage bmp = new BitmapImage(new Uri(tileSetPath));
 			var crop = new CroppedBitmap(bmp, new Int32Rect(x, y, xtile, ytile));
 			// using BitmapImage version to prove its created successfully
 			Image image2 = new Image
@@ -1507,7 +1515,7 @@ namespace AmethystEngine.Forms
 
 			}
 
-			CurrentLevel.ExportLevel(dlg.FileName + (dlg.FileName.Contains(".lvl") ? "" : ".lvl"), TileSetImages, celldim);
+			CurrentLevel.ExportLevel(dlg.FileName + (dlg.FileName.Contains(".lvl") ? "" : ".lvl"), TileSetImages, EditorProjectContentDirectory, celldim);
 		}
 
 		/// <summary>
@@ -1789,13 +1797,14 @@ namespace AmethystEngine.Forms
 					TileSets_CB.Items.Add(tilesetTuples.Item1);
 					//CreateTileMap(tilesetTuples.SpriteSheetName, tilesetTuples.Item3, tilesetTuples.Item4); //fill in the new data.
 
+					String tileSetPath = tilesetTuples.Item2.Replace("{Content}", EditorProjectContentDirectory);
 					Image image = new Image();
 					var pic = new System.Windows.Media.Imaging.BitmapImage();
 					pic.BeginInit();
-					pic.UriSource = new Uri(tilesetTuples.Item2); // url is from the xml
+					pic.UriSource = new Uri(tileSetPath); // url is from the xml
 					pic.EndInit();
 
-					System.Drawing.Image img = System.Drawing.Image.FromFile(tilesetTuples.Item2);
+					System.Drawing.Image img = System.Drawing.Image.FromFile(tileSetPath);
 					image.Source = pic;
 					image.Width = img.Width;
 					image.Height = img.Height;

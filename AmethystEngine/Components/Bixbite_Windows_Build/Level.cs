@@ -23,7 +23,7 @@ namespace BixBite
 		/// LayerName: TileSetName SpriteSheetName: TileSet Image Location Item3: TileWidth Item4:TileHeight
 		/// </summary>
 		public List<Tuple<String, String, int, int>> TileSet = new List<Tuple<string, string, int, int>>();
-		public List<Tuple<String, String>> sprites = new  List<Tuple<string, string>>();
+		public List<Tuple<String, String>> sprites = new List<Tuple<string, string>>();
 		public ObservableCollection<SpriteLayer> Layers { get; set; }
 
 
@@ -191,10 +191,11 @@ namespace BixBite
 				{
 					SetProperty("Pname", ((CheckBox)sender).IsChecked);
 				}
-				else if(GetPropertyData(PName) is int)
+				else if (GetPropertyData(PName) is int)
 				{
 					int num = 0;
-					if (Int32.TryParse((((TextBox)sender).Tag.ToString()), out num)) {
+					if (Int32.TryParse((((TextBox)sender).Tag.ToString()), out num))
+					{
 						if (PName == "xCells")
 						{
 							SetProperty(PName, num);
@@ -211,7 +212,7 @@ namespace BixBite
 				{
 					SetProperty(PName, ((TextBox)sender).Text);
 				}
-				
+
 			}
 		}
 
@@ -220,18 +221,19 @@ namespace BixBite
 			String PName = ((CheckBox)sender).Tag.ToString();
 			if (GetPropertyData(PName) is bool)
 			{
-				
-				if(PName == "bMainLevel")
+
+				if (PName == "bMainLevel")
 				{
 					SetProperty(PName, ((CheckBox)sender).IsChecked);
 				}
-				else{
+				else
+				{
 					Console.WriteLine("Others... Saved should be enabled= false...");
 				}
 
 
 			}
-			
+
 		}
 
 		#endregion
@@ -246,7 +248,7 @@ namespace BixBite
 			int val = 0;
 			for (int i = 0; i < Layers.Count; i++)
 			{
-				if(Layers[i].LayerName == LayerName)
+				if (Layers[i].LayerName == LayerName)
 				{
 					val++;
 					LayerName += val;
@@ -266,9 +268,9 @@ namespace BixBite
 		/// <returns>TRUE: index of the SpriteLayer			FALSE: -1</returns>
 		public int FindLayerindex(String DesName)
 		{
-			for(int i =0; i <Layers.Count; i++)
+			for (int i = 0; i < Layers.Count; i++)
 			{
-				if(DesName == Layers[i].LayerName)
+				if (DesName == Layers[i].LayerName)
 				{
 					return i;
 				}
@@ -360,9 +362,9 @@ namespace BixBite
 						Console.WriteLine(reader.AttributeCount);
 
 						//set properties
-						TempLevel.SetProperty("LevelName",reader.GetAttribute("Name"));
+						TempLevel.SetProperty("LevelName", reader.GetAttribute("Name"));
 						TempLevel.LevelName = reader.GetAttribute("Name");
-						TempLevel.SetProperty("bMainLevel" ,(reader.GetAttribute("MainLevel").ToLower() == "false" ? false : true));
+						TempLevel.SetProperty("bMainLevel", (reader.GetAttribute("MainLevel").ToLower() == "false" ? false : true));
 						TempLevel.SetProperty("xCells", Int32.Parse(reader.GetAttribute("Width")) / 40);
 						TempLevel.SetProperty("yCells", Int32.Parse(reader.GetAttribute("Height")) / 40);
 						reader.Read();
@@ -621,7 +623,7 @@ namespace BixBite
 						//next up is the tilesets for the map.
 						while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "TileSet")
 						{
-							
+
 							String Name = reader.GetAttribute("Name");
 							String Location = reader.GetAttribute("Location");
 							int Width = Int32.Parse(reader.GetAttribute("TileWidth"));
@@ -638,7 +640,7 @@ namespace BixBite
 						{
 							String Name = reader.GetAttribute("Name");
 							String Location = reader.GetAttribute("Location");
-							TempLevel.sprites.Add(new Tuple<string,String>(Name, Location));
+							TempLevel.sprites.Add(new Tuple<string, String>(Name, Location));
 							await reader.ReadAsync(); await reader.ReadAsync();
 						}
 
@@ -648,7 +650,7 @@ namespace BixBite
 						//the next thing is the layers . LOOPS
 						while ((reader.NodeType == XmlNodeType.EndElement && reader.Name.Trim() != "Layers") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Layers")) //loop through all the TileSets
 						{
-							
+
 							//create a temp array.//Tile int[,]
 							List<List<int>> LevelData = new List<List<int>>();
 							await reader.ReadAsync(); await reader.ReadAsync(); //move to next element
@@ -668,9 +670,9 @@ namespace BixBite
 										rowdata.Add(Int32.Parse(ss));
 									await reader.ReadAsync(); await reader.ReadAsync(); await reader.ReadAsync();
 									LevelData.Add(rowdata);
-									
+
 								}
-								
+
 							}
 							if (reader.NodeType == XmlNodeType.EndElement && reader.Name.Trim() == "TileLayer")
 							{
@@ -767,7 +769,7 @@ namespace BixBite
 								if (reader.Name.ToLower() == "gameeventslayer")
 									continue;
 							}
-							
+
 							//Game events!
 							while ((reader.NodeType != XmlNodeType.EndElement && reader.Name.Trim() == "GameEvents") || (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "Event")) //loop through all the TileSets
 																																																																																										 //while (reader.NodeType == XmlNodeType.Element && reader.Name.Trim() == "GameEvents")
@@ -839,7 +841,7 @@ namespace BixBite
 			return TempLevel;
 		}
 
-		async public void ExportLevel(String FilePath, List<String> TileSets, List<Tuple<int, int>> CellDimen = null)
+		async public void ExportLevel(String FilePath, List<String> TileSets, String contentPath, List<Tuple<int, int>> CellDimen = null)
 		{
 			XmlWriterSettings settings = new XmlWriterSettings
 			{
@@ -847,7 +849,7 @@ namespace BixBite
 				IndentChars = "  ",
 				NewLineChars = "\r\n",
 				NewLineHandling = NewLineHandling.Replace
-				
+
 			};
 			settings.Async = true;
 			//settings.NewLineHandling = NewLineHandling.Entitize;
@@ -861,14 +863,23 @@ namespace BixBite
 				await writer.WriteAttributeStringAsync(null, "Width", null, ((int)GetPropertyData("xCells") * 40).ToString());
 				await writer.WriteAttributeStringAsync(null, "Height", null, ((int)GetPropertyData("yCells") * 40).ToString());
 
-				for(int i = 0; i < TileSets.Count; i++)
-				{ 
-					System.Drawing.Image img = System.Drawing.Image.FromFile(TileSets[i]);
+				string tileSetPath = "";
+				for (int i = 0; i < TileSets.Count; i++)
+				{
+					tileSetPath = TileSets[i];
+					tileSetPath = tileSetPath.Replace("{Content}", contentPath);
+					if (!System.IO.File.Exists(tileSetPath))
+					{
+						Console.WriteLine("Tile Set image doesn't exist.");
+						return;
+					}
+
+					System.Drawing.Image img = System.Drawing.Image.FromFile(tileSetPath);
 					int len = TileSets[i].LastIndexOf('.') - TileSets[i].LastIndexOfAny(new char[] { '/', '\\' });
 					String name = TileSets[i].Substring(TileSets[i].LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
 					await writer.WriteStartElementAsync(null, "TileSet", null);
 					await writer.WriteAttributeStringAsync(null, "Name", null, name);
-					await writer.WriteAttributeStringAsync(null, "Location", null, TileSets[i]);
+					await writer.WriteAttributeStringAsync(null, "Location", null, TileSets[i].Replace(contentPath, "{Content}"));
 					await writer.WriteAttributeStringAsync(null, "MapWidth", null, img.Width.ToString());
 					await writer.WriteAttributeStringAsync(null, "MapHeight", null, img.Height.ToString());
 					await writer.WriteAttributeStringAsync(null, "TileWidth", null, CellDimen[i].Item1.ToString());
@@ -878,18 +889,18 @@ namespace BixBite
 
 				for (int i = 0; i < sprites.Count; i++)
 				{
-					System.Drawing.Image img = System.Drawing.Image.FromFile(TileSets[i]);
+					// System.Drawing.Image img = System.Drawing.Image.FromFile(TileSets[i]);
 					int len = TileSets[i].LastIndexOf('.') - TileSets[i].LastIndexOfAny(new char[] { '/', '\\' });
 					String name = sprites[i].Item2.Substring(sprites[i].Item2.LastIndexOfAny(new char[] { '/', '\\' }) + 1, len - 1);
 					await writer.WriteStartElementAsync(null, "Sprites", null);
-					await writer.WriteAttributeStringAsync(null, "Name", null, sprites[i].Item2);
-					await writer.WriteAttributeStringAsync(null, "Location", null, sprites[i].Item2);
+					await writer.WriteAttributeStringAsync(null, "Name", null, sprites[i].Item1);
+					await writer.WriteAttributeStringAsync(null, "Location", null, sprites[i].Item2.Replace(contentPath, "{Content}"));
 					await writer.WriteEndElementAsync();//end of tile set
 				}
 
 				await writer.WriteStartElementAsync(null, "Layers", null);
-				
-				foreach(SpriteLayer layer in Layers)
+
+				foreach (SpriteLayer layer in Layers)
 				{
 					if (Layers.Count == 0) break;
 					else if (layer.layerType == LayerType.Tile)
@@ -924,7 +935,7 @@ namespace BixBite
 						{
 							await writer.WriteStartElementAsync(null, "Sprite", null);
 							await writer.WriteAttributeStringAsync(null, "Name", null, sprite.Name);
-							await writer.WriteAttributeStringAsync(null, "Location", null, sprite.ImgPathLocation);
+							await writer.WriteAttributeStringAsync(null, "Location", null, sprite.ImgPathLocation.Replace(contentPath, "{Content}"));
 							await writer.WriteAttributeStringAsync(null, "Width", null, sprite.GetPropertyData("width").ToString());
 							await writer.WriteAttributeStringAsync(null, "Height", null, sprite.GetPropertyData("height").ToString());
 							await writer.WriteAttributeStringAsync(null, "x", null, sprite.GetPropertyData("x").ToString());
@@ -1051,11 +1062,11 @@ namespace BixBite
 				await writer.WriteEndElementAsync(); //end of layers
 
 				List<SpriteLayer> gameeventlayers = new List<SpriteLayer>();
-				
+
 				foreach (SpriteLayer g in Layers)
-				{ 
+				{
 					if (g.layerType == LayerType.GameEvent)
-					gameeventlayers.Add(g);
+						gameeventlayers.Add(g);
 				}
 
 				//there will always be a default collision event!
@@ -1069,7 +1080,7 @@ namespace BixBite
 				//await writer.WriteStringAsync("Objects to load here");
 				//await writer.WriteEndElementAsync();
 				//await writer.WriteEndElementAsync();
-				
+
 
 				await writer.WriteEndElementAsync();
 
@@ -1077,6 +1088,6 @@ namespace BixBite
 			}
 		}
 
-		
+
 	}
 }
