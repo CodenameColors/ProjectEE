@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Level Name="Level1" MainLevel="false" Width="2000" Height="2000">
-  <TileSet Name="PathAndObjects" Location="{Content}\Images\PathAndObjects.png" MapWidth="512" MapHeight="512" TileWidth="32" TileHeight="32" />
+  <TileSet Name="PathAndObjects" Location="{Content}\images\PathAndObjects.png" MapWidth="512" MapHeight="512" TileWidth="32" TileHeight="32" />
   <Layers>
     <TileLayer Name="Background">
       <Row>84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,84,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1</Row>

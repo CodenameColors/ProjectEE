@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<GameUI Name="NewUITool" Width="632" Height="263" Background="#00000000" ShowBorder="True" Zindex="1">
+  <GameIMG Name="NewImgBox" Width="221" Height="235" Background="#00000000" ShowBorder="True" Zindex="1" Xoffset="406" YOffset="21" Image="C:/Users/Antonio/Documents/CreateTest/test2/test2_Game/Content/Images/Player.jpg" />
+  <GameTextBlock Name="NewTextBox" Width="453" Height="168" Background="#00000000" ShowBorder="True" Zindex="1" Xoffset="6" YOffset="10" ContentText="" Font="Ariel" FontSize="24" FontColor="Black" FontStyle="Normal" TextSpeed="1" TextTime="1" Image="C:/Users/Antonio/Documents/CreateTest/test2/test2_Game/Content/Images/SmallTextBubble_Orange.png" />
+</GameUI>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Level Name="level2" MainLevel="false" Width="1200" Height="1200">
-  <TileSet Name="PathAndObjects" Location="{Content}\Images\PathAndObjects.png" MapWidth="512" MapHeight="512" TileWidth="32" TileHeight="32" />
-  <Sprites Name="Ame_icon_small" Location="{Content}\Images\Ame_icon_small.png" />
+  <TileSet Name="PathAndObjects" Location="{Content}\images\PathAndObjects.png" MapWidth="512" MapHeight="512" TileWidth="32" TileHeight="32" />
+  <Sprites Name="{Content}\images\Ame_icon_small.png" Location="{Content}\images\Ame_icon_small.png" />
   <Layers>
     <TileLayer Name="Background">
       <Row>4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1</Row>
@@ -76,7 +76,7 @@
       </GameEvents>
     </GameEventsLayer>
     <SpriteLayer Name="Sprite">
-      <Sprite Name="new sprite" Location="{Content}/Images/Ame_icon_small.png" Width="30" Height="30" x="671" y="191" />
+      <Sprite Name="new sprite" Location="{Content}/images/Ame_icon_small.png" Width="30" Height="30" x="671" y="191" />
     </SpriteLayer>
   </Layers>
 </Level>

@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<GameUI Name="NewUITool" Width="362" Height="210" Background="#00000000" ShowBorder="True" Zindex="1">
+  <GameIMG Name="Sprite_IMG" Width="129" Height="130" Background="#00000000" ShowBorder="False" Zindex="1" Xoffset="259" YOffset="81" Image="" />
+  <GameTextBlock Name="Dialogue_TB" Width="262" Height="105" Background="#00000000" ShowBorder="False" Zindex="1" Xoffset="32" YOffset="60" ContentText="Hi Hi! :D" Font="Ariel" FontSize="24" FontColor="White" FontStyle="Normal" TextSpeed="1" TextTime="1" Image="" />
+  <GameTextBlock Name="NewTextBox1" Width="138" Height="97" Background="#00000000" ShowBorder="False" Zindex="1" Xoffset="251" YOffset="5" ContentText="Emma" Font="Ariel" FontSize="24" FontColor="Black" FontStyle="Normal" TextSpeed="1" TextTime="1" Image="" />
+</GameUI>
