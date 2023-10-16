@@ -84,7 +84,7 @@ namespace BixBite.Rendering.UI.TextBlock
 			: base(UIName, xPos, yPos, width, height, zindex, border, xOff, yOff, text, textTime, backColor, backImage)
 		{
 			AddProperty("Rotation", 0.0f);
-			AddProperty("Text", Text);
+			AddProperty("Text", text);
 			AddProperty("Font", "Ariel");
 			AddProperty("FontSize", 24);
 			AddProperty("FontColor", "Black");

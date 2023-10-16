@@ -213,6 +213,7 @@ namespace AmethystEngine.Forms
 						CUI.Tag = "IMAGE";
 
 						String TB = childUI.GetPropertyData("Image").ToString();
+						TB = TB.Replace("{Content}", EditorProjectContentDirectory);
 						Image img = new Image();
 						img.Stretch = Stretch.Fill;
 						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
@@ -320,6 +321,7 @@ namespace AmethystEngine.Forms
 						CUI.Tag = "IMAGE";
 
 						String TB = childUI.GetPropertyData("Image").ToString();
+						TB = TB.Replace("{Content}", EditorProjectContentDirectory);
 						Image img = new Image() { IsHitTestVisible = false };
 						img.Stretch = Stretch.Fill;
 						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));
@@ -473,6 +475,7 @@ namespace AmethystEngine.Forms
 						CUI.Tag = "IMAGE";
 
 						String TB = childUI.GetPropertyData("Image").ToString();
+						TB = TB.Replace("{Content}", EditorProjectContentDirectory);
 						Image img = new Image();
 						img.Stretch = Stretch.Fill;
 						img.Source = new BitmapImage(new Uri(TB, UriKind.RelativeOrAbsolute));

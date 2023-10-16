@@ -114,6 +114,10 @@ namespace AmethystEngine.Forms
 					{
 						//((TextBox)sender).FontSize = Int32.Parse(((TextBox)sender).Text);
 					}
+					else if (Property == "Text")
+					{
+						((GameTextBlock)baseUi).Text = (((TextBox)sender).Text);
+					}
 				}
 			}
 		}

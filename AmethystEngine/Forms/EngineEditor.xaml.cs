@@ -902,13 +902,26 @@ namespace AmethystEngine.Forms
 			return false;
 		}
 
+		static bool DirectoryInPath(String path, String directoryName)
+		{
+
+			DirectoryInfo currentDirectory = new DirectoryInfo(path);
+			while (currentDirectory != null)
+			{
+				if (currentDirectory.Name == directoryName)
+					return true;
+				currentDirectory = currentDirectory.Parent;
+			}
+			return false;
+		}
+
 		private void ContentImportAndBuildXNB_BTN_OnClick(object sender, RoutedEventArgs e)
 		{
 			// Are we in the right directory...?
-			if (ContainsFolder(ProjectDirectory, "Content"))
+			if (DirectoryInPath(ProjectDirectory, "Content"))
 			{
 				// Are we in the right directory...?
-				if (ContainsFolder(ProjectDirectory, "Images"))
+				if (DirectoryInPath(ProjectDirectory, "Images"))
 				{
 					// We are going to be handling an image build here.
 					Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog

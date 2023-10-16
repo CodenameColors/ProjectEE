@@ -35,7 +35,7 @@
     </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -560,8 +560,12 @@
     <Folder Include="Components\Bixbite_Windows_Build\Rendering\UI\Textbox\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="FreeImage.dll" />
-    <Content Include="FreeImageNET.dll" />
+    <Content Include="FreeImage.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FreeImageNET.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="MonoGame.Framework.dll" />
     <Content Include="Resources\CollapsedPropertyGrid.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

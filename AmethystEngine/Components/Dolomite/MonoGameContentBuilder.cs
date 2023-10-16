@@ -82,7 +82,7 @@ namespace AmethystEngine.Components.Dolomite
 			};
 			manager.BuildContent((pathA + "\\" + Path.GetFileName(pngPath)), (pathC + "\\" + inputFileName), "TextureImporter", "TextureProcessor", keyValues);
 
-
+			change the directories to use the EDITOR, and the GAME content -> images.So we don't have to do the final and source shit
 
 			//// Step 1: Load Raw Image
 			//Texture2DContent texture2DContent = new Texture2DContent();
@@ -95,11 +95,15 @@ namespace AmethystEngine.Components.Dolomite
 			//	new PipelineProcessorContext(_pipelineManager, PipelineBuildEvent.Load(pngPath)));
 
 			//// Step 3: Save as XNB
-			String directoryPath = Directory.GetDirectoryRoot(pngPath);
-			using (FileStream stream = new FileStream(directoryPath, FileMode.Create))
-			{
-				IntermediateSerializer.Serialize(XmlWriter.Create(monoGameContentFilePath), manager, directoryPath);
-			}
+			//String directoryPath = Directory.GetDirectoryRoot(pngPath);
+			//using (FileStream stream = new FileStream(directoryPath, FileMode.Create))
+			//{
+			//	IntermediateSerializer.Serialize(XmlWriter.Create(monoGameContentFilePath), manager, directoryPath);
+			//}
+
+			//// Step 4: Have celebratory sex with your girlfriend
+			//penis.position = setLocation(inside_gf);
+			//bool cum = (warmth + GRIP)^moans ? true : false;
 
 
 
