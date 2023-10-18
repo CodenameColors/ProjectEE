@@ -1,31 +1,256 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Markup;
-using System.Windows.Navigation;
+using System.Text.RegularExpressions;
 using System.Xml;
-using Microsoft.Xna.Framework;
+using AmethystEngine.Forms;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using MonoGame.Framework.Content.Pipeline.Builder;
-using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Intermediate;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Framework.Content.Pipeline.Builder;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace AmethystEngine.Components.Dolomite
 {
 	public class MonoGameContentBuilder
 	{
+		private enum EMonoGameAssetType
+		{
+			NONE  = 0,
+			IMAGE = 1,
+			SOUND = 2,
+			FONT  = 3,
+			EFFECT= 4,
+		}
+
+		private class MonoGameAssetData
+		{
+			public String Name { get; set; }
+			public String AssetPath { get; set; }
+
+			/// name, value of parameter
+			public List<Tuple<String, String>> Parameters  = new List<Tuple<string, string>>();
+		}
 
 		private ContentManager _contentManager;
 		private GraphicsDevice _graphicsDevice;
 		private PipelineManager _pipelineManager;
+
+
+
+		/// <summary>
+		/// I'm not sure if there is a way to auto change the content file when adding
+		/// so for now i'm just going to change the file manually.
+		/// </summary>
+		/// <param name="editorMonoGameAssetFilePath"></param>
+		/// <param name="monogameContentBuilderPath"></param>
+		/// <returns></returns>
+		private bool UpdateMonogameContentBuilderFiles(String editorMonoGameAssetFilePath, String monogameContentBuilderPath, 
+			MonoGameAssetData newAssetData)
+		{
+			bool updateStatus = false;
+			Dictionary<String, String> monoGameParameters = new Dictionary<string, string>();
+			List<String> monogameReferences = new List<string>();
+			List<MonoGameAssetData> monoGameAssets = new List<MonoGameAssetData>();
+
+			// First read in the global properties. 
+			XmlReaderSettings settings = new XmlReaderSettings
+			{
+				//Async = true
+			};
+
+			using (XmlReader reader = XmlReader.Create(editorMonoGameAssetFilePath, settings))
+			{
+				while (reader.Read())
+				{
+					//skip to a mgcb node
+					while (reader.Name != "mgcb")
+						reader.Read();
+
+					//by this time we have found the dialogue scene tag
+
+					//skip to a Global node
+					while (reader.Name != "Global")
+						reader.Read();
+
+					// At this point we need to read in the parameters. 
+					do
+					{
+						reader.Read();
+						if (reader.Name == "Parameter" && reader.NodeType == XmlNodeType.Element)
+						{
+							monoGameParameters.Add(reader.GetAttribute("Name"), reader.GetAttribute("Value"));
+						}
+					} while (reader.Name.Trim() != "Global");
+
+					while (reader.Name != "References")
+						reader.Read();
+
+					do
+					{
+						reader.Read();
+						if (reader.Name == "Reference" && reader.NodeType == XmlNodeType.Element)
+						{
+							monogameReferences.Add(reader.GetAttribute("Path"));
+						}
+					} while (reader.Name.Trim() != "References");
+
+					while (reader.Name != "Content")
+						reader.Read();
+
+					do
+					{
+						reader.Read();
+						if (reader.Name == "Asset" && reader.NodeType == XmlNodeType.Element)
+						{
+							MonoGameAssetData assetData = new MonoGameAssetData();
+							assetData.Name = reader.GetAttribute("Name");
+							assetData.AssetPath = reader.GetAttribute("Path");
+							do
+							{
+								reader.Read();
+								if (reader.Name == "Parameter" && reader.NodeType == XmlNodeType.Element)
+								{
+									assetData.Parameters.Add(new Tuple<string, string>(
+										reader.GetAttribute("Name"), reader.GetAttribute("Value")));
+								}
+							} while (reader.Name.Trim() != "Asset");
+							monoGameAssets.Add(assetData);
+						}
+					} while (reader.Name.Trim() != "Content");
+
+					// Kick out
+					while (!reader.EOF)
+						reader.Read();
+					break;
+				}
+
+			}
+
+			// Now we need to add the NEW ASSET to the arrays.
+			if (monoGameAssets.Find(x => x.AssetPath == newAssetData.AssetPath) != null)
+			{
+				return false;
+			}
+			monoGameAssets.Add(newAssetData);
+
+			// Now we need to update the actual MonoGame builder file.
+			UpdateMGCBFile(monogameContentBuilderPath, monoGameParameters, monogameReferences, monoGameAssets);
+			UpdateContentConfigFile(editorMonoGameAssetFilePath, monoGameParameters, monogameReferences, monoGameAssets);
+
+			return updateStatus = true;
+		}
+
+		private bool UpdateContentConfigFile(String filePath, Dictionary<String, String> monoGameParameters, List<String> monogameReferences,
+			List<MonoGameAssetData> monoGameAssets)
+		{
+			XmlWriterSettings settings = new XmlWriterSettings
+			{
+				Indent = true,
+				IndentChars = "  ",
+				NewLineChars = "\r\n",
+				NewLineHandling = NewLineHandling.Replace
+
+			};
+			//settings.Async = true;
+
+			using (XmlWriter writer = XmlWriter.Create(filePath, settings))
+			{
+				// Start the file
+				writer.WriteStartElement(null, "mgcb", null);
+
+				writer.WriteStartElement(null, "Global", null);
+				foreach (var parameter in monoGameParameters)
+				{
+					writer.WriteStartElement(null, "Parameter", null);
+					writer.WriteAttributeString(null, "Name", null, parameter.Key);
+					writer.WriteAttributeString(null, "Value", null, parameter.Value);
+					writer.WriteFullEndElement();//end of Parameter tag
+				}
+				writer.WriteFullEndElement();//end of mgcb tag
+
+				writer.WriteStartElement(null, "References", null);
+				foreach (var reference in monogameReferences)
+				{
+					writer.WriteStartElement(null, "Reference", null);
+					writer.WriteAttributeString(null, "Path", null, reference);
+					writer.WriteFullEndElement();//end of Reference tag
+				}
+				writer.WriteFullEndElement();//end of References tag
+
+				writer.WriteStartElement(null, "Content", null);
+				foreach (var asset in monoGameAssets)
+				{
+					writer.WriteStartElement(null, "Asset", null);
+					writer.WriteAttributeString(null, "Type", null, "Image");
+					writer.WriteAttributeString(null, "Name", null, asset.Name);
+					writer.WriteAttributeString(null, "Path", null, asset.AssetPath);
+
+					foreach (var param in asset.Parameters)
+					{
+						writer.WriteStartElement(null, "Parameter", null);
+						writer.WriteAttributeString(null, "Name", null, param.Item1);
+						writer.WriteAttributeString(null, "Value", null, param.Item2);
+						writer.WriteFullEndElement();//end of parameter tag
+					}
+					writer.WriteFullEndElement();//end of Asset tag
+				}
+				writer.WriteFullEndElement();//end of Content tag
+
+			}
+			return true;
+		}
+
+		private bool UpdateMGCBFile(String filePath, Dictionary<String, String> monoGameParameters, List<String> monogameReferences,
+			List<MonoGameAssetData> monoGameAssets)
+		{
+			bool fileWriteStatus = false;
+			List<String> OutputFileLines = new List<string>();
+			string pattern = "[^a-zA-Z0-9 =,]"; // This pattern matches any character that is not a letter, digit, or space.
+
+
+			// Header
+			OutputFileLines.Add("#----------------------------- Global Properties ----------------------------#");
+			OutputFileLines.Add("");
+			// we need to output all the global parameters!
+			foreach (var param in monoGameParameters)
+			{
+				OutputFileLines.Add(String.Format("/{0}:{1}", param.Key, param.Value ));
+			}
+
+			OutputFileLines.Add("");
+			OutputFileLines.Add("#----------------------------- References ----------------------------#");
+			// Add all reference here!
+			foreach (var reference in monogameReferences)
+			{
+				OutputFileLines.Add(String.Format("/{0}:{1}", "reference", reference));
+			}
+
+			OutputFileLines.Add("");
+			OutputFileLines.Add("#----------------------------- Content ----------------------------#");
+			// Time to add all the assets!
+			foreach (var asset in monoGameAssets)
+			{
+				OutputFileLines.Add( String.Format("#begin {0}",
+					((asset.AssetPath).Replace(Path.GetExtension(asset.AssetPath), "")) + ".xnb"));
+				
+				// UNCOMMENT IF YOU WANT TO MAKE THE MONOGAME FILE BUILDABLE AGAIN!!!
+				//foreach (var parameter in asset.Parameters)
+				//{
+				//	OutputFileLines.Add(String.Format("/{0}:{1}", parameter.Item1, Regex.Replace(parameter.Item2, pattern, "" )));
+				//}
+				OutputFileLines.Add(String.Format("/copy:{0}",
+					((asset.AssetPath).Replace(Path.GetExtension(asset.AssetPath), "")) + ".xnb"));
+				OutputFileLines.Add("");
+
+			}
+
+			File.WriteAllLines(filePath, OutputFileLines);
+			fileWriteStatus = true;
+
+			return fileWriteStatus;
+		}
 
 		public MonoGameContentBuilder(String projPath)
 		{
@@ -36,11 +261,9 @@ namespace AmethystEngine.Components.Dolomite
 			// _pipelineManager = new PipelineManager(projPath, projPath, projPath);
 		}
 
-		public bool AttemptToBuildPNGToXNBFile(String pngPath, String finalDirectory, String monoGameContentFilePath)
+		public bool AttemptToBuildPNGToXNBFile(String pngPath, String editorDirectory, String finalDirectory, String editorMonoGameAssetFilePath, String monoGameContentFilePath)
 		{
 			bool returnStatus = false;
-
-
 
 			OpaqueDataDictionary keyValues = new OpaqueDataDictionary();
 			keyValues.Add("Importer", "TextureImporter");
@@ -59,13 +282,8 @@ namespace AmethystEngine.Components.Dolomite
 			string inputDir = input.Substring(0, input.LastIndexOf("\\"));
 			string output = String.Format("{0}\\{1}", finalDirectory, "output\\");
 
-			string pathA = string.Format("{0}\\source", finalDirectory);
-			string pathC = string.Format("{0}\\final", finalDirectory);
-
-			Console.WriteLine("XNB Converter > [INFO] Creating temporary directories.");
-			if (!Directory.Exists(pathA)) Directory.CreateDirectory(pathA);
-			if (!Directory.Exists(pathC)) Directory.CreateDirectory(pathC);
-			Console.WriteLine("XNB Converter > [INFO] Finished creating temporary directories.");
+			string pathA = editorDirectory;
+			string pathC = finalDirectory;
 
 			Console.WriteLine("XNB Converter > [INFO] Copying Files.");
 			if(!File.Exists(String.Format("{0}/{1}", pathA, Path.GetFileName(pngPath))))
@@ -80,9 +298,31 @@ namespace AmethystEngine.Components.Dolomite
 				Platform = TargetPlatform.Windows,
 				Profile = GraphicsProfile.Reach
 			};
-			manager.BuildContent((pathA + "\\" + Path.GetFileName(pngPath)), (pathC + "\\" + inputFileName), "TextureImporter", "TextureProcessor", keyValues);
+			manager.BuildContent((pathA + Path.GetFileName(pngPath)), (pathC + inputFileName), "TextureImporter", "TextureProcessor", keyValues);
 
-			change the directories to use the EDITOR, and the GAME content -> images.So we don't have to do the final and source shit
+			// we need Add the new asset to the amethyst engine config file for assets
+			MonoGameAssetData newAssetData = new MonoGameAssetData();
+			newAssetData.Name = inputFileName;
+			newAssetData.AssetPath = (pathC + Path.GetFileName(pngPath)).Replace(Directory.GetParent(monoGameContentFilePath).FullName, "");
+			newAssetData.AssetPath = newAssetData.AssetPath.Replace("\\", "/").Substring(1);
+			foreach (var paramKeyValue in keyValues)
+			{
+				if(paramKeyValue.Key.ToLower() == "importer" || paramKeyValue.Key.ToLower() == "processor")
+					newAssetData.Parameters.Add(new Tuple<string, string>(paramKeyValue.Key.ToLower(), paramKeyValue.Value.ToString()));
+				else
+				{
+					if (paramKeyValue.Key.ToLower() == "colorkeycolor")
+					{
+						Color? color = paramKeyValue.Value as Color?;
+						String colorCode = String.Format("{0},{1},{2},{3}", color?.R, color?.G, color?.B, color?.A );
+						newAssetData.Parameters.Add(new Tuple<string, string>("processorParam", paramKeyValue.Key.ToLower() + "=" + colorCode));
+					}
+					else
+						newAssetData.Parameters.Add(new Tuple<string, string>("processorParam", paramKeyValue.Key.ToLower() + "=" + paramKeyValue.Value.ToString()));
+				}
+			}
+
+			UpdateMonogameContentBuilderFiles(editorMonoGameAssetFilePath, monoGameContentFilePath, newAssetData);
 
 			//// Step 1: Load Raw Image
 			//Texture2DContent texture2DContent = new Texture2DContent();

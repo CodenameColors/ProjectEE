@@ -943,8 +943,15 @@ namespace AmethystEngine.Forms
 					else
 						return;
 
+					String editorCopyDirectory = ProjectDirectory.Replace(MonoGameProjectContentDirectory, EditorProjectContentDirectory);
+					String finalBinaryDirectory = ProjectDirectory;
 
-					_monoGameContentBuilder.AttemptToBuildPNGToXNBFile(importfilename, ProjectFilePath.Replace(".gem", "_Game\\Content\\Images"),
+
+					_monoGameContentBuilder.AttemptToBuildPNGToXNBFile(
+						importfilename,
+						editorCopyDirectory,
+						finalBinaryDirectory,
+						EditorProjectContentDirectory + "ContentBuilderSettings.config",
 						ProjectFilePath.Replace(".gem", "_Game\\Content\\Content.mgcb"));
 				}
 

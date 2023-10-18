@@ -22,6 +22,7 @@ namespace Game1
 		Map C_map; //for map change testing
 		Player Player;
 		Camera camera;
+		
 
 		string MainLevelPath = "";
 
@@ -76,7 +77,7 @@ namespace Game1
 
 		protected async void Load_async()
 		{
-			map.level = await map.GetLevelFromFile(MainLevelPath);
+			// map.level = await map.GetLevelFromFile(MainLevelPath);
 
 		}
 
@@ -102,10 +103,11 @@ namespace Game1
 			map.GenerateLevel(map.level, this.GraphicsDevice, spriteBatch);
 
 
-			Player.Load(this.Content);
+			//Player.Load(this.Content);
 			// TODO: use this.Content to load your game content here
 
 			//C_map.level = Level.ImportLevel("C:\\Users\\Antonio\\Documents\\createst\\test2\\test2_Game\\Content\\Levels\\LevelChangeTestNew.lvl");
+			t2 = Content.Load<Texture2D>("Images/ShyCat");
 
 		}
 
@@ -192,7 +194,8 @@ namespace Game1
 			spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, camera.Transform);
 			if (map != null)
 				map.Draw(spriteBatch);
-			Player.Draw(spriteBatch);
+			//Player.Draw(spriteBatch);
+			spriteBatch.Draw(t2, Vector2.Zero, Color.White );
 			spriteBatch.End();
 			base.Draw(gameTime);
 		}
