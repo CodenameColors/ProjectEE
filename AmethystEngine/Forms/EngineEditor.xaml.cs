@@ -1711,88 +1711,86 @@ namespace AmethystEngine.Forms
 				int i = 0;
 				PropGrid LB =
 					((PropGrid)(ObjectProperties_Control.Template.FindName("UIPropertyGrid", ObjectProperties_Control)));
-				LB.ClearProperties();
-				foreach (object o in CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item2))
+
+				if (LB != null)
 				{
-					if (o is null)
-						continue;
-					if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "Zindex")
-					{
-						TextBox TB = new TextBox();
-						TB.KeyDown += BaseUI_ZIndex_Changed;
+					LB.ClearProperties();
 
-						// TODO: FIX PROP GRID CALLBACKS
-
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
-							TB,
-							o.ToString(), (sender1, args) =>
-							{
-								Console.WriteLine("BROKEN CALLBACK :(");
-								PropertyCallbackTB(sender1, args, CurrentUIDictionary[SelectedUIControl.Name]);
-							}); //CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
-					}
-					else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] ==
-									 "ShowBorder")
+					foreach (object o in CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item2))
 					{
-						CheckBox CB = new CheckBox() { VerticalAlignment = VerticalAlignment.Center };
-						CB.Click += SetBorderVisibility;
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
-							CB,
-							o);
-					}
-					else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] ==
-									 "Image")
-					{
-						ComboBox CB = new ComboBox() { Height = 50, ItemTemplate = (DataTemplate)this.Resources["CBIMGItems"] };
-						CB.SelectionChanged += GameImage_SelectionChanged;
-						List<EditorObject> ComboItems = new List<EditorObject>();
-						foreach (String filepath in GetAllProjectImages())
+						if (o is null)
+							continue;
+						if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "Zindex")
 						{
-							ComboItems.Add(new EditorObject(filepath,
-								filepath.Substring(filepath.LastIndexOfAny(new char[] { '\\', '/' })), false));
+							TextBox TB = new TextBox();
+							TB.KeyDown += BaseUI_ZIndex_Changed;
+
+							// TODO: FIX PROP GRID CALLBACKS
+
+							LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB,
+								o.ToString(), (sender1, args) =>
+								{
+									Console.WriteLine("BROKEN CALLBACK :(");
+									PropertyCallbackTB(sender1, args, CurrentUIDictionary[SelectedUIControl.Name]);
+								}); //CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
+						}
+						else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "ShowBorder")
+						{
+							CheckBox CB = new CheckBox() { VerticalAlignment = VerticalAlignment.Center };
+							CB.Click += SetBorderVisibility;
+							LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], CB, o);
+						}
+						else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "Text")
+						{
+							TextBox TB = new TextBox() { VerticalAlignment = VerticalAlignment.Center };
+							TB.KeyDown += SetMessageText;
+							LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB, o);
+						}
+						else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "Image")
+						{
+							ComboBox CB = new ComboBox() { Height = 50, ItemTemplate = (DataTemplate)this.Resources["CBIMGItems"] };
+							CB.SelectionChanged += GameImage_SelectionChanged;
+							List<EditorObject> ComboItems = new List<EditorObject>();
+							foreach (String filepath in GetAllProjectImages())
+							{
+								ComboItems.Add(new EditorObject(filepath,
+									filepath.Substring(filepath.LastIndexOfAny(new char[] { '\\', '/' })), false));
+							}
+
+							CB.ItemsSource = ComboItems;
+
+							LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], CB,
+								new List<String>());
+						}
+						else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "Background")
+						{
+							DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
+							TB.SelectedColorChanged += customCP_BackgroundColorChanged;
+							LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB, o.ToString());
+						}
+						else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "FontColor")
+						{
+							DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
+							TB.SelectedColorChanged += customCP_FontColorChanged;
+							LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB, o.ToString());
+						}
+						else
+						{
+							TextBox TB = new TextBox();
+							TB.KeyDown += UIPropertyCallback;
+
+							// TODO: FIX PROP GRID CALLBACKS
+
+							LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB,
+								o.ToString(), (sender1, args) =>
+								{
+									Console.WriteLine("BROKEN CALLBACK :(");
+									PropertyCallbackTB(sender1, args, CurrentUIDictionary[SelectedUIControl.Name]);
+								}); //CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
 						}
 
-						CB.ItemsSource = ComboItems;
-
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
-							CB,
-							new List<String>());
+						i++;
 					}
-					else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] ==
-									 "Background")
-					{
-						DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
-						TB.SelectedColorChanged += customCP_BackgroundColorChanged;
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
-							TB,
-							o.ToString());
-					}
-					else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] ==
-									 "FontColor")
-					{
-						DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
-						TB.SelectedColorChanged += customCP_FontColorChanged;
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
-							TB,
-							o.ToString());
-					}
-					else
-					{
-						TextBox TB = new TextBox();
-						TB.KeyDown += UIPropertyCallback;
-
-						// TODO: FIX PROP GRID CALLBACKS
-
-						LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i],
-							TB,
-							o.ToString(), (sender1, args) =>
-							{
-								Console.WriteLine("BROKEN CALLBACK :(");
-								PropertyCallbackTB(sender1, args, CurrentUIDictionary[SelectedUIControl.Name]);
-							}); //CurrentUIDictionary[SelectedUIControl.Name].PropertyCallbackTB);
-					}
-
-					i++;
 				}
 			}
 			else if (((TabItem)EditorWindows_TC.SelectedItem).Header.ToString().Contains("Dialogue"))

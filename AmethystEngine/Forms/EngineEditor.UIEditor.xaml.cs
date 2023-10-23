@@ -341,6 +341,32 @@ namespace AmethystEngine.Forms
 		}
 
 		/// <summary>
+		/// Changes the visibility of a border control. Also doesn't create it in the game.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void SetMessageText(object sender, KeyEventArgs e)
+		{
+			if (Key.Enter == e.Key)
+			{
+				String Property = ((TextBox)sender).Tag.ToString();
+				if (Property.Contains( "Text"))
+				{
+					Console.WriteLine("Set text to target");
+					String desiredText = ((TextBox)sender).Text;
+
+					// Let's find the Textbox
+					foreach(var uiElement in ((Grid)SelectedUIControl.Content).Children)
+					{
+						if (uiElement is TextBox textBox)
+							textBox.Text = desiredText;
+					}
+					SelectedUI.SetProperty("Text", desiredText);
+				}
+			}
+		}
+
+		/// <summary>
 		/// This method is here as the DEFAULT property callback.
 		/// IF THIS IS CALLED YOU NEED TO FIX IT AND DECLARE THE CALLBACK 
 		/// </summary>
