@@ -1,4 +1,5 @@
 ﻿#define DEV_DEBUG
+#define EDITOR
 
 using BixBite.Characters;
 using BixBite.Rendering;
@@ -7,15 +8,46 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-
 using System.Xml;
 using BixBite.NodeEditor;
 using BixBite.NodeEditor.Logic;
 using BixBite.Resources;
-using TimelinePlayer.Components;
+
+#if EDITOR
+using NodeEditor.Components;
+using NodeEditor;
+using BaseNodeBlock = NodeEditor.Components.BaseNodeBlock;
+using ConditionalNodeBlock = NodeEditor.Components.ConditionalNodeBlock;
+using GetConstantNodeBlock = NodeEditor.Components.GetConstantNodeBlock;
+using ECOnnectionType = NodeEditor.Components.ECOnnectionType;
+using DialogueNodeBlock = NodeEditor.Components.DialogueNodeBlock;
+using SetConstantNodeBlock = NodeEditor.Components.SetConstantNodeBlock;
+using StartBlockNode = NodeEditor.StartBlockNode;
+using ConnectionNode = NodeEditor.Components.ConnectionNode;
+using ExitBlockNode = NodeEditor.ExitBlockNode;
+using static NodeEditor.BlockNodeEditor;
+using RuntimeVars = NodeEditor.BlockNodeEditor.RuntimeVars;
+using Timeline = TimelinePlayer.Components.Timeline;
+using ChoiceTimeBlock = TimelinePlayer.Components.ChoiceTimeBlock;
+using TimeBlock = TimelinePlayer.Components.TimeBlock;
+#else
+using BixBite;
+using BaseNodeBlock = BixBite.NodeEditor.BaseNodeBlock;
+using ConditionalNodeBlock = BixBite.NodeEditor.ConditionalNodeBlock;
+using GetConstantNodeBlock = BixBite.NodeEditor.GetConstantNodeBlock;
+using ECOnnectionType = BixBite.NodeEditor.ECOnnectionType;
+using DialogueNodeBlock = BixBite.NodeEditor.DialogueNodeBlock;
+using SetConstantNodeBlock = BixBite.NodeEditor.SetConstantNodeBlock;
+using StartBlockNode = BixBite.NodeEditor.StartBlockNode;
+using ExitBlockNode = BixBite.NodeEditor.ExitBlockNode;
+using ConnectionNode = BixBite.NodeEditor.ConnectionNode;
+using RuntimeVars = BixBite.NodeEditor.RuntimeVars;
+using Timeline = BixBite.Components.Timeline;
 using ChoiceTimeBlock = BixBite.TimelinePlayer.ChoiceTimeBlock;
 using TimeBlock = BixBite.TimelinePlayer.TimeBlock;
 using Timeline = BixBite.TimelinePlayer.Timeline;
+
+#endif
 
 namespace BixBite
 {
@@ -82,9 +114,9 @@ namespace BixBite
 
 		//PROPERTIES 
 
-		#region Properties
+#region Properties
 
-		#region IPropertiesImplementation
+#region IPropertiesImplementation
 		public void SetNewProperties(ObservableCollection<Tuple<string, object>> NewProperties)
 		{
 			Properties = NewProperties;
@@ -128,9 +160,9 @@ namespace BixBite
 			return Properties;
 		}
 
-		#endregion
+#endregion
 
-		#region Helper
+#region Helper
 		public int GetPropertyIndex(String Key)
 		{
 			int i = 0;
@@ -142,15 +174,15 @@ namespace BixBite
 			}
 			return -1;
 		}
-		#endregion
+#endregion
 
-		#region PropertiesCallBack
-		#endregion
-		#endregion
+#region PropertiesCallBack
+#endregion
+#endregion
 
-		#region PropertyCallbacks
+#region PropertyCallbacks
 
-		#endregion
+#endregion
 
 
 		public void AddCharacterToScene(SceneEntity deschar)
@@ -176,7 +208,7 @@ namespace BixBite
 			}
 		}
 
-		public static DialogueScene ImportScene(String FilePath, ref List<Tuple<String, String, int, String, String, int>> connectionList)
+		public static DialogueScene ImportScene(String FilePath, ref List<Tuple<String, String, int, String, String, int>> connectionList, String ContentPath = "")
 		{
 			//Create our return GameUI
 			DialogueScene retDialogueScene = null;
@@ -224,22 +256,17 @@ namespace BixBite
 								if (reader.Name == "Image" && reader.NodeType == XmlNodeType.Element)
 								{
 									String path = reader.GetAttribute("Path");
-									if (System.IO.File.Exists(reader.GetAttribute("Path")))
-									{
-										System.Drawing.Image img =
-											System.Drawing.Image.FromFile(
-												reader.GetAttribute("Path") ?? throw new InvalidOperationException());
-										retDialogueScene.Characters.Last().DialogueSprites.Add(
-											new Sprite(
-												path.Substring(path.LastIndexOfAny(new char[]{'/','\\'}),  path.LastIndexOf('.') - path.LastIndexOfAny(new char[] { '/', '\\' })),
-												path,
-												0,0,
-												img.Width,
-												img.Height
-											)
-										);
-									}
-
+									int width = int.Parse(reader.GetAttribute("Width"));
+									int height = int.Parse(reader.GetAttribute("Height"));
+									retDialogueScene.Characters.Last().DialogueSprites.Add(
+										new Sprite(
+											path.Substring(path.LastIndexOfAny(new char[] { '/', '\\' }), path.LastIndexOf('.') - path.LastIndexOfAny(new char[] { '/', '\\' })),
+											path,
+											0, 0,
+											width,
+											height
+										)
+									);
 								}
 							} while (reader.Name.Trim() != "Character" && XmlNodeType.EndElement != reader.NodeType && !reader.EOF);
 						}
@@ -592,6 +619,8 @@ namespace BixBite
 					{
 						writer.WriteStartElement(null, "Image", null);
 						writer.WriteAttributeString(null, "Path", null, sprite.ImgPathLocation);
+						writer.WriteAttributeString(null, "Width", null, sprite.Width.ToString());
+						writer.WriteAttributeString(null, "Height", null, sprite.Height.ToString());
 						writer.WriteEndElement();//end of Image tag
 					}
 					writer.WriteEndElement();//end of Images tag

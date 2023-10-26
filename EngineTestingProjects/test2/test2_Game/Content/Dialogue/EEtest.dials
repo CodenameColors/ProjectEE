@@ -3,44 +3,12 @@
   <Characters>
     <Character Name="Emma" UI="{Content}/UI/Persona_work.UI" LinkedImgBox="NewImgBox" Horizontal="Left" Vertical="Bottom">
       <Images>
-        <Image Path="{Content}/Images/500px-Mcol_money_bag.svg.png" />
-        <Image Path="{Content}/Images/522019a1q4bjrol3.jpg" />
-        <Image Path="{Content}/Images/a50afebd-a3e7-42bb-9c0b-33d394d33334.gif" />
-        <Image Path="{Content}/Images/Agent8.png" />
-        <Image Path="{Content}/Images/Ame_icon_small.png" />
-        <Image Path="{Content}/Images/emma_colors_oc.png" />
-        <Image Path="{Content}/Images/folder.png" />
-        <Image Path="{Content}/Images/PathAndObjects.png" />
-        <Image Path="{Content}/Images/Persona5_TB.png" />
-        <Image Path="{Content}/Images/SmallTextBubble_Orange.png" />
-        <Image Path="{Content}/Images/SmallTextBubble_Purple.png" />
-        <Image Path="{Content}/Images/smol%20megumin.jpg" />
-        <Image Path="{Content}/Images/Splatoon%20TB_Back.png" />
-        <Image Path="{Content}/Images/text_bubbles.png" />
-        <Image Path="{Content}/Images/winter.png" />
-        <Image Path="{Content}/Images/__pluse_and_minun___by_celsius_ice_rose.jpg" />
-        <Image Path="{Content}/Images/emma_colors_oc.png" />
+        <Image Path="{Content}/Images/emma_colors_oc.png" Width="550" Height="550"/>
       </Images>
     </Character>
     <Character Name="PC" UI="{Content}/UI/Persona_work.UI" LinkedImgBox="NewImgBox" Horizontal="Right" Vertical="Bottom">
       <Images>
-        <Image Path="{Content}/Images/500px-Mcol_money_bag.svg.png" />
-        <Image Path="{Content}/Images/522019a1q4bjrol3.jpg" />
-        <Image Path="{Content}/Images/a50afebd-a3e7-42bb-9c0b-33d394d33334.gif" />
-        <Image Path="{Content}/Images/Agent8.png" />
-        <Image Path="{Content}/Images/Ame_icon_small.png" />
-        <Image Path="{Content}/Images/emma_colors_oc.png" />
-        <Image Path="{Content}/Images/folder.png" />
-        <Image Path="{Content}/Images/PathAndObjects.png" />
-        <Image Path="{Content}/Images/Persona5_TB.png" />
-        <Image Path="{Content}/Images/SmallTextBubble_Orange.png" />
-        <Image Path="{Content}/Images/SmallTextBubble_Purple.png" />
-        <Image Path="{Content}/Images/smol%20megumin.jpg" />
-        <Image Path="{Content}/Images/Splatoon%20TB_Back.png" />
-        <Image Path="{Content}/Images/text_bubbles.png" />
-        <Image Path="{Content}/Images/winter.png" />
-        <Image Path="{Content}/Images/__pluse_and_minun___by_celsius_ice_rose.jpg" />
-        <Image Path="{Content}/Images/emma_colors_oc.png" />
+        <Image Path="{Content}/Images/emma_colors_oc.png" Width="550" Height="550"/>
       </Images>
     </Character>
   </Characters>

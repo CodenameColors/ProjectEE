@@ -244,6 +244,7 @@
     <Compile Include="Components\Bixbite_Windows_Build\Crafting\PuzzlePiece.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Crafting\PuzzlePieceCreationHelper.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Crafting\Recipe.cs" />
+    <Compile Include="Components\Bixbite_Windows_Build\DialogueScene.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Effects\ImageEffect.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\GameEvent.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Input\InputController.cs" />
@@ -338,7 +339,6 @@
     <Compile Include="Components\Bixbite_Windows_Build\TimelinePlayer\Timeline.cs" />
     <Compile Include="Components\Bixbite_Windows_Build\Tweening\Tweening.cs" />
     <Compile Include="Components\CanvasSpritesheet.cs" />
-    <Compile Include="Components\DialogueScene.cs" />
     <Compile Include="Components\Dolomite\MonoGameContentBuilder.cs" />
     <Compile Include="Components\PropertyBag.cs" />
     <Compile Include="Components\Tools\Cuprite.cs" />
@@ -660,8 +660,8 @@
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>python .\..\..\BuildScripts\NodeEditorCopyFiles.py py2exe
-      python .\..\..\BuildScripts\BixbiteCopyForAmetheystEngine.py py2exe
-      python .\..\..\BuildScripts\NodeEditorPatchFiles.py py2exe</PreBuildEvent>
+python .\..\..\BuildScripts\BixbiteCopyForAmetheystEngine.py py2exe
+python .\..\..\BuildScripts\NodeEditorPatchFiles.py py2exe</PreBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\MonoGame.Framework.WindowsDX.3.8.0.1641\build\MonoGame.Framework.WindowsDX.targets" Condition="Exists('..\packages\MonoGame.Framework.WindowsDX.3.8.0.1641\build\MonoGame.Framework.WindowsDX.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -22,6 +22,7 @@ using NodeEditor;
 using PropertyGridEditor;
 using TimelinePlayer.Components;
 using GameImage = BixBite.Rendering.UI.Image.GameImage;
+using BixBite;
 
 namespace AmethystEngine.Forms
 {
@@ -916,6 +917,9 @@ namespace AmethystEngine.Forms
 					{
 						try
 						{
+							String filePath = filepath.ImgPathLocation;
+							filepath = filePath.Replace("{Content}", EditorProjectContentDirectory);
+
 							ComboItems.Add(new EditorObject(filepath.ImgPathLocation,
 								filepath.ImgPathLocation.Substring(filepath.ImgPathLocation.LastIndexOfAny(new char[] { '\\', '/' })),
 								false));
@@ -1866,7 +1870,10 @@ namespace AmethystEngine.Forms
 
 			foreach (Timeline tl in dia.Timelines)
 			{
-				tl.TrackImagePath = dia.Characters[charcnt++].DialogueSprites[0].ImgPathLocation;
+				String actualFilePath = dia.Characters[charcnt++].DialogueSprites[0].ImgPathLocation;
+				actualFilePath = actualFilePath.Replace("{Content}", EditorProjectContentDirectory);
+
+				tl.TrackImagePath = actualFilePath;
 				DialogueEditor_Timeline.AddTimeline(tl);
 			}
 
@@ -1894,7 +1901,10 @@ namespace AmethystEngine.Forms
 			Dialogue_CE_Tree.ItemsSource = CurActiveDialogueScene.Characters;
 			for (int i = 0; i < CurActiveDialogueScene.Characters.Count; i++)
 			{
-				CurActiveDialogueScene.DialogueBoxes.Add(BaseUI.ImportBaseUI(CurActiveDialogueScene.DialogueBoxesFilePaths[i]));
+				String filePath = CurActiveDialogueScene.DialogueBoxesFilePaths[i];
+				filePath = filePath.Replace("{Content}", MonoGameProjectContentDirectory);
+
+				CurActiveDialogueScene.DialogueBoxes.Add(BaseUI.ImportBaseUI(filePath));
 				DialogueEditor_NodeGraph.SceneCharacters_list.Add(CurActiveDialogueScene.Characters[i].Name);
 			}
 

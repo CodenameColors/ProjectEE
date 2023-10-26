@@ -4,7 +4,7 @@ import shutil
 
 print('Starting Node Editor Build Script --  {}'.format((__file__)))
 
-# there are 2 FILES that we need to patch. 
+# there are 3 FILES that we need to patch. 
 
 # let's get the file BaseNodeBlock.cs
 output_file_baseblock = '{}{}'.format(os.getcwd(), "\\..\\..\\..\\NodeEditor\\NodeEditor_Windows\\BaseNodeBlock.cs")
@@ -33,6 +33,25 @@ with open(output_file_baseblock, 'w') as fp:
 
 # --------------------------------------------------------------------------------------------------------------------------------------
         
+# let's get the file DialogueScene.cs
+output_file_dialogue = '{}{}'.format(os.getcwd(), "\\..\\..\\..\\AmethystEngine\\Components\\Bixbite_Windows_Build\\DialogueScene.cs")
+with open(output_file_dialogue) as file:
+    file_lines = file.readlines()
+    line_count = 0
+    while line_count < len(file_lines):
+        if(file_lines[line_count].find("// PATCH:") != -1):
+            file_lines[line_count] = file_lines[line_count].replace("// PATCH:", "")
+        line_count += 1
+
+with open(output_file_dialogue, 'w') as fp:
+    for item in file_lines:
+        # write each item on a new line
+        fp.write("%s" % item)
+
+
+# --------------------------------------------------------------------------------------------------------------------------------------
+
+
 # at this point we have patched the first file. Now let's do the last one. ConnectionNode.cs
 output_file_connection = '{}{}'.format(os.getcwd(), "\\..\\..\\..\\AmethystEngine\\Components\\Bixbite_Windows_Build\\NodeEditor\\ConnectionNode.cs")
 

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<GameUI Name="NewUITool" Width="530" Height="234" Background="#00000000" ShowBorder="False" Zindex="1">
-  <GameIMG Name="NewImgBox" Width="201" Height="207" Background="#00000000" ShowBorder="False" Zindex="1" Xoffset="4" YOffset="21" Image="C:/Users/Antonio/Documents/CreateTest/test2/test2_Game/Content/Images/emma_colors_oc.png" />
-  <GameTextBlock Name="NewTextBox" Width="381" Height="122" Background="#00000000" ShowBorder="False" Zindex="1" Xoffset="135" YOffset="67" ContentText="" Font="Ariel" FontSize="24" FontColor="#FFF0F8FF" FontStyle="Normal" TextSpeed="1" TextTime="1" Image="C:/Users/Antonio/Documents/CreateTest/test2/test2_Game/Content/Images/Persona5_TB.png" />
+<GameUI Name="NewUITool" Width="530" Height="234" Background="#00000000" ShowBorder="False" ZIndex="1">
+  <GameIMG Name="NewImgBox" Width="201" Height="207" Background="#00000000" ShowBorder="False" ZIndex="1" Xoffset="4" YOffset="21" Image="{Content}/Images/emma_colors_oc.png" />
+  <GameTextBlock Name="NewTextBox" Width="381" Height="122" Background="#00000000" ShowBorder="False" ZIndex="1" Xoffset="135" YOffset="67" Text="" Font="Ariel" FontSize="24" FontColor="#FFF0F8FF" FontStyle="Normal" TextSpeed="1" TextTime="1" Image="C:/Users/Antonio/Documents/CreateTest/test2/test2_Game/Content/Images/Persona5_TB.png" />
 </GameUI>
