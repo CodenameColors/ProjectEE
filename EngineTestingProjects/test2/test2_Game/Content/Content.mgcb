@@ -10,10 +10,18 @@
 #----------------------------- References ----------------------------#
 
 #----------------------------- Content ----------------------------#
-
 #begin Images/ShyCat.xnb
 /copy:Images/ShyCat.xnb
 
 #begin Images/char.xnb
 /copy:Images/char.xnb
+
+#begin Images/Characters/Emmaemma_colors_oc.xnb
+/copy:Images/Characters/Emmaemma_colors_oc.xnb
+
+#begin Images/Characters/Emma/emma_colors_oc.xnb
+/copy:Images/Characters/Emma/emma_colors_oc.xnb
+
+#begin Images/Characters/PC/Agent8.xnb
+/copy:Images/Characters/PC/Agent8.xnb
 

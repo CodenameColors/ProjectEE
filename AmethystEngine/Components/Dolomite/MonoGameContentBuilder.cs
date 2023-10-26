@@ -261,6 +261,7 @@ namespace AmethystEngine.Components.Dolomite
 			// _pipelineManager = new PipelineManager(projPath, projPath, projPath);
 		}
 
+
 		public bool AttemptToBuildPNGToXNBFile(String pngPath, String editorDirectory, String finalDirectory, String editorMonoGameAssetFilePath, String monoGameContentFilePath)
 		{
 			bool returnStatus = false;
@@ -282,8 +283,13 @@ namespace AmethystEngine.Components.Dolomite
 			string inputDir = input.Substring(0, input.LastIndexOf("\\"));
 			string output = String.Format("{0}\\{1}", finalDirectory, "output\\");
 
-			string pathA = editorDirectory;
-			string pathC = finalDirectory;
+			string pathA = editorDirectory + "\\";
+			string pathC = finalDirectory + "\\";
+
+			Console.WriteLine("XNB Converter > [INFO] Creating required Directories.");
+			Directory.CreateDirectory(editorDirectory);
+			Console.WriteLine("XNB Converter > [INFO] DONE Creating required Directories.");
+
 
 			Console.WriteLine("XNB Converter > [INFO] Copying Files.");
 			if(!File.Exists(String.Format("{0}/{1}", pathA, Path.GetFileName(pngPath))))

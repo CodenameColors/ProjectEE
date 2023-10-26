@@ -1228,7 +1228,14 @@ namespace AmethystEngine.Forms
 			Window w = new AddCharacterForm(ProjectFilePath) { AddToScene = AddCharacterHook };
 			w.ShowDialog();
 
-			DialogueEditor_NodeGraph.SceneCharacters_list.Add(CurActiveDialogueScene.Characters.Last().Name);
+			try
+			{
+				DialogueEditor_NodeGraph.SceneCharacters_list.Add(CurActiveDialogueScene.Characters.Last().Name);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("No character was created because of faulty data given");
+			}
 
 			//CurActiveDialogueScene.Characters.Add(c);
 			//DialogueEditor_Timeline.AddTimeline(c.Name);

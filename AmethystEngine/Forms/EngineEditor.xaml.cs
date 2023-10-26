@@ -790,20 +790,44 @@ namespace AmethystEngine.Forms
 		private void ProjectContentExplorer_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
 		{
 			String TempPic = "/AmethystEngine;component/images/Ame_icon_small.png";
+			String folderPic = "/AmethystEngine;component/images/folder.png";
+
+
 			CurrentProjectTreeView = (TreeView) sender;
 			ContentLibaryObjList.Clear();
 			if (CurrentProjectTreeView.Items.Count == 0) return;
 			((TreeViewItem) (CurrentProjectTreeView.SelectedItem)).IsExpanded = true;
 			ProjectDirectory = ProjectFilePath.Replace(".gem",
 				"_Game\\Content\\" + ((TreeViewItem) (CurrentProjectTreeView.SelectedItem)).Header + "\\");
+
+			if(Directory.Exists((CurrentProjectTreeView.SelectedItem as TreeViewItem).Tag.ToString()))
+				ProjectDirectory = (CurrentProjectTreeView.SelectedItem as TreeViewItem).Tag.ToString();
+			else
+				ProjectDirectory = Path.GetDirectoryName((CurrentProjectTreeView.SelectedItem as TreeViewItem).Tag.ToString());
+
+			//ProjectDirectory = ProjectFilePath
+
 			AmethystEngine.Components.EObjectType EType = EObjectType.File;
 			foreach (TreeViewItem tvi in ((TreeViewItem) (CurrentProjectTreeView.SelectedItem)).Items)
 			{
 				bool brel = false;
-				String desimg = tvi.Tag.ToString();
-				String desname = tvi.Tag.ToString();
+				String desimg = "";
+				String desname = "";
+
+				// Are we a file of a directory?
+				if (File.Exists(tvi.Tag.ToString()))
+				{
+					desimg = tvi.Tag.ToString();
+					desname = tvi.Tag.ToString();
+				}
+				else if(Directory.Exists(tvi.Tag.ToString()))
+				{
+					desimg = folderPic;
+					desname = folderPic;
+				}
+
 				desname = desname.Substring(desname.LastIndexOfAny(new char[] {'/', '\\'}) + 1);
-				if (tvi.Tag.ToString().Contains(';')) //its a foldername
+				if (desimg.Contains(';')) //its a foldername
 				{
 					brel = true;
 					EType = EObjectType.Folder;
@@ -854,15 +878,17 @@ namespace AmethystEngine.Forms
 			String TempPic = "/AmethystEngine;component/images/folder.png";
 
 			var directoryNode = new TreeViewItem
-				{Header = directoryInfo.Name, Tag = TempPic, Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255))};
+				{Header = directoryInfo.Name, Tag = directoryInfo.FullName, Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255))};
 			foreach (var directory in directoryInfo.GetDirectories())
 				directoryNode.Items.Add(CreateDirectoryNode(directory));
 
 			foreach (var file in directoryInfo.GetFiles())
 				directoryNode.Items.Add(new TreeViewItem
 				{
-					Visibility = System.Windows.Visibility.Collapsed, Tag = directoryInfo.FullName + "\\" + file.Name,
-					Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255)), Header = file.Name
+					Visibility = System.Windows.Visibility.Collapsed,
+					Tag = directoryInfo.FullName + "\\" + file.Name,
+					Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255)),
+					Header = file.Name
 				});
 			return directoryNode;
 

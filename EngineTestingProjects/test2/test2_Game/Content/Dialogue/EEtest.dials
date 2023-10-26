@@ -1,46 +1,46 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <DialogueScene Name="Dialogue1">
   <Characters>
-    <Character Name="Emma" UI="C:\Users\Antonio\Documents\CreateTest\test2\test2_Game\Content\UI\Persona_work.UI" LinkedImgBox="NewImgBox" Horizontal="Left" Vertical="Bottom">
+    <Character Name="Emma" UI="{Content}/UI/Persona_work.UI" LinkedImgBox="NewImgBox" Horizontal="Left" Vertical="Bottom">
       <Images>
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/500px-Mcol_money_bag.svg.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/522019a1q4bjrol3.jpg" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/a50afebd-a3e7-42bb-9c0b-33d394d33334.gif" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Ame_icon_small.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/folder.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/PathAndObjects.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Persona5_TB.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/SmallTextBubble_Orange.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/SmallTextBubble_Purple.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/smol%20megumin.jpg" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Splatoon%20TB_Back.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/text_bubbles.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/winter.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/__pluse_and_minun___by_celsius_ice_rose.jpg" />
-        <Image Path="file:///C:/Users/Antonio/Documents/CreateTest/test2/test2_Game/Content/Images/emma_colors_oc.png" />
+        <Image Path="{Content}/Images/500px-Mcol_money_bag.svg.png" />
+        <Image Path="{Content}/Images/522019a1q4bjrol3.jpg" />
+        <Image Path="{Content}/Images/a50afebd-a3e7-42bb-9c0b-33d394d33334.gif" />
+        <Image Path="{Content}/Images/Agent8.png" />
+        <Image Path="{Content}/Images/Ame_icon_small.png" />
+        <Image Path="{Content}/Images/emma_colors_oc.png" />
+        <Image Path="{Content}/Images/folder.png" />
+        <Image Path="{Content}/Images/PathAndObjects.png" />
+        <Image Path="{Content}/Images/Persona5_TB.png" />
+        <Image Path="{Content}/Images/SmallTextBubble_Orange.png" />
+        <Image Path="{Content}/Images/SmallTextBubble_Purple.png" />
+        <Image Path="{Content}/Images/smol%20megumin.jpg" />
+        <Image Path="{Content}/Images/Splatoon%20TB_Back.png" />
+        <Image Path="{Content}/Images/text_bubbles.png" />
+        <Image Path="{Content}/Images/winter.png" />
+        <Image Path="{Content}/Images/__pluse_and_minun___by_celsius_ice_rose.jpg" />
+        <Image Path="{Content}/Images/emma_colors_oc.png" />
       </Images>
     </Character>
-    <Character Name="PC" UI="C:\Users\Antonio\Documents\CreateTest\test2\test2_Game\Content\UI\Persona_work.UI" LinkedImgBox="NewImgBox" Horizontal="Right" Vertical="Bottom">
+    <Character Name="PC" UI="{Content}/UI/Persona_work.UI" LinkedImgBox="NewImgBox" Horizontal="Right" Vertical="Bottom">
       <Images>
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/500px-Mcol_money_bag.svg.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/522019a1q4bjrol3.jpg" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/a50afebd-a3e7-42bb-9c0b-33d394d33334.gif" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Ame_icon_small.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/folder.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/PathAndObjects.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Persona5_TB.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/SmallTextBubble_Orange.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/SmallTextBubble_Purple.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/smol%20megumin.jpg" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Splatoon%20TB_Back.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/text_bubbles.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/winter.png" />
-        <Image Path="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/__pluse_and_minun___by_celsius_ice_rose.jpg" />
-        <Image Path="file:///C:/Users/Antonio/Documents/CreateTest/test2/test2_Game/Content/Images/emma_colors_oc.png" />
+        <Image Path="{Content}/Images/500px-Mcol_money_bag.svg.png" />
+        <Image Path="{Content}/Images/522019a1q4bjrol3.jpg" />
+        <Image Path="{Content}/Images/a50afebd-a3e7-42bb-9c0b-33d394d33334.gif" />
+        <Image Path="{Content}/Images/Agent8.png" />
+        <Image Path="{Content}/Images/Ame_icon_small.png" />
+        <Image Path="{Content}/Images/emma_colors_oc.png" />
+        <Image Path="{Content}/Images/folder.png" />
+        <Image Path="{Content}/Images/PathAndObjects.png" />
+        <Image Path="{Content}/Images/Persona5_TB.png" />
+        <Image Path="{Content}/Images/SmallTextBubble_Orange.png" />
+        <Image Path="{Content}/Images/SmallTextBubble_Purple.png" />
+        <Image Path="{Content}/Images/smol%20megumin.jpg" />
+        <Image Path="{Content}/Images/Splatoon%20TB_Back.png" />
+        <Image Path="{Content}/Images/text_bubbles.png" />
+        <Image Path="{Content}/Images/winter.png" />
+        <Image Path="{Content}/Images/__pluse_and_minun___by_celsius_ice_rose.jpg" />
+        <Image Path="{Content}/Images/emma_colors_oc.png" />
       </Images>
     </Character>
   </Characters>
@@ -81,7 +81,7 @@
         <Timeblock Start="0" End="2" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" Location="{Content}/Images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="Heya!" />
           </DiaChoice>
         </Data>
@@ -100,7 +100,7 @@
         <Timeblock Start="2.1" End="4.1" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/Agent8.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/Agent8.png" Location="{Content}/Images/Agent8.png" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="Yo, what's up?" />
           </DiaChoice>
         </Data>
@@ -119,7 +119,7 @@
         <Timeblock Start="4" End="6" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" Location="{Content}/Images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="chilling, how about you?" />
           </DiaChoice>
         </Data>
@@ -176,7 +176,7 @@
         <Timeblock Start="8.375" End="10.375" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" Location="{Content}/Images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="Just gotta pass time, huh?" />
           </DiaChoice>
         </Data>
@@ -195,7 +195,7 @@
         <Timeblock Start="10.425" End="12.425" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/Agent8.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/Agent8.png" Location="{Content}/Images/Agent8.png" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="Yea, pretty much" />
           </DiaChoice>
         </Data>
@@ -252,7 +252,7 @@
         <Timeblock Start="12.425" End="14.425" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" Location="{Content}/Images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="Anything else?" />
           </DiaChoice>
         </Data>
@@ -271,7 +271,7 @@
         <Timeblock Start="16.4" End="18.4" LinkedTextBox="" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" Location="{Content}/Images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="ight... good talk" />
           </DiaChoice>
         </Data>
@@ -290,7 +290,7 @@
         <Timeblock Start="8.4" End="10.4" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" Location="{Content}/Images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="Duuuddee saaamme" />
           </DiaChoice>
         </Data>
@@ -309,7 +309,7 @@
         <Timeblock Start="10.425" End="12.425" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" Location="{Content}/Images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="ughhh it's been a LONG day" />
           </DiaChoice>
         </Data>
@@ -328,7 +328,7 @@
         <Timeblock Start="12.5" End="14.5" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/Agent8.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/Agent8.png" Location="{Content}/Images/Agent8.png" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="haha, don't i know it" />
           </DiaChoice>
         </Data>
@@ -347,7 +347,7 @@
         <Timeblock Start="16.45" End="18.45" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" Location="{Content}/Images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="Wanna talk about it?" />
           </DiaChoice>
         </Data>
@@ -366,7 +366,7 @@
         <Timeblock Start="18.55" End="20.55" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/Agent8.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/Agent8.png" Location="{Content}/Images/Agent8.png" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="Not today... sorry" />
           </DiaChoice>
         </Data>
@@ -392,7 +392,7 @@
         <Timeblock Start="14.525" End="16.525" LinkedTextBox="" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/Agent8.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/Agent8.png" Location="{Content}/Images/Agent8.png" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="But im sure it will be over" />
           </DiaChoice>
         </Data>
@@ -411,7 +411,7 @@
         <Timeblock Start="16.55" End="18.55" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/Agent8.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/Agent8.png" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/Agent8.png" Location="{Content}/Images/Agent8.png" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="before we know it" />
           </DiaChoice>
         </Data>
@@ -430,7 +430,7 @@
         <Timeblock Start="0" End="2" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" Location="C:/Users/Antonio/Documents/ProjectEE/ProjectEE/AmethystEngine/images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" Location="{Content}/Images/emma_colors_oc.png" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="yea... sure, totally" />
           </DiaChoice>
         </Data>
