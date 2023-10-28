@@ -9,6 +9,7 @@
     <Character Name="PC" UI="{Content}/UI/Persona_work.UI" LinkedImgBox="NewImgBox" Horizontal="Right" Vertical="Bottom">
       <Images>
         <Image Path="{Content}/Images/Characters/PC/Agent8.png" Width="550" Height="550" />
+        <Image Path="{Content}Images\Characters\PC\GirlPCFullBody_(1.0_1v).png" Width="0" Height="0" />
       </Images>
     </Character>
   </Characters>
@@ -18,14 +19,14 @@
       <Var Name="EmmaFP" Type="System.Int32" DefaultVal="0" />
     </Params>
     <BlockNodes>
-      <NodeEditor.StartBlockNode Key="Start_0" LocX="59.333333333333" LocY="-33.142961962272" DataType="Enter">
+      <NodeEditor.StartBlockNode Key="Start_0" LocX="-272.666666666668" LocY="31.857038037728" DataType="Enter">
         <Nodes>
           <ExitNode Type="Exit">
             <Connection ToBlock="Dialogue_Emma_0" Node="Enter" Ind="0" />
           </ExitNode>
         </Nodes>
       </NodeEditor.StartBlockNode>
-      <NodeEditor.ExitBlockNode Key="End_0" LocX="2157.33333333333" LocY="21.857038037728" DataType="Exit">
+      <NodeEditor.ExitBlockNode Key="End_0" LocX="1825.33333333333" LocY="86.857038037728" DataType="Exit">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_Emma_8" Node="Exit" Ind="0" />
@@ -35,7 +36,7 @@
           </EntryNode>
         </Nodes>
       </NodeEditor.ExitBlockNode>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_0" LocX="187.333333333333" LocY="-14.142961962272" Character="Emma">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_0" LocX="-144.666666666668" LocY="50.857038037728" Character="Emma">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Start_0" Node="Exit" Ind="0" />
@@ -54,7 +55,7 @@
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_1" LocX="364.333333333333" LocY="-12.142961962272" Character="PC">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_1" LocX="32.3333333333321" LocY="52.857038037728" Character="PC">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_Emma_0" Node="Exit" Ind="0" />
@@ -73,7 +74,7 @@
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_2" LocX="549.333333333333" LocY="20.857038037728" Character="Emma">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_2" LocX="217.333333333332" LocY="85.857038037728" Character="Emma">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_PC_1" Node="Exit" Ind="0" />
@@ -84,15 +85,15 @@
             </OutputNode>
           </Outputs>
         </Nodes>
-        <Timeblock Start="4" End="6" SpriteIndex="-1" LinkedTextBox="NewTextBox" />
+        <Timeblock Start="4" End="6" SpriteIndex="0" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" SpriteIndex="-1" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" SpriteIndex="0" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="chilling, how about you?" />
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_3" LocX="743.333333333333" LocY="-3.142961962272" Character="Dialogue Choice">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_3" LocX="411.333333333332" LocY="61.857038037728" Character="Dialogue Choice">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_Emma_2" Node="Exit" Ind="0" />
@@ -123,7 +124,7 @@
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.Components.GetConstantNodeBlock Key="GetVar_ChoiceVar_1" LocX="546" LocY="-71.6943905337008" DataType="Int">
+      <NodeEditor.Components.GetConstantNodeBlock Key="GetVar_ChoiceVar_1" LocX="213.999999999999" LocY="-6.69439053370081" DataType="Int">
         <Nodes>
           <Outputs>
             <OutputNode Type="Int">
@@ -156,10 +157,16 @@
             <OutputNode Type="Int">
               <Connection ToNode="" Node="" Ind="" />
             </OutputNode>
+            <OutputNode Type="Int">
+              <Connection ToNode="" Node="" Ind="" />
+            </OutputNode>
+            <OutputNode Type="Int">
+              <Connection ToNode="" Node="" Ind="" />
+            </OutputNode>
           </Outputs>
         </Nodes>
       </NodeEditor.Components.GetConstantNodeBlock>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_4" LocX="954.333333333333" LocY="-18.142961962272" Character="Emma">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_4" LocX="622.333333333332" LocY="46.857038037728" Character="Emma">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_Emma_3" Node="Exit" Ind="0" />
@@ -170,15 +177,15 @@
             </OutputNode>
           </Outputs>
         </Nodes>
-        <Timeblock Start="8.425" End="10.425" SpriteIndex="-1" LinkedTextBox="NewTextBox" />
+        <Timeblock Start="8.425" End="10.425" SpriteIndex="0" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" SpriteIndex="-1" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" SpriteIndex="0" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="Just gotta pass time, huh?" />
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_5" LocX="1125.33333333333" LocY="18.857038037728" Character="PC">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_5" LocX="793.333333333329" LocY="83.857038037728" Character="PC">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_Emma_4" Node="Exit" Ind="0" />
@@ -189,15 +196,15 @@
             </OutputNode>
           </Outputs>
         </Nodes>
-        <Timeblock Start="10.425" End="12.425" SpriteIndex="-1" LinkedTextBox="NewTextBox" />
+        <Timeblock Start="10.425" End="12.425" SpriteIndex="0" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/Agent8.png" SpriteIndex="-1" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/Agent8.png" SpriteIndex="0" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="Yea, pretty much" />
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_6" LocX="1511.08333333333" LocY="-63.142961962272" Character="Dialogue Choice">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_6" LocX="1179.08333333333" LocY="1.85703803772799" Character="Dialogue Choice">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_Emma_7" Node="Exit" Ind="0" />
@@ -228,7 +235,7 @@
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.Components.GetConstantNodeBlock Key="GetVar_ChoiceVar_1" LocX="1309.25" LocY="-93.6943905337008" DataType="Int">
+      <NodeEditor.Components.GetConstantNodeBlock Key="GetVar_ChoiceVar_1" LocX="977.249999999999" LocY="-28.6943905337008" DataType="Int">
         <Nodes>
           <Outputs>
             <OutputNode Type="Int">
@@ -237,7 +244,7 @@
           </Outputs>
         </Nodes>
       </NodeEditor.Components.GetConstantNodeBlock>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_7" LocX="1311.33333333333" LocY="33.857038037728" Character="Emma">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_7" LocX="979.33333333333" LocY="98.857038037728" Character="Emma">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_PC_5" Node="Exit" Ind="0" />
@@ -248,15 +255,15 @@
             </OutputNode>
           </Outputs>
         </Nodes>
-        <Timeblock Start="12.425" End="14.425" SpriteIndex="-1" LinkedTextBox="NewTextBox" />
+        <Timeblock Start="12.425" End="14.425" SpriteIndex="0" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" SpriteIndex="-1" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" SpriteIndex="0" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="Anything else?" />
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_8" LocX="1760.58333333333" LocY="-27.142961962272" Character="Emma">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_8" LocX="1428.58333333333" LocY="37.857038037728" Character="Emma">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_Emma_6" Node="Exit" Ind="0" />
@@ -267,15 +274,15 @@
             </OutputNode>
           </Outputs>
         </Nodes>
-        <Timeblock Start="16.5458333333333" End="18.5458333333333" SpriteIndex="-1" LinkedTextBox="NewTextBox" />
+        <Timeblock Start="16.5458333333333" End="18.5458333333333" SpriteIndex="0" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" SpriteIndex="-1" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" SpriteIndex="0" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="ight... good talk" />
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_9" LocX="957.333333333333" LocY="143.857038037728" Character="Emma">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_9" LocX="625.333333333332" LocY="208.857038037728" Character="Emma">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_Emma_3" Node="Exit" Ind="1" />
@@ -286,15 +293,15 @@
             </OutputNode>
           </Outputs>
         </Nodes>
-        <Timeblock Start="8.4" End="10.4" SpriteIndex="-1" LinkedTextBox="NewTextBox" />
+        <Timeblock Start="8.4" End="10.4" SpriteIndex="0" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" SpriteIndex="-1" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" SpriteIndex="0" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="Duuuddee saaamme" />
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_10" LocX="1155.33333333333" LocY="179.857038037728" Character="Emma">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_10" LocX="823.333333333329" LocY="244.857038037728" Character="Emma">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_Emma_9" Node="Exit" Ind="0" />
@@ -305,15 +312,15 @@
             </OutputNode>
           </Outputs>
         </Nodes>
-        <Timeblock Start="10.425" End="12.425" SpriteIndex="-1" LinkedTextBox="NewTextBox" />
+        <Timeblock Start="10.425" End="12.425" SpriteIndex="0" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" SpriteIndex="-1" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" SpriteIndex="0" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="ughhh it's been a LONG day" />
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_11" LocX="1380.33333333333" LocY="198.857038037728" Character="PC">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_11" LocX="1048.33333333333" LocY="263.857038037728" Character="PC">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_Emma_10" Node="Exit" Ind="0" />
@@ -324,15 +331,15 @@
             </OutputNode>
           </Outputs>
         </Nodes>
-        <Timeblock Start="12.5" End="14.5" SpriteIndex="-1" LinkedTextBox="NewTextBox" />
+        <Timeblock Start="12.5" End="14.5" SpriteIndex="0" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/Agent8.png" SpriteIndex="-1" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/Agent8.png" SpriteIndex="0" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="haha, don't i know it" />
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_12" LocX="1754.08333333333" LocY="93.857038037728" Character="Emma">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_12" LocX="1422.08333333333" LocY="158.857038037728" Character="Emma">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_Emma_6" Node="Exit" Ind="1" />
@@ -343,15 +350,15 @@
             </OutputNode>
           </Outputs>
         </Nodes>
-        <Timeblock Start="16.45" End="18.45" SpriteIndex="-1" LinkedTextBox="NewTextBox" />
+        <Timeblock Start="16.45" End="18.45" SpriteIndex="0" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" SpriteIndex="-1" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" SpriteIndex="0" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="Wanna talk about it?" />
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_13" LocX="1950.33333333333" LocY="95.857038037728" Character="PC">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_13" LocX="1618.33333333333" LocY="160.857038037728" Character="PC">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_Emma_12" Node="Exit" Ind="0" />
@@ -362,22 +369,22 @@
             </OutputNode>
           </Outputs>
         </Nodes>
-        <Timeblock Start="18.625" End="20.625" SpriteIndex="-1" LinkedTextBox="NewTextBox" />
+        <Timeblock Start="18.7638888888889" End="20.7638888888889" SpriteIndex="0" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/Agent8.png" SpriteIndex="-1" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/Agent8.png" SpriteIndex="0" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="Not today... sorry" />
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.ExitBlockNode Key="EndBlock_0" LocX="2183.08333333333" LocY="242.107038037728" DataType="Exit">
+      <NodeEditor.ExitBlockNode Key="EndBlock_0" LocX="1851.08333333333" LocY="307.107038037728" DataType="Exit">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_Emma_16" Node="Exit" Ind="0" />
           </EntryNode>
         </Nodes>
       </NodeEditor.ExitBlockNode>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_14" LocX="1563.08333333333" LocY="211.857038037728" Character="PC">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_14" LocX="1231.08333333333" LocY="276.857038037728" Character="PC">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_PC_11" Node="Exit" Ind="0" />
@@ -388,15 +395,15 @@
             </OutputNode>
           </Outputs>
         </Nodes>
-        <Timeblock Start="14.525" End="16.525" SpriteIndex="-1" LinkedTextBox="NewTextBox" />
+        <Timeblock Start="14.5875" End="16.5875" SpriteIndex="0" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/Agent8.png" SpriteIndex="-1" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/Agent8.png" SpriteIndex="0" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="But im sure it will be over" />
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_15" LocX="1751.08333333333" LocY="211.107038037728" Character="PC">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_PC_15" LocX="1419.08333333333" LocY="276.107038037728" Character="PC">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_PC_14" Node="Exit" Ind="0" />
@@ -407,15 +414,15 @@
             </OutputNode>
           </Outputs>
         </Nodes>
-        <Timeblock Start="16.55" End="18.55" SpriteIndex="-1" LinkedTextBox="NewTextBox" />
+        <Timeblock Start="16.65" End="18.65" SpriteIndex="0" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/Agent8.png" SpriteIndex="-1" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/Agent8.png" SpriteIndex="0" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="before we know it" />
           </DiaChoice>
         </Data>
       </NodeEditor.Components.DialogueNodeBlock>
-      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_16" LocX="1945.08333333333" LocY="221.107038037728" Character="Emma">
+      <NodeEditor.Components.DialogueNodeBlock Key="Dialogue_Emma_16" LocX="1613.08333333333" LocY="286.107038037728" Character="Emma">
         <Nodes>
           <EntryNode Type="Enter">
             <Connection FromBlock="Dialogue_PC_15" Node="Exit" Ind="0" />
@@ -426,10 +433,10 @@
             </OutputNode>
           </Outputs>
         </Nodes>
-        <Timeblock Start="0" End="2" SpriteIndex="-1" LinkedTextBox="NewTextBox" />
+        <Timeblock Start="18.6944444444444" End="20.6944444444444" SpriteIndex="0" LinkedTextBox="NewTextBox" />
         <Data>
           <DiaChoice>
-            <Sprite Name="/emma_colors_oc.png" SpriteIndex="-1" Width="0" Height="0" x="0" y="0" />
+            <Sprite Name="/emma_colors_oc.png" SpriteIndex="0" Width="0" Height="0" x="0" y="0" />
             <DialogueText Text="yea... sure, totally" />
           </DiaChoice>
         </Data>

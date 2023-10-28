@@ -814,7 +814,7 @@ namespace AmethystEngine.Forms
 							String filePathImage = filepath.ImgPathLocation;
 							filePathImage = filePathImage.Replace("{Content}", EditorProjectContentDirectory);
 
-							ComboItems.Add(new EditorObject(filePathImage, filepath.ImgPathLocation,
+							ComboItems.Add(new EditorObject(filepath.ImgPathLocation, filePathImage,
 								filePathImage.Substring(filePathImage.LastIndexOfAny(new char[] { '\\', '/' })),
 								false));
 						}
@@ -2207,6 +2207,73 @@ namespace AmethystEngine.Forms
 			DialogueEditor_NodeGraph.TimelineLoad_Hook += LoadTimelineWithSelectedPath;
 
 
+		}
+
+		private void AddCharacterSpriteDialogueCharacter_BTN_Click(object sender, RoutedEventArgs e )
+		{
+			Button btn = sender as Button;
+			if(btn != null)
+			{
+				SceneEntity entity = btn.DataContext as SceneEntity;
+				if(entity != null)
+				{
+
+					// We are going to be handling an image build here.
+					Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+					{
+						FileName = "images", //default file 
+						Title = "Import and build new Image file",
+						DefaultExt = "All files (*.png)|*.png", //default file extension
+						Filter = "png file (*.png)|*.png"
+					};
+
+					// Show save file dialog box
+					Nullable<bool> result = dlg.ShowDialog();
+					// Process save file dialog box results kicks out if the user doesn't select an item.
+					String importfilename, destfilename = "";
+					if (result == true)
+					{
+						importfilename = dlg.FileName;
+					}
+					else return;
+					
+					// Find the correct character
+					//SceneEntity selectedEntity = CurActiveDialogueScene.Characters.FirstOrDefault(x => x.Name == entity.Name);
+
+					//if (selectedEntity != null)
+					//{
+					//	selected
+					
+					// make sure the new sprite is in the same directory.
+					if(entity.DialogueSprites.Count == 0)
+					{
+						EngineOutputLog.AddErrorLogItem(-7, "There isn't a dialogue sprite to compare paths too.", "Dialogue Editor", false);
+						return;
+					}
+					else
+					{
+						String directory = entity.DialogueSprites[0].ImgPathLocation;
+						directory = directory.Replace("{Content}", EditorProjectContentDirectory);
+						directory = System.IO.Path.GetDirectoryName(directory);
+
+						if (importfilename.Contains(directory))
+						{
+							entity.DialogueSprites.Add(new Sprite(importfilename.Substring(importfilename.LastIndexOfAny(new char[] { '\\', '/' })),
+								0, 0, 0, 0)
+							{ ImgPathLocation = importfilename.Replace(EditorProjectContentDirectory, "{Content}")
+						});
+						}
+						else
+						{
+							EngineOutputLog.AddErrorLogItem(-7, "The Sprite image you are trying to add MUST BE in same directory as the other image files!", "Dialogue Editor", false);
+							return;
+						}
+					}
+					//}
+
+					// entity.DialogueSprites.Add()
+				}
+			}
 		}
 
 	}

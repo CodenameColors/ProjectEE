@@ -967,8 +967,7 @@ namespace AmethystEngine.Forms
 					{
 						importfilename = dlg.FileName;
 					}
-					else
-						return;
+					else return;
 
 					String editorCopyDirectory = ProjectDirectory.Replace(MonoGameProjectContentDirectory, EditorProjectContentDirectory);
 					String finalBinaryDirectory = ProjectDirectory;

@@ -1094,14 +1094,21 @@
 					<Button Content="+" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="106,5,0,5" Height="20" VerticalContentAlignment="Top" Width="20"
 					        RenderTransformOrigin="1.5,0.5" Click="AddCharacterToScene"/>
 
-					<TreeView x:Name="DialogueEditor_CE_TV" Grid.Row="1" Background="#FF383838">
+					<TreeView x:Name="DialogueEditor_CE_TV" Grid.Row="1" Background="#FF383838" HorizontalAlignment="Stretch">
 						<TreeView.Resources>
 							<HierarchicalDataTemplate DataType="{x:Type BixChar:SceneEntity}" ItemsSource="{Binding DialogueSprites}">
-								<StackPanel Orientation="Horizontal">
-									<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50"
-									       />
-									<TextBlock Text="{Binding Name}" Foreground="White" />
-								</StackPanel>
+								<Grid HorizontalAlignment="Stretch">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition MinWidth="150"/>
+									</Grid.ColumnDefinitions>
+									<StackPanel Orientation="Horizontal">
+										<Image Margin="0,0,5,0" Source="/AmethystEngine;component/images/smol megumin.jpg" MaxWidth="50" MaxHeight="50"
+													 />
+										<TextBlock Text="{Binding Name}" Foreground="White" />
+									</StackPanel>
+									<Button Content="Add Sprite" HorizontalAlignment="Right" Click="AddCharacterSpriteDialogueCharacter_BTN_Click"/>
+
+								</Grid>
 							</HierarchicalDataTemplate>
 							<DataTemplate DataType="{x:Type BixRen:Sprite}">
 								<StackPanel Orientation="Horizontal">
