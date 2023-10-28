@@ -10,3 +10,5 @@ DialogueEditor
 -4 = New Animation Machine hasn't been created or opened yet!
 -5 = Frame Entered Exceeds Max Frame Count!
 -6 = Frame Entered cannot be negative!
+-7 = There isn't a dialogue sprite to compare paths too.
+-8 = The Sprite image you are trying to add MUST BE in same directory as the other image files!
