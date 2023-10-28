@@ -834,22 +834,23 @@ namespace AmethystEngine.Forms
 					desname = tvi.Header.ToString();
 				}
 
+				String contentPath = desimg.Replace(EditorProjectContentDirectory, "{Content}");
 				if (new[] {".tif", ".jpg", ".png"}.Any(c => desname.ToLower().Contains(c)))
 				{
-					EditorObject ed = new EditorObject(desimg, desname, brel, EObjectType.File);
+					EditorObject ed = new EditorObject(contentPath, desimg, desname, brel, EObjectType.File);
 					ContentLibaryObjList.Add(ed);
 				}
 				else if (!tvi.Header.ToString().Contains("."))
 				{
 					//desimg = TempPic; brel = true;
-					EditorObject ed = new EditorObject(desimg, desname, brel, EType);
+					EditorObject ed = new EditorObject(contentPath, desimg, desname, brel, EType);
 					ContentLibaryObjList.Add(ed);
 				}
 				else
 				{
 					desimg = TempPic;
 					brel = true;
-					EditorObject ed = new EditorObject(desimg, desname, brel, EObjectType.File);
+					EditorObject ed = new EditorObject(contentPath, desimg, desname, brel, EObjectType.File);
 					ContentLibaryObjList.Add(ed);
 				}
 
@@ -1029,7 +1030,7 @@ namespace AmethystEngine.Forms
 			LoadFileTree(ProjectFilePath.Replace(".gem", "_Game\\Content\\")); //reload the project to show the new file.
 			CurrentProjectTreeView.SelectedValuePath = v;
 
-			ContentLibaryObjList.Add(new EditorObject(destfilename, importstartlocation.Substring(
+			ContentLibaryObjList.Add(new EditorObject("", destfilename, importstartlocation.Substring(
 				importstartlocation.LastIndexOfAny(new char[] {'\\', '/'}) + 1, len - 1), true, EObjectType.File));
 
 			SearchResultList.ItemsSource = null;
@@ -1160,7 +1161,9 @@ namespace AmethystEngine.Forms
 					ListBox SpriteLibary_LB =
 						(ListBox) ContentLibrary_Control.Template.FindName("SpriteLibary_LB", ContentLibrary_Control);
 
-					EditorObject E = new EditorObject(filename,
+					String contentPath = filename.Replace(EditorProjectContentDirectory, "{Content}");
+
+					EditorObject E = new EditorObject(contentPath, filename,
 						filename.Substring(filename.LastIndexOf((filename.Contains("\\") ? "\\" : "/")) + 1,
 							filename.LastIndexOf(".") - filename.LastIndexOf((filename.Contains("\\") ? "\\" : "/")) - 1), false);
 					LESpriteObjectList.Add(E);
@@ -1176,10 +1179,10 @@ namespace AmethystEngine.Forms
 			else
 			{
 				//get the sprite listbox
-				TabControl SpriteLibary_LB =
-					(TabControl) ContentLibrary_Control.Template.FindName("SpriteLibary_LB", ContentLibrary_Control);
+				TabControl SpriteLibary_LB = (TabControl) ContentLibrary_Control.Template.FindName("SpriteLibary_LB", ContentLibrary_Control);
+				String contentPath = filename.Replace(EditorProjectContentDirectory, "{Content}");
 
-				EditorObject E = new EditorObject(filename,
+				EditorObject E = new EditorObject(contentPath, filename,
 					filename.Substring(filename.LastIndexOf((filename.Contains("\\") ? "\\" : "/")) + 1,
 						filename.LastIndexOf(".") - filename.LastIndexOf((filename.Contains("\\") ? "\\" : "/")) - 1), false);
 				EditorObj_list.Add(E);
@@ -1779,7 +1782,9 @@ namespace AmethystEngine.Forms
 							List<EditorObject> ComboItems = new List<EditorObject>();
 							foreach (String filepath in GetAllProjectImages())
 							{
-								ComboItems.Add(new EditorObject(filepath,
+								String contentPath = filepath.Replace(EditorProjectContentDirectory, "{Content}");
+
+								ComboItems.Add(new EditorObject(contentPath, filepath,
 									filepath.Substring(filepath.LastIndexOfAny(new char[] { '\\', '/' })), false));
 							}
 

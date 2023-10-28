@@ -34,6 +34,7 @@ namespace AmethystEngine.Forms
 		public delegate void HooKfunction(SceneEntity c, BaseUI BaseUI, String BaseUIFIlePath, String LinkedTextboxName, String LinkedDialogueImage = null);
 		public HooKfunction AddToScene;
 		private String ProjectFilePath ="";
+		private String ContentDirectory ="";
 
 
 		private List<Border> DialogueImageChoices_List = new List<Border>();
@@ -41,13 +42,15 @@ namespace AmethystEngine.Forms
 		private String CurrentUIFilePath = "";
 
 
-		public AddCharacterForm(String projectFilePath)
+		public AddCharacterForm(String projectFilePath, String contentDirectory)
     {
       InitializeComponent();
 
 			CharacterSprites_LB.ItemsSource = Sprites;
 			this.ProjectFilePath = projectFilePath;
-    }
+			this.ContentDirectory = contentDirectory;
+
+		}
 
 		private void BImportFolder_CB_Click(object sender, RoutedEventArgs e)
 		{
@@ -80,9 +83,11 @@ namespace AmethystEngine.Forms
 				importfilename = dlg.FileName;
 			}
 			else return;
+
+			String contentPath = dlg.FileName.Replace(ContentDirectory, "{Content}");
 			String s = dlg.FileName.Substring(dlg.FileName.LastIndexOfAny(new char[] { '/', '\\' })+1);
 			s.Substring(0, s.IndexOf('.')-1);
-			Sprites.Add(new EditorObject(dlg.FileName, s,false,EObjectType.File));
+			Sprites.Add(new EditorObject(contentPath,dlg.FileName, s,false,EObjectType.File));
 		}
 
 		private void GetCharacterFolderLoc_BTN_Click(object sender, RoutedEventArgs e)
@@ -109,9 +114,10 @@ namespace AmethystEngine.Forms
 
 			foreach (String filepath in getFilesInDir(filename))
 			{
+				String contentPath = filepath.Replace(ContentDirectory, "{Content}");
 				String s = filepath.Substring(filename.LastIndexOfAny(new char[] { '/', '\\' }) + 1);
 				s.Substring(0, s.IndexOf('.') - 1);
-				Sprites.Add(new EditorObject(filepath, s, false, EObjectType.File));
+				Sprites.Add(new EditorObject(contentPath, filepath, s, false, EObjectType.File));
 				
 			}
 

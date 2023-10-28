@@ -42,11 +42,9 @@ using StartBlockNode = BixBite.NodeEditor.StartBlockNode;
 using ExitBlockNode = BixBite.NodeEditor.ExitBlockNode;
 using ConnectionNode = BixBite.NodeEditor.ConnectionNode;
 using RuntimeVars = BixBite.NodeEditor.RuntimeVars;
-using Timeline = BixBite.Components.Timeline;
 using ChoiceTimeBlock = BixBite.TimelinePlayer.ChoiceTimeBlock;
 using TimeBlock = BixBite.TimelinePlayer.TimeBlock;
 using Timeline = BixBite.TimelinePlayer.Timeline;
-
 #endif
 
 namespace BixBite
@@ -109,14 +107,14 @@ namespace BixBite
 			AddProperty("SceneName", Name);
 
 			this.SceneName = Name;
-			
+
 		}
 
 		//PROPERTIES 
 
-#region Properties
+		#region Properties
 
-#region IPropertiesImplementation
+		#region IPropertiesImplementation
 		public void SetNewProperties(ObservableCollection<Tuple<string, object>> NewProperties)
 		{
 			Properties = NewProperties;
@@ -160,9 +158,9 @@ namespace BixBite
 			return Properties;
 		}
 
-#endregion
+		#endregion
 
-#region Helper
+		#region Helper
 		public int GetPropertyIndex(String Key)
 		{
 			int i = 0;
@@ -174,15 +172,15 @@ namespace BixBite
 			}
 			return -1;
 		}
-#endregion
+		#endregion
 
-#region PropertiesCallBack
-#endregion
-#endregion
+		#region PropertiesCallBack
+		#endregion
+		#endregion
 
-#region PropertyCallbacks
+		#region PropertyCallbacks
 
-#endregion
+		#endregion
 
 
 		public void AddCharacterToScene(SceneEntity deschar)
@@ -220,7 +218,7 @@ namespace BixBite
 
 			using (XmlReader reader = XmlReader.Create(FilePath, settings))
 			{
-				while (reader.Read() )
+				while (reader.Read())
 				{
 					//skip to a DialogueScene node
 					while (reader.Name != "DialogueScene")
@@ -248,7 +246,7 @@ namespace BixBite
 								VerticalAnchor = reader.GetAttribute("Vertical"),
 							});
 							//add the timeline for the added character to the scene. SET THE Windows settigns in the engine. NOT HERE.
-							retDialogueScene.Timelines.Add(new Timeline(60, 200) {TrackName = retDialogueScene.Characters.Last().Name});
+							retDialogueScene.Timelines.Add(new Timeline(60, 200) { TrackName = retDialogueScene.Characters.Last().Name });
 							retDialogueScene.DialogueBoxesFilePaths.Add(reader.GetAttribute("UI"));
 							do
 							{
@@ -283,9 +281,10 @@ namespace BixBite
 						if (reader.Name == "Var" && reader.NodeType == XmlNodeType.Element)
 						{
 							retDialogueScene.DialogueSceneParams.Add(
-								new RuntimeVars() {
+								new RuntimeVars()
+								{
 									VarName = reader.GetAttribute("Name"),
-									Type = Type.GetType(reader.GetAttribute("Type")) ,
+									Type = Type.GetType(reader.GetAttribute("Type")),
 									OrginalVarData = Convert.ChangeType(reader.GetAttribute("DefaultVal"), Type.GetType(reader.GetAttribute("Type"))),
 									VarData = Convert.ChangeType(reader.GetAttribute("DefaultVal"), Type.GetType(reader.GetAttribute("Type"))),
 								}
@@ -307,10 +306,10 @@ namespace BixBite
 						reader.Read();
 						if (reader.Name.Contains("NodeEditor") && reader.NodeType == XmlNodeType.Element)
 						{
-							CreateBlockNodeFromXML(reader, ref retDialogueScene, ref connectionList);
+							CreateBlockNodeFromXML(reader, ref retDialogueScene, ref connectionList, ContentPath);
 						}
 					}
-					while (reader.Name.Trim() != "BlockNodes") ;
+					while (reader.Name.Trim() != "BlockNodes");
 
 					//The last type of data to load into memory is all the block nodes for this scene. There are quite a few, so we use a helper.
 					do
@@ -331,13 +330,13 @@ namespace BixBite
 		/// <param name="reader">XMLReader current place</param>
 		/// <param name="blocknodes_list">This is used to add to [ref]</param>
 		/// <param name="ConnectionList">this is used to add to [ref]. {from, ConType, to, ConType, index}</param>
-		private static void CreateBlockNodeFromXML(XmlReader reader, ref DialogueScene curDialogueScene, ref List<Tuple<String, String, int, String, String, int>> ConnectionList)
+		private static void CreateBlockNodeFromXML(XmlReader reader, ref DialogueScene curDialogueScene, ref List<Tuple<String, String, int, String, String, int>> ConnectionList, String contentPath)
 		{
 			//first what type of block node is it?
 			Type t = Type.GetType(String.Format("{0}, {1}", reader.Name, "NodeEditor"));
 			BaseNodeBlock baseNode = null;
 			if (t.Name.Contains("Dialogue"))
-				baseNode = (DialogueNodeBlock)Activator.CreateInstance(t, new object[]{reader.GetAttribute("Character"), false});
+				baseNode = (DialogueNodeBlock)Activator.CreateInstance(t, new object[] { reader.GetAttribute("Character"), false });
 			else if (t.Name.Contains("GetConstant"))
 				baseNode = (GetConstantNodeBlock)Activator.CreateInstance(t, new object[]
 				{
@@ -345,7 +344,7 @@ namespace BixBite
 					 curDialogueScene.DialogueSceneParams.Find(x=>x.VarName == reader.GetAttribute("Key").Split('_')[1]),
 					 false
 				});
-			else if(t.Name.Contains("SetConstant"))
+			else if (t.Name.Contains("SetConstant"))
 				baseNode = (BaseNodeBlock)Activator.CreateInstance(t, new object[] { ECOnnectionType.NONE, false });
 			else if (t.Name.Contains("Conditional"))
 			{
@@ -375,11 +374,11 @@ namespace BixBite
 				}
 				baseNode.DType = ECOnnectionType.Int;
 			}
-			else if(t.Namespace.Contains("Logic") || t.Namespace.Contains("Arithmetic"))
-				baseNode = (BaseNodeBlock)Activator.CreateInstance(t, new object[]{false});
+			else if (t.Namespace.Contains("Logic") || t.Namespace.Contains("Arithmetic"))
+				baseNode = (BaseNodeBlock)Activator.CreateInstance(t, new object[] { false });
 			else
 			{
-				baseNode = (BaseNodeBlock) Activator.CreateInstance(t);
+				baseNode = (BaseNodeBlock)Activator.CreateInstance(t);
 #if DEV_DEBUG
 				Console.WriteLine(t.Name + "||" + t.Namespace);
 #endif
@@ -397,7 +396,7 @@ namespace BixBite
 				baseNode.NewValConnected = false;
 				baseNode.NewValue_Constant = reader.GetAttribute("NewVal");
 			}
-			
+
 			//skip to nodes
 			while (reader.Name != "Nodes")
 				reader.Read();
@@ -410,7 +409,7 @@ namespace BixBite
 				//entry
 				if (reader.Name == "EntryNode")
 				{
-					baseNode.EntryNode.NodeType = (ECOnnectionType) Enum.Parse(typeof(ECOnnectionType), reader.GetAttribute("Type")); //(ECOnnectionType) reader.GetAttribute("Type");
+					baseNode.EntryNode.NodeType = (ECOnnectionType)Enum.Parse(typeof(ECOnnectionType), reader.GetAttribute("Type")); //(ECOnnectionType) reader.GetAttribute("Type");
 					do
 					{
 						reader.Read();
@@ -449,10 +448,10 @@ namespace BixBite
 						if (reader.Name == "InputNode" && reader.NodeType != XmlNodeType.EndElement)
 						{
 							baseNode.InputNodes.Add(new ConnectionNode(
-								baseNode, "InputNode"+baseNode.InputNodes.Count, 
+								baseNode, "InputNode" + baseNode.InputNodes.Count,
 								(ECOnnectionType)Enum.Parse(typeof(ECOnnectionType), reader.GetAttribute("Type")))
 							);
-							if(!(baseNode is DialogueNodeBlock)) baseNode.DType = baseNode.InputNodes[0].NodeType;
+							if (!(baseNode is DialogueNodeBlock)) baseNode.DType = baseNode.InputNodes[0].NodeType;
 							do
 							{
 								reader.Read();
@@ -460,12 +459,12 @@ namespace BixBite
 								{
 									if (reader.GetAttribute("Node") == "") break; // this means the node exists BUT there is no connection set for this node
 									ConnectionList.Add(new Tuple<string, string, int, string, string, int>(
-										reader.GetAttribute("FromBlock"), 
+										reader.GetAttribute("FromBlock"),
 										reader.GetAttribute("Node"),
 										int.Parse(reader.GetAttribute("Ind")),
 										baseNode.Name,
 										(reader.GetAttribute("Node") == "Exit" ? ECOnnectionType.Enter.ToString() : reader.GetAttribute("Node")),
-										baseNode.InputNodes.Count-1
+										baseNode.InputNodes.Count - 1
 									));
 								}
 							} while (reader.Name.Trim() != "InputNode");
@@ -484,7 +483,7 @@ namespace BixBite
 						if (reader.Name == "OutputNode")
 						{
 							baseNode.OutputNodes.Add(new ConnectionNode(
-								baseNode, "OutputNode" + baseNode.OutputNodes.Count ,
+								baseNode, "OutputNode" + baseNode.OutputNodes.Count,
 								(ECOnnectionType)Enum.Parse(typeof(ECOnnectionType), reader.GetAttribute("Type")))
 							);
 							if (!(baseNode is DialogueNodeBlock || baseNode is ConditionalNodeBlock)) baseNode.DType = baseNode.OutputNodes[0].NodeType;
@@ -512,6 +511,21 @@ namespace BixBite
 					reader.Read();
 
 				//TimeLines have not been made yet. So we need to set the parent timeline to null for now. But set this in the engine.
+				int spriteIndex = int.Parse(reader.GetAttribute("SpriteIndex"));
+				string trackSpriteImagePath = "";
+				if (curDialogueScene.Characters.FirstOrDefault(x => x.Name == dialogue.Header) is SceneEntity entity && spriteIndex >= 0)
+				{
+					trackSpriteImagePath = entity.DialogueSprites[spriteIndex].ImgPathLocation;
+					if(System.IO.File.Exists(trackSpriteImagePath.Replace("{Content}", contentPath)))
+					{
+						trackSpriteImagePath = trackSpriteImagePath.Replace("{Content}", contentPath);
+					}
+					else
+					{
+						trackSpriteImagePath = "";
+					}
+				}
+
 				if (dialogue.OutputNodes.Count > 1)
 				{
 					Timeline tltemp = null;
@@ -521,9 +535,11 @@ namespace BixBite
 						tltemp = curDialogueScene.Timelines[0];
 					dialogue.LinkedTimeBlock = new ChoiceTimeBlock(tltemp, Double.Parse(reader.GetAttribute("Start")))
 					{
-						EndTime = Double.Parse(reader.GetAttribute("End")), Trackname = dialogue.Header,
+						EndTime = Double.Parse(reader.GetAttribute("End")),
+						Trackname = dialogue.Header,
 						LinkedDialogueBlock = dialogue,
-						LinkedTextBoxName = reader.GetAttribute("LinkedTextBox")
+						LinkedTextBoxName = reader.GetAttribute("LinkedTextBox"),
+						TrackSpritePath = trackSpriteImagePath
 					};
 				}
 				else
@@ -532,9 +548,11 @@ namespace BixBite
 						Array.Find(curDialogueScene.Timelines.ToArray(), x => x.TrackName == dialogue.Header),
 						Double.Parse(reader.GetAttribute("Start")))
 					{
-						EndTime = Double.Parse(reader.GetAttribute("End")), Trackname = dialogue.Header,
+						EndTime = Double.Parse(reader.GetAttribute("End")),
+						Trackname = dialogue.Header,
 						LinkedDialogueBlock = dialogue,
 						LinkedTextBoxName = reader.GetAttribute("LinkedTextBox"),
+						TrackSpritePath = trackSpriteImagePath
 					};
 				}
 
@@ -552,7 +570,6 @@ namespace BixBite
 							reader.Read();
 							if (reader.Name == "Sprite")
 							{
-								(dialogue.LinkedTimeBlock as TimeBlock).TrackSpritePath = reader.GetAttribute("Location");
 								dialogue.DialogueSprites.Add(
 									new Sprite(
 									reader.GetAttribute("Name"),
@@ -585,7 +602,7 @@ namespace BixBite
 		/// <param name="GameUIs">List of UI files in use</param>
 		/// <param name="sceneParams">List of params for this scene</param>
 		/// <param name="SceneBlockNodes">List of all the block nodes for this scene</param>
-		public void ExportScene(String filePath, List<SceneEntity> characters, List<String> GameUIs,List<Tuple<String, object>> sceneParams, List<BaseNodeBlock> SceneBlockNodes)
+		public void ExportScene(String filePath, List<SceneEntity> characters, List<String> GameUIs, List<Tuple<String, object>> sceneParams, List<BaseNodeBlock> SceneBlockNodes)
 		{
 			XmlWriterSettings settings = new XmlWriterSettings
 			{
@@ -597,7 +614,7 @@ namespace BixBite
 			};
 			//settings.Async = true;
 
-			using (XmlWriter writer = XmlWriter.Create(filePath+".dials", settings))
+			using (XmlWriter writer = XmlWriter.Create(filePath + ".dials", settings))
 			{
 				writer.WriteStartElement(null, "DialogueScene", null);
 				writer.WriteAttributeString(null, "Name", null, GetPropertyData("SceneName").ToString());
@@ -636,7 +653,7 @@ namespace BixBite
 					writer.WriteStartElement(null, "Var", null);
 					writer.WriteAttributeString(null, "Name", null, varTuple.Item1);
 					writer.WriteAttributeString(null, "Type", null, varTuple.Item2.GetType().ToString());
-					writer.WriteAttributeString(null, "DefaultVal", null,varTuple.Item2.ToString());
+					writer.WriteAttributeString(null, "DefaultVal", null, varTuple.Item2.ToString());
 					writer.WriteEndElement();//end of Var tag
 				}
 				writer.WriteEndElement();//end of Params tag
@@ -645,7 +662,7 @@ namespace BixBite
 				//TODO: create a methods for each block node to xml nodes.
 				foreach (BaseNodeBlock baseNode in SceneBlockNodes)
 				{
-					CreateBlockNodeXML(writer, baseNode);
+					CreateBlockNodeXML(writer, baseNode, characters);
 				}
 
 				writer.WriteEndElement();//end of BlockNodes tag
@@ -655,7 +672,7 @@ namespace BixBite
 			} //end of dialogue scene creation
 		}
 
-		private void CreateBlockNodeXML(XmlWriter writer, BaseNodeBlock blockNode)
+		private void CreateBlockNodeXML(XmlWriter writer, BaseNodeBlock blockNode, List<SceneEntity> characters)
 		{
 			writer.WriteStartElement(null, blockNode.GetType().ToString(), null);
 			writer.WriteAttributeString(null, "Key", null, blockNode.Name);
@@ -697,7 +714,7 @@ namespace BixBite
 						if (ind >= 0)
 							writer.WriteAttributeString(null, "Ind", null, ind.ToString());
 					}
-					if(ind == -1)
+					if (ind == -1)
 						Console.WriteLine("Incorrect!! No node found during saving.");
 					writer.WriteEndElement(); //end of the Connection Tag
 					writer.WriteEndElement(); //end of the EntryNode Tag
@@ -722,7 +739,7 @@ namespace BixBite
 			}
 
 			//input nodes
-			if (blockNode.InputNodes != null && blockNode.InputNodes.Count > 0 )
+			if (blockNode.InputNodes != null && blockNode.InputNodes.Count > 0)
 			{
 				writer.WriteStartElement(null, "Inputs", null);
 				foreach (ConnectionNode input in blockNode.InputNodes)
@@ -814,6 +831,14 @@ namespace BixBite
 				writer.WriteStartElement(null, "Timeblock", null);
 				writer.WriteAttributeString(null, "Start", null, (dialogueNode.LinkedTimeBlock as TimeBlock)?.StartTime.ToString());
 				writer.WriteAttributeString(null, "End", null, (dialogueNode.LinkedTimeBlock as TimeBlock)?.EndTime.ToString());
+
+				int spriteIndex = -1;
+				if (!dialogueNode.Header.Contains("Dialogue Choice"))
+				{
+					spriteIndex = Array.FindIndex(characters.FirstOrDefault(x => x.Name == dialogueNode.Header)?.DialogueSprites.ToArray(), y => (dialogueNode.LinkedTimeBlock as TimeBlock)?.TrackSpritePath?.Contains(y.ImgPathLocation.Replace("{Content}", "")) == true);
+				}
+
+				writer.WriteAttributeString(null, "SpriteIndex", null, spriteIndex.ToString());
 				writer.WriteAttributeString(null, "LinkedTextBox", null, (dialogueNode.LinkedTimeBlock as TimeBlock)?.LinkedTextBoxName);
 				writer.WriteEndElement(); //end of the TimeBlock Tag
 
@@ -827,7 +852,7 @@ namespace BixBite
 					{
 						writer.WriteStartElement(null, "Sprite", null);
 						writer.WriteAttributeString(null, "Name", null, sprite.Name);
-						writer.WriteAttributeString(null, "Location", null, sprite.ImgPathLocation);
+						writer.WriteAttributeString(null, "SpriteIndex", null, spriteIndex.ToString());
 						writer.WriteAttributeString(null, "Width", null, sprite.GetPropertyData("width").ToString());
 						writer.WriteAttributeString(null, "Height", null, sprite.GetPropertyData("height").ToString());
 						writer.WriteAttributeString(null, "x", null, sprite.GetPropertyData("x").ToString());

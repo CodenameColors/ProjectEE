@@ -31,7 +31,8 @@ namespace AmethystEngine.Components
 
 		public Uri Thumbnail { get; set; }
     public String Name { get; set; }
-    public int Width { get; set; }
+    public String ContentPath { get; set; }
+		public int Width { get; set; }
     public EObjectType EditObjType;
 
 		
@@ -42,9 +43,11 @@ namespace AmethystEngine.Components
       //Thumbnail.Stretch = Stretch.Fill;
     }
 
-    public EditorObject(String desimg, String desName, bool rel = true, EObjectType eot = EObjectType.None)
+    public EditorObject(String contentPath, String desimg, String desName, bool rel = true, EObjectType eot = EObjectType.None)
     {
-      if (rel)
+			this.ContentPath = contentPath;
+
+			if (rel)
       {
         Thumbnail = new Uri(desimg, UriKind.Relative);
         Name = desName;

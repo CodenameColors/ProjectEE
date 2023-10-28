@@ -49,12 +49,10 @@ namespace AmethystEngine.Forms
 
 		#endregion
 
-
 		private void DialogueEditorLoaded()
 		{
 
 		}
-
 
 		#region Dialogue
 
@@ -91,9 +89,6 @@ namespace AmethystEngine.Forms
 		#endregion
 
 		#endregion
-
-
-
 
 		/// <summary>
 		/// method to draw a newly added/imported UI to the screen. Choose whether or not to breakdown the components for editing.
@@ -816,8 +811,11 @@ namespace AmethystEngine.Forms
 					{
 						try
 						{
-							ComboItems.Add(new EditorObject(filepath.ImgPathLocation,
-								filepath.ImgPathLocation.Substring(filepath.ImgPathLocation.LastIndexOfAny(new char[] { '\\', '/' })),
+							String filePathImage = filepath.ImgPathLocation;
+							filePathImage = filePathImage.Replace("{Content}", EditorProjectContentDirectory);
+
+							ComboItems.Add(new EditorObject(filePathImage, filepath.ImgPathLocation,
+								filePathImage.Substring(filePathImage.LastIndexOfAny(new char[] { '\\', '/' })),
 								false));
 						}
 						catch (ArgumentException ae)
@@ -917,12 +915,13 @@ namespace AmethystEngine.Forms
 					{
 						try
 						{
-							String filePath = filepath.ImgPathLocation;
-							filepath = filePath.Replace("{Content}", EditorProjectContentDirectory);
+							String filePathImage = filepath.ImgPathLocation;
+							filePathImage = filePathImage.Replace("{Content}", EditorProjectContentDirectory);
 
-							ComboItems.Add(new EditorObject(filepath.ImgPathLocation,
-								filepath.ImgPathLocation.Substring(filepath.ImgPathLocation.LastIndexOfAny(new char[] { '\\', '/' })),
+							ComboItems.Add(new EditorObject(filepath.ImgPathLocation, filePathImage,
+								filePathImage.Substring(filePathImage.LastIndexOfAny(new char[] { '\\', '/' })),
 								false));
+
 						}
 						catch (ArgumentException ae)
 						{
@@ -932,7 +931,7 @@ namespace AmethystEngine.Forms
 					}
 
 					CB.ItemsSource = ComboItems;
-					int index = Array.FindIndex(ComboItems.ToArray(), x => x.Thumbnail.AbsolutePath == TimeB.TrackSpritePath);
+					int index = Array.FindIndex(ComboItems.ToArray(), x => x.ContentPath.Replace("{Content}", EditorProjectContentDirectory) == TimeB.TrackSpritePath);
 					if (index >= 0) CB.SelectedIndex = index;
 
 					dialoguePropertyBag.Properties.Add(
@@ -1085,7 +1084,7 @@ namespace AmethystEngine.Forms
 				(dialogue.LinkedTimeBlock as TimeBlock).Trackname = dialogue.Header;
 				dialogue.DialogueSprites.Add(new Sprite(
 					((EditorObject)((ComboBox)sender).SelectedValue).Name,
-					((EditorObject)((ComboBox)sender).SelectedValue).Thumbnail.AbsolutePath,
+					((EditorObject)((ComboBox)sender).SelectedValue).ContentPath,
 					0, 0, 0, 0));
 			}
 			else if (DialogueEditor_Timeline.SelectedControl is Timeline timeline)
@@ -1229,7 +1228,7 @@ namespace AmethystEngine.Forms
 			//CurActiveDialogueScene.Characters.Add(new Character() { Name = "Antonio" });
 
 			SceneEntity c = new SceneEntity(HorizontalAlignment.Left.ToString(), VerticalAlignment.Bottom.ToString());
-			Window w = new AddCharacterForm(ProjectFilePath) { AddToScene = AddCharacterHook };
+			Window w = new AddCharacterForm(ProjectFilePath, EditorProjectContentDirectory) { AddToScene = AddCharacterHook };
 			w.ShowDialog();
 
 			try
@@ -1866,7 +1865,7 @@ namespace AmethystEngine.Forms
 			List<Tuple<String, String, int, String, String, int>> connectiList =
 				new List<Tuple<string, String, int, String, string, int>>();
 
-			DialogueScene dia = DialogueScene.ImportScene(dlg.FileName, ref connectiList);
+			DialogueScene dia = DialogueScene.ImportScene(dlg.FileName, ref connectiList, EditorProjectContentDirectory);
 
 			foreach (Timeline tl in dia.Timelines)
 			{

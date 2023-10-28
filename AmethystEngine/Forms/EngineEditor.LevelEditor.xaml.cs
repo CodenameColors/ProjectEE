@@ -2166,7 +2166,9 @@ namespace AmethystEngine.Forms
 
 				foreach (Tuple<string, string> t in CurrentLevel.sprites)
 				{
-					LESpriteObjectList.Add(new EditorObject(t.Item2, t.Item1, false));
+					String imagePath = t.Item2.Replace("{Content}", EditorProjectContentDirectory);
+
+					LESpriteObjectList.Add(new EditorObject(t.Item2, imagePath,  t.Item1, false));
 				}
 
 				ListBox SpriteLibary_LB =
