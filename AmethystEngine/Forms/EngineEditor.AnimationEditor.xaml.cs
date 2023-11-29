@@ -2577,7 +2577,7 @@ namespace AmethystEngine.Forms
 			Console.WriteLine(dlg.FileName);
 			Console.WriteLine("Saving Animation State Machine");
 
-			CurrentAnimationStateMachine.ExportAnimationStateMachine(dlg.FileName.Replace(".animachine", ""));
+			CurrentAnimationStateMachine.ExportAnimationStateMachine(dlg.FileName.Replace(".animachine", ""), EditorProjectContentDirectory);
 
 		}
 
@@ -2605,7 +2605,7 @@ namespace AmethystEngine.Forms
 
 			Console.WriteLine(dlg.FileName);
 
-			AnimationStateMachine stateMachine = AnimationStateMachine.ImportAnimationStateMachine(dlg.FileName);
+			AnimationStateMachine stateMachine = AnimationStateMachine.ImportAnimationStateMachine(dlg.FileName, EditorProjectContentDirectory);
 
 			//We need to recreate the dictionary with the correct keys
 			List<AnimationState> tempsSpriteAnimationStates = stateMachine.States.Values.ToList();

@@ -141,7 +141,7 @@ namespace BixBite.Rendering.Animation
 			return returnStatus;
 		}
 
-		public void ExportAnimationStateMachine(String filePath)
+		public void ExportAnimationStateMachine(String filePath, String contentPath)
 		{
 
 			XmlWriterSettings settings = new XmlWriterSettings
@@ -240,7 +240,11 @@ namespace BixBite.Rendering.Animation
 						foreach (SpriteSheet spriteSheet in layer.ReferenceSpriteSheets)
 						{
 							writer.WriteStartElement(null, "SpriteSheet", null);
-							writer.WriteAttributeString(null, "Path", null, spriteSheet.SpriteSheetPath);
+
+							String finalPath = spriteSheet.SpriteSheetPath;
+							finalPath = finalPath.Replace(contentPath, "{Content}\\");
+							writer.WriteAttributeString(null, "Path", null, finalPath);
+							
 							writer.WriteEndElement(); // End of Tag "spritesheet"
 						}
 						writer.WriteEndElement(); // End of Tag "spritesheets"
@@ -261,7 +265,7 @@ namespace BixBite.Rendering.Animation
 
 		}
 
-		public static AnimationStateMachine ImportAnimationStateMachine(String AnimationStateMachineFilePath)
+		public static AnimationStateMachine ImportAnimationStateMachine(String AnimationStateMachineFilePath, String contentPath)
 		{
 			AnimationStateMachine returnAnimationStateMachine = new AnimationStateMachine();
 
@@ -422,6 +426,8 @@ namespace BixBite.Rendering.Animation
 														{
 															SpriteSheet newSpriteSheet = new SpriteSheet();
 															newSpriteSheet.SpriteSheetPath = (reader.GetAttribute("Path"));
+															newSpriteSheet.SpriteSheetPath = newSpriteSheet.SpriteSheetPath.Replace("{Content}", contentPath);
+
 
 															newAnimationLayer.ReferenceSpriteSheets.Add(newSpriteSheet);
 														}

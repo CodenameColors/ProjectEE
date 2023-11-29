@@ -20,7 +20,7 @@
             </Animation>
           </Animations>
           <SpriteSheets>
-            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Base_Sword_Sheet.png" />
+            <SpriteSheet Path="{Content}\\Animations\Base_Sword_Sheet.png" />
           </SpriteSheets>
         </Layer>
         <Layer Name="Weapon">
@@ -36,7 +36,7 @@
             </Animation>
           </Animations>
           <SpriteSheets>
-            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Sword_Sheet.png" />
+            <SpriteSheet Path="{Content}\\Animations\Sword_Sheet.png" />
           </SpriteSheets>
         </Layer>
       </Layers>
@@ -59,7 +59,7 @@
             </Animation>
           </Animations>
           <SpriteSheets>
-            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Base_Sword_Sheet.png" />
+            <SpriteSheet Path="{Content}\\Animations\Base_Sword_Sheet.png" />
           </SpriteSheets>
         </Layer>
         <Layer Name="Weapon">
@@ -75,7 +75,7 @@
             </Animation>
           </Animations>
           <SpriteSheets>
-            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Sword_Sheet.png" />
+            <SpriteSheet Path="{Content}\\Animations\Sword_Sheet.png" />
           </SpriteSheets>
         </Layer>
       </Layers>
@@ -95,7 +95,7 @@
             </Animation>
           </Animations>
           <SpriteSheets>
-            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Base_Sword_Sheet.png" />
+            <SpriteSheet Path="{Content}\\Animations\Base_Sword_Sheet.png" />
           </SpriteSheets>
         </Layer>
         <Layer Name="Weapon">
@@ -108,7 +108,7 @@
             </Animation>
           </Animations>
           <SpriteSheets>
-            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Sword_Sheet.png" />
+            <SpriteSheet Path="{Content}\\Animations\Sword_Sheet.png" />
           </SpriteSheets>
         </Layer>
       </Layers>
@@ -138,7 +138,7 @@
             </Animation>
           </Animations>
           <SpriteSheets>
-            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Base_Sword_Sheet.png" />
+            <SpriteSheet Path="{Content}\\Animations\Base_Sword_Sheet.png" />
           </SpriteSheets>
         </Layer>
         <Layer Name="Weapon">
@@ -161,7 +161,7 @@
             </Animation>
           </Animations>
           <SpriteSheets>
-            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Sword_Sheet.png" />
+            <SpriteSheet Path="{Content}\\Animations\Sword_Sheet.png" />
           </SpriteSheets>
         </Layer>
       </Layers>
