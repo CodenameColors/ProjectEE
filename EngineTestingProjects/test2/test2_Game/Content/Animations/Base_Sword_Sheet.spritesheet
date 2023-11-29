@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SpriteSheet SheetName="Template_character_Sheet" File="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Base_Sword_Sheet.png" AnimationCount="4" Width="1000" Height="1000">
+<SpriteSheet SheetName="Template_character_Sheet" File="{Content}\Animations\Base_Sword_Sheet.png" AnimationCount="4" Width="1000" Height="1000">
   <AnimationStates>
     <AnimationState Name="Idle_Sword" NumOfFrames="4">
       <SubLayers>
         <Layer Name="Weapon" />
       </SubLayers>
-      <Frame X="0" Y="0" W="146" H="263" RX="64" RY="244" CX="86" CY="60" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Idle\body_layer\body_bt_sword_idle_0000.png">
+      <Frame X="0" Y="0" W="146" H="263" RX="64" RY="244" CX="86" CY="60" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\body_bt_sword_idle_0000.png">
         <SubLayerPoints LayerName="Weapon" RX="5" RY="162" />
       </Frame>
-      <Frame X="147" Y="0" W="143" H="261" RX="66" RY="244" CX="84" CY="61" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Idle\body_layer\body_bt_sword_idle_0001.png">
+      <Frame X="147" Y="0" W="143" H="261" RX="66" RY="244" CX="84" CY="61" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\body_bt_sword_idle_0001.png">
         <SubLayerPoints LayerName="Weapon" RX="10" RY="164" />
       </Frame>
-      <Frame X="293" Y="0" W="136" H="261" RX="60" RY="242" CX="92" CY="63" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Idle\body_layer\body_bt_sword_idle_0002.png">
+      <Frame X="293" Y="0" W="136" H="261" RX="60" RY="242" CX="92" CY="63" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\body_bt_sword_idle_0002.png">
         <SubLayerPoints LayerName="Weapon" RX="6" RY="162" />
       </Frame>
-      <Frame X="433" Y="0" W="142" H="261" RX="62" RY="242" CX="89" CY="63" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Idle\body_layer\body_bt_sword_idle_0003.png">
+      <Frame X="433" Y="0" W="142" H="261" RX="62" RY="242" CX="89" CY="63" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\body_bt_sword_idle_0003.png">
         <SubLayerPoints LayerName="Weapon" RX="5" RY="162" />
       </Frame>
     </AnimationState>
@@ -22,16 +22,16 @@
       <SubLayers>
         <Layer Name="Weapon" />
       </SubLayers>
-      <Frame X="0" Y="264" W="146" H="263" RX="66" RY="244" CX="86" CY="60" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Defense\base_template\Base_Template_Sword_defense_0000.png">
+      <Frame X="0" Y="264" W="146" H="263" RX="66" RY="244" CX="86" CY="60" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\Base_Template_Sword_defense_0000.png">
         <SubLayerPoints LayerName="Weapon" RX="7" RY="162" />
       </Frame>
-      <Frame X="147" Y="264" W="141" H="264" RX="62" RY="244" CX="89" CY="59" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Defense\base_template\Base_Template_Sword_defense_0001.png">
+      <Frame X="147" Y="264" W="141" H="264" RX="62" RY="244" CX="89" CY="59" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\Base_Template_Sword_defense_0001.png">
         <SubLayerPoints LayerName="Weapon" RX="6" RY="166" />
       </Frame>
-      <Frame X="289" Y="265" W="140" H="262" RX="60" RY="243" CX="90" CY="61" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Defense\base_template\Base_Template_Sword_defense_0002.png">
+      <Frame X="289" Y="265" W="140" H="262" RX="60" RY="243" CX="90" CY="61" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\Base_Template_Sword_defense_0002.png">
         <SubLayerPoints LayerName="Weapon" RX="6" RY="168" />
       </Frame>
-      <Frame X="429" Y="265" W="139" H="261" RX="58" RY="242" CX="92" CY="62" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Defense\base_template\Base_Template_Sword_defense_0003.png">
+      <Frame X="429" Y="265" W="139" H="261" RX="58" RY="242" CX="92" CY="62" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\Base_Template_Sword_defense_0003.png">
         <SubLayerPoints LayerName="Weapon" RX="7" RY="172" />
       </Frame>
     </AnimationState>
@@ -39,7 +39,7 @@
       <SubLayers>
         <Layer Name="Weapon" />
       </SubLayers>
-      <Frame X="568" Y="265" W="138" H="259" RX="60" RY="240" CX="91" CY="64" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Defense\base_template\Base_Template_Sword_defense_0004.png">
+      <Frame X="568" Y="265" W="138" H="259" RX="60" RY="240" CX="91" CY="64" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\Base_Template_Sword_defense_0004.png">
         <SubLayerPoints LayerName="Weapon" RX="8" RY="171" />
       </Frame>
     </AnimationState>
@@ -47,37 +47,37 @@
       <SubLayers>
         <Layer Name="Weapon" />
       </SubLayers>
-      <Frame X="2" Y="528" W="145" H="263" RX="64" RY="244" CX="63" CY="60" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Attack\body_bt_sword_attack_0000.png">
+      <Frame X="2" Y="528" W="145" H="263" RX="64" RY="244" CX="63" CY="60" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\body_bt_sword_attack_0000.png">
         <SubLayerPoints LayerName="Weapon" RX="5" RY="163" />
       </Frame>
-      <Frame X="144" Y="530" W="163" H="262" RX="83" RY="244" CX="45" CY="61" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Attack\body_bt_sword_attack_0001.png">
+      <Frame X="144" Y="530" W="163" H="262" RX="83" RY="244" CX="45" CY="61" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\body_bt_sword_attack_0001.png">
         <SubLayerPoints LayerName="Weapon" RX="8" RY="160" />
       </Frame>
-      <Frame X="308" Y="531" W="157" H="252" RX="69" RY="232" CX="104" CY="71" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Attack\body_bt_sword_attack_0002.png">
+      <Frame X="308" Y="531" W="157" H="252" RX="69" RY="232" CX="104" CY="71" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\body_bt_sword_attack_0002.png">
         <SubLayerPoints LayerName="Weapon" RX="94" RY="136" />
       </Frame>
-      <Frame X="462" Y="526" W="165" H="264" RX="50" RY="248" CX="185" CY="59" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Attack\body_bt_sword_attack_0003.png">
+      <Frame X="462" Y="526" W="165" H="264" RX="50" RY="248" CX="185" CY="59" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\body_bt_sword_attack_0003.png">
         <SubLayerPoints LayerName="Weapon" RX="143" RY="138" />
       </Frame>
-      <Frame X="624" Y="524" W="118" H="263" RX="60" RY="250" CX="183" CY="60" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Attack\body_bt_sword_attack_0004.png">
+      <Frame X="624" Y="524" W="118" H="263" RX="60" RY="250" CX="183" CY="60" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\body_bt_sword_attack_0004.png">
         <SubLayerPoints LayerName="Weapon" RX="20" RY="100" />
       </Frame>
-      <Frame X="627" Y="524" W="118" H="263" RX="57" RY="250" CX="187" CY="59" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Attack\body_bt_sword_attack_0005.png">
+      <Frame X="627" Y="524" W="118" H="263" RX="57" RY="250" CX="187" CY="59" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\body_bt_sword_attack_0005.png">
         <SubLayerPoints LayerName="Weapon" RX="17" RY="100" />
       </Frame>
-      <Frame X="581" Y="0" W="100" H="265" RX="60" RY="248" CX="186" CY="58" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Attack\body_bt_sword_attack_0006.png">
+      <Frame X="581" Y="0" W="100" H="265" RX="60" RY="248" CX="186" CY="58" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\body_bt_sword_attack_0006.png">
         <SubLayerPoints LayerName="Weapon" RX="16" RY="96" />
       </Frame>
-      <Frame X="686" Y="0" W="125" H="267" RX="75" RY="254" CX="158" CY="56" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Attack\body_bt_sword_attack_0007.png">
+      <Frame X="686" Y="0" W="125" H="267" RX="75" RY="254" CX="158" CY="56" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\body_bt_sword_attack_0007.png">
         <SubLayerPoints LayerName="Weapon" RX="100" RY="148" />
       </Frame>
-      <Frame X="805" Y="0" W="117" H="271" RX="55" RY="257" CX="134" CY="52" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Attack\body_bt_sword_attack_0008.png">
+      <Frame X="805" Y="0" W="117" H="271" RX="55" RY="257" CX="134" CY="52" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\body_bt_sword_attack_0008.png">
         <SubLayerPoints LayerName="Weapon" RX="40" RY="174" />
       </Frame>
-      <Frame X="705" Y="267" W="152" H="255" RX="105" RY="243" CX="67" CY="62" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Attack\body_bt_sword_attack_0009.png">
+      <Frame X="705" Y="267" W="152" H="255" RX="105" RY="243" CX="67" CY="62" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\body_bt_sword_attack_0009.png">
         <SubLayerPoints LayerName="Weapon" RX="6" RY="155" />
       </Frame>
-      <Frame X="858" Y="268" W="141" H="264" RX="64" RY="245" CX="64" CY="59" Path="C:\Users\Antonio\Pictures\ProjectEE\Animations\WIP\Combat\BaseTemplate\Sword\Attack\body_bt_sword_attack_0010.png">
+      <Frame X="858" Y="268" W="141" H="264" RX="64" RY="245" CX="64" CY="59" Path="{Content}/Animations/ImageSources/Template_character_Sheet_Sheet\body_bt_sword_attack_0010.png">
         <SubLayerPoints LayerName="Weapon" RX="4" RY="164" />
       </Frame>
     </AnimationState>
