@@ -12,3 +12,7 @@ DialogueEditor
 -6 = Frame Entered cannot be negative!
 -7 = There isn't a dialogue sprite to compare paths too.
 -8 = The Sprite image you are trying to add MUST BE in same directory as the other image files!
+
+XNA Builder/Importer
+-1 = importer path not valid. you need to have a "Content" folder in the path as well as either "Images" || "Animations"
+-2 = importer file extension given not valid for "Animations" sub folder type
