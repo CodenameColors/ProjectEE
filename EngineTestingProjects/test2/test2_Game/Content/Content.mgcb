@@ -28,3 +28,9 @@
 #begin Images/Characters/PC/GirlPCFullBody_(1.0_1v).xnb
 /copy:Images/Characters/PC/GirlPCFullBody_(1.0_1v).xnb
 
+#begin Animations/Base_Sword_Sheet.xnb
+/copy:Animations/Base_Sword_Sheet.xnb
+
+#begin Animations/Sword_Sheet.xnb
+/copy:Animations/Sword_Sheet.xnb
+

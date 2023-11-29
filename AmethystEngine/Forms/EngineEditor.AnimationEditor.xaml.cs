@@ -2224,7 +2224,7 @@ namespace AmethystEngine.Forms
 			if (File.Exists(filename))
 			{
 				// Now that we have a valid file path we need to turn the "canvas spritesheet" into Animation State Machine Object
-				CanvasSpritesheet importedCanvasSpritesheet = CanvasSpritesheet.ImportSpriteSheet(filename);
+				CanvasSpritesheet importedCanvasSpritesheet = CanvasSpritesheet.ImportSpriteSheet(filename, EditorProjectContentDirectory);
 				returnAnimationStateMachine = new AnimationStateMachine();
 
 
@@ -2360,7 +2360,7 @@ namespace AmethystEngine.Forms
 			if (File.Exists(filename))
 			{
 				// Now that we have a valid file path we need to turn the "canvas spritesheet" into Animation State Machine Object
-				CanvasSpritesheet importedCanvasSpritesheet = CanvasSpritesheet.ImportSpriteSheet(filename);
+				CanvasSpritesheet importedCanvasSpritesheet = CanvasSpritesheet.ImportSpriteSheet(filename, EditorProjectContentDirectory);
 				returnAnimationStateMachine = new AnimationStateMachine();
 
 

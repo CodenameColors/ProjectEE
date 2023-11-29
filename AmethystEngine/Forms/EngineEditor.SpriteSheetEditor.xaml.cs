@@ -1021,7 +1021,7 @@ namespace AmethystEngine.Forms
 
 			Console.WriteLine(dlg.FileName);
 
-			CurrentSelectedSpriteSheet = CanvasSpritesheet.ImportSpriteSheet(dlg.FileName);
+			CurrentSelectedSpriteSheet = CanvasSpritesheet.ImportSpriteSheet(dlg.FileName, EditorProjectContentDirectory);
 
 			if (CurrentSelectedSpriteSheet != null)
 			{
@@ -1140,9 +1140,12 @@ namespace AmethystEngine.Forms
 
 			Console.WriteLine(dlg.FileName);
 
+			String filePath = dlg.FileName;
+			filePath = filePath.Replace(MonoGameProjectContentDirectory, EditorProjectContentDirectory);
+			
 			Console.WriteLine("Saving Spritesheet");
 
-			CanvasSpritesheet.ExportSpriteSheet(CurrentSelectedSpriteSheet, dlg.FileName.Replace(".spritesheet", ""));
+			CanvasSpritesheet.ExportSpriteSheet(CurrentSelectedSpriteSheet, dlg.FileName.Replace(".spritesheet", ""), EditorProjectContentDirectory, MonoGameProjectContentDirectory);
 
 			// Let's not let frames render target crosshairs be visiable
 			foreach (var anim in CurrentSelectedSpriteSheet.AllAnimationOnSheet)
@@ -1177,10 +1180,21 @@ namespace AmethystEngine.Forms
 			pngEncoder.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
 
 			// Save the PngBitmapEncoder to a file or stream
-			var fileStream = new FileStream(String.Format("{0}.png", dlg.FileName.Replace(".spritesheet", "")),
-				FileMode.Create);
+			String pngPath = (String.Format("{0}.png", filePath.Replace(".spritesheet", "")));
+			var fileStream = new FileStream(pngPath, FileMode.Create);
 			pngEncoder.Save(fileStream);
 			fileStream.Close();
+
+			String editorCopyDirectory = Path.GetDirectoryName(pngPath);
+			String finalBinaryDirectory = editorCopyDirectory.Replace(EditorProjectContentDirectory, MonoGameProjectContentDirectory);
+
+			_monoGameContentBuilder.AttemptToBuildPNGToXNBFile(
+				pngPath,
+				editorCopyDirectory,
+				finalBinaryDirectory,
+				EditorProjectContentDirectory + "ContentBuilderSettings.config",
+				ProjectFilePath.Replace(".gem", "_Game\\Content\\Content.mgcb"));
+
 		}
 
 		private void SaveSpriteSheetAs_MI_Click(object sender, RoutedEventArgs e)
@@ -1436,6 +1450,32 @@ namespace AmethystEngine.Forms
 						// filename = filename.Substring(0, filename.LastIndexOfAny(new Char[] {'/', '\\'}));
 					}
 					else return; //invalid name
+
+					// We need to know what is the current path?
+					// The path must be [ProjName]_Editor/Animation/ImageSources/[NameofSheet]_Sheet/
+					// IF IT'S NOT THEN WE NEED TO COPY IT HERE.
+					// ALSO DON'T COPY If the file is already there.
+
+					String correctDirectory = String.Format("{0}/{1}/{2}_Sheet/", EditorProjectContentDirectory, 
+						"Animations/ImageSources/", CurrentSelectedSpriteSheet.Name);
+
+					if(!filename.Contains(correctDirectory))
+					{
+						String finalPath = String.Format("{0}/{1}", correctDirectory, Path.GetFileName(filename));
+						if(!File.Exists(finalPath))
+						{
+							if (!Directory.Exists(Path.GetDirectoryName(finalPath)))
+								Directory.CreateDirectory(Path.GetDirectoryName(finalPath));
+
+							File.Copy(filename, finalPath);
+							filename = finalPath;
+						}
+						else
+						{
+							// This image is already here. but is it in use already?
+						}
+					}
+
 
 					Console.WriteLine(dlg.FileName);
 					BitmapImage _baseImage = new BitmapImage();

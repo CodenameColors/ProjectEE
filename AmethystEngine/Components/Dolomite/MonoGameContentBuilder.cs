@@ -330,6 +330,18 @@ namespace AmethystEngine.Components.Dolomite
 
 			UpdateMonogameContentBuilderFiles(editorMonoGameAssetFilePath, monoGameContentFilePath, newAssetData);
 
+			// this ALWAYS creates a mgcontent file... however, i change the main content.mgcb file so it's not needed
+			// So we can delete it for cleaner directories.
+			String[] files = Directory.GetFiles(pathC);
+			for(int fileIndex = files.Length - 1; fileIndex > 0; fileIndex--)
+			{
+				String file = files[fileIndex];
+
+				String extension = Path.GetExtension(file);
+				if (extension == ".mgcontent")
+					File.Delete(file);
+			}
+
 			//// Step 1: Load Raw Image
 			//Texture2DContent texture2DContent = new Texture2DContent();
 			//texture2DContent.Identity = new ContentIdentity(pngPath);

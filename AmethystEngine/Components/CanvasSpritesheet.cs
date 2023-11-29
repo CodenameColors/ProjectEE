@@ -181,7 +181,7 @@ namespace AmethystEngine.Components
 		}
 
 
-		public static CanvasSpritesheet ImportSpriteSheet(String filePath)
+		public static CanvasSpritesheet ImportSpriteSheet(String filePath, String contentDirectory)
 		{
 			CanvasSpritesheet retSpriteSheet = new CanvasSpritesheet("", 0,0);
 			XmlReaderSettings settings = new XmlReaderSettings
@@ -200,6 +200,8 @@ namespace AmethystEngine.Components
 					{
 						//retSpriteSheet.Name = reader.GetAttribute("Name"); // grab the name
 						retSpriteSheet.ImagePath = reader.GetAttribute("File"); // grab the name
+						retSpriteSheet.ImagePath = retSpriteSheet.ImagePath.Replace("{Content}", contentDirectory);
+
 						retSpriteSheet.Name = reader.GetAttribute("SheetName");
 						retSpriteSheet.Width = int.Parse(reader.GetAttribute("Width") ?? "0");	// fallback
 						retSpriteSheet.Height = int.Parse(reader.GetAttribute("Height") ?? "0"); // fallback
@@ -235,6 +237,7 @@ namespace AmethystEngine.Components
 										imageProperty.CropX = int.Parse(reader.GetAttribute("CX") ?? "0"); // fallback
 										imageProperty.CropY = int.Parse(reader.GetAttribute("CY") ?? "0"); // fallback
 										imageProperty.ImageLocation = (reader.GetAttribute("Path") ?? ""); // fallback
+										imageProperty.ImageLocation = imageProperty.ImageLocation.Replace("{Content}", contentDirectory);
 
 										spriteAnimation.CanvasFrames.Add(imageProperty);
 
@@ -268,7 +271,7 @@ namespace AmethystEngine.Components
 		}
 
 
-		public static bool ExportSpriteSheet(CanvasSpritesheet desiredSheet, String filepath)
+		public static bool ExportSpriteSheet(CanvasSpritesheet desiredSheet, String filepath, String editorContentPath, String mmonogameContentPath)
 		{
 			bool retbool = false;
 
@@ -287,7 +290,11 @@ namespace AmethystEngine.Components
 
 				writer.WriteStartElement(null, "SpriteSheet", null);
 				writer.WriteAttributeString(null, "SheetName", null, desiredSheet.Name);
-				writer.WriteAttributeString(null, "File", null, filepath + ".png");	// We are creating this sheet. so we need to use our sent path
+
+				String finalFilePath = filepath + ".png";
+				finalFilePath = finalFilePath.Replace(mmonogameContentPath, "{Content}\\");
+				writer.WriteAttributeString(null, "File", null, finalFilePath);	// We are creating this sheet. so we need to use our sent path
+
 				writer.WriteAttributeString(null, "AnimationCount", null, desiredSheet.AllAnimationOnSheet.Count.ToString());
 				writer.WriteAttributeString(null, "Width", null, desiredSheet.Width.ToString());
 				writer.WriteAttributeString(null, "Height", null, desiredSheet.Height.ToString());
@@ -324,7 +331,10 @@ namespace AmethystEngine.Components
 						writer.WriteAttributeString(null, "RY", null, imgpProperty.RY.ToString());
 						writer.WriteAttributeString(null, "CX", null, imgpProperty.CropX.ToString());
 						writer.WriteAttributeString(null, "CY", null, imgpProperty.CropY.ToString());
-						writer.WriteAttributeString(null, "Path", null, imgpProperty.ImageLocation.ToString());
+
+						finalFilePath = imgpProperty.ImageLocation.ToString();
+						finalFilePath = finalFilePath.Replace(editorContentPath, "{Content}");
+						writer.WriteAttributeString(null, "Path", null, finalFilePath);
 
 						// Export all the Sub layer points
 						writer.WriteStartElement(null, "SubLayerPoints", null);

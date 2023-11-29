@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<AnimationStateMachine>
+  <AnimationStates>
+    <AnimationState Name="Idle_Sword" Frames="4" Default="True" FPS="12">
+      <Connections>
+        <Connection OriginState="Idle_Sword" DestinationState="Starting_Sword_Defense" FinishFirst="False" Threshold="100"></Connection>
+        <Connection OriginState="Idle_Sword" DestinationState="Sword_Attack" FinishFirst="False" Threshold="0"></Connection>
+      </Connections>
+      <Layers>
+        <Layer Name="base_layer">
+          <Animations>
+            <Animation Name="Idle_Sword" ParentLayer="base_layer" ReferenceIndex="0">
+              <Frames>
+                <Frame XPos="0" YPos="0" Width="146" Height="263" OriginX="0" OriginY="0" RenderX="64" RenderY="244" />
+                <Frame XPos="147" YPos="0" Width="143" Height="261" OriginX="0" OriginY="0" RenderX="66" RenderY="244" />
+                <Frame XPos="293" YPos="0" Width="136" Height="261" OriginX="0" OriginY="0" RenderX="60" RenderY="242" />
+                <Frame XPos="433" YPos="0" Width="142" Height="261" OriginX="0" OriginY="0" RenderX="62" RenderY="242" />
+              </Frames>
+              <Events></Events>
+            </Animation>
+          </Animations>
+          <SpriteSheets>
+            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Base_Sword_Sheet.png" />
+          </SpriteSheets>
+        </Layer>
+        <Layer Name="Weapon">
+          <Animations>
+            <Animation Name="Weapon_Idle" ParentLayer="Weapon" ReferenceIndex="0">
+              <Frames>
+                <Frame XPos="0" YPos="0" Width="119" Height="80" OriginX="5" OriginY="162" RenderX="95" RenderY="60" />
+                <Frame XPos="122" YPos="0" Width="122" Height="81" OriginX="10" OriginY="164" RenderX="97" RenderY="60" />
+                <Frame XPos="249" YPos="0" Width="124" Height="85" OriginX="6" OriginY="162" RenderX="100" RenderY="65" />
+                <Frame XPos="376" YPos="0" Width="124" Height="85" OriginX="5" OriginY="162" RenderX="98" RenderY="64" />
+              </Frames>
+              <Events></Events>
+            </Animation>
+          </Animations>
+          <SpriteSheets>
+            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Sword_Sheet.png" />
+          </SpriteSheets>
+        </Layer>
+      </Layers>
+    </AnimationState>
+    <AnimationState Name="Starting_Sword_Defense" Frames="4" Default="False" FPS="12">
+      <Connections>
+        <Connection OriginState="Starting_Sword_Defense" DestinationState="Looping_Sword_Defense" FinishFirst="True" Threshold="100"></Connection>
+      </Connections>
+      <Layers>
+        <Layer Name="base_layer">
+          <Animations>
+            <Animation Name="Starting_Sword_Defense" ParentLayer="base_layer" ReferenceIndex="0">
+              <Frames>
+                <Frame XPos="0" YPos="264" Width="146" Height="263" OriginX="0" OriginY="0" RenderX="66" RenderY="244" />
+                <Frame XPos="147" YPos="264" Width="141" Height="264" OriginX="0" OriginY="0" RenderX="62" RenderY="244" />
+                <Frame XPos="289" YPos="265" Width="140" Height="262" OriginX="0" OriginY="0" RenderX="60" RenderY="243" />
+                <Frame XPos="429" YPos="265" Width="139" Height="261" OriginX="0" OriginY="0" RenderX="58" RenderY="242" />
+              </Frames>
+              <Events></Events>
+            </Animation>
+          </Animations>
+          <SpriteSheets>
+            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Base_Sword_Sheet.png" />
+          </SpriteSheets>
+        </Layer>
+        <Layer Name="Weapon">
+          <Animations>
+            <Animation Name="Weapon_Starting_Defense" ParentLayer="Weapon" ReferenceIndex="0">
+              <Frames>
+                <Frame XPos="495" YPos="0" Width="225" Height="90" OriginX="7" OriginY="162" RenderX="96" RenderY="65" />
+                <Frame XPos="721" YPos="0" Width="229" Height="75" OriginX="6" OriginY="166" RenderX="98" RenderY="55" />
+                <Frame XPos="0" YPos="80" Width="233" Height="90" OriginX="6" OriginY="168" RenderX="99" RenderY="70" />
+                <Frame XPos="234" YPos="82" Width="223" Height="114" OriginX="7" OriginY="172" RenderX="102" RenderY="92" />
+              </Frames>
+              <Events></Events>
+            </Animation>
+          </Animations>
+          <SpriteSheets>
+            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Sword_Sheet.png" />
+          </SpriteSheets>
+        </Layer>
+      </Layers>
+    </AnimationState>
+    <AnimationState Name="Looping_Sword_Defense" Frames="1" Default="False" FPS="12">
+      <Connections>
+        <Connection OriginState="Looping_Sword_Defense" DestinationState="Idle_Sword" FinishFirst="True" Threshold="0"></Connection>
+      </Connections>
+      <Layers>
+        <Layer Name="base_layer">
+          <Animations>
+            <Animation Name="Looping_Sword_Defense" ParentLayer="base_layer" ReferenceIndex="0">
+              <Frames>
+                <Frame XPos="568" YPos="265" Width="138" Height="259" OriginX="0" OriginY="0" RenderX="60" RenderY="240" />
+              </Frames>
+              <Events></Events>
+            </Animation>
+          </Animations>
+          <SpriteSheets>
+            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Base_Sword_Sheet.png" />
+          </SpriteSheets>
+        </Layer>
+        <Layer Name="Weapon">
+          <Animations>
+            <Animation Name="Weapon_Looping_Defense" ParentLayer="Weapon" ReferenceIndex="0">
+              <Frames>
+                <Frame XPos="233" YPos="81" Width="224" Height="114" OriginX="8" OriginY="171" RenderX="102" RenderY="93" />
+              </Frames>
+              <Events></Events>
+            </Animation>
+          </Animations>
+          <SpriteSheets>
+            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Sword_Sheet.png" />
+          </SpriteSheets>
+        </Layer>
+      </Layers>
+    </AnimationState>
+    <AnimationState Name="Sword_Attack" Frames="11" Default="False" FPS="12">
+      <Connections>
+        <Connection OriginState="Sword_Attack" DestinationState="Idle_Sword" FinishFirst="True" Threshold="0"></Connection>
+      </Connections>
+      <Layers>
+        <Layer Name="base_layer">
+          <Animations>
+            <Animation Name="Sword_Attack" ParentLayer="base_layer" ReferenceIndex="0">
+              <Frames>
+                <Frame XPos="2" YPos="528" Width="145" Height="263" OriginX="0" OriginY="0" RenderX="64" RenderY="244" />
+                <Frame XPos="144" YPos="530" Width="163" Height="262" OriginX="0" OriginY="0" RenderX="83" RenderY="244" />
+                <Frame XPos="308" YPos="531" Width="157" Height="252" OriginX="0" OriginY="0" RenderX="69" RenderY="232" />
+                <Frame XPos="462" YPos="526" Width="165" Height="264" OriginX="0" OriginY="0" RenderX="50" RenderY="248" />
+                <Frame XPos="624" YPos="524" Width="118" Height="263" OriginX="0" OriginY="0" RenderX="60" RenderY="250" />
+                <Frame XPos="627" YPos="524" Width="118" Height="263" OriginX="0" OriginY="0" RenderX="57" RenderY="250" />
+                <Frame XPos="581" YPos="0" Width="100" Height="265" OriginX="0" OriginY="0" RenderX="60" RenderY="248" />
+                <Frame XPos="686" YPos="0" Width="125" Height="267" OriginX="0" OriginY="0" RenderX="75" RenderY="254" />
+                <Frame XPos="805" YPos="0" Width="117" Height="271" OriginX="0" OriginY="0" RenderX="55" RenderY="257" />
+                <Frame XPos="705" YPos="267" Width="152" Height="255" OriginX="0" OriginY="0" RenderX="105" RenderY="243" />
+                <Frame XPos="858" YPos="268" Width="141" Height="264" OriginX="0" OriginY="0" RenderX="64" RenderY="245" />
+              </Frames>
+              <Events></Events>
+            </Animation>
+          </Animations>
+          <SpriteSheets>
+            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Base_Sword_Sheet.png" />
+          </SpriteSheets>
+        </Layer>
+        <Layer Name="Weapon">
+          <Animations>
+            <Animation Name="Weapon_Attack" ParentLayer="Weapon" ReferenceIndex="0">
+              <Frames>
+                <Frame XPos="27" YPos="112" Width="93" Height="59" OriginX="5" OriginY="163" RenderX="72" RenderY="39" />
+                <Frame XPos="43" YPos="118" Width="79" Height="51" OriginX="8" OriginY="160" RenderX="56" RenderY="32" />
+                <Frame XPos="460" YPos="91" Width="248" Height="51" OriginX="94" OriginY="136" RenderX="198" RenderY="2" />
+                <Frame XPos="459" YPos="141" Width="441" Height="77" OriginX="143" OriginY="138" RenderX="318" RenderY="11" />
+                <Frame XPos="0" YPos="196" Width="408" Height="173" OriginX="20" OriginY="100" RenderX="166" RenderY="72" />
+                <Frame XPos="721" YPos="80" Width="98" Height="57" OriginX="17" OriginY="100" RenderX="85" RenderY="42" />
+                <Frame XPos="903" YPos="143" Width="73" Height="68" OriginX="16" OriginY="96" RenderX="60" RenderY="52" />
+                <Frame XPos="410" YPos="221" Width="106" Height="133" OriginX="100" OriginY="148" RenderX="2" RenderY="114" />
+                <Frame XPos="822" YPos="83" Width="170" Height="49" OriginX="40" OriginY="174" RenderX="12" RenderY="10" />
+                <Frame XPos="522" YPos="223" Width="100" Height="52" OriginX="6" OriginY="155" RenderX="76" RenderY="28" />
+                <Frame XPos="521" YPos="283" Width="94" Height="56" OriginX="4" OriginY="164" RenderX="70" RenderY="38" />
+              </Frames>
+              <Events></Events>
+            </Animation>
+          </Animations>
+          <SpriteSheets>
+            <SpriteSheet Path="C:\Users\Antonio\Documents\createst\AnimationTesting\AnimationTesting_Game\Content\Animations\Sword_Sheet.png" />
+          </SpriteSheets>
+        </Layer>
+      </Layers>
+    </AnimationState>
+  </AnimationStates>
+</AnimationStateMachine>

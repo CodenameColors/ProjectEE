@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SpriteSheet SheetName="Testing_Sheet" File="{Content}\Animations\Sword_Sheet.png" AnimationCount="4" Width="1000" Height="1000">
+  <AnimationStates>
+    <AnimationState Name="Idle" NumOfFrames="4">
+      <SubLayers>
+        <Layer Name="" />
+      </SubLayers>
+      <Frame X="0" Y="0" W="119" H="80" RX="95" RY="60" CX="0" CY="162" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\weapon_bt_sword_idle_0000.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+      <Frame X="122" Y="0" W="122" H="81" RX="97" RY="60" CX="0" CY="163" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\weapon_bt_sword_idle_0001.png">
+        <SubLayerPoints LayerName="" RX="50" RY="0" />
+      </Frame>
+      <Frame X="249" Y="0" W="124" H="85" RX="100" RY="65" CX="0" CY="158" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\weapon_bt_sword_idle_0002.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+      <Frame X="376" Y="0" W="124" H="85" RX="98" RY="64" CX="0" CY="159" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\weapon_bt_sword_idle_0003.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+    </AnimationState>
+    <AnimationState Name="Starting_Defense" NumOfFrames="4">
+      <SubLayers>
+        <Layer Name="" />
+      </SubLayers>
+      <Frame X="495" Y="0" W="225" H="90" RX="96" RY="65" CX="0" CY="154" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\Weapon_Sword_defense_0000_0000.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+      <Frame X="721" Y="0" W="229" H="75" RX="98" RY="55" CX="0" CY="168" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\Weapon_Sword_defense_0000_0001.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+      <Frame X="0" Y="80" W="233" H="90" RX="99" RY="70" CX="0" CY="155" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\Weapon_Sword_defense_0000_0002.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+      <Frame X="234" Y="82" W="223" H="114" RX="102" RY="92" CX="0" CY="137" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\Weapon_Sword_defense_0000_0003.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+    </AnimationState>
+    <AnimationState Name="Looping_Defense" NumOfFrames="1">
+      <SubLayers>
+        <Layer Name="" />
+      </SubLayers>
+      <Frame X="233" Y="81" W="224" H="114" RX="102" RY="93" CX="0" CY="137" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\Weapon_Sword_defense_0000_0004.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+    </AnimationState>
+    <AnimationState Name="Attack" NumOfFrames="11">
+      <SubLayers>
+        <Layer Name="" />
+      </SubLayers>
+      <Frame X="27" Y="112" W="93" H="59" RX="72" RY="39" CX="0" CY="182" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\weapon_sword_attack_0000.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+      <Frame X="43" Y="118" W="79" H="51" RX="56" RY="32" CX="0" CY="188" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\weapon_sword_attack_0001.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+      <Frame X="460" Y="91" W="248" H="51" RX="198" RY="2" CX="0" CY="208" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\weapon_sword_attack_0002.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+      <Frame X="459" Y="141" W="441" H="77" RX="318" RY="11" CX="8" CY="185" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\weapon_sword_attack_0003.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+      <Frame X="0" Y="196" W="408" H="173" RX="166" RY="72" CX="41" CY="93" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\weapon_sword_attack_0004.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+      <Frame X="721" Y="80" W="98" H="57" RX="85" RY="42" CX="121" CY="121" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\weapon_sword_attack_0005.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+      <Frame X="903" Y="143" W="73" H="68" RX="60" RY="52" CX="146" CY="102" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\weapon_sword_attack_0006.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+      <Frame X="410" Y="221" W="106" H="133" RX="2" RY="114" CX="254" CY="96" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\weapon_sword_attack_0007.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+      <Frame X="822" Y="83" W="170" H="49" RX="12" RY="10" CX="166" CY="217" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\weapon_sword_attack_0008.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+      <Frame X="522" Y="223" W="100" H="52" RX="76" RY="28" CX="0" CY="190" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\weapon_sword_attack_0009.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+      <Frame X="521" Y="283" W="94" H="56" RX="70" RY="38" CX="0" CY="183" Path="{Content}\Animations\ImageSources\Testing_Sheet_Sheet\weapon_sword_attack_0010.png">
+        <SubLayerPoints LayerName="" RX="0" RY="0" />
+      </Frame>
+    </AnimationState>
+  </AnimationStates>
+</SpriteSheet>

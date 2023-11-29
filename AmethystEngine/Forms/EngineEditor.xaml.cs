@@ -980,8 +980,96 @@ namespace AmethystEngine.Forms
 						EditorProjectContentDirectory + "ContentBuilderSettings.config",
 						ProjectFilePath.Replace(".gem", "_Game\\Content\\Content.mgcb"));
 				}
+				else if (DirectoryInPath(ProjectDirectory, "Animations"))
+				{
+					//	This can be multiple things. 
+					//		One an image (the actual spritesheet)
+					//		Two the spritesheet file (holds positions and order data)
+					//		Three the Animation state machine file (holds animation linking data)
 
+					String filter = "SpriteSheet|*.spritesheet|animation state machine|*.animachine|PNG|*.png";
+					Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog
+					{
+						
 
+						FileName = "Images", //default file 
+						Title = "Import and build new animation file",
+						DefaultExt = "Sprite Sheet (*.png)|*.png", //default file extension
+						Filter = filter
+					};
+
+					// Show save file dialog box
+					Nullable<bool> result = dlg.ShowDialog();
+					// Process save file dialog box results kicks out if the user doesn't select an item.
+					String importfilename, destfilename = "";
+					if (result == true)
+					{
+						importfilename = dlg.FileName;
+					}
+					else return;
+
+					// What type of file did we import?
+					String editorCopyDirectory = ProjectDirectory.Replace(MonoGameProjectContentDirectory, EditorProjectContentDirectory);
+					String finalBinaryDirectory = ProjectDirectory;
+
+					if (Path.GetExtension(importfilename).ToLower() == ".png")
+					{
+						EngineOutputLog.AddLogItem("Dolomite starting import of a PNG file");
+
+						_monoGameContentBuilder.AttemptToBuildPNGToXNBFile(
+							importfilename,
+							editorCopyDirectory,
+							finalBinaryDirectory,
+							EditorProjectContentDirectory + "ContentBuilderSettings.config",
+							ProjectFilePath.Replace(".gem", "_Game\\Content\\Content.mgcb"));
+
+						EngineOutputLog.AddLogItem("Dolomite finshed importing of a PNG file");
+					}
+					else if (Path.GetExtension(importfilename).ToLower() == ".spritesheet")
+					{
+						EngineOutputLog.AddLogItem("Dolomite starting import of a sprite sheet file");
+						try
+						{
+							File.Copy(importfilename, String.Format("{0}/{1}", finalBinaryDirectory, Path.GetFileName(importfilename)));
+						}
+						catch (Exception ex)
+						{
+							EngineOutputLog.AddLogItem(ex.Message);
+						}
+						finally
+						{
+							EngineOutputLog.AddLogItem("Dolomite finished importing a sprite sheet file");
+						}
+					}
+					else if (Path.GetExtension(importfilename).ToLower() == ".animachine")
+					{
+						EngineOutputLog.AddLogItem("Dolomite starting import of a animation state machine file");
+						try
+						{
+							File.Copy(importfilename, String.Format("{0}/{1}", finalBinaryDirectory, Path.GetFileName(importfilename)));
+						}
+						catch (Exception ex)
+						{
+							EngineOutputLog.AddLogItem(ex.Message);
+						}
+						finally
+						{
+							EngineOutputLog.AddLogItem("Dolomite finished importing a animation state machine file");
+						}
+					}
+					else
+					{
+						EngineOutputLog.AddErrorLogItem(-2, "importer file extension given not valid for \"Animations\" sub folder type",
+						"Dolomite", true);
+						return;
+					}
+
+				}
+				else
+				{
+					EngineOutputLog.AddErrorLogItem(-1, "importer path not valid. you need to have a \"Content\" folder in the path as well as either \"Images\" || \"Animations\"",
+						"Dolomite", true);
+				}
 			}
 
 		}
