@@ -28,7 +28,8 @@ using Button = System.Windows.Controls.Button;
 using CheckBox = System.Windows.Controls.CheckBox;
 using Color = System.Windows.Media.Color;
 using ComboBox = System.Windows.Controls.ComboBox;
-using ContextMenu = System.Windows.Controls.ContextMenu;
+using // TODO ContextMenu is no longer supported. Use ContextMenuStrip instead. For more details see https://docs.microsoft.com/en-us/dotnet/core/compatibility/winforms#removed-controls
+ContextMenu = System.Windows.Controls.ContextMenu;
 using Control = System.Windows.Controls.Control;
 using Cursors = System.Windows.Input.Cursors;
 using Image = System.Windows.Controls.Image;
@@ -1882,17 +1883,19 @@ namespace AmethystEngine.Forms
 						}
 						else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "Background")
 						{
-							DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
-							TB.SelectedColorChanged += customCP_BackgroundColorChanged;
-							LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB, o.ToString());
+							// TODO: disabled because porting
+							//DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
+							//TB.SelectedColorChanged += customCP_BackgroundColorChanged;
+							//LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB, o.ToString());
 						}
 						else if (CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i] == "FontColor")
 						{
-							DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
-							TB.SelectedColorChanged += customCP_FontColorChanged;
-							LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB, o.ToString());
-						}
-						else
+                            // TODO: disabled because porting
+                            //DropDownCustomColorPicker.CustomColorPicker TB = new DropDownCustomColorPicker.CustomColorPicker();
+                            //TB.SelectedColorChanged += customCP_FontColorChanged;
+                            //LB.AddProperty(CurrentUIDictionary[SelectedUIControl.Name].GetProperties().Select(m => m.Item1).ToList()[i], TB, o.ToString());
+                        }
+                        else
 						{
 							TextBox TB = new TextBox();
 							TB.KeyDown += UIPropertyCallback;

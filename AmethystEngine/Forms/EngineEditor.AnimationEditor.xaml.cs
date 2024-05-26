@@ -16,7 +16,7 @@ using System.Windows.Media.Imaging;
 using AmethystEngine.Components;
 using BixBite.Rendering;
 using BixBite.Rendering.Animation;
-using Microsoft.Build.BuildEngine;
+//using Microsoft.Build.BuildEngine;
 using Image = System.Windows.Controls.Image;
 
 namespace AmethystEngine.Forms

@@ -20,7 +20,7 @@ def copy_files_recrusively(src, dest):
 print('Starting Node Editor Build Script --  {}'.format((__file__)))
 
 # we need to get all the files from Bixbite, and copy them to NodeEditor/Bixbite_windows
-output_path = '{}{}'.format(os.getcwd(), "\\..\\..\\..\\NodeEditor\\NodeEditor_Windows\\")
+output_path = '{}{}'.format(os.getcwd(), "\\..\\..\\..\\..\\NodeEditor\\NodeEditor_Windows\\")
 
 if (output_path.find("MonogameTesting") == -1):
     print('Exiting script --  {}  Reason: not needed for non monogame testing projects'.format((__file__)))
@@ -36,8 +36,8 @@ if os.path.exists(output_path) and os.path.isdir(output_path):
 # os.makedirs('{}{}'.format(output_path, "\\Resources"))
 
 # step 3. Copy all the bixbite files.
-copy_files_recrusively('{}{}'.format(os.getcwd(), "\\..\\..\\..\\Bixbite\\NodeEditor\\"), output_path)
-copy_files_recrusively('{}{}'.format(os.getcwd(), "\\..\\..\\..\\Bixbite\\Resources"), '{}{}'.format(output_path, "Resources"))
+copy_files_recrusively('{}{}'.format(os.getcwd(), "\\..\\..\\..\\..\\Bixbite\\NodeEditor\\"), output_path)
+copy_files_recrusively('{}{}'.format(os.getcwd(), "\\..\\..\\..\\..\\Bixbite\\Resources"), '{}{}'.format(output_path, "Resources"))
 
 
 print('End of Node Editor Build Script --  {}'.format((__file__)))

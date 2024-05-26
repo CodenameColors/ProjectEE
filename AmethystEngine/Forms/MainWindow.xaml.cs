@@ -32,11 +32,22 @@ namespace AmethystEngine.Forms
 		private void LoadRecentProjectsToMainWindow()
 		{
 			//String pathString = System.Environment.CurrentDirectory + "\\rpj.txt";
-			String pathString = String.Format("{0}/AmethystEngine/{1}", Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
+			String pathString = String.Format("{0}\\AmethystEngine\\{1}", 
+                Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData),
 				"rpj.txt");
-			List<String> EditedOutputList = new List<string>();
+
+            String folderPath = String.Format("{0}\\AmethystEngine",
+                Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData));
+
+
+            List <String> EditedOutputList = new List<string>();
 			if (!System.IO.File.Exists(pathString))
 			{
+                if (!System.IO.Directory.Exists(folderPath))
+                {
+                    System.IO.Directory.CreateDirectory(folderPath);
+                }
+
 				using (System.IO.FileStream fs = System.IO.File.Create(pathString))
 				{
 
