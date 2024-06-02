@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AmethystEngine": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

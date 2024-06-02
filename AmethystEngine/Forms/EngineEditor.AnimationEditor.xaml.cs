@@ -1456,7 +1456,7 @@ namespace AmethystEngine.Forms
 						CurrentActiveAnimationName_TB.Text = animationState.StateName;
 						CurrentActiveAnimationFPS_TB.Text = animationState.FPS.ToString();
 						CurrentActiveAnimationCurrentFrame_TB.Text = "1";
-						CurrentBaseLayerAnimation_Img.Tag = 1;
+						CurrentBaseLayerAnimation_Img.Tag = 0;
 						CurrentlySelectedAnimationState = animationState;
 					}
 				}

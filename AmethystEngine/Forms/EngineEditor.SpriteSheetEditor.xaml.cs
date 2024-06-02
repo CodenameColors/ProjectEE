@@ -1057,8 +1057,26 @@ namespace AmethystEngine.Forms
 						Image image = new Image();
 						image.Name = "cropped_image_preview";
 						BitmapImage bitmap = new BitmapImage(new Uri(frame.ImageLocation));
-						CroppedBitmap croppedBitmap = new CroppedBitmap(bitmap,
-							new Int32Rect(frame.CropX, frame.CropY, (int)frame.W, (int)frame.H));
+						CroppedBitmap croppedBitmap = null;
+
+                        // Have we scaled up the image, we can't crop a scaled image yet...
+                        if (frame.W > bitmap.Width || frame.H > bitmap.Height)
+						{
+							// what is the scale
+							float sx = (float)bitmap.Width / frame.W;
+							float sy = (float)bitmap.Height / frame.H;
+
+                            croppedBitmap = new CroppedBitmap(bitmap,
+                            new Int32Rect((int)(frame.CropX * sx), (int)(frame.CropY * sy), (int)bitmap.Width, (int)bitmap.Height));
+
+
+                        }
+                        else
+						{
+                            croppedBitmap = new CroppedBitmap(bitmap,
+                            new Int32Rect(frame.CropX, frame.CropY, (int)frame.W, (int)frame.H));
+                        }
+
 						image.Source = croppedBitmap;
 						image.Width = frame.W;
 						image.Height = frame.H;

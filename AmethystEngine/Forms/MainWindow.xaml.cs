@@ -88,7 +88,7 @@ namespace AmethystEngine.Forms
 					{
 						foreach (String ss in EditedOutputList)
 						{
-							fs.Write((byte[])new UTF8Encoding(true).GetBytes(ss.ToString()), 0, ss.Length + 1);
+							fs.Write((byte[])new UTF8Encoding(true).GetBytes(ss.ToString()), 0, ss.Length);
 						}
 					}
 					continue;
