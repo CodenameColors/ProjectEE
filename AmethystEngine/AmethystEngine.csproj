@@ -234,6 +234,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Build" Version="17.10.4" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.0.1641" />
     <PackageReference Include="MonoGame.Framework.WpfInterop" Version="1.9.2" />
     <PackageReference Include="SharpDX" Version="4.0.1" />

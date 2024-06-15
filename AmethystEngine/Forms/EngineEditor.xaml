@@ -572,8 +572,7 @@
 
 										<Grid MinWidth="170" Loaded="AnimationChangeEventItem_Loaded"
 								      MouseLeave="AnimationPreviewThumbnail_Image_Leave" 
-								      MouseEnter="AnimationPreviewThumbnail_EVENT_Image_Enter"
-								>
+								      MouseEnter="AnimationPreviewThumbnail_EVENT_Image_Enter">
 											<Grid.RowDefinitions>
 												<RowDefinition Height="20"/>
 												<RowDefinition Height="25"/>
